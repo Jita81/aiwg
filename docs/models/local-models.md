@@ -82,6 +82,8 @@ ollama --version
 | General reasoning (budget) | llama3.1:8b | ~5GB | 6GB |
 | Fast summaries (haiku-tier) | llama3.2:3b | ~2GB | 4GB |
 | Code completion | qwen2.5-coder:14b | ~9GB | 12GB |
+| Code + reasoning (community) | qwen3.5:9b | ~6GB | 8GB |
+| Instruction following (community) | hermes-3-llama-3.1:8b | ~5GB | 6GB |
 
 ```bash
 # Pull models
@@ -421,8 +423,57 @@ export OLLAMA_MAX_LOADED_MODELS=2
 
 ---
 
+## Community Validated Setups
+
+The following setups have been tested and reported working by community members.
+
+### Qwen 3.5:9B on Ollama
+
+- **Model**: `qwen3.5:9b`
+- **Backend**: Ollama
+- **Tier mapping**: sonnet
+- **Strengths**: Strong coding quality, good tool use support, solid structured output
+- **Limitations**: Reasoning quality degrades on multi-step planning tasks; SDLC workflow support is partial
+- **VRAM**: ~6GB (default quantization), 8GB recommended
+- **Configuration**:
+
+```json
+{
+  "shorthand": {
+    "sonnet": "qwen3.5:9b",
+    "haiku": "llama3.2:3b"
+  }
+}
+```
+
+### Hermes 3 (Llama 3.1 8B) on Ollama
+
+- **Model**: `hermes-3-llama-3.1:8b`
+- **Backend**: Ollama
+- **Tier mapping**: haiku
+- **Strengths**: Good instruction following, reliable tool use, consistent output formatting
+- **Limitations**: Limited multi-step planning, not recommended for SDLC orchestration workflows
+- **VRAM**: ~5GB (default quantization), 6GB recommended
+- **Configuration**:
+
+```json
+{
+  "shorthand": {
+    "haiku": "hermes-3-llama-3.1:8b"
+  }
+}
+```
+
+For the full compatibility matrix and more community-tested models, see [Supported Models](supported-models.md).
+
+To contribute your own model test results, see [Community Model Testing Guide](../contributing/model-testing.md).
+
+---
+
 ## See Also
 
+- [Supported Models](supported-models.md) — Full compatibility matrix for all tested models
+- [Community Model Testing](../contributing/model-testing.md) — How to submit test results
 - `docs/models/hybrid-architectures.md` — Routing between local and cloud models
 - `docs/models/gpt-optimization.md` — OpenAI-compatible API patterns
 - `docs/integrations/codex-quickstart.md` — Codex CLI setup

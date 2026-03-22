@@ -42,6 +42,10 @@ See [Testing Requirements](docs/contributing/testing-requirements.md) for:
 - Test categories and coverage thresholds
 - PR requirements checklist
 
+## Model Testing
+
+Tested a local model with AIWG? We want to hear about it. See [Community Model Testing Guide](docs/contributing/model-testing.md) for how to submit your setup and results to the supported models list.
+
 ## Scope
 
 - SDLC framework: `agentic/code/frameworks/sdlc-complete/`
