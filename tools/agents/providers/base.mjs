@@ -338,13 +338,14 @@ export function deployFiles(files, destDir, opts, transformFn) {
     seen.add(dest);
   }
 
+  const verbose = opts.verbose !== false;
   for (const a of actions) {
     if (a.type === 'deploy') {
       if (dryRun) console.log(`[dry-run] deploy ${a.src} -> ${a.dest} (${a.reason})`);
       else writeFile(a.dest, a.content, false);
-      console.log(`deployed ${path.basename(a.src)} -> ${path.relative(process.cwd(), a.dest)} (${a.reason})`);
+      if (verbose) console.log(`deployed ${path.basename(a.src)} -> ${path.relative(process.cwd(), a.dest)} (${a.reason})`);
     } else if (a.type === 'skip') {
-      console.log(`skip (${a.reason}): ${path.basename(a.dest)}`);
+      if (verbose) console.log(`skip (${a.reason}): ${path.basename(a.dest)}`);
     }
   }
 
@@ -356,6 +357,7 @@ export function deployFiles(files, destDir, opts, transformFn) {
  */
 export function deploySkillDir(skillDir, destDir, opts) {
   const { force = false, dryRun = false } = opts;
+  const verbose = opts.verbose !== false;
   const skillName = path.basename(skillDir);
   const destSkillDir = path.join(destDir, skillName);
 
@@ -376,7 +378,7 @@ export function deploySkillDir(skillDir, destDir, opts) {
         if (fs.existsSync(destPath)) {
           const destContent = fs.readFileSync(destPath, 'utf8');
           if (destContent === srcContent && !force) {
-            console.log(`skip (unchanged): ${path.relative(destDir, destPath)}`);
+            if (verbose) console.log(`skip (unchanged): ${path.relative(destDir, destPath)}`);
             continue;
           }
         }
@@ -385,14 +387,14 @@ export function deploySkillDir(skillDir, destDir, opts) {
           console.log(`[dry-run] deploy ${srcPath} -> ${destPath}`);
         } else {
           fs.writeFileSync(destPath, srcContent, 'utf8');
-          console.log(`deployed ${entry.name} -> ${path.relative(process.cwd(), destPath)}`);
+          if (verbose) console.log(`deployed ${entry.name} -> ${path.relative(process.cwd(), destPath)}`);
         }
       }
     }
   }
 
   copyRecursive(skillDir, destSkillDir);
-  console.log(`deployed skill: ${skillName}`);
+  if (verbose) console.log(`deployed skill: ${skillName}`);
 }
 
 // ============================================================================

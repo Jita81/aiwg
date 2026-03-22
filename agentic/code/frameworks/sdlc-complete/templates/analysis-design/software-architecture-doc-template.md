@@ -73,8 +73,15 @@ Describe the architectural baseline, including views, decisions, and rationale t
     - Reference coding standards, patterns, and integration expectations.
 11. **Outstanding Issues**
     - Document open questions, experiments, or pending validations.
-12. **Appendices**
-    - Include diagrams, ADR references, glossary terms.
+12. **Diagrams**
+    - **C4 Context Diagram** (required): Show system boundaries and external actors using PlantUML C4.
+    - **C4 Container Diagram** (required): Show major containers (web app, API, database, etc.) and their interactions.
+    - **Component Diagram** (required): Show internal components of the primary container(s).
+    - Include MermaidJS or PlantUML source in fenced code blocks. Commit source alongside any rendered images.
+    - Each diagram should answer a specific architectural question (e.g., "What are the system boundaries?" or "How do containers communicate?").
+    - See @agentic/code/addons/aiwg-utils/rules/diagram-generation.md for tool selection guidance.
+13. **Appendices**
+    - ADR references, glossary terms, additional supporting material.
 
 ## Agent Notes
 

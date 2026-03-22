@@ -357,6 +357,14 @@ Should have been (in framework source):
 
 **The fix**: Framework schemas, templates, and docs belong in `agentic/code/frameworks/{framework}/` or `agentic/code/addons/{addon}/`. Project-local artifacts (requirements, architecture docs, test plans generated during development) belong in `.aiwg/`.
 
+### The Incomplete Docset Anti-Pattern
+
+Another common pattern: agents silently skip or abbreviate SDLC artifacts based on inferred project characteristics ("this is a small utility, no need for a full SAD" or "skip threat model for a CLI tool"). This produces inconsistent, incomplete artifact sets.
+
+**The rule**: **Completeness is the default; incompleteness requires explicit user consent.** No artifact should be omitted based on project type, size, complexity, or agent inference. If an artifact doesn't fully apply, generate it with appropriate scope notes — don't skip it.
+
+Agents MAY suggest an artifact is low-value for the project context, but MUST surface a HITL gate asking the user to confirm the skip. Silent omission is prohibited. See `hitl-gates.md` Rule 8 for the gate schema.
+
 ## Creation Guides by Type
 
 | Creating... | Detailed Guide | Key Files |
@@ -446,6 +454,54 @@ Use this checklist for every new component. Not all items apply to every type �
 - [ ] `aiwg use sdlc` deploys without errors
 - [ ] Component appears in deployed platform folder
 - [ ] Command/skill/agent is invocable after deployment
+
+## Context Loading Best Practices for CLAUDE.md
+
+Claude Code automatically reads and loads into context any files directly @-linked from `CLAUDE.md` (or `AGENTS.md`) at session start. This is powerful but must be used carefully — large documents linked directly from `CLAUDE.md` consume significant context budget on every session, even when irrelevant to the current task.
+
+### The Layered Linking Strategy
+
+Use a **two-tier approach**: `CLAUDE.md` links to short indices and summaries, which in turn contain @-links to full documents that agents follow on demand.
+
+**Bad** — loads ~9,000 lines of rule files on every session:
+```md
+## Rules
+@agentic/code/frameworks/sdlc-complete/rules/anti-laziness.md
+@agentic/code/frameworks/sdlc-complete/rules/token-security.md
+@agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md
+... (31 more files)
+```
+
+**Good** — loads ~200-line index; agents follow links as needed:
+```md
+## Rules
+@agentic/code/frameworks/sdlc-complete/rules/RULES-INDEX.md
+```
+
+### Guidelines
+
+| Principle | Description |
+|-----------|-------------|
+| **Link indices, not documents** | `CLAUDE.md` should reference `RULES-INDEX.md`, `README.md`, or similar summaries — never individual rule/template/guide files |
+| **Keep direct links under 500 lines total** | All files @-linked from `CLAUDE.md` should sum to under ~500 lines of loaded context |
+| **Use on-demand loading** | Indices contain @-links to full documents; agents load these only when the topic is relevant to their current task |
+| **Large references go in agent definitions** | Agent-specific documentation belongs in agent `.md` files (loaded only when that agent is spawned), not in `CLAUDE.md` |
+| **Template variables over @-links** | In CLAUDE.md templates shipped to users, prefer `$AIWG_ROOT/path` references (not auto-loaded) over `@path` references (auto-loaded) for large files |
+
+### When Developing CLAUDE.md Templates
+
+When creating or updating CLAUDE.md templates in `agentic/code/frameworks/*/templates/`:
+
+1. **Audit @-links** — count the total lines that would be auto-loaded at session start
+2. **Replace large @-links** with references to index files or use `$AIWG_ROOT` path variables
+3. **Test context impact** — deploy the template and verify session startup doesn't load excessive context
+
+### Existing Example
+
+The `RULES-INDEX.md` pattern is the canonical example of layered linking done right:
+- `CLAUDE.md` links to `@.claude/rules/RULES-INDEX.md` (~200 lines)
+- `RULES-INDEX.md` contains summaries + @-links to 35 individual rule files (~9,300 lines total)
+- Agents load individual rules on-demand when the topic is relevant
 
 ## Platform Deployment
 

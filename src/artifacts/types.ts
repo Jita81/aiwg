@@ -181,18 +181,25 @@ export const INDEX_DIR = '.aiwg/.index';
 export const INDEX_VERSION = '1.0.0';
 
 /**
- * Graph types for multi-graph index architecture
+ * Built-in graph type identifiers
  *
- * @implements #421
+ * @implements #421 #426
  */
-export type GraphType = 'framework' | 'project' | 'codebase';
+export type BuiltinGraphType = 'framework' | 'project' | 'codebase';
+
+/**
+ * Any graph identifier — built-in or user-defined via .aiwg/config.yaml
+ *
+ * @implements #426
+ */
+export type GraphType = string;
 
 /**
  * Graph configuration — defines what each graph indexes
  */
 export interface GraphConfig {
   /** Graph type identifier */
-  type: GraphType;
+  type: string;
 
   /** Directories to scan (relative to project/framework root) */
   scanDirs: string[];
@@ -202,31 +209,107 @@ export interface GraphConfig {
 
   /** Whether this graph is shared across projects */
   shared: boolean;
+
+  /** Whether to include in default `aiwg index build` (no --graph flag) */
+  defaultBuild: boolean;
 }
 
 /**
- * Graph definitions
+ * Built-in graph definitions
  */
-export const GRAPH_CONFIGS: Record<GraphType, GraphConfig> = {
+export const BUILTIN_GRAPH_CONFIGS: Record<BuiltinGraphType, GraphConfig> = {
   framework: {
     type: 'framework',
     scanDirs: ['agentic/code/frameworks', 'agentic/code/addons', 'agentic/code/agents', 'docs'],
     extensions: ['.md', '.yaml', '.json'],
     shared: true,
+    defaultBuild: false, // Explicitly requested via --graph framework
   },
   project: {
     type: 'project',
     scanDirs: ['.aiwg'],
     extensions: ['.md', '.yaml', '.json'],
     shared: false,
+    defaultBuild: true,
   },
   codebase: {
     type: 'codebase',
     scanDirs: ['src', 'test', 'tools'],
     extensions: ['.ts', '.mts', '.js', '.mjs', '.json', '.yaml'],
     shared: false,
+    defaultBuild: true,
   },
 };
+
+/**
+ * Mutable graph configs — starts with built-ins, extended by user config
+ *
+ * @implements #426
+ */
+export const GRAPH_CONFIGS: Record<string, GraphConfig> = { ...BUILTIN_GRAPH_CONFIGS };
+
+/**
+ * Load user-defined graph configs from .aiwg/config.yaml
+ *
+ * Merges user graphs into GRAPH_CONFIGS. User graphs cannot override built-in names.
+ *
+ * @param cwd - Project root directory
+ * @returns Names of user-defined graphs that were loaded
+ *
+ * @implements #426
+ */
+export function loadUserGraphConfigs(cwd: string): string[] {
+  const configPath = `${cwd}/.aiwg/config.yaml`;
+  const loaded: string[] = [];
+
+  try {
+    const fs = await_fs();
+    if (!fs.existsSync(configPath)) return loaded;
+
+    const { load } = await_yaml();
+    const content = fs.readFileSync(configPath, 'utf-8');
+    const config = load(content) as Record<string, unknown> | null;
+    if (!config || typeof config !== 'object') return loaded;
+
+    const indexConfig = config.index as Record<string, unknown> | undefined;
+    if (!indexConfig || typeof indexConfig !== 'object') return loaded;
+
+    const graphs = indexConfig.graphs as Record<string, unknown> | undefined;
+    if (!graphs || typeof graphs !== 'object') return loaded;
+
+    for (const [name, def] of Object.entries(graphs)) {
+      if (name in BUILTIN_GRAPH_CONFIGS) {
+        // Cannot override built-in graph names
+        continue;
+      }
+      const graphDef = def as Record<string, unknown>;
+      if (!Array.isArray(graphDef.scanDirs)) continue;
+
+      GRAPH_CONFIGS[name] = {
+        type: name,
+        scanDirs: graphDef.scanDirs as string[],
+        extensions: Array.isArray(graphDef.extensions) ? graphDef.extensions as string[] : ['.md', '.yaml', '.json'],
+        shared: graphDef.shared === true,
+        defaultBuild: graphDef.defaultBuild !== false, // Default true for user graphs
+      };
+      loaded.push(name);
+    }
+  } catch {
+    // Config loading is best-effort
+  }
+
+  return loaded;
+}
+
+// Lazy imports to avoid circular dependency issues at module load time
+function await_fs(): typeof import('fs') {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  return require('fs');
+}
+function await_yaml(): { load: (s: string) => unknown } {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  return require('js-yaml');
+}
 
 /**
  * Get the index output directory for a given graph type

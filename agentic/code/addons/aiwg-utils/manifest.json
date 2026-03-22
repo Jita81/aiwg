@@ -71,6 +71,14 @@
   "skills": [
     "project-awareness"
   ],
+  "rules": [
+    "agent-deployment",
+    "context-budget",
+    "instruction-comprehension",
+    "research-before-decision",
+    "subagent-scoping",
+    "diagram-generation"
+  ],
   "templates": [
     "devkit/addon-manifest",
     "devkit/framework-manifest",

@@ -18,14 +18,18 @@
  */
 
 import type { GraphType } from './types.js';
+import { GRAPH_CONFIGS, loadUserGraphConfigs } from './types.js';
 
 /** Parse --graph flag from args, returns undefined for "all graphs" */
 function parseGraphFlag(args: string[]): GraphType | undefined {
   const idx = args.indexOf('--graph');
   if (idx === -1 || idx + 1 >= args.length) return undefined;
   const val = args[idx + 1];
-  if (val === 'framework' || val === 'project' || val === 'codebase') return val;
-  console.error(`Error: Invalid graph type '${val}'. Valid: framework, project, codebase`);
+  // Load user-defined graphs so validation is complete
+  loadUserGraphConfigs(process.cwd());
+  if (val in GRAPH_CONFIGS) return val;
+  const validNames = Object.keys(GRAPH_CONFIGS).join(', ');
+  console.error(`Error: Invalid graph type '${val}'. Valid: ${validNames}`);
   process.exit(1);
 }
 
@@ -63,10 +67,12 @@ export async function main(args: string[]): Promise<void> {
       console.log('  stats   Show index statistics');
       console.log('');
       console.log('Options:');
-      console.log('  --graph <type>  Target a specific graph (framework, project, codebase)');
+      console.log('  --graph <type>  Target a specific graph (framework, project, codebase, or user-defined)');
+      console.log('  --all           Build all known graphs (including user-defined)');
       console.log('');
       console.log('Examples:');
       console.log('  aiwg index build');
+      console.log('  aiwg index build --all');
       console.log('  aiwg index build --graph codebase --force');
       console.log('  aiwg index query "authentication" --type use-case');
       console.log('  aiwg index query "security rules" --graph framework --json');
@@ -95,6 +101,7 @@ async function handleBuild(args: string[]): Promise<void> {
 
   const force = args.includes('--force');
   const verbose = args.includes('--verbose');
+  const all = args.includes('--all');
   const graph = parseGraphFlag(args);
 
   let scope: string | undefined;
@@ -103,13 +110,24 @@ async function handleBuild(args: string[]): Promise<void> {
     scope = args[scopeIdx + 1];
   }
 
+  // Load user-defined graphs
+  loadUserGraphConfigs(cwd);
+
   if (graph) {
     // Build a specific graph
     await buildIndex(cwd, { force, verbose, scope, graph });
+  } else if (all) {
+    // Build all known graphs
+    for (const name of Object.keys(GRAPH_CONFIGS)) {
+      await buildIndex(cwd, { force, verbose, graph: name });
+    }
   } else {
-    // Default: build project-local graphs only
-    await buildIndex(cwd, { force, verbose, scope, graph: 'project' });
-    await buildIndex(cwd, { force, verbose, graph: 'codebase' });
+    // Default: build graphs with defaultBuild=true
+    for (const [name, config] of Object.entries(GRAPH_CONFIGS)) {
+      if (config.defaultBuild) {
+        await buildIndex(cwd, { force, verbose, scope: name === Object.keys(GRAPH_CONFIGS)[0] ? scope : undefined, graph: name });
+      }
+    }
   }
 }
 

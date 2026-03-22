@@ -182,6 +182,7 @@ All flow commands support:
 6. **Guidance First**: Use `--guidance` or `--interactive` upfront
 7. **Parallel Execution**: Launch independent agents in single message
 8. **Wire-As-You-Go**: Include @-mentions in ALL generated artifacts (see `.claude/rules/mention-wiring.md`)
+9. **Complete Docset by Default**: Never silently skip or abbreviate artifacts based on inferred project type, size, or complexity. If an artifact seems low-value for the project context, surface a HITL gate asking the user to confirm the skip — never silently omit documentation. Completeness is the default; incompleteness requires explicit user consent.
 
 ## Phase Overview
 

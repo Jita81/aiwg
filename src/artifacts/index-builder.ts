@@ -15,7 +15,7 @@ import path from 'path';
 import { createHash } from 'crypto';
 import { load as loadYaml } from 'js-yaml';
 import type { MetadataEntry, ArtifactIndex, TagIndex, DependencyGraph, GraphType } from './types.js';
-import { INDEX_VERSION, INDEX_DIR, PHASE_DIRECTORIES, GRAPH_CONFIGS } from './types.js';
+import { INDEX_VERSION, INDEX_DIR, PHASE_DIRECTORIES, GRAPH_CONFIGS, loadUserGraphConfigs } from './types.js';
 import { writeIndexFile, resolveIndexDir, loadGraphIndexFile } from './index-reader.js';
 
 export interface BuildOptions {
@@ -138,6 +138,9 @@ export async function buildIndex(
 ): Promise<void> {
   const { force = false, verbose = false, scope, outputDir, graph } = options;
   const startTime = Date.now();
+
+  // Ensure user-defined graphs are loaded
+  loadUserGraphConfigs(cwd);
 
   // Determine scan directories based on graph type
   const graphConfig = graph ? GRAPH_CONFIGS[graph] : undefined;

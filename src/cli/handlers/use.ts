@@ -104,6 +104,45 @@ const PROVIDER_PATHS: Record<string, { agents: string; skills: string; commands:
 };
 
 /**
+ * Framework-specific next steps guidance
+ */
+const NEXT_STEPS: Record<string, string[]> = {
+  sdlc: [
+    'Start a project:   aiwg sdlc-accelerate "Your project idea"',
+    'Check health:      aiwg doctor',
+    'View commands:     aiwg help',
+  ],
+  marketing: [
+    'Start a campaign:  /campaign-kickoff',
+    'Marketing intake:  /marketing-intake',
+    'Check health:      aiwg doctor',
+  ],
+  'media-curator': [
+    'Analyze artist:    /analyze-artist "Artist Name"',
+    'Find sources:      /find-sources "query"',
+    'Check health:      aiwg doctor',
+  ],
+  research: [
+    'Discover papers:   /research-discover "topic"',
+    'Research workflow:  /research-workflow',
+    'Check health:      aiwg doctor',
+  ],
+  all: [
+    'Start a project:   aiwg sdlc-accelerate "Your project idea"',
+    'Check health:      aiwg doctor',
+    'View commands:     aiwg help',
+  ],
+};
+
+function printNextSteps(framework: Framework): void {
+  const steps = NEXT_STEPS[framework] ?? NEXT_STEPS.sdlc;
+  console.log('Next steps:');
+  for (const step of steps) {
+    console.log(`  ${step}`);
+  }
+}
+
+/**
  * Use command handler
  *
  * Deploys framework agents, commands, and skills to the current project,
@@ -191,9 +230,16 @@ export class UseHandler implements CommandHandler {
     const mode = MODE_MAP[framework as Framework];
     const deployArgs = ['--mode', mode, '--deploy-commands', '--deploy-skills', '--deploy-rules', ...remainingArgs];
 
-    // Check if --no-utils was passed
+    // Check flags
     const skipUtils = remainingArgs.includes('--no-utils');
+    const verbose = remainingArgs.includes('--verbose') || remainingArgs.includes('-v');
     const filteredArgs = deployArgs.filter(a => a !== '--no-utils');
+
+    // Pass verbose through (add if not already present)
+    if (!verbose) {
+      // Default: quiet mode — suppress per-file output
+      // No --verbose flag needed, providers default to verbose=false when not passed
+    }
 
     // Extract provider and target from remainingArgs to pass to addon deployments
     const providerIdx = remainingArgs.findIndex(a => a === '--provider' || a === '--platform');
@@ -202,6 +248,9 @@ export class UseHandler implements CommandHandler {
     const target = targetIdx >= 0 && remainingArgs[targetIdx + 1] ? remainingArgs[targetIdx + 1] : process.cwd();
 
     // Deploy main framework
+    if (!verbose) {
+      console.log(`\nInstalling ${framework} framework...`);
+    }
     const runner = createScriptRunner(ctx.frameworkRoot);
     const mainResult = await runner.run('tools/agents/deploy-agents.mjs', filteredArgs);
 
@@ -213,11 +262,14 @@ export class UseHandler implements CommandHandler {
     const addonBaseArgs = ['--deploy-commands', '--deploy-skills', '--deploy-rules'];
     if (provider) addonBaseArgs.push('--provider', provider);
     if (target) addonBaseArgs.push('--target', target);
+    if (verbose) addonBaseArgs.push('--verbose');
 
     // Deploy aiwg-utils unless --no-utils
     if (!skipUtils) {
-      console.log('');
-      console.log('Deploying aiwg-utils addon...');
+      if (verbose) {
+        console.log('');
+        console.log('Deploying aiwg-utils addon...');
+      }
       const frameworkRoot = await getFrameworkRoot();
       const utilsSource = path.join(frameworkRoot, 'agentic/code/addons/aiwg-utils');
       const utilsResult = await runner.run('tools/agents/deploy-agents.mjs', [
@@ -232,8 +284,10 @@ export class UseHandler implements CommandHandler {
 
     // Deploy ralph addon (iterative execution loops)
     if (!skipUtils) {
-      console.log('');
-      console.log('Deploying ralph addon...');
+      if (verbose) {
+        console.log('');
+        console.log('Deploying ralph addon...');
+      }
       const frameworkRoot = await getFrameworkRoot();
       const ralphSource = path.join(frameworkRoot, 'agentic/code/addons/ralph');
       const ralphResult = await runner.run('tools/agents/deploy-agents.mjs', [
@@ -247,8 +301,10 @@ export class UseHandler implements CommandHandler {
     }
 
     // Register deployed extensions in the registry
-    console.log('');
-    console.log('Registering deployed extensions...');
+    if (verbose) {
+      console.log('');
+      console.log('Registering deployed extensions...');
+    }
     try {
       const registry = getRegistry();
       const paths = PROVIDER_PATHS[provider] || PROVIDER_PATHS.claude;
@@ -262,15 +318,23 @@ export class UseHandler implements CommandHandler {
         cwd: target,
       });
 
-      console.log('Extension registration complete');
+      if (verbose) console.log('Extension registration complete');
     } catch (error) {
       console.error('Warning: Failed to register extensions:', error instanceof Error ? error.message : String(error));
       // Don't fail the deployment if registration fails
     }
 
+    // Show completion summary and next steps (default mode only)
+    if (!verbose) {
+      const providerLabel = provider === 'claude' ? 'Claude Code' : provider;
+      console.log(`\nAIWG ${framework} framework installed (${providerLabel})`);
+      console.log('');
+      printNextSteps(framework as Framework);
+    }
+
     return {
       exitCode: 0,
-      message: `Successfully deployed ${framework} framework`,
+      message: verbose ? `Successfully deployed ${framework} framework` : '',
     };
   }
 }

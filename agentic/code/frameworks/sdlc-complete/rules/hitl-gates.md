@@ -255,6 +255,43 @@ notification:
     **Timeout**: {{timeout_remaining}}
 ```
 
+## Rule 8: Artifact Omission Requires Human Approval
+
+**REQUIRED**: Agents MUST NOT silently skip, abbreviate, or omit any SDLC artifact based on inferred project type, size, or complexity. Completeness is the default.
+
+When an agent determines an artifact is low-value for the project context, it MUST surface a HITL gate:
+
+```yaml
+artifact_omission_gate:
+  trigger:
+    type: agent_skip_request
+    artifact: "{{artifact_name}}"
+  behavior:
+    mode: ALWAYS
+    timeout_action: block
+  presentation:
+    summary_template: |
+      ## Artifact Omission Request
+
+      **Artifact**: {{artifact_name}}
+      **Phase**: {{current_phase}}
+      **Reason**: {{agent_rationale}}
+
+      The agent suggests this artifact may not be needed for this project.
+      However, completeness is the default — skipping requires your approval.
+
+    questions:
+      - id: "skip_approved"
+        question: "Skip generating {{artifact_name}}?"
+        options:
+          - "No — generate it (recommended)"
+          - "Yes — skip this artifact"
+          - "Generate abbreviated version"
+        required: true
+```
+
+**Rationale**: Implicit decisions to skip documentation based on project type inference produce inconsistent, incomplete artifact sets and erode trust. The human must explicitly opt out of any artifact.
+
 ## Checklist
 
 Before configuring a gate:

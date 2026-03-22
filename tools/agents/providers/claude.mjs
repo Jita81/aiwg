@@ -266,9 +266,13 @@ export async function deploy(opts) {
     dryRun
   } = opts;
 
-  console.log(`\n=== Claude Code Provider ===`);
-  console.log(`Target: ${target}`);
-  console.log(`Mode: ${mode}`);
+  const verbose = opts.verbose || false;
+
+  if (verbose) {
+    console.log(`\n=== Claude Code Provider ===`);
+    console.log(`Target: ${target}`);
+    console.log(`Mode: ${mode}`);
+  }
 
   // Collect source files based on mode
   const agentFiles = [];
@@ -343,15 +347,18 @@ export async function deploy(opts) {
   skillDirs.push(...frameworkArtifacts.skills);
   ruleFiles.push(...frameworkArtifacts.rules);
 
-  // Deploy based on flags
+  // Deploy based on flags — track counts for summary
+  const counts = { agents: 0, commands: 0, skills: 0, rules: 0 };
+
   if (!commandsOnly && !skillsOnly) {
     // Apply filters if specified
     const filteredAgents = filterAgentFiles(agentFiles, opts);
-    if (opts.filter || opts.filterRole) {
+    if (verbose && (opts.filter || opts.filterRole)) {
       console.log(`\nFiltered from ${agentFiles.length} to ${filteredAgents.length} agents`);
     }
-    console.log(`\nDeploying ${filteredAgents.length} agents...`);
+    if (verbose) console.log(`\nDeploying ${filteredAgents.length} agents...`);
     deployAgents(filteredAgents, target, opts);
+    counts.agents = filteredAgents.length;
   }
 
   // Filter commands that collide with skills (skills take precedence)
@@ -360,24 +367,39 @@ export async function deploy(opts) {
     : commandFiles;
 
   if (shouldDeployCommands || commandsOnly) {
-    console.log(`\nDeploying ${filteredCommands.length} commands...`);
+    if (verbose) console.log(`\nDeploying ${filteredCommands.length} commands...`);
     deployCommands(filteredCommands, target, opts);
+    counts.commands = filteredCommands.length;
   }
 
   if (shouldDeploySkills || skillsOnly) {
-    console.log(`\nDeploying ${skillDirs.length} skills...`);
+    if (verbose) console.log(`\nDeploying ${skillDirs.length} skills...`);
     deploySkills(skillDirs, target, opts);
+    counts.skills = skillDirs.length;
   }
 
   if (shouldDeployRules || rulesOnly) {
-    console.log(`\nDeploying ${ruleFiles.length} rules...`);
+    if (verbose) console.log(`\nDeploying ${ruleFiles.length} rules...`);
     deployRules(ruleFiles, target, opts);
+    counts.rules = ruleFiles.length;
   }
 
   // Post-deployment
   await postDeploy(target, opts);
 
-  console.log('\n=== Claude deployment complete ===\n');
+  if (verbose) {
+    console.log('\n=== Claude deployment complete ===\n');
+  } else {
+    // Clean summary output
+    const parts = [];
+    if (counts.agents > 0) parts.push(`${counts.agents} agents`);
+    if (counts.commands > 0) parts.push(`${counts.commands} commands`);
+    if (counts.skills > 0) parts.push(`${counts.skills} skills`);
+    if (counts.rules > 0) parts.push(`${counts.rules} rules`);
+    if (parts.length > 0) {
+      console.log(`  Deployed: ${parts.join('  ')}`);
+    }
+  }
 }
 
 // ============================================================================

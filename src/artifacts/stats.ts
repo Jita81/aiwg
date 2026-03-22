@@ -11,7 +11,7 @@
 import fs from 'fs';
 import path from 'path';
 import type { GraphType, IndexStats } from './types.js';
-import { GRAPH_CONFIGS } from './types.js';
+import { GRAPH_CONFIGS, loadUserGraphConfigs } from './types.js';
 import { loadIndexStats, loadGraphIndexFile } from './index-reader.js';
 
 export interface StatsOptions {
@@ -72,8 +72,11 @@ export async function showStats(
     return;
   }
 
-  // No graph specified: show per-project graphs (framework is global, use --graph framework)
-  const graphTypes: GraphType[] = ['project', 'codebase'];
+  // No graph specified: show all graphs with defaultBuild=true
+  loadUserGraphConfigs(cwd);
+  const graphTypes: GraphType[] = Object.entries(GRAPH_CONFIGS)
+    .filter(([, config]) => config.defaultBuild)
+    .map(([name]) => name);
   const availableGraphs: { type: GraphType; stats: IndexStats }[] = [];
   for (const g of graphTypes) {
     const s = loadGraphIndexFile<IndexStats>(cwd, 'stats.json', g);

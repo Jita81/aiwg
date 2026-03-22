@@ -99,7 +99,8 @@ function parseArgs() {
     filter: null,           // Glob pattern for agent names
     filterRole: null,       // Filter by role: reasoning|coding|efficiency
     save: false,            // Save model config to project models.json
-    saveUser: false         // Save model config to ~/.config/aiwg/models.json
+    saveUser: false,        // Save model config to ~/.config/aiwg/models.json
+    verbose: false          // Show per-file deployment details
   };
   for (let i = 0; i < args.length; i++) {
     const a = args[i];
@@ -125,6 +126,7 @@ function parseArgs() {
     else if (a === '--filter-role' && args[i + 1]) cfg.filterRole = args[++i];
     else if (a === '--save') cfg.save = true;
     else if (a === '--save-user') cfg.saveUser = true;
+    else if (a === '--verbose' || a === '-v') cfg.verbose = true;
     else if (a === '--help' || a === '-h') {
       printHelp();
       process.exit(0);
