@@ -1,12 +1,16 @@
 ---
 name: aiwg-regenerate-warp
 description: Regenerate WARP.md for Warp Terminal with preserved team directives
-args: "[--no-backup] [--dry-run] [--show-preserved] [--full] [--interactive] [--guidance "text"]"
+args: "[--no-backup] [--dry-run] [--show-preserved] [--full] [--full-inject] [--migrate] [--interactive] [--guidance "text"]"
 ---
 
 # Regenerate WARP.md
 
 Regenerate the WARP.md file for Warp Terminal integration, analyzing current project state while preserving team directives and organizational requirements.
+
+**Hook file approach (default):** Generates `AIWG-warp.md` and adds a section or `@AIWG-warp.md` directive to WARP.md. Note: Warp's @-link support is unverified — defaults to section-style toggle until confirmed (see #444).
+
+**Full inject (`--full-inject`):** Embeds AIWG content inline in WARP.md with AIWG markers.
 
 ## Parameters
 

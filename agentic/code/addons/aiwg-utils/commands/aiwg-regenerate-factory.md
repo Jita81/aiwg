@@ -1,7 +1,7 @@
 ---
 name: aiwg-regenerate-factory
-description: "Alias for /aiwg-regenerate-agents - Regenerate AGENTS.md"
-args: "[--no-backup] [--dry-run] [--show-preserved] [--full] [--interactive] [--guidance "text"]"
+description: "Regenerate AGENTS.md for Factory AI with hook file architecture"
+args: "[--no-backup] [--dry-run] [--show-preserved] [--full] [--full-inject] [--migrate] [--interactive] [--guidance "text"]"
 ---
 
 # Regenerate AGENTS.md (Factory Alias)

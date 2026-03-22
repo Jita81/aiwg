@@ -1,12 +1,16 @@
 ---
 name: aiwg-regenerate-cursorrules
 description: Regenerate .cursorrules for Cursor with preserved team directives
-args: "[--no-backup] [--dry-run] [--show-preserved] [--full] [--interactive] [--guidance "text"]"
+args: "[--no-backup] [--dry-run] [--show-preserved] [--full] [--full-inject] [--migrate] [--interactive] [--guidance "text"]"
 ---
 
 # Regenerate .cursorrules
 
 Regenerate the `.cursorrules` file for Cursor IDE integration, analyzing current project state while preserving team directives and organizational requirements.
+
+**Hook file approach (default):** Generates `AIWG-cursor.md` and adds `@AIWG-cursor.md` directive to `.cursorrules`. Note: Cursor's @-link support in `.cursorrules` is partially confirmed — see #444.
+
+**Full inject (`--full-inject`):** Embeds AIWG content inline with AIWG markers (safe fallback).
 
 ## Parameters
 

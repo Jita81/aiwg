@@ -1,12 +1,16 @@
 ---
 name: aiwg-regenerate-claude
-description: Regenerate CLAUDE.md for Claude Code with vendor-specific content only
-args: "[--no-backup] [--dry-run] [--full] [--interactive] [--guidance "text"]"
+description: Regenerate CLAUDE.md for Claude Code with hook file architecture
+args: "[--no-backup] [--dry-run] [--full] [--full-inject] [--migrate] [--interactive] [--guidance "text"]"
 ---
 
 # Regenerate CLAUDE.md
 
-Regenerate the CLAUDE.md file for Claude Code integration. This command performs an **intelligent merge** - analyzing the current project state while preserving team-written content.
+Regenerate the CLAUDE.md file for Claude Code integration. This command performs an **intelligent merge** — analyzing the current project state while preserving team-written content.
+
+**Hook file architecture (default):** Generates `AIWG.md` with all AIWG context, and adds a single `@AIWG.md` directive to CLAUDE.md. This keeps CLAUDE.md minimal and user-owned.
+
+**Full injection (`--full-inject`):** Legacy mode — injects full AIWG content directly into CLAUDE.md (useful for platforms that do not support @-link loading, or user preference).
 
 **Vendor-specific filtering:** This command includes ONLY Claude Code slash commands and agents, reducing context pollution. Other vendor content is referenced but not inlined.
 
@@ -27,6 +31,31 @@ The agent must distinguish between:
 | `--no-backup` | Skip creating backup file |
 | `--dry-run` | Preview changes without writing |
 | `--full` | Full regeneration - replaces everything (destructive) |
+| `--full-inject` | Inject AIWG content directly into CLAUDE.md (legacy/compatibility mode) |
+| `--migrate` | Migrate existing full-injection to hook file approach (runs `/migrate-hook --provider claude`) |
+
+## Hook File Architecture (Default)
+
+When running without `--full-inject`:
+
+1. **Generate `AIWG.md`** — assembles AIWG context from installed framework manifests
+2. **Update `CLAUDE.md`** — minimal: user content + `@AIWG.md` directive
+
+```markdown
+# CLAUDE.md
+
+## Repository Purpose
+[your project description]
+
+@AIWG.md
+
+## Project-Specific Notes
+[your team conventions here]
+```
+
+To revert to inline injection: `/aiwg-regenerate-claude --full-inject`
+
+To disable context temporarily: `aiwg hook-disable`
 
 ## Execution Steps
 
@@ -388,6 +417,29 @@ Display the generated content, do not write.
 2. Verify write succeeded
 3. Report summary
 
+**Hook file approach (default)**:
+```
+CLAUDE.md Regenerated
+=====================
+
+Backup: CLAUDE.md.backup-20260113-152233
+
+Hook File:
+  ✓ AIWG.md generated (312 lines)
+    - Frameworks: sdlc-complete v2.1.0, aiwg-utils v1.5.0
+    - Includes: orchestrator context, RULES-INDEX, 47 commands, 12 agents
+
+CLAUDE.md Updated:
+  ✓ Team content preserved (46 lines)
+  ✓ @AIWG.md directive added
+
+Output: CLAUDE.md (49 lines), AIWG.md (312 lines)
+
+To disable AIWG context: aiwg hook-disable
+To regenerate hook only: aiwg hook-regenerate
+```
+
+**Full inject mode (`--full-inject`)**:
 ```
 CLAUDE.md Regenerated
 =====================
@@ -404,22 +456,10 @@ AIWG Content Updated:
   ✓ Tech Stack (TypeScript, Node.js 18+)
   ✓ Development Commands (12 scripts)
   ✓ Testing (Vitest)
-  ✓ Project Artifacts (@-mentions)
-  ✓ AIWG Integration
-    - Claude Commands (20 listed, 52 total)
-    - Claude Agents (15 listed, 54 total)
-    - Full references included
+  ✓ AIWG Integration (387 lines inline)
 
-Vendor-Specific Filtering:
-  ✓ Only Claude Code content inlined
-  ✓ Other vendors referenced for multi-vendor setups
-  ✓ Context size optimized: 387 lines
-
-Enhancements Added:
-  ✓ Linked Security Requirements → flow-security-review-cycle
-  ✓ Linked API Guidelines → architecture docs
-
-Output: CLAUDE.md (387 lines, 16,428 bytes)
+Output: CLAUDE.md (433 lines, 18,244 bytes)
+Note: Using legacy full-inject mode. Run without --full-inject to use hook file approach.
 ```
 
 ## Content Enhancement

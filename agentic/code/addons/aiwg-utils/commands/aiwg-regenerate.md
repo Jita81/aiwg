@@ -1,12 +1,14 @@
 ---
 name: aiwg-regenerate
 description: Regenerate platform context file with preserved team directives
-args: "[--no-backup] [--dry-run] [--show-preserved] [--full] [--interactive] [--guidance "text"]"
+args: "[--no-backup] [--dry-run] [--show-preserved] [--full] [--full-inject] [--all] [--interactive] [--guidance "text"] [--migrate]"
 ---
 
 # Regenerate Platform Context File
 
 Analyze current project state and regenerate the platform context file (CLAUDE.md, WARP.md, or AGENTS.md) while preserving team directives and organizational requirements.
+
+By default, uses the **hook file architecture**: generates `AIWG.md` (or provider equivalent) and adds a single directive to the context file. Use `--full-inject` for the legacy inline approach.
 
 ## Parameters
 
@@ -16,6 +18,9 @@ Analyze current project state and regenerate the platform context file (CLAUDE.m
 | `--dry-run` | Preview changes without writing |
 | `--show-preserved` | List all detected preserved content and exit |
 | `--full` | Full regeneration, preserve nothing (destructive) |
+| `--full-inject` | Inject AIWG content directly into context file (legacy/compatibility mode) |
+| `--all` | Regenerate for ALL installed providers simultaneously |
+| `--migrate` | Migrate existing full-injection to hook file approach |
 
 ## Platform Detection
 
@@ -28,21 +33,40 @@ Detect current platform automatically by checking for existing context files:
 | 3 | `.cursorrules` exists | Cursor | `/aiwg-regenerate-cursorrules` |
 | 4 | `.windsurfrules` exists | Windsurf | `/aiwg-regenerate-windsurfrules` |
 | 5 | `.github/copilot-instructions.md` exists | GitHub Copilot | `/aiwg-regenerate-copilot` |
-| 6 | `AGENTS.md` exists | Factory/OpenCode/Codex | `/aiwg-regenerate-agents` |
-| 7 | `.factory/` exists | Factory AI | `/aiwg-regenerate-agents` |
-| 8 | `.cursor/` exists | Cursor | `/aiwg-regenerate-cursorrules` |
-| 9 | `.windsurf/` exists | Windsurf | `/aiwg-regenerate-windsurfrules` |
-| 10 | `.github/agents/` exists | GitHub Copilot | `/aiwg-regenerate-copilot` |
+| 6 | `CODEX.md` exists | Codex | `/aiwg-regenerate-codex` |
+| 7 | `.opencode/context.md` exists | OpenCode | `/aiwg-regenerate-opencode` |
+| 8 | `AGENTS.md` exists + `.factory/` | Factory AI | `/aiwg-regenerate-factory` |
+| 9 | `AGENTS.md` exists | Windsurf/generic | `/aiwg-regenerate-agents` |
+| 10 | `.factory/` exists | Factory AI | `/aiwg-regenerate-factory` |
+| 11 | `.cursor/` exists | Cursor | `/aiwg-regenerate-cursorrules` |
+| 12 | `.windsurf/` exists | Windsurf | `/aiwg-regenerate-windsurfrules` |
+| 13 | `.github/agents/` exists | GitHub Copilot | `/aiwg-regenerate-copilot` |
 
 If multiple files exist, use priority order. If ambiguous, ask user.
 
+### `--all` Mode
+
+Regenerate all detected providers simultaneously:
+
+```
+Detected providers: claude, warp, cursor
+Regenerating all...
+  ✓ CLAUDE.md → AIWG.md (312 lines)
+  ✓ WARP.md → AIWG-warp.md (298 lines)
+  ✓ .cursorrules → AIWG-cursor.md (295 lines)
+Regenerated 3 providers.
+```
+
 For explicit platform targeting, use:
-- `/aiwg-regenerate-claude` → CLAUDE.md
-- `/aiwg-regenerate-warp` → WARP.md
-- `/aiwg-regenerate-agents` → AGENTS.md
-- `/aiwg-regenerate-cursorrules` → .cursorrules
-- `/aiwg-regenerate-windsurfrules` → .windsurfrules
-- `/aiwg-regenerate-copilot` → copilot-instructions.md
+- `/aiwg-regenerate-claude` → CLAUDE.md + AIWG.md
+- `/aiwg-regenerate-warp` → WARP.md + AIWG-warp.md
+- `/aiwg-regenerate-agents` → AGENTS.md + AIWG-agents.md
+- `/aiwg-regenerate-cursorrules` → .cursorrules + AIWG-cursor.md
+- `/aiwg-regenerate-windsurfrules` → .windsurfrules + AIWG-windsurf.md
+- `/aiwg-regenerate-copilot` → copilot-instructions.md + AIWG-copilot.md
+- `/aiwg-regenerate-factory` → AGENTS.md + AIWG-factory.md
+- `/aiwg-regenerate-opencode` → .opencode/context.md + AIWG-opencode.md
+- `/aiwg-regenerate-codex` → CODEX.md (full inject, no @-link support)
 
 ## Execution Steps
 

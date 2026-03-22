@@ -1,12 +1,16 @@
 ---
 name: aiwg-regenerate-windsurfrules
 description: Regenerate .windsurfrules for Windsurf with preserved team directives
-args: "[--no-backup] [--dry-run] [--show-preserved] [--full] [--interactive] [--guidance "text"]"
+args: "[--no-backup] [--dry-run] [--show-preserved] [--full] [--full-inject] [--migrate] [--interactive] [--guidance "text"]"
 ---
 
 # Regenerate .windsurfrules
 
 Regenerate the `.windsurfrules` file for Windsurf (Codeium) integration, analyzing current project state while preserving team directives and organizational requirements.
+
+**Hook file approach (default):** Generates `AIWG-windsurf.md` and adds `@AIWG-windsurf.md` directive. Note: Windsurf @-link support is unverified — defaults to full inject until confirmed (see #444).
+
+**Full inject (`--full-inject`):** Embeds AIWG content inline with AIWG markers.
 
 ## Parameters
 

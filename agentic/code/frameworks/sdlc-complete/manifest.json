@@ -11,5 +11,10 @@
     "manifest.json",
     "artifacts",
     "templates"
-  ]
+  ],
+  "contextContributions": {
+    "hookFragment": "templates/project/AIWG-sdlc-fragment.md",
+    "priority": 10,
+    "description": "SDLC framework context: orchestration, NL translations, phase overview, commands"
+  }
 }

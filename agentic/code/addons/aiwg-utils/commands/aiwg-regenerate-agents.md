@@ -1,12 +1,16 @@
 ---
 name: aiwg-regenerate-agents
 description: Regenerate AGENTS.md with vendor-neutral content for multi-platform support
-args: "[--no-backup] [--dry-run] [--show-preserved] [--full] [--interactive] [--guidance "text"]"
+args: "[--no-backup] [--dry-run] [--show-preserved] [--full] [--full-inject] [--migrate] [--provider windsurf|factory] [--interactive] [--guidance "text"]"
 ---
 
 # Regenerate AGENTS.md
 
-Regenerate the AGENTS.md file, analyzing current project state while preserving team directives and organizational requirements.
+Regenerate the AGENTS.md file, analyzing current project state while preserving team directives and organizational requirements. Supports Windsurf and Factory AI (both use AGENTS.md as context file).
+
+**Hook file approach (default):** Generates `AIWG-windsurf.md` or `AIWG-factory.md` (per `--provider`) and adds directive to AGENTS.md. @-link support unverified — defaults to section-style until confirmed (see #444).
+
+**Full inject (`--full-inject`):** Embeds AIWG content inline with AIWG markers.
 
 **Used by:** Factory AI, Cursor, OpenCode, Codex, and other platforms that use AGENTS.md for configuration.
 

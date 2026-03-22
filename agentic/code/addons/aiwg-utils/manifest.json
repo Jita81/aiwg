@@ -60,7 +60,18 @@
     "mention-validate",
     "mention-report",
     "mention-lint",
-    "mention-conventions"
+    "mention-conventions",
+    "hook-enable",
+    "hook-disable",
+    "hook-status",
+    "hook-regenerate",
+    "migrate-hook",
+    "aiwg-regenerate-agents",
+    "aiwg-regenerate-copilot",
+    "aiwg-regenerate-cursorrules",
+    "aiwg-regenerate-windsurfrules",
+    "aiwg-regenerate-opencode",
+    "aiwg-regenerate-codex"
   ],
   "agents": [
     "context-regenerator",

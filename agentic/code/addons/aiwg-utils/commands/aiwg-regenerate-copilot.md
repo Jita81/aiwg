@@ -1,12 +1,16 @@
 ---
 name: aiwg-regenerate-copilot
 description: Regenerate copilot-instructions.md for GitHub Copilot with vendor-specific content only
-args: "[--no-backup] [--dry-run] [--show-preserved] [--full] [--interactive] [--guidance "text"]"
+args: "[--no-backup] [--dry-run] [--show-preserved] [--full] [--full-inject] [--migrate] [--interactive] [--guidance "text"]"
 ---
 
 # Regenerate copilot-instructions.md
 
 Regenerate the `.github/copilot-instructions.md` file for GitHub Copilot integration, analyzing current project state while preserving team directives and organizational requirements.
+
+**Hook file approach (default):** Generates `AIWG-copilot.md` and adds `@AIWG-copilot.md` directive to copilot-instructions.md if @-link is supported. Note: Copilot @-link support is unverified — defaults to full inject until confirmed (see #444).
+
+**Full inject (`--full-inject`):** Embeds AIWG content inline with AIWG markers.
 
 **Vendor-specific filtering:** This command includes ONLY GitHub Copilot patterns and agent references, reducing context pollution. Other vendor content is referenced but not inlined.
 
