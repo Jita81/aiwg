@@ -66,6 +66,9 @@
     "hook-status",
     "hook-regenerate",
     "migrate-hook",
+    "soul-enable",
+    "soul-disable",
+    "soul-status",
     "aiwg-regenerate-agents",
     "aiwg-regenerate-copilot",
     "aiwg-regenerate-cursorrules",
@@ -80,7 +83,9 @@
     "self-debug"
   ],
   "skills": [
-    "project-awareness"
+    "project-awareness",
+    "soul-create",
+    "soul-validate"
   ],
   "rules": [
     "agent-deployment",

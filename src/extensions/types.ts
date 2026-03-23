@@ -26,7 +26,8 @@ export type ExtensionType =
   | 'framework'
   | 'addon'
   | 'template'
-  | 'prompt';
+  | 'prompt'
+  | 'soul';
 
 /**
  * Extension lifecycle status
@@ -398,7 +399,8 @@ export type ExtensionMetadata =
   | FrameworkMetadata
   | AddonMetadata
   | TemplateMetadata
-  | PromptMetadata;
+  | PromptMetadata
+  | SoulMetadata;
 
 /**
  * Agent-specific metadata
@@ -944,6 +946,60 @@ export interface PromptMetadata {
   requiredContext?: string[];
 }
 
+/**
+ * Soul-specific metadata
+ *
+ * Defines an AI agent's identity, worldview, and character.
+ * Distinct from voice profiles (how content sounds) — soul defines
+ * who the agent is.
+ *
+ * @see https://github.com/aaronjmars/soul.md
+ */
+export interface SoulMetadata {
+  type: 'soul';
+
+  /**
+   * Soul scope
+   *
+   * @example "project" — applies to all agents in the project
+   * @example "agent" — applies to a specific agent
+   */
+  scope: 'project' | 'agent';
+
+  /**
+   * Target agent name (required when scope is 'agent')
+   *
+   * @example "test-engineer"
+   */
+  targetAgent?: string;
+
+  /**
+   * Sections present in the soul file
+   *
+   * @example ["who-i-am", "worldview", "opinions", "vocabulary", "boundaries"]
+   */
+  sections: string[];
+
+  /**
+   * Companion files
+   *
+   * Optional related files in the soul ecosystem
+   */
+  companions?: {
+    /** STYLE.md — writing style companion */
+    style?: string;
+    /** MEMORY.md — session memory */
+    memory?: string;
+    /** examples/ — calibration examples */
+    examples?: string;
+  };
+
+  /**
+   * Context budget estimate in tokens
+   */
+  estimatedTokens?: number;
+}
+
 // ============================================
 // Capability Index
 // ============================================
@@ -1325,4 +1381,11 @@ export function isTemplateExtension(ext: Extension): ext is Extension & { metada
  */
 export function isPromptExtension(ext: Extension): ext is Extension & { metadata: PromptMetadata } {
   return ext.type === 'prompt' && ext.metadata.type === 'prompt';
+}
+
+/**
+ * Type guard for soul extensions
+ */
+export function isSoulExtension(ext: Extension): ext is Extension & { metadata: SoulMetadata } {
+  return ext.type === 'soul' && ext.metadata.type === 'soul';
 }

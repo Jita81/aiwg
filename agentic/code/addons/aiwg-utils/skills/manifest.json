@@ -47,6 +47,16 @@
       "name": "claims-validator",
       "description": "Validates factual claims against source documents",
       "triggers": ["validate claims", "check facts", "verify statements"]
+    },
+    {
+      "name": "soul-create",
+      "description": "Generate SOUL.md identity files from source material or interactive prompts",
+      "triggers": ["create a soul", "build a soul file", "generate SOUL.md", "define agent identity", "create an agent persona"]
+    },
+    {
+      "name": "soul-validate",
+      "description": "Validate SOUL.md quality against community best practices",
+      "triggers": ["validate soul", "check SOUL.md quality", "soul quality check", "review my SOUL.md"]
     }
   ],
   "usage": "These skills are consumed by framework-specific skills and can be invoked directly for utility operations."
