@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # architecture-evolution
 
 Manage architecture changes with impact analysis, ADR generation, and migration planning.

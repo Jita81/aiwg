@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # regression-baseline
 
 Create and maintain regression test baselines for comparison and drift detection.

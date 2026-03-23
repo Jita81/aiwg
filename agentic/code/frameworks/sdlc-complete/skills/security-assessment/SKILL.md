@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # security-assessment
 
 Execute threat modeling, vulnerability scanning, and security control validation.

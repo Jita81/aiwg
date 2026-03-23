@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # reflection-injection
 
 Automatically inject relevant past reflections into agent context when starting new iterations or retrying after failures.

@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # issue-auto-sync
 
 Automatically detect and update linked issues after commits or artifact changes.

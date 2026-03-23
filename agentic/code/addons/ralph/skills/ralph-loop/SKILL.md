@@ -14,6 +14,7 @@ triggers:
   - "keep fixing until"
   - "keep going until"
   - "iterate on"
+platforms: [claude-code, hermes]
 ---
 
 # Ralph Loop Skill

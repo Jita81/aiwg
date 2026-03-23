@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # iteration-control
 
 Manages bounded iteration loops for autonomous implementation with escalation.

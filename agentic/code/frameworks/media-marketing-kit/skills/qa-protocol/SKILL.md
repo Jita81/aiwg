@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # qa-protocol
 
 Multi-stage quality assurance protocol for marketing assets with channel-specific validation.

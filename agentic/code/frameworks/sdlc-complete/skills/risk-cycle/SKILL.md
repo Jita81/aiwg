@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # risk-cycle
 
 Continuous risk identification, assessment, tracking, and retirement throughout SDLC.

@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # decision-support
 
 Facilitate data-driven technical decisions using embedded decision matrices and trade-off analysis.

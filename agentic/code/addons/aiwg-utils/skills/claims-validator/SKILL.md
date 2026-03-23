@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # claims-validator
 
 Validate documentation for unsupported claims, made-up metrics, and unverifiable statements.

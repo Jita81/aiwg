@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # sdlc-accelerate
 
 End-to-end SDLC ramp-up from idea to construction-ready in a single orchestrated pipeline.

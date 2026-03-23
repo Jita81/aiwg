@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # config-validator
 
 Validate AIWG configuration files and project setup for correctness and completeness.

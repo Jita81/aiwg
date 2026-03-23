@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # regression-cicd-hooks
 
 Integrate regression testing into CI/CD pipelines with automated baseline comparison, merge blocking, and multi-platform support.

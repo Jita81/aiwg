@@ -1,3 +1,7 @@
+---
+platforms: [claude-code]
+---
+
 # soul-enhance
 
 Improve an existing SOUL.md by identifying vague sections, suggesting missing content, and generating calibration examples.

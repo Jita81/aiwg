@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # nl-router
 
 Route natural language requests to appropriate skills and workflows.

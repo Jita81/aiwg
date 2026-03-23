@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # test-coverage
 
 Analyze test coverage, identify gaps, and recommend test improvements.

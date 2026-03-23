@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # artifact-lookup
 
 Search and navigate SDLC artifacts using the artifact index.

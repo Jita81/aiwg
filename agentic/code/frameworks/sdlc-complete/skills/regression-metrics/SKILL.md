@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # regression-metrics
 
 Track and analyze regression statistics, trends, and health indicators.

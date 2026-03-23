@@ -1,5 +1,8 @@
 # AIWG
 
+
+@AIWG.md
+
 Framework for improving AI-generated content quality with voice profiles, validation tools, and specialized agents.
 
 ## Quick Start

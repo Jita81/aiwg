@@ -1,3 +1,7 @@
+---
+platforms: [claude-code]
+---
+
 # project-awareness
 
 Comprehensive project context detection and state awareness.

@@ -2,6 +2,7 @@
 name: evidence-preservation
 description: "Chain of custody and evidence preservation procedures covering log collection, hash verification, custody documentation, and evidence packaging per RFC 3227"
 tools: Bash, Read, Write, Glob, Grep
+platforms: [claude-code, hermes]
 ---
 
 # evidence-preservation

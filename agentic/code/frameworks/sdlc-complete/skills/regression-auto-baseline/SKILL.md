@@ -1,3 +1,7 @@
+---
+platforms: [claude-code]
+---
+
 # regression-auto-baseline
 
 Automatically manage regression test baseline lifecycle with triggers for releases, deployments, and quality gates.

@@ -1,3 +1,7 @@
+---
+platforms: [claude-code]
+---
+
 # soul-apply
 
 Apply a SOUL.md identity to content generation — deeper than voice-apply, incorporating worldview, opinions, and character.

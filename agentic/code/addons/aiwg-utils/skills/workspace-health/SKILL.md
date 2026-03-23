@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # Workspace Health Check Skill
 
 Assesses workspace alignment and suggests cleanup or realignment actions at key transition points.

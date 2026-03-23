@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # voice-blend
 
 Combine multiple voice profiles with weighted mixing to create hybrid voices.

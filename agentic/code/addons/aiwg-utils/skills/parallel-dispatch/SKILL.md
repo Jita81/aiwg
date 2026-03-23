@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # parallel-dispatch
 
 Generic parallel agent orchestration utility for launching multiple agents concurrently.

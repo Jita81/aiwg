@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # voice-analyze
 
 Reverse-engineer voice profiles from sample content by analyzing writing patterns.

@@ -1,3 +1,7 @@
+---
+platforms: [claude-code]
+---
+
 # regression-api-contract
 
 Detect breaking changes in API contracts across REST, GraphQL, and gRPC interfaces.

@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # voice-create
 
 Generate custom voice profiles from natural language descriptions.

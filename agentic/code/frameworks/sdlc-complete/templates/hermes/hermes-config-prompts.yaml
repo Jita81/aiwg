@@ -23,6 +23,7 @@ mcp_servers:
       prompts: true          # Enable AIWG prompt exposure
       resources: false       # Resources still suppressed (use artifact-read instead)
 
+# Model strategy: hermes3 (parent/conversation) + qwen3.5:9b (coding via delegate_task)
 # Same compression settings as minimal config
 compression:
   enabled: true

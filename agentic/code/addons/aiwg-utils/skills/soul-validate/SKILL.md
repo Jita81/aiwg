@@ -1,3 +1,7 @@
+---
+platforms: [claude-code]
+---
+
 # soul-validate
 
 Validate a SOUL.md file against community best practices and quality criteria.

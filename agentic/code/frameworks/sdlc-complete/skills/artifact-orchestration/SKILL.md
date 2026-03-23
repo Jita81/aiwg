@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # artifact-orchestration
 
 Orchestrate multi-agent artifact generation with the Primary Author → Parallel Reviewers → Synthesizer → Archive pattern.

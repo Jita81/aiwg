@@ -1,3 +1,7 @@
+---
+platforms: [claude-code]
+---
+
 # auto-test-execution
 
 Automatically execute tests when code-generating agents write to source files, enforcing the execute-before-return pattern.

@@ -26,7 +26,24 @@ mcp_servers:
       prompts: false         # Suppress prompt schemas (saves tokens)
       resources: false       # Suppress resource schemas (saves tokens)
 
-# Recommended compression settings for local models (12GB VRAM)
+# Recommended model strategy — two roles, two models:
+#
+#   Parent (conversation, soul, memory):
+#     hermes3          — best for roleplay/soul features (recommended)
+#     mistral:7b       — solid general-purpose alternative
+#     llama3.2:3b      — lightweight, fast on low VRAM
+#
+#   Coding / tool calls (via delegate_task model override):
+#     qwen3.5:9b       — best tool call accuracy of any open-weight model (recommended)
+#     qwen2.5-coder:7b — smaller Qwen variant, still excellent tool calls
+#     phi4-mini        — compact alternative for low VRAM
+#
+#   Note: Qwen models have the best tool call accuracy open-weight. Use them
+#   for any AIWG workflow involving structured output or function calling.
+#
+# Pull recommended pair: ollama pull hermes3 && ollama pull qwen3.5:9b
+
+# Compression settings for local hardware (12GB VRAM)
 compression:
   enabled: true
   threshold: 0.30              # Lower than default 0.50 — avoids abrupt context cliffs

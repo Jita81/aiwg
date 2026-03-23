@@ -2,6 +2,7 @@
 name: flaky-detect
 description: Identify flaky tests from CI history and test execution patterns. Use when debugging intermittent test failures, auditing test reliability, or improving CI stability.
 version: 1.0.0
+platforms: [claude-code, hermes]
 ---
 
 # Flaky Detect Skill

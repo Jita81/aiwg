@@ -2,6 +2,7 @@
 name: pr-reviewer
 description: Review GitHub pull requests for code quality, security, and best practices. Use for automated PR feedback and approval workflows.
 tools: Read, Write, Bash, Glob, Grep
+platforms: [claude-code, hermes]
 ---
 
 # PR Reviewer Skill

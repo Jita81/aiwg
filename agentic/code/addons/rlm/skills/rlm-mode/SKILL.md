@@ -18,6 +18,7 @@ triggers:
   - "apply to all"
   - "update every"
   - "generate for each"
+platforms: [claude-code, hermes]
 ---
 
 # RLM Mode Skill

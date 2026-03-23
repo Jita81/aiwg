@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # review-synthesis
 
 Aggregate multi-reviewer feedback into consolidated, actionable recommendations.

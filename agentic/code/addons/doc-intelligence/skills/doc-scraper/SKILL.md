@@ -2,6 +2,7 @@
 name: doc-scraper
 description: Scrape documentation websites into organized reference files. Use when converting docs sites to searchable references or building Claude skills.
 tools: Read, Write, Bash, WebFetch
+platforms: [claude-code, hermes]
 ---
 
 # Documentation Scraper Skill

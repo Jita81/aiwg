@@ -1,3 +1,7 @@
+---
+platforms: [claude-code]
+---
+
 # citation-guard
 
 Automatically verify citations when agents generate content that makes factual claims or references research.

@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # traceability-check
 
 Verify bidirectional traceability from requirements to code to tests.

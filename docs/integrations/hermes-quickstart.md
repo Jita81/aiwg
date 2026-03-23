@@ -24,13 +24,46 @@ Hermes Agent (host)
 
 **MCP is the seam.** Coexistence with clear boundaries — not system unification.
 
+### Recommended Model Strategy
+
+Two roles, two models. The parent agent handles conversation; coding tasks are delegated with a model override.
+
+#### Conversation & Soul (parent agent)
+
+| Model | Size | Notes |
+|---|---|---|
+| `hermes3` ⭐ | 8B | Purpose-built for roleplay, persistent memory, character — ideal for soul features |
+| `llama3.2:3b` | 3B | Lightweight option; fast on CPU or low VRAM |
+| `mistral:7b` | 7B | Solid general-purpose conversation |
+| `gemma2:9b` | 9B | Strong nuanced dialogue, good at following persona instructions |
+
+#### Coding & Tool Calls (delegate_task target)
+
+> **Qwen models have the best tool call accuracy of any open-weight family.** For AIWG workflows involving structured output, function calling, or code generation, Qwen should be the first choice.
+
+| Model | Size | Notes |
+|---|---|---|
+| `qwen3.5:9b` ⭐ | 9B | Best tool call accuracy; recommended for AIWG workflows |
+| `qwen2.5-coder:7b` | 7B | Smaller Qwen coding variant; excellent tool calls, lower VRAM |
+| `qwen2.5-coder:14b` | 14B | Higher quality at more VRAM cost |
+| `phi4-mini` | 3.8B | Microsoft; compact, strong at structured reasoning |
+| `deepseek-coder-v2:16b` | 16B | Strong coding quality; needs 16GB+ VRAM |
+
+```bash
+# Pull both recommended models
+ollama pull hermes3
+ollama pull qwen3.5:9b
+```
+
+Use `delegate_task(model="ollama/qwen3.5:9b")` to route coding-heavy AIWG workflows to the coding model while keeping the parent conversation on `hermes3`.
+
 ---
 
 ## Prerequisites
 
 - Hermes Agent installed ([installation guide](https://hermes-agent.nousresearch.com/docs))
 - AIWG installed (`npm install -g aiwg`)
-- A local model running via Ollama (e.g., `qwen2.5-coder:14b`)
+- Local models via Ollama: `hermes3` (conversation, soul features) and `qwen3.5:9b` (coding tasks)
 - A project directory with source code
 
 ---
@@ -207,7 +240,8 @@ test plan, or any structured artifact that persists in .aiwg/.
    delegate_task(
        task="Run AIWG workflow for [description]",
        skip_context_files=True,
-       skip_memory=True
+       skip_memory=True,
+       model="ollama/qwen3.5:9b"  # Use coding model for structured output
    )
 3. Store artifact path + one-sentence summary in MEMORY.md
 4. Report result to user

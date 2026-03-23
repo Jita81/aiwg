@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # artifact-metadata
 
 Manage artifact metadata, versioning, ownership, and history tracking.

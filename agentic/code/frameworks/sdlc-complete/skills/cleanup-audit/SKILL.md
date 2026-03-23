@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # cleanup-audit
 
 Identify dead code, unused exports, orphaned files, stale manifest entries, and unused dependencies in a codebase. Produces a structured report with confidence-rated findings.

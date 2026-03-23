@@ -2,6 +2,7 @@
 name: skill-builder
 description: Build Claude skills from extracted documentation. Use after doc-scraper/pdf-extractor to generate uploadable skill packages.
 tools: Read, Write, Bash, Glob
+platforms: [claude-code, hermes]
 ---
 
 # Skill Builder Skill

@@ -2,6 +2,7 @@
 name: test-sync
 description: Detect orphaned tests, obsolete assertions, and test-code misalignment. Use for test suite maintenance, cleanup, and traceability validation.
 version: 1.0.0
+platforms: [claude-code, hermes]
 ---
 
 # Test Sync Skill

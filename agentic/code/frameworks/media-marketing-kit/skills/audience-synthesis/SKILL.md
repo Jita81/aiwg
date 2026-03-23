@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # audience-synthesis
 
 Synthesize audience insights from multiple data sources into unified personas and segments.

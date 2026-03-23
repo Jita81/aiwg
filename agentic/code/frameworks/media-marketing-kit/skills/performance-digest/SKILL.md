@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # performance-digest
 
 Generate executive-ready performance summaries with insights and recommendations.

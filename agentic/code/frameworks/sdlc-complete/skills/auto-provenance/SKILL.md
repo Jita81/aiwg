@@ -1,3 +1,7 @@
+---
+platforms: [claude-code]
+---
+
 # Auto-Provenance
 
 Automatically generates W3C PROV-compliant provenance records when agents create or modify artifacts.

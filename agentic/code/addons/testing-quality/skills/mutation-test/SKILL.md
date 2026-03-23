@@ -2,6 +2,7 @@
 name: mutation-test
 description: Run mutation testing to validate test quality beyond code coverage. Use when assessing test effectiveness, finding weak tests, or validating test suite quality.
 version: 1.0.0
+platforms: [claude-code, hermes]
 ---
 
 # Mutation Test Skill

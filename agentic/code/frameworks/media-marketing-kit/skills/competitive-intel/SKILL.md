@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # competitive-intel
 
 Gather and analyze competitive intelligence from multiple sources.

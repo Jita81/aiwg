@@ -1,3 +1,7 @@
+---
+platforms: [claude-code]
+---
+
 # regression-learning
 
 Cross-task learning skill for improving regression detection over time through pattern recognition, test prioritization, and historical analysis.

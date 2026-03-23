@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # regression-report
 
 Generate comprehensive regression analysis reports combining bisect, baseline, and metrics data.

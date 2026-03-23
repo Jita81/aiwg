@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # brand-compliance
 
 Unified brand compliance validation across visual, verbal, and legal dimensions.

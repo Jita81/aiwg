@@ -1,3 +1,7 @@
+---
+platforms: [claude-code]
+---
+
 # soul-create
 
 Generate a SOUL.md identity file from source material or interactive prompts.

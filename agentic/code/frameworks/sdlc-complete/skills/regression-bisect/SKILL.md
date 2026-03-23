@@ -1,3 +1,7 @@
+---
+platforms: [claude-code]
+---
+
 # regression-bisect
 
 Automatically identify the commit that introduced a regression using git bisect.

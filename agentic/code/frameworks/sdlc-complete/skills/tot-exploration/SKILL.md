@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # tot-exploration
 
 Automatically trigger Tree of Thoughts exploration when agents face architectural decisions with multiple valid approaches.

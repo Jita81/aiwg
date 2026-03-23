@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # template-engine
 
 Load, validate, and populate templates consistently across frameworks.

@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # code-chunker
 
 Analyze a source file's structure and produce a navigable map with logical sections, line ranges, and summaries for efficient agent navigation.

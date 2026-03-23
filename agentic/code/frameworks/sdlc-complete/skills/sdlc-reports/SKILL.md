@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # sdlc-reports
 
 Generate comprehensive SDLC reports including iteration status, metrics dashboards, and executive summaries.

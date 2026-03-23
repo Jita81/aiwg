@@ -1,3 +1,7 @@
+---
+platforms: [claude-code]
+---
+
 # regression-performance
 
 Detect performance regressions by comparing benchmarks across versions, analyzing latency/throughput degradation, and providing statistical significance testing.

@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # gate-evaluation
 
 Validate phase gate criteria with multi-agent review and generate pass/fail reports.

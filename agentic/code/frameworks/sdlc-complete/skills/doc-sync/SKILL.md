@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # doc-sync
 
 Synchronize documentation and code to eliminate drift through parallel audit and automated fixes.

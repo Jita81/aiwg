@@ -28,7 +28,8 @@ delegate_task(
     task="Run AIWG workflow: [workflow-name] for [description]. Save artifact to .aiwg/[category]/[filename].md",
     context="Project: [project name]. Key constraint: [if any].",
     skip_context_files=True,
-    skip_memory=True
+    skip_memory=True,
+    model="ollama/qwen3.5:9b"  # Coding model for structured output; parent stays on hermes3
 )
 ```
 

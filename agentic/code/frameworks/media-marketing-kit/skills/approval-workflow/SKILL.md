@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # approval-workflow
 
 Multi-stakeholder approval routing with status tracking and escalation.

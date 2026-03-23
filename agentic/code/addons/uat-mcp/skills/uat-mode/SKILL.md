@@ -16,6 +16,7 @@ triggers:
   - "run UAT report"
   - "show UAT results"
   - "UAT coverage"
+platforms: [claude-code, hermes]
 ---
 
 # UAT Mode

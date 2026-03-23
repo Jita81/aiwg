@@ -2,6 +2,7 @@
 name: pytest-runner
 description: Execute Python tests with pytest, supporting fixtures, markers, coverage, and parallel execution. Use for Python test automation.
 tools: Read, Write, Bash
+platforms: [claude-code, hermes]
 ---
 
 # Pytest Runner Skill

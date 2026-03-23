@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # decompose-file
 
 Analyze a large source file and produce a concrete decomposition plan, optionally executing the refactoring with import updates and test verification.

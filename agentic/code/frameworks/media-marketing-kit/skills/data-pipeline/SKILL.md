@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # data-pipeline
 
 Orchestrate marketing data collection, transformation, and reporting workflows.

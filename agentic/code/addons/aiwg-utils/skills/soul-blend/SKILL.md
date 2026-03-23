@@ -1,3 +1,7 @@
+---
+platforms: [claude-code]
+---
+
 # soul-blend
 
 Merge multiple SOUL.md files into a composite persona — for team-level agents or multi-perspective characters.

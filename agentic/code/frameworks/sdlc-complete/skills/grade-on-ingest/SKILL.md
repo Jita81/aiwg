@@ -1,3 +1,7 @@
+---
+platforms: [claude-code]
+---
+
 # GRADE-on-Ingest
 
 Automatically triggers GRADE quality assessment when new research sources or findings are added to the corpus.

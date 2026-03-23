@@ -1,3 +1,7 @@
+---
+platforms: [claude-code, hermes]
+---
+
 # incident-triage
 
 Rapid incident classification, severity assessment, and response coordination.

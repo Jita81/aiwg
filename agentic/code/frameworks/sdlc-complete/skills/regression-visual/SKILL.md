@@ -1,3 +1,7 @@
+---
+platforms: [claude-code]
+---
+
 # regression-visual
 
 Detect visual and UI regressions through screenshot comparison and pixel-diff analysis.
