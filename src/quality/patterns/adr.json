@@ -1,0 +1,24 @@
+{
+  "id": "adr",
+  "name": "Architecture Decision Record",
+  "description": "Quality patterns for ADR artifacts",
+  "required": [
+    { "id": "adr-title", "pattern": "^#\\s+ADR-\\d+", "description": "ADR ID and title heading" },
+    { "id": "adr-status", "pattern": "(?i)status\\s*:", "description": "Decision status" },
+    { "id": "adr-context", "pattern": "(?i)context\\s*:", "description": "Context/problem statement" },
+    { "id": "adr-decision", "pattern": "(?i)decision\\s*:", "description": "Decision statement" },
+    { "id": "adr-consequences", "pattern": "(?i)consequences?\\s*:", "description": "Consequences of the decision" }
+  ],
+  "recommended": [
+    { "id": "adr-alternatives", "pattern": "(?i)(alternatives?|options?)\\s*(considered)?\\s*:", "description": "Alternatives considered" },
+    { "id": "adr-rationale", "pattern": "(?i)rationale\\s*:", "description": "Decision rationale" },
+    { "id": "adr-date", "pattern": "(?i)date\\s*:", "description": "Decision date" },
+    { "id": "adr-refs", "pattern": "@[\\w./\\-]+", "description": "@-mention traceability links" },
+    { "id": "adr-supersedes", "pattern": "(?i)supersed(es|ed by)", "description": "Supersession chain" }
+  ],
+  "antipatterns": [
+    { "id": "adr-no-context", "pattern": "(?i)\\bwe decided\\b(?!.*\\bbecause\\b)", "weight": 0.1, "description": "Decision without justification" },
+    { "id": "adr-todo", "pattern": "(?i)\\bTODO\\b|\\bTBD\\b|\\bFIXME\\b", "weight": 0.05, "description": "Unresolved TODOs" },
+    { "id": "adr-vague", "pattern": "(?i)\\bsomehow\\b|\\bprobably\\b|\\bmaybe\\b", "weight": 0.05, "description": "Vague language in decisions" }
+  ]
+}

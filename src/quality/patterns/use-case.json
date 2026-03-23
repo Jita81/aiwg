@@ -1,0 +1,24 @@
+{
+  "id": "use-case",
+  "name": "Use Case",
+  "description": "Quality patterns for SDLC use case artifacts",
+  "required": [
+    { "id": "uc-title", "pattern": "^#\\s+UC-\\d+", "description": "Use case ID and title heading" },
+    { "id": "uc-actors", "pattern": "(?i)(actor|stakeholder)s?\\s*:", "description": "Actors/stakeholders section" },
+    { "id": "uc-preconditions", "pattern": "(?i)pre-?conditions?\\s*:", "description": "Preconditions section" },
+    { "id": "uc-flow", "pattern": "(?i)(main|basic|normal)\\s*(flow|scenario|path)", "description": "Main flow/scenario" },
+    { "id": "uc-postconditions", "pattern": "(?i)post-?conditions?\\s*:", "description": "Postconditions section" }
+  ],
+  "recommended": [
+    { "id": "uc-alt-flows", "pattern": "(?i)(alternative|alternate|exception)\\s*(flow|scenario|path)", "description": "Alternative flows" },
+    { "id": "uc-priority", "pattern": "(?i)priority\\s*:", "description": "Priority assignment" },
+    { "id": "uc-nfr-refs", "pattern": "(?i)(NFR|non-functional)", "description": "NFR cross-references" },
+    { "id": "uc-acceptance", "pattern": "(?i)acceptance\\s*criteria", "description": "Acceptance criteria" },
+    { "id": "uc-trace", "pattern": "@[\\w./\\-]+", "description": "@-mention traceability links" }
+  ],
+  "antipatterns": [
+    { "id": "uc-no-impl", "pattern": "(?i)(implementation|code|function|class|method)\\s+details?", "weight": 0.1, "description": "Implementation details in use case" },
+    { "id": "uc-vague-actor", "pattern": "(?i)\\bsomeone\\b|\\bthe user\\b", "weight": 0.05, "description": "Vague actor references" },
+    { "id": "uc-todo", "pattern": "(?i)\\bTODO\\b|\\bTBD\\b|\\bFIXME\\b", "weight": 0.05, "description": "Unresolved TODOs" }
+  ]
+}

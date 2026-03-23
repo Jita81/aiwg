@@ -1,0 +1,24 @@
+{
+  "id": "test-plan",
+  "name": "Test Plan",
+  "description": "Quality patterns for test plan artifacts",
+  "required": [
+    { "id": "tp-scope", "pattern": "(?i)(scope|objective)s?\\s*:", "description": "Test scope/objectives" },
+    { "id": "tp-strategy", "pattern": "(?i)(strategy|approach)\\s*:", "description": "Test strategy/approach" },
+    { "id": "tp-cases", "pattern": "(?i)test\\s*(case|scenario)s?", "description": "Test cases or scenarios" },
+    { "id": "tp-criteria", "pattern": "(?i)(pass|exit|completion)\\s*criteria", "description": "Pass/exit criteria" },
+    { "id": "tp-env", "pattern": "(?i)(environment|infrastructure|setup)\\s*:", "description": "Test environment description" }
+  ],
+  "recommended": [
+    { "id": "tp-coverage", "pattern": "(?i)coverage\\s*(target|goal|matrix)?\\s*:", "description": "Coverage targets" },
+    { "id": "tp-risk", "pattern": "(?i)(risk|priority)\\s*(based)?\\s*(testing)?", "description": "Risk-based testing approach" },
+    { "id": "tp-schedule", "pattern": "(?i)(schedule|timeline|milestone)s?\\s*:", "description": "Test schedule" },
+    { "id": "tp-data", "pattern": "(?i)test\\s*data\\s*:", "description": "Test data requirements" },
+    { "id": "tp-trace", "pattern": "@[\\w./\\-]+", "description": "@-mention traceability links" }
+  ],
+  "antipatterns": [
+    { "id": "tp-no-negative", "pattern": "(?i)\\b(only|just)\\s*(happy|positive)\\s*path", "weight": 0.1, "description": "Only happy path testing" },
+    { "id": "tp-todo", "pattern": "(?i)\\bTODO\\b|\\bTBD\\b|\\bFIXME\\b", "weight": 0.05, "description": "Unresolved TODOs" },
+    { "id": "tp-manual-only", "pattern": "(?i)\\bmanual\\s*only\\b|\\bno\\s*automation\\b", "weight": 0.05, "description": "No automation consideration" }
+  ]
+}
