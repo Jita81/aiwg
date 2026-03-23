@@ -67,6 +67,11 @@
       "name": "soul-apply",
       "description": "Apply SOUL.md identity to content generation with worldview, opinions, and character",
       "triggers": ["apply soul", "write as soul", "generate with soul", "use persona", "in character"]
+    },
+    {
+      "name": "soul-blend",
+      "description": "Merge multiple SOUL.md files into a composite persona with configurable conflict resolution",
+      "triggers": ["blend these souls", "merge soul files", "combine personas", "create a composite soul", "soul blend", "mix these identities"]
     }
   ],
   "usage": "These skills are consumed by framework-specific skills and can be invoked directly for utility operations."

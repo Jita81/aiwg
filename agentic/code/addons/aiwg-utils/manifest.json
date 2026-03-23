@@ -89,7 +89,8 @@
     "soul-create",
     "soul-validate",
     "soul-enhance",
-    "soul-apply"
+    "soul-apply",
+    "soul-blend"
   ],
   "rules": [
     "agent-deployment",
