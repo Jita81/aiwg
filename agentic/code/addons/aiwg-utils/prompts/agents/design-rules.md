@@ -99,6 +99,7 @@ Before deploying any agent:
 - [ ] Right model tier?
 - [ ] Parallel-safe?
 - [ ] Observable?
+- [ ] Uses native UX tools for questions? (see `native-ux-tools` rule)
 
 ## CLI Validation
 

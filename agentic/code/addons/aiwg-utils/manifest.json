@@ -98,7 +98,8 @@
     "instruction-comprehension",
     "research-before-decision",
     "subagent-scoping",
-    "diagram-generation"
+    "diagram-generation",
+    "native-ux-tools"
   ],
   "templates": [
     "devkit/addon-manifest",

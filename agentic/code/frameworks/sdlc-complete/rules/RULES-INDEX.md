@@ -211,24 +211,43 @@ Research rules manage the research corpus. Deployed when research features are a
 
 ---
 
+## Utility Rules (2 rules — active with aiwg-utils addon)
+
+### HIGH
+
+#### native-ux-tools
+**Summary**: Agents MUST prefer platform-native interaction tools (e.g., AskUserQuestion in Claude Code) over plain text output for interactive questions. Check tool availability before asking, fall back to formatted markdown if unavailable. One question per turn. Includes platform capability matrix.
+**When to apply**: Interactive commands (--interactive flag), decision gates, user confirmations, intake wizards, any agent question
+**Full rule**: @agentic/code/addons/aiwg-utils/rules/native-ux-tools.md
+
+### MEDIUM
+
+#### diagram-generation
+**Summary**: Diagram generation is a standard output alongside every major documentation artifact. Defines required diagram types per artifact (C4 for SAD, ER for data models, sequence for APIs, DFD for threat models). MermaidJS is default; PlantUML for C4/formal UML. Source must be committed alongside rendered output.
+**When to apply**: Architecture documentation, threat modeling, API design, deployment planning, any artifact with visual communication needs
+**Full rule**: @agentic/code/addons/aiwg-utils/rules/diagram-generation.md
+
+---
+
 ## Quick Reference by Context
 
 | Task Type | Relevant Rules |
 |-----------|---------------|
 | **Writing code** | no-attribution, executable-feedback, research-before-decision, anti-laziness, token-security, agent-friendly-code, agent-generation-guardrails |
 | **Running tests** | executable-feedback, anti-laziness, reproducibility, reproducibility-validation |
-| **Creating artifacts** | mention-wiring, provenance-tracking, qualified-references, progressive-disclosure, artifact-discovery |
+| **Creating artifacts** | mention-wiring, provenance-tracking, qualified-references, progressive-disclosure, artifact-discovery, diagram-generation |
 | **Phase transitions** | hitl-gates, sdlc-orchestration, human-gate-display |
 | **Ralph loops** | tao-loop, actionable-feedback, best-output-selection, anti-laziness |
-| **Agent design** | few-shot-examples, conversable-agent-interface, agent-fallback, thought-protocol |
-| **Documentation** | citation-policy, no-attribution, reasoning-sections, research-metadata |
+| **Agent design** | few-shot-examples, conversable-agent-interface, agent-fallback, thought-protocol, native-ux-tools |
+| **Documentation** | citation-policy, no-attribution, reasoning-sections, research-metadata, diagram-generation |
 | **Security review** | token-security, failure-mitigation, research-before-decision |
 | **Delegating to subagents** | subagent-scoping, instruction-comprehension, research-before-decision |
 | **Multi-agent work** | auto-reply-chains, criticality-panel-sizing, sdlc-orchestration, subagent-scoping |
+| **Interactive commands** | native-ux-tools, instruction-comprehension |
 | **Versioning/release** | versioning, no-attribution |
 | **Research** | research-metadata, index-generation, citation-policy |
 
 ---
 
-*Generated from manifest.json v2.0.0 — 35 rules across 3 tiers*
+*Generated from manifest.json v2.0.0 — 37 rules across 4 tiers*
 *Full rule files: @agentic/code/frameworks/sdlc-complete/rules/*

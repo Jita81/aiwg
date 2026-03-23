@@ -381,6 +381,19 @@ This cannot be undone (backup will still be created).
 Continue with full regeneration? [y/N]
 ```
 
+## Interactive Mode
+
+When `--interactive` is specified, ask strategic questions before regenerating:
+
+1. Which provider to regenerate (if multiple detected)
+2. Whether to use hook file or full-inject approach
+3. Whether to preserve all detected team directives
+4. Whether to create a backup
+
+**Native UX tool preference**: For each question, use the platform's native interaction tool if available (e.g., `AskUserQuestion` in Claude Code). This provides a proper input UI rather than plain text output. If no native tool is available, fall back to formatted markdown with clear options. Ask one question per interaction turn.
+
+See `@agentic/code/addons/aiwg-utils/rules/native-ux-tools.md` for the full pattern.
+
 ## Error Handling
 
 | Condition | Action |
