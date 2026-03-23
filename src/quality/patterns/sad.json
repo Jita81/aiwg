@@ -1,0 +1,24 @@
+{
+  "id": "sad",
+  "name": "Software Architecture Document",
+  "description": "Quality patterns for SAD artifacts",
+  "required": [
+    { "id": "sad-overview", "pattern": "(?i)(overview|introduction|purpose)\\s*:", "description": "Architecture overview" },
+    { "id": "sad-constraints", "pattern": "(?i)constraints?\\s*:", "description": "Architecture constraints" },
+    { "id": "sad-components", "pattern": "(?i)(component|module|service)s?\\s*(diagram|overview|architecture)", "description": "Component/module descriptions" },
+    { "id": "sad-decisions", "pattern": "(?i)(decision|ADR|rationale)s?", "description": "Key architectural decisions" },
+    { "id": "sad-quality", "pattern": "(?i)(quality|non-?functional|NFR)\\s*(attribute|requirement)s?", "description": "Quality attributes/NFRs" }
+  ],
+  "recommended": [
+    { "id": "sad-views", "pattern": "(?i)(logical|physical|deployment|process)\\s*view", "description": "Multiple architecture views (4+1)" },
+    { "id": "sad-interfaces", "pattern": "(?i)(interface|API|contract)s?\\s*(definition|spec)?", "description": "Interface definitions" },
+    { "id": "sad-security", "pattern": "(?i)security\\s*(architecture|model|considerations?)", "description": "Security architecture" },
+    { "id": "sad-deployment", "pattern": "(?i)deployment\\s*(model|topology|diagram)", "description": "Deployment model" },
+    { "id": "sad-trace", "pattern": "@[\\w./\\-]+", "description": "@-mention traceability links" }
+  ],
+  "antipatterns": [
+    { "id": "sad-no-rationale", "pattern": "(?i)\\bwe use\\b(?!.*\\bbecause\\b)", "weight": 0.1, "description": "Technology choice without rationale" },
+    { "id": "sad-todo", "pattern": "(?i)\\bTODO\\b|\\bTBD\\b|\\bFIXME\\b", "weight": 0.05, "description": "Unresolved TODOs" },
+    { "id": "sad-monolith", "pattern": "(?i)\\bsingle\\s*point\\s*of\\s*failure\\b", "weight": 0.1, "description": "Acknowledged SPOF without mitigation" }
+  ]
+}
