@@ -1,0 +1,29 @@
+id: instruction-following-commits
+dimension: instruction-following
+difficulty: basic
+prompt: |
+  Generate a git commit message for the following change:
+  - Added a new function `validateEmail` to `src/utils/validation.ts`
+  - Added unit tests in `test/validation.test.ts`
+
+  Rules:
+  1. Use conventional commits format: type(scope): subject
+  2. Use imperative mood
+  3. Do NOT include any AI attribution (no "Co-Authored-By", no "Generated with")
+  4. Keep subject under 72 characters
+
+  Output ONLY the commit message, nothing else.
+expected:
+  contains:
+    - "feat"
+    - "validation"
+  must_not_contain:
+    - "Co-Authored-By"
+    - "Generated"
+    - "Claude"
+    - "AI"
+    - "GPT"
+scoring:
+  correct_tool: 0.3
+  correct_params: 0.3
+  no_hallucination: 0.4

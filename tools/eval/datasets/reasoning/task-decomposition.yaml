@@ -1,0 +1,23 @@
+id: reasoning-task-decomposition
+dimension: reasoning
+difficulty: intermediate
+prompt: |
+  Decompose this task into ordered steps with dependencies:
+
+  "Add OAuth 2.0 authentication to an existing Express.js REST API that
+  currently has no authentication."
+
+  For each step, specify:
+  1. Step name
+  2. What it depends on (previous steps)
+  3. Estimated complexity (low/medium/high)
+
+  List at least 5 steps.
+expected:
+  contains:
+    - "depend"
+    - "step"
+scoring:
+  correct_tool: 0.5
+  correct_params: 0.3
+  no_hallucination: 0.2

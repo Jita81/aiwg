@@ -1,0 +1,20 @@
+id: tool-use-basic-edit
+dimension: tool-use
+difficulty: basic
+prompt: |
+  You need to read the file at src/example.ts and change the function name
+  from "processData" to "transformData". What tool calls would you make?
+  List each tool call with its parameters.
+expected:
+  tool_calls:
+    - tool: Read
+      params_contain:
+        file_path: "src/example.ts"
+    - tool: Edit
+      params_contain:
+        old_string: "processData"
+        new_string: "transformData"
+scoring:
+  correct_tool: 0.4
+  correct_params: 0.4
+  no_hallucination: 0.2

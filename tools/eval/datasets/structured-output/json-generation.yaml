@@ -1,0 +1,20 @@
+id: structured-output-json
+dimension: structured-output
+difficulty: basic
+prompt: |
+  Generate a valid JSON manifest for an AIWG addon called "code-analysis"
+  with the following fields: id, type (must be "addon"), name, version (1.0.0),
+  description, keywords (array of 3), and dependencies (object with required
+  and optional arrays). Output only the JSON, no explanation.
+expected:
+  valid_json: true
+  contains:
+    - "code-analysis"
+    - "addon"
+    - "1.0.0"
+    - "keywords"
+    - "dependencies"
+scoring:
+  correct_tool: 0.3
+  correct_params: 0.5
+  no_hallucination: 0.2

@@ -1,0 +1,23 @@
+{
+  "name": "@aiwg/eval",
+  "version": "0.1.0",
+  "description": "AIWG model evaluation suite for local and cloud model compatibility",
+  "type": "module",
+  "scripts": {
+    "eval": "tsx src/index.ts",
+    "eval:quick": "tsx src/index.ts --dimensions tool-use,instruction-following",
+    "report": "tsx src/index.ts --output markdown"
+  },
+  "keywords": ["evaluation", "llm", "aiwg", "ollama", "model-compatibility"],
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.1.0",
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.0",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.0.0"
+  }
+}
