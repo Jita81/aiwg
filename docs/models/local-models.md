@@ -21,17 +21,131 @@ Use this guide if you are:
 # Install Ollama (macOS / Linux)
 curl -fsSL https://ollama.com/install.sh | sh
 
-# Pull and run a model
-ollama pull llama3.3:70b
-ollama serve
+# Pull a model that supports tool use (required for AIWG agents)
+# Minimum recommended: qwen2.5-coder:14b or qwen3.5:9b on 8GB+ VRAM
+ollama pull qwen2.5-coder:14b
 
-# Point AIWG at the local endpoint
-export OPENAI_BASE_URL="http://localhost:11434/v1"
-export OPENAI_API_KEY="ollama"  # Ollama accepts any non-empty key
+# Install OpenCode (the recommended agentic platform for local model use)
+npm install -g opencode-ai
 
-# Deploy AIWG using the local endpoint
-aiwg use sdlc --provider codex
+# Configure OpenCode to use your local Ollama instance
+# Create opencode.json in your project root:
+cat > opencode.json << 'EOF'
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "ollama": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Ollama",
+      "options": {
+        "baseURL": "http://localhost:11434/v1"
+      },
+      "models": {
+        "qwen2.5-coder:14b": { "name": "Qwen 2.5 Coder 14B" }
+      }
+    }
+  },
+  "model": "ollama/qwen2.5-coder:14b"
+}
+EOF
+
+# Deploy AIWG agents and commands for OpenCode
+aiwg use sdlc --provider opencode
 ```
+
+> **Important**: AIWG requires tool use (function calling) support. Not all local models support this reliably. See [Tool Use Requirements](#tool-use-requirements-for-aiwg) below before selecting a model.
+
+---
+
+## Choosing Your Agentic Platform for Local Models
+
+AIWG requires an **agentic platform** — a tool with file editing, shell execution, and tool use capabilities — not just a model API. Two platforms work well with local models:
+
+### OpenCode (Recommended for Local Models)
+
+OpenCode natively supports multiple model backends including Ollama and any OpenAI-compatible endpoint. No proxy required.
+
+```bash
+# Install
+npm install -g opencode-ai
+
+# Configure with Ollama in opencode.json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "ollama": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Ollama",
+      "options": {
+        "baseURL": "http://localhost:11434/v1"
+      },
+      "models": {
+        "qwen2.5-coder:14b": { "name": "Qwen 2.5 Coder 14B" }
+      }
+    }
+  },
+  "model": "ollama/qwen2.5-coder:14b"
+}
+
+# Deploy AIWG
+aiwg use sdlc --provider opencode
+```
+
+See [OpenCode + Ollama Configuration Template](#opencode--ollama-configuration) for a complete template.
+
+### Claude Code (via API Proxy)
+
+Claude Code talks to the Anthropic API by default. To use local models, run a translation proxy (such as LiteLLM) that exposes an Anthropic-compatible API backed by your local model.
+
+```bash
+# Install LiteLLM
+pip install litellm
+
+# Start a proxy that routes Anthropic calls to Ollama
+litellm --model ollama/qwen2.5-coder:14b \
+        --api_base http://localhost:11434 \
+        --port 4000 \
+        --drop_params
+
+# Point Claude Code at the proxy
+export ANTHROPIC_BASE_URL="http://localhost:4000"
+export ANTHROPIC_API_KEY="local"
+
+# Deploy AIWG
+aiwg use sdlc --provider claude
+```
+
+> **Note**: Proxy-based setups add latency and an extra failure point. OpenCode's native Ollama integration is more reliable for local model use. Use the proxy approach when you want to stay in the Claude Code interface.
+
+---
+
+## Tool Use Requirements for AIWG
+
+AIWG agents rely heavily on tool use (function calling) — reading files, editing code, running shell commands. **This is non-negotiable**: a model without reliable tool use cannot run AIWG workflows.
+
+### Minimum Requirements
+
+| Requirement | Why It Matters |
+|-------------|----------------|
+| Tool use / function calling | All AIWG agents use tools to read/edit files and run tests |
+| Structured JSON output | Commands, agents, and skills require valid JSON for tool calls |
+| Instruction following | AIWG prompts contain multi-constraint rules agents must follow |
+| Context window ≥ 8K | AIWG sessions with multiple files easily exceed smaller windows |
+| Context window ≥ 32K (recommended) | Comfortable headroom for SDLC orchestration workflows |
+
+### Model Capability Matrix
+
+| Model | Size | Tool Use | AIWG Compatible | Tier | Notes |
+|-------|------|----------|-----------------|------|-------|
+| qwen2.5-coder:14b | 14B | Yes | Yes | sonnet | Best coding quality/VRAM ratio of validated local models |
+| qwen3.5:9b | 9B | Yes | Partial | sonnet | Strong coding, reasoning degrades on long chains |
+| hermes-3-llama-3.1:8b | 8B | Yes | Partial | haiku | Good instruction following, limited multi-step planning |
+| llama3.3:70b | 70B | Partial | Partial | opus | Closest to cloud quality; requires 48GB+ VRAM |
+| codellama:34b | 34B | No | No | — | Strong code gen but no tool use; cannot run AIWG agents |
+| llama3.1:8b | 8B | No | No | — | No tool use support |
+| llama3.2:3b | 3B | No | No | — | Summaries/formatting only via direct prompting |
+
+> **The 9B sweet spot**: Models in the 9B–14B range running on 8–12GB VRAM (RTX 3080/4070 class) can now run AIWG workflows reliably. This is the recommended entry point for local use on consumer hardware.
 
 ---
 
@@ -311,54 +425,145 @@ Otherwise: cloud API is more practical.
 
 ## AIWG Integration: Configuring Local Model Providers
 
-### Environment Variables
+### OpenCode + Ollama Configuration
+
+The recommended setup. Create `opencode.json` in your project root:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "ollama": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Ollama",
+      "options": {
+        "baseURL": "http://localhost:11434/v1"
+      },
+      "models": {
+        "qwen2.5-coder:14b": { "name": "Qwen 2.5 Coder 14B" },
+        "qwen3.5:9b": { "name": "Qwen 3.5 9B" },
+        "llama3.3:70b": { "name": "Llama 3.3 70B" }
+      }
+    }
+  },
+  "model": "ollama/qwen2.5-coder:14b",
+  "mcp": {
+    "aiwg": {
+      "type": "local",
+      "command": ["npx", "aiwg", "mcp", "serve"]
+    }
+  },
+  "instructions": [
+    "AGENTS.md",
+    ".aiwg/instructions.md"
+  ]
+}
+```
+
+For LM Studio (OpenAI-compatible on port 1234):
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "lmstudio": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "LM Studio",
+      "options": {
+        "baseURL": "http://127.0.0.1:1234/v1"
+      },
+      "models": {
+        "qwen2.5-coder-14b-instruct": { "name": "Qwen 2.5 Coder 14B Instruct" }
+      }
+    }
+  },
+  "model": "lmstudio/qwen2.5-coder-14b-instruct"
+}
+```
+
+### Claude Code + Local Models (via LiteLLM Proxy)
 
 ```bash
-# Point AIWG's OpenAI-compatible calls at local endpoint
-export OPENAI_BASE_URL="http://localhost:11434/v1"  # Ollama
-export OPENAI_API_KEY="local"                        # Any non-empty value
+# Start LiteLLM routing Anthropic API calls to Ollama
+litellm --model ollama/qwen2.5-coder:14b \
+        --api_base http://localhost:11434 \
+        --port 4000 \
+        --drop_params
 
-# Or for llama.cpp server
-export OPENAI_BASE_URL="http://localhost:8080/v1"
+# Configure Claude Code to use the proxy
+export ANTHROPIC_BASE_URL="http://localhost:4000"
+export ANTHROPIC_API_KEY="local"
 
-# Or for vLLM
-export OPENAI_BASE_URL="http://localhost:8000/v1"
+# Deploy AIWG for Claude Code
+aiwg use sdlc --provider claude
 ```
 
 ### models.json for Local Models
 
+Create `models.json` in your project root to map AIWG tiers to local model names:
+
 ```json
 {
-  "openai": {
+  "ollama": {
     "reasoning": {
       "model": "llama3.3:70b",
-      "description": "Local 70B for complex reasoning"
+      "description": "Local 70B for complex reasoning (requires 48GB+ VRAM)"
     },
     "coding": {
-      "model": "codellama:34b",
-      "description": "Local CodeLlama for implementation"
+      "model": "qwen2.5-coder:14b",
+      "description": "Best coding quality per VRAM among local models"
     },
     "efficiency": {
-      "model": "llama3.2:3b",
-      "description": "Local 3B for quick tasks"
+      "model": "qwen3.5:9b",
+      "description": "9B model with good tool use on consumer hardware"
     }
   },
   "shorthand": {
     "opus": "llama3.3:70b",
-    "sonnet": "codellama:34b",
-    "haiku": "llama3.2:3b"
+    "sonnet": "qwen2.5-coder:14b",
+    "haiku": "qwen3.5:9b"
   }
 }
+```
+
+### Consumer Hardware Configurations
+
+**8GB VRAM (RTX 3070/4060)**:
+```json
+{ "shorthand": { "sonnet": "qwen3.5:9b", "haiku": "qwen3.5:9b" } }
+```
+
+**12GB VRAM (RTX 3080/4070)**:
+```json
+{ "shorthand": { "sonnet": "qwen2.5-coder:14b", "haiku": "qwen3.5:9b" } }
+```
+
+**24GB VRAM (RTX 4090)**:
+```json
+{ "shorthand": { "opus": "qwen2.5-coder:32b", "sonnet": "qwen2.5-coder:14b", "haiku": "qwen3.5:9b" } }
+```
+
+**48GB+ VRAM (2x 4090 / A100)**:
+```json
+{ "shorthand": { "opus": "llama3.3:70b", "sonnet": "qwen2.5-coder:14b", "haiku": "qwen3.5:9b" } }
 ```
 
 ### Testing the Connection
 
 ```bash
-# Verify AIWG can reach the local endpoint
-curl "$OPENAI_BASE_URL/models" \
-  -H "Authorization: Bearer $OPENAI_API_KEY"
+# OpenCode + Ollama: verify models are available
+curl http://localhost:11434/v1/models -H "Authorization: Bearer ollama"
 
-# Should return a list of available local models
+# Test a tool call directly
+curl http://localhost:11434/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ollama" \
+  -d '{
+    "model": "qwen2.5-coder:14b",
+    "messages": [{"role": "user", "content": "List 3 programming languages"}],
+    "tools": [{"type": "function", "function": {"name": "list_items", "parameters": {"type": "object", "properties": {"items": {"type": "array", "items": {"type": "string"}}}}}}]
+  }'
+# If the response includes a tool_calls field, the model supports tool use with AIWG
 ```
 
 ### Prompt Format Considerations

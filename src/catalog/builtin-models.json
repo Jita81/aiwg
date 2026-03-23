@@ -438,6 +438,126 @@
       "tags": ["preview", "long-context", "multimodal", "free"],
       "source": "builtin",
       "lastVerified": "2025-12-12"
+    },
+    "qwen2.5-coder:14b": {
+      "provider": "ollama",
+      "displayName": "Qwen 2.5 Coder 14B",
+      "releaseDate": "2024-11-01",
+      "status": "active",
+      "deprecated": false,
+      "deprecationDate": null,
+      "successorModel": null,
+      "local": true,
+      "capabilities": {
+        "contextWindow": 32768,
+        "maxOutputTokens": 8192,
+        "vision": false,
+        "toolUse": true,
+        "streaming": true,
+        "reasoning": "good",
+        "coding": "excellent",
+        "speed": "good"
+      },
+      "pricing": null,
+      "hardware": {
+        "minVram": "12GB",
+        "recommendedVram": "12GB",
+        "quantization": "Q4_K_M"
+      },
+      "aliases": ["qwen2.5-coder", "qwen-coder-14b"],
+      "tags": ["local", "coding", "tool-use", "ollama", "recommended"],
+      "source": "builtin",
+      "lastVerified": "2026-03-01"
+    },
+    "qwen3.5:9b": {
+      "provider": "ollama",
+      "displayName": "Qwen 3.5 9B",
+      "releaseDate": "2025-07-01",
+      "status": "active",
+      "deprecated": false,
+      "deprecationDate": null,
+      "successorModel": null,
+      "local": true,
+      "capabilities": {
+        "contextWindow": 32768,
+        "maxOutputTokens": 8192,
+        "vision": false,
+        "toolUse": true,
+        "streaming": true,
+        "reasoning": "fair",
+        "coding": "good",
+        "speed": "excellent"
+      },
+      "pricing": null,
+      "hardware": {
+        "minVram": "8GB",
+        "recommendedVram": "8GB",
+        "quantization": "Q4_K_M"
+      },
+      "aliases": ["qwen3.5", "qwen-3.5-9b"],
+      "tags": ["local", "efficiency", "tool-use", "ollama", "consumer-hardware"],
+      "source": "builtin",
+      "lastVerified": "2026-03-01"
+    },
+    "hermes-3-llama-3.1:8b": {
+      "provider": "ollama",
+      "displayName": "Hermes 3 Llama 3.1 8B",
+      "releaseDate": "2024-09-01",
+      "status": "active",
+      "deprecated": false,
+      "deprecationDate": null,
+      "successorModel": null,
+      "local": true,
+      "capabilities": {
+        "contextWindow": 131072,
+        "maxOutputTokens": 8192,
+        "vision": false,
+        "toolUse": true,
+        "streaming": true,
+        "reasoning": "fair",
+        "coding": "good",
+        "speed": "excellent"
+      },
+      "pricing": null,
+      "hardware": {
+        "minVram": "8GB",
+        "recommendedVram": "8GB",
+        "quantization": "Q4_K_M"
+      },
+      "aliases": ["hermes-3", "nous-hermes-3"],
+      "tags": ["local", "tool-use", "ollama", "long-context", "consumer-hardware"],
+      "source": "builtin",
+      "lastVerified": "2026-03-01"
+    },
+    "llama3.3:70b": {
+      "provider": "ollama",
+      "displayName": "Llama 3.3 70B",
+      "releaseDate": "2024-12-01",
+      "status": "active",
+      "deprecated": false,
+      "deprecationDate": null,
+      "successorModel": null,
+      "local": true,
+      "capabilities": {
+        "contextWindow": 131072,
+        "maxOutputTokens": 8192,
+        "vision": false,
+        "toolUse": true,
+        "streaming": true,
+        "reasoning": "excellent",
+        "coding": "good",
+        "speed": "fair"
+      },
+      "pricing": null,
+      "hardware": {
+        "minVram": "48GB",
+        "recommendedVram": "48GB",
+        "quantization": "Q4_K_M"
+      },
+      "aliases": ["llama3.3", "llama-3.3-70b"],
+      "tags": ["local", "reasoning", "tool-use", "ollama", "high-end"],
+      "source": "builtin",
+      "lastVerified": "2026-03-01"
     }
   },
   "providers": {
@@ -468,12 +588,20 @@
       "modelsEndpoint": "https://openrouter.ai/api/v1/models",
       "docsUrl": "https://openrouter.ai/docs",
       "pricingUrl": "https://openrouter.ai/models"
+    },
+    "ollama": {
+      "displayName": "Ollama",
+      "apiEndpoint": "http://localhost:11434",
+      "modelsEndpoint": "http://localhost:11434/api/tags",
+      "docsUrl": "https://ollama.com/library",
+      "pricingUrl": null,
+      "local": true
     }
   },
   "metadata": {
-    "version": "1.1.0",
-    "lastRefresh": "2026-02-06T00:00:00Z",
-    "modelCount": 15,
-    "providerCount": 4
+    "version": "1.2.0",
+    "lastRefresh": "2026-03-23T00:00:00Z",
+    "modelCount": 19,
+    "providerCount": 5
   }
 }

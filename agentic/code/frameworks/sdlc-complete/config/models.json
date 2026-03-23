@@ -67,6 +67,22 @@
     }
   },
 
+  "ollama": {
+    "_note": "Local model defaults via Ollama. These are reasonable starting points — tune to your hardware.",
+    "reasoning": {
+      "model": "llama3.3:70b",
+      "description": "Llama 3.3 70B — closest to cloud reasoning quality locally, requires 48GB+ VRAM"
+    },
+    "coding": {
+      "model": "qwen2.5-coder:14b",
+      "description": "Qwen 2.5 Coder 14B — best coding quality per VRAM of validated local models (12GB VRAM)"
+    },
+    "efficiency": {
+      "model": "qwen3.5:9b",
+      "description": "Qwen 3.5 9B — consumer hardware entry point with tool use support (8GB VRAM)"
+    }
+  },
+
   "shorthand": {
     "opus": "claude-opus-4-6",
     "sonnet": "claude-sonnet-4-6",
