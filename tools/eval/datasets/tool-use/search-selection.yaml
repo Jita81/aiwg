@@ -1,0 +1,18 @@
+id: tool-use-search-selection
+dimension: tool-use
+difficulty: basic
+prompt: |
+  I need to find all TypeScript files that contain the word "authenticate".
+  What tool would you use? Provide the tool call with parameters.
+expected:
+  tool_calls:
+    - tool: Grep
+      params_contain:
+        pattern: "authenticate"
+  must_not_contain:
+    - "grep -r"
+    - "find ."
+scoring:
+  correct_tool: 0.5
+  correct_params: 0.3
+  no_hallucination: 0.2

@@ -1,0 +1,17 @@
+id: tool-use-multi-step
+dimension: tool-use
+difficulty: intermediate
+prompt: |
+  I need to find all files that import "lodash", then check if each file
+  also uses the "merge" function from lodash. List the sequence of tool
+  calls you would make with their parameters.
+expected:
+  tool_calls:
+    - tool: Grep
+      params_contain:
+        pattern: "lodash"
+    - tool: Read
+scoring:
+  correct_tool: 0.4
+  correct_params: 0.4
+  no_hallucination: 0.2

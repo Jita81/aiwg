@@ -1,0 +1,19 @@
+id: structured-output-yaml
+dimension: structured-output
+difficulty: basic
+prompt: |
+  Generate YAML frontmatter for a research document about "Transformer Architecture"
+  published in 2023. Include fields: title, authors (array), year, doi, tags (array),
+  grade (one of HIGH/MODERATE/LOW/VERY_LOW). Output only the YAML block with ---
+  delimiters, no other content.
+expected:
+  contains:
+    - "---"
+    - "title:"
+    - "Transformer"
+    - "2023"
+    - "grade:"
+scoring:
+  correct_tool: 0.3
+  correct_params: 0.5
+  no_hallucination: 0.2

@@ -1,0 +1,217 @@
+/**
+ * Evaluation Runner — orchestrates test execution across dimensions
+ * Pattern from matric-eval: @matric-memory/evals/src/runner.ts
+ */
+
+import { promises as fs } from 'fs';
+import path from 'path';
+import yaml from 'js-yaml';
+import type { GenerationModel, TestCase, EvalResult, DimensionScore, EvalReport } from './models/types.js';
+import { DIMENSION_WEIGHTS, scoreTier, calculateOverall } from './scoring/weights.js';
+
+export interface RunnerOptions {
+  dimensions?: string[];
+  outputFormat?: 'json' | 'markdown';
+  verbose?: boolean;
+}
+
+export class EvalRunner {
+  private model: GenerationModel;
+  private datasetsDir: string;
+
+  constructor(model: GenerationModel, datasetsDir: string) {
+    this.model = model;
+    this.datasetsDir = datasetsDir;
+  }
+
+  async run(options: RunnerOptions = {}): Promise<EvalReport> {
+    const dimensions = options.dimensions || Object.keys(DIMENSION_WEIGHTS);
+    const results: EvalResult[] = [];
+    const dimensionScores: DimensionScore[] = [];
+
+    for (const dimension of dimensions) {
+      const testCases = await this.loadTestCases(dimension);
+      if (testCases.length === 0) {
+        if (options.verbose) console.log(`  Skipping ${dimension}: no test cases found`);
+        continue;
+      }
+
+      if (options.verbose) console.log(`\nEvaluating: ${dimension} (${testCases.length} test cases)`);
+
+      const dimResults: EvalResult[] = [];
+
+      for (const testCase of testCases) {
+        if (options.verbose) console.log(`  Running: ${testCase.id}`);
+        const result = await this.evaluateTestCase(testCase);
+        dimResults.push(result);
+        results.push(result);
+      }
+
+      const totalScore = dimResults.reduce((s, r) => s + r.score, 0);
+      const maxScore = dimResults.reduce((s, r) => s + r.maxScore, 0);
+      const dimScore = maxScore > 0 ? Math.round((totalScore / maxScore) * 100) : 0;
+
+      dimensionScores.push({
+        dimension,
+        score: dimScore,
+        tier: scoreTier(dimScore),
+        testCases: testCases.length,
+        passed: dimResults.filter((r) => r.score / r.maxScore >= 0.5).length,
+      });
+    }
+
+    const dimScoreMap: Record<string, number> = {};
+    for (const ds of dimensionScores) {
+      dimScoreMap[ds.dimension] = ds.score;
+    }
+
+    const overall = calculateOverall(dimScoreMap);
+    const totalLatency = results.reduce((s, r) => s + r.latencyMs, 0);
+
+    return {
+      model: this.model.name,
+      backend: 'ollama',
+      date: new Date().toISOString(),
+      aiwgVersion: '2026.3.2',
+      dimensions: dimensionScores,
+      overall,
+      overallTier: scoreTier(overall),
+      totalLatencyMs: totalLatency,
+    };
+  }
+
+  private async loadTestCases(dimension: string): Promise<TestCase[]> {
+    const dimDir = path.join(this.datasetsDir, dimension);
+    try {
+      const files = await fs.readdir(dimDir);
+      const testCases: TestCase[] = [];
+
+      for (const file of files) {
+        if (!file.endsWith('.yaml') && !file.endsWith('.yml')) continue;
+        const content = await fs.readFile(path.join(dimDir, file), 'utf-8');
+        const parsed = yaml.load(content) as TestCase;
+        if (parsed?.id) testCases.push(parsed);
+      }
+
+      return testCases;
+    } catch {
+      return [];
+    }
+  }
+
+  private async evaluateTestCase(testCase: TestCase): Promise<EvalResult> {
+    const startTime = Date.now();
+
+    try {
+      const result = await this.model.generate(testCase.prompt, {
+        temperature: 0,
+        maxTokens: 2048,
+      });
+
+      const latencyMs = Date.now() - startTime;
+      const { score, maxScore, details } = scoreResponse(result.text, testCase);
+
+      return {
+        testCaseId: testCase.id,
+        dimension: testCase.dimension,
+        score,
+        maxScore,
+        details,
+        latencyMs,
+        modelResponse: result.text.slice(0, 500),
+      };
+    } catch (error) {
+      return {
+        testCaseId: testCase.id,
+        dimension: testCase.dimension,
+        score: 0,
+        maxScore: 1,
+        details: { error: (error as Error).message },
+        latencyMs: Date.now() - startTime,
+        modelResponse: '',
+      };
+    }
+  }
+}
+
+function scoreResponse(response: string, testCase: TestCase): { score: number; maxScore: number; details: Record<string, unknown> } {
+  const scoring = testCase.scoring;
+  const expected = testCase.expected;
+  let score = 0;
+  let maxScore = 0;
+  const details: Record<string, unknown> = {};
+
+  // Check for expected tool calls
+  if (expected.tool_calls) {
+    const toolCalls = expected.tool_calls as Array<{ tool: string; params_contain?: Record<string, string> }>;
+    for (const tc of toolCalls) {
+      maxScore += scoring.correct_tool || 0.5;
+      if (response.toLowerCase().includes(tc.tool.toLowerCase())) {
+        score += scoring.correct_tool || 0.5;
+        details[`tool_${tc.tool}`] = 'found';
+      }
+
+      if (tc.params_contain) {
+        maxScore += scoring.correct_params || 0.5;
+        const paramsFound = Object.values(tc.params_contain).every((v) =>
+          response.includes(String(v))
+        );
+        if (paramsFound) {
+          score += scoring.correct_params || 0.5;
+          details[`params_${tc.tool}`] = 'correct';
+        }
+      }
+    }
+  }
+
+  // Check for expected content
+  if (expected.contains) {
+    const contains = expected.contains as string[];
+    for (const c of contains) {
+      maxScore += 1;
+      if (response.toLowerCase().includes(c.toLowerCase())) {
+        score += 1;
+        details[`contains_${c}`] = true;
+      }
+    }
+  }
+
+  // Check for forbidden content
+  if (expected.must_not_contain) {
+    const forbidden = expected.must_not_contain as string[];
+    maxScore += scoring.no_hallucination || 0.2;
+    const clean = forbidden.every((f) => !response.toLowerCase().includes(f.toLowerCase()));
+    if (clean) {
+      score += scoring.no_hallucination || 0.2;
+      details.no_hallucination = true;
+    }
+  }
+
+  // Check JSON/YAML validity
+  if (expected.valid_json) {
+    maxScore += 1;
+    try {
+      JSON.parse(response);
+      score += 1;
+      details.valid_json = true;
+    } catch {
+      details.valid_json = false;
+    }
+  }
+
+  if (expected.valid_yaml) {
+    maxScore += 1;
+    try {
+      yaml.load(response);
+      score += 1;
+      details.valid_yaml = true;
+    } catch {
+      details.valid_yaml = false;
+    }
+  }
+
+  // Fallback: at least 1 point max
+  if (maxScore === 0) maxScore = 1;
+
+  return { score, maxScore, details };
+}
