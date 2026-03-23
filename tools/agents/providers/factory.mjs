@@ -260,6 +260,7 @@ export function transformCommand(srcPath, content, opts) {
   const rawName = frontmatter.match(/name:\s*(.+)/)?.[1]?.trim();
   const description = frontmatter.match(/description:\s*(.+)/)?.[1]?.trim();
   const args = frontmatter.match(/args:\s*(.+)/)?.[1]?.trim();
+  const argumentHint = frontmatter.match(/argument-hint:\s*(.+)/)?.[1]?.trim();
 
   // Convert name to kebab-case
   const name = toKebabCase(rawName) || path.basename(srcPath, '.md');
@@ -267,7 +268,8 @@ export function transformCommand(srcPath, content, opts) {
   // Build Factory command frontmatter
   let factoryFrontmatter = `---
 name: ${name}
-description: ${description || 'AIWG command'}`;
+description: ${description || 'AIWG command'}
+argument-hint: ${argumentHint || '<task-description>'}`;
 
   if (args) {
     factoryFrontmatter += `\nargs: ${args}`;
@@ -275,7 +277,12 @@ description: ${description || 'AIWG command'}`;
 
   factoryFrontmatter += '\n---';
 
-  return `${factoryFrontmatter}\n\n${body.trim()}`;
+  // Prepend $ARGUMENTS so Factory passes user input into the prompt body.
+  // Factory silently drops anything typed after the command name if $ARGUMENTS
+  // is not present. This is a deploy-time transform only — source files are unchanged.
+  const bodyWithArgs = `$ARGUMENTS\n\n${body.trim()}`;
+
+  return `${factoryFrontmatter}\n\n${bodyWithArgs}`;
 }
 
 // ============================================================================

@@ -534,4 +534,79 @@ describe('Factory CLI Integration', () => {
       }
     });
   });
+
+  describe('Command Transform ($ARGUMENTS injection)', () => {
+    it('injects $ARGUMENTS at the top of deployed command body', async () => {
+      const { transformCommand } = await import(
+        path.join(REPO_ROOT, 'tools/agents/providers/factory.mjs')
+      );
+
+      const source = `---
+name: flow-guided-implementation
+description: Guided implementation workflow
+---
+
+You are a senior engineer. Execute guided implementation for the given task.`;
+
+      const result = transformCommand('flow-guided-implementation.md', source, {});
+      const [, body] = result.split(/\n---\n/);
+
+      expect(body.trimStart()).toMatch(/^\$ARGUMENTS/);
+      expect(body).toContain('You are a senior engineer.');
+    });
+
+    it('adds argument-hint to deployed frontmatter', async () => {
+      const { transformCommand } = await import(
+        path.join(REPO_ROOT, 'tools/agents/providers/factory.mjs')
+      );
+
+      const source = `---
+name: flow-guided-implementation
+description: Guided implementation workflow
+---
+
+You are a senior engineer.`;
+
+      const result = transformCommand('flow-guided-implementation.md', source, {});
+
+      expect(result).toContain('argument-hint:');
+    });
+
+    it('preserves argument-hint from source frontmatter when already present', async () => {
+      const { transformCommand } = await import(
+        path.join(REPO_ROOT, 'tools/agents/providers/factory.mjs')
+      );
+
+      const source = `---
+name: my-command
+description: My command
+argument-hint: <branch-name>
+---
+
+Do something with $ARGUMENTS.`;
+
+      const result = transformCommand('my-command.md', source, {});
+
+      expect(result).toContain('argument-hint: <branch-name>');
+    });
+
+    it('does not modify source command files (transform only affects output)', async () => {
+      const commandsDir = path.join(
+        REPO_ROOT,
+        'agentic/code/frameworks/sdlc-complete/commands'
+      );
+
+      const exists = await fs.access(commandsDir).then(() => true).catch(() => false);
+      if (!exists) return;
+
+      const files = await fs.readdir(commandsDir);
+      const mdFiles = files.filter(f => f.endsWith('.md'));
+
+      for (const file of mdFiles.slice(0, 5)) {
+        const content = await fs.readFile(path.join(commandsDir, file), 'utf-8');
+        // Source files should NOT contain $ARGUMENTS — it's deploy-time only
+        expect(content).not.toContain('$ARGUMENTS');
+      }
+    });
+  });
 });
