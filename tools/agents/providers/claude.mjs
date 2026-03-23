@@ -31,7 +31,8 @@ import {
   normalizeDeploymentMode,
   collectFrameworkArtifacts,
   cleanupOldRuleFiles,
-  filterCommandsAgainstSkills
+  filterCommandsAgainstSkills,
+  deploySoulCompanions
 } from './base.mjs';
 
 // ============================================================================
@@ -399,12 +400,13 @@ export async function deploy(opts) {
     consolidatedSdlcRules: true
   });
   agentFiles.push(...frameworkArtifacts.agents);
+  const soulFiles = [...(frameworkArtifacts.souls || [])];
   commandFiles.push(...frameworkArtifacts.commands);
   skillDirs.push(...frameworkArtifacts.skills);
   ruleFiles.push(...frameworkArtifacts.rules);
 
   // Deploy based on flags — track counts for summary
-  const counts = { agents: 0, commands: 0, skills: 0, rules: 0 };
+  const counts = { agents: 0, commands: 0, skills: 0, rules: 0, souls: 0 };
 
   if (!commandsOnly && !skillsOnly) {
     // Apply filters if specified
@@ -415,6 +417,14 @@ export async function deploy(opts) {
     if (verbose) console.log(`\nDeploying ${filteredAgents.length} agents...`);
     deployAgents(filteredAgents, target, opts);
     counts.agents = filteredAgents.length;
+
+    // Deploy soul companion files alongside agents
+    if (soulFiles.length > 0) {
+      const destDir = path.join(target, paths.agents);
+      if (verbose) console.log(`\nDeploying ${soulFiles.length} soul files...`);
+      deploySoulCompanions(soulFiles, destDir, opts);
+      counts.souls = soulFiles.length;
+    }
   }
 
   // Filter commands that collide with skills (skills take precedence)
@@ -449,6 +459,7 @@ export async function deploy(opts) {
     // Clean summary output
     const parts = [];
     if (counts.agents > 0) parts.push(`${counts.agents} agents`);
+    if (counts.souls > 0) parts.push(`${counts.souls} souls`);
     if (counts.commands > 0) parts.push(`${counts.commands} commands`);
     if (counts.skills > 0) parts.push(`${counts.skills} skills`);
     if (counts.rules > 0) parts.push(`${counts.rules} rules`);

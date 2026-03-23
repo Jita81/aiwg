@@ -36,7 +36,8 @@ import {
   normalizeDeploymentMode,
   collectFrameworkArtifacts,
   cleanupOldRuleFiles,
-  filterCommandsAgainstSkills
+  filterCommandsAgainstSkills,
+  deploySoulCompanions
 } from './base.mjs';
 
 // ============================================================================
@@ -465,12 +466,21 @@ export async function deploy(opts) {
     includeRules: false
   });
   allAgentFiles.push(...frameworkAgents.agents);
+  const soulFiles = [...(frameworkAgents.souls || [])];
 
   // Generate aggregated AGENTS.md
   if (allAgentFiles.length > 0 && !commandsOnly && !skillsOnly && !rulesOnly) {
     const agentsMdPath = path.join(target, 'AGENTS.md');
     console.log(`\nGenerating AGENTS.md with ${allAgentFiles.length} agents...`);
     generateAgentsMd(allAgentFiles, agentsMdPath, opts);
+
+    // Deploy soul companion files alongside agents (discrete mirror dir)
+    if (soulFiles.length > 0) {
+      const destDir = path.join(target, paths.agents);
+      ensureDir(destDir, opts.dryRun);
+      console.log(`\nDeploying ${soulFiles.length} soul files...`);
+      deploySoulCompanions(soulFiles, destDir, opts);
+    }
   }
 
   // Generate .windsurfrules with orchestration context

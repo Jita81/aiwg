@@ -38,7 +38,9 @@ import {
   normalizeDeploymentMode,
   getRulesIndexPath,
   cleanupOldRuleFiles,
-  filterCommandsAgainstSkills
+  filterCommandsAgainstSkills,
+  collectFrameworkArtifacts,
+  deploySoulCompanions
 } from './base.mjs';
 
 // ============================================================================
@@ -359,6 +361,15 @@ export async function deploy(opts) {
     ruleFiles.push(...getAddonRuleFiles(srcRoot));
   }
 
+  // Collect soul companion files
+  const soulArtifacts = collectFrameworkArtifacts(srcRoot, normalizedMode, {
+    includeAgents: false,
+    includeCommands: false,
+    includeSkills: false,
+    includeRules: false
+  });
+  const soulFiles = [...(soulArtifacts.souls || [])];
+
   // Deploy based on flags
   if (!commandsOnly && !skillsOnly && !rulesOnly) {
     if (asAgentsMd) {
@@ -369,6 +380,14 @@ export async function deploy(opts) {
     } else {
       console.log(`\nDeploying ${agentFiles.length} agents...`);
       deployAgents(agentFiles, target, opts);
+    }
+
+    // Deploy soul companion files alongside agents
+    if (soulFiles.length > 0) {
+      const destDir = path.join(target, paths.agents);
+      ensureDir(destDir, opts.dryRun);
+      console.log(`\nDeploying ${soulFiles.length} soul files...`);
+      deploySoulCompanions(soulFiles, destDir, opts);
     }
   }
 

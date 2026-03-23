@@ -36,7 +36,8 @@ import {
   normalizeDeploymentMode,
   collectFrameworkArtifacts,
   cleanupOldRuleFiles,
-  filterCommandsAgainstSkills
+  filterCommandsAgainstSkills,
+  deploySoulCompanions
 } from './base.mjs';
 
 // ============================================================================
@@ -421,6 +422,7 @@ export async function deploy(opts) {
     consolidatedSdlcRules: true
   });
   agentFiles.push(...frameworkArtifacts.agents);
+  const soulFiles = [...(frameworkArtifacts.souls || [])];
   commandFiles.push(...frameworkArtifacts.commands);
   skillDirs.push(...frameworkArtifacts.skills);
   ruleFiles.push(...frameworkArtifacts.rules);
@@ -429,6 +431,13 @@ export async function deploy(opts) {
   if (!commandsOnly && !skillsOnly && !rulesOnly) {
     console.log(`\nDeploying ${agentFiles.length} agents (YAML format)...`);
     deployAgents(agentFiles, target, opts);
+
+    // Deploy soul companion files alongside agents
+    if (soulFiles.length > 0) {
+      const destDir = path.join(target, paths.agents);
+      console.log(`\nDeploying ${soulFiles.length} soul files...`);
+      deploySoulCompanions(soulFiles, destDir, opts);
+    }
   }
 
   // Filter commands that collide with skills (skills take precedence)

@@ -34,7 +34,18 @@ export function listMdFiles(dir, excludePatterns = []) {
   const excluded = [...defaultExcluded, ...excludePatterns];
   return fs
     .readdirSync(dir, { withFileTypes: true })
-    .filter((e) => e.isFile() && e.name.toLowerCase().endsWith('.md') && !excluded.includes(e.name))
+    .filter((e) => e.isFile() && e.name.toLowerCase().endsWith('.md') && !e.name.toLowerCase().endsWith('.soul.md') && !excluded.includes(e.name))
+    .map((e) => path.join(dir, e.name));
+}
+
+/**
+ * List .soul.md companion files in a directory (non-recursive)
+ */
+export function listSoulFiles(dir) {
+  if (!fs.existsSync(dir)) return [];
+  return fs
+    .readdirSync(dir, { withFileTypes: true })
+    .filter((e) => e.isFile() && e.name.toLowerCase().endsWith('.soul.md'))
     .map((e) => path.join(dir, e.name));
 }
 
@@ -350,6 +361,15 @@ export function deployFiles(files, destDir, opts, transformFn) {
   }
 
   return actions;
+}
+
+/**
+ * Deploy .soul.md companion files alongside agents.
+ * Soul files are copied as-is (no transformation) to the same directory as agents.
+ */
+export function deploySoulCompanions(soulFiles, destDir, opts) {
+  if (!soulFiles || soulFiles.length === 0) return [];
+  return deployFiles(soulFiles, destDir, opts, null);
 }
 
 /**
@@ -791,6 +811,7 @@ export function collectFrameworkArtifacts(srcRoot, mode, options = {}) {
   const artifacts = {
     frameworks,
     agents: [],
+    souls: [],
     commands: [],
     skills: [],
     rules: []
@@ -799,6 +820,7 @@ export function collectFrameworkArtifacts(srcRoot, mode, options = {}) {
   for (const framework of frameworks) {
     if (includeAgents && framework.components.agents.exists) {
       artifacts.agents.push(...listMdFiles(framework.components.agents.path));
+      artifacts.souls.push(...listSoulFiles(framework.components.agents.path));
     }
 
     if (includeCommands && framework.components.commands.exists) {
