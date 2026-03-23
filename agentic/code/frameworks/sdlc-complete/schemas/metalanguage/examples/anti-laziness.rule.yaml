@@ -1,0 +1,32 @@
+rule:
+  id: anti-laziness
+  name: Anti-Laziness
+  description: Prevent destructive avoidance behaviors in agent execution
+  severity: HIGH
+  tier: core
+  when_to_apply: Test failures, difficult bugs, refactoring, coverage regression
+
+  prohibitions:
+    - delete_tests_to_pass
+    - skip_tests
+    - remove_features_instead_of_fixing
+    - weaken_assertions
+    - premature_task_abandonment
+
+  requirements:
+    - escalate_after_3_failed_attempts
+    - preserve_test_coverage
+    - fix_root_cause_not_symptoms
+
+  recovery_protocol:
+    - PAUSE
+    - DIAGNOSE
+    - ADAPT
+    - RETRY
+    - ESCALATE
+
+  max_retries: 3
+
+  exceptions:
+    - explicitly_requested_by_user
+    - test_is_genuinely_obsolete
