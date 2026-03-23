@@ -57,6 +57,16 @@
       "name": "soul-validate",
       "description": "Validate SOUL.md quality against community best practices",
       "triggers": ["validate soul", "check SOUL.md quality", "soul quality check", "review my SOUL.md"]
+    },
+    {
+      "name": "soul-enhance",
+      "description": "Improve existing SOUL.md by resolving vague sections and generating calibration examples",
+      "triggers": ["enhance soul", "improve SOUL.md", "sharpen soul", "fix vague soul sections"]
+    },
+    {
+      "name": "soul-apply",
+      "description": "Apply SOUL.md identity to content generation with worldview, opinions, and character",
+      "triggers": ["apply soul", "write as soul", "generate with soul", "use persona", "in character"]
     }
   ],
   "usage": "These skills are consumed by framework-specific skills and can be invoked directly for utility operations."
