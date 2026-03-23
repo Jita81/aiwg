@@ -1,0 +1,26 @@
+# AIWG Integration
+
+AIWG connected via MCP (`aiwg mcp serve`). Tools: workflow-run, artifact-read, artifact-write, template-render, agent-list.
+
+## Route to AIWG When
+
+- Structured artifacts needed (requirements, architecture, test plans, risk registers)
+- Multi-step workflows with phase gates or checkpoints
+- Template-driven output that persists across sessions
+
+Handle in Hermes directly: one-off questions, short tasks, conversation.
+
+## Memory Boundary
+
+Store artifact path + one-sentence summary in MEMORY.md. Never copy artifact body text.
+
+Use `delegate_task(skip_context_files=True, skip_memory=True)` for AIWG workflows.
+
+## Artifact Store (.aiwg/)
+
+Fetch on demand via `artifact-read`:
+- `requirements/` — use cases, user stories
+- `architecture/` — SAD, ADRs
+- `planning/` — phase plans
+- `testing/` — test strategy
+- `security/` — threat models

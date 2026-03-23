@@ -1,0 +1,41 @@
+# Hermes Agent + AIWG — Minimal MCP Configuration
+#
+# This config connects AIWG as an MCP sidecar with a restricted tool surface.
+# Schema overhead: ~3,000 tokens (vs. ~12,000+ with full surface).
+#
+# Architecture: Hermes (host) → MCP → AIWG (sidecar)
+# Hermes owns: conversation, memory, sessions
+# AIWG owns: .aiwg/ artifacts, workflows, templates
+#
+# Usage:
+#   1. Copy the mcp_servers block into ~/.hermes/config.yaml
+#   2. Restart Hermes or reload MCP servers
+#   3. Verify: ask Hermes "what AIWG tools are available?"
+
+mcp_servers:
+  aiwg:
+    command: "aiwg"
+    args: ["mcp", "serve"]
+    tools:
+      include:
+        - workflow-run       # Execute AIWG workflow by name
+        - artifact-read      # Read a specific .aiwg/ artifact
+        - artifact-write     # Write/update a .aiwg/ artifact
+        - template-render    # Render an AIWG template with data
+        - agent-list         # List available AIWG agents
+      prompts: false         # Suppress prompt schemas (saves tokens)
+      resources: false       # Suppress resource schemas (saves tokens)
+
+# Recommended compression settings for local models (12GB VRAM)
+compression:
+  enabled: true
+  threshold: 0.30              # Lower than default 0.50 — avoids abrupt context cliffs
+  summary_model: "ollama/qwen3.5:9b"
+  summary_provider: "custom"
+  summary_base_url: "http://localhost:11434/v1"
+
+# Context window (auto-detected from /models endpoint, or set manually)
+# model:
+#   context_length: 32768
+
+max_tool_rounds: 10
