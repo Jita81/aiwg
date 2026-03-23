@@ -205,6 +205,14 @@ function createOrUpdateSettings(aiwgPath, provider) {
     console.log(`exists  CLAUDE.md`);
   }
 
+  // Copy AIWG.md hook file (generated content loaded by @AIWG.md directive in CLAUDE.md)
+  const aiwgMdTemplate = path.join(aiwgPath, 'agentic', 'code', 'frameworks', 'sdlc-complete', 'templates', 'project', 'AIWG.md');
+  const aiwgMdDest = path.resolve(process.cwd(), 'AIWG.md');
+  if (fs.existsSync(aiwgMdTemplate)) {
+    fs.writeFileSync(aiwgMdDest, fs.readFileSync(aiwgMdTemplate, 'utf8'), 'utf8');
+    console.log(`created AIWG.md`);
+  }
+
   const readmePath = path.resolve(process.cwd(), 'README.md');
   if (!fs.existsSync(readmePath)) {
     const readme = `# ${name}\n\n` +

@@ -234,6 +234,62 @@ export async function postDeploy(targetDir, opts) {
     fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2), 'utf8');
     console.log('Created .claude/settings.json');
   }
+
+  // Hook file architecture: write AIWG.md and wire @AIWG.md into CLAUDE.md
+  if (opts.srcRoot) {
+    deployHookFile(targetDir, opts);
+  }
+}
+
+/**
+ * Deploy the AIWG.md hook file and add @AIWG.md directive to CLAUDE.md.
+ * Hook file approach: AIWG content lives in AIWG.md; CLAUDE.md stays minimal
+ * with a single @AIWG.md directive that Claude Code loads at session start.
+ * Falls back gracefully if template is missing (older installs).
+ */
+function deployHookFile(targetDir, opts) {
+  const { srcRoot, dryRun } = opts;
+  const templatePath = path.join(srcRoot, 'agentic', 'code', 'frameworks', 'sdlc-complete', 'templates', 'project', 'AIWG.md');
+  const hookDest = path.join(targetDir, 'AIWG.md');
+  const claudeDest = path.join(targetDir, 'CLAUDE.md');
+  const directive = '@AIWG.md';
+
+  if (!fs.existsSync(templatePath)) return;
+
+  // Write AIWG.md (always overwrite — it's generated content)
+  if (dryRun) {
+    console.log('[dry-run] Would write AIWG.md from template');
+  } else {
+    const content = fs.readFileSync(templatePath, 'utf8');
+    fs.writeFileSync(hookDest, content, 'utf8');
+    console.log('Created AIWG.md (hook file)');
+  }
+
+  // Add @AIWG.md directive to CLAUDE.md if present but missing the directive
+  if (fs.existsSync(claudeDest)) {
+    const existing = fs.readFileSync(claudeDest, 'utf8');
+    if (!existing.includes(directive)) {
+      if (dryRun) {
+        console.log('[dry-run] Would add @AIWG.md directive to CLAUDE.md');
+      } else {
+        // Insert directive after the first heading or at end of first paragraph
+        const lines = existing.split('\n');
+        let insertAt = lines.length;
+        for (let i = 0; i < lines.length; i++) {
+          if (lines[i].startsWith('#')) {
+            // Insert after the first heading block (skip blank lines after heading)
+            let j = i + 1;
+            while (j < lines.length && lines[j].trim() === '') j++;
+            insertAt = j;
+            break;
+          }
+        }
+        lines.splice(insertAt, 0, '', directive, '');
+        fs.writeFileSync(claudeDest, lines.join('\n'), 'utf8');
+        console.log('Added @AIWG.md directive to CLAUDE.md');
+      }
+    }
+  }
 }
 
 // ============================================================================
