@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aiwg.io/schemas/metalanguage/flow.schema.json",
+  "title": "AIWG Flow Definition",
+  "description": "Declarative YAML schema for multi-agent workflow orchestration",
+  "type": "object",
+  "required": ["flow"],
+  "properties": {
+    "flow": {
+      "type": "object",
+      "required": ["id", "steps"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "model": { "type": "string", "enum": ["opus", "sonnet", "haiku", "auto"] },
+        "entry_criteria": {
+          "type": "object",
+          "properties": {
+            "gate": { "type": "string" },
+            "artifacts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["path"],
+                "properties": {
+                  "path": { "type": "string" },
+                  "required": { "type": "boolean", "default": true }
+                }
+              }
+            }
+          }
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "agent"],
+            "properties": {
+              "id": { "type": "string" },
+              "agent": { "type": "string" },
+              "parallel_group": { "type": "string" },
+              "depends_on": { "type": "array", "items": { "type": "string" } },
+              "inputs": { "type": "array", "items": { "type": "string" } },
+              "outputs": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["path"],
+                  "properties": {
+                    "path": { "type": "string" },
+                    "type": { "type": "string", "enum": ["file", "directory"] }
+                  }
+                }
+              },
+              "prompt": { "type": "string" },
+              "max_retries": { "type": "integer", "default": 3 }
+            }
+          }
+        },
+        "exit_criteria": {
+          "type": "object",
+          "properties": {
+            "gate": { "type": "string" },
+            "decision": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "next_flows": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    }
+  }
+}

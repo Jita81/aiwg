@@ -1,0 +1,28 @@
+skill:
+  id: project-awareness
+  name: Project Awareness
+  description: Detect project context and load appropriate framework artifacts
+  version: 1.0.0
+
+  triggers:
+    - "what's the project status"
+    - "where are we"
+    - "project health"
+    - "show project state"
+
+  parameters:
+    detail_level:
+      type: string
+      default: summary
+      description: "Level of detail: summary, full, or json"
+
+  platforms: [claude-code, opencode, hermes]
+
+  workflow:
+    - step: detect
+      action: Scan .aiwg/ for installed frameworks and artifacts
+    - step: assess
+      action: Evaluate artifact completeness per current phase
+    - step: report
+      action: Generate status report with recommendations
+      agent: metrics-analyst

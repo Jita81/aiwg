@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aiwg.io/schemas/metalanguage/agent.schema.json",
+  "title": "AIWG Agent Definition",
+  "description": "Declarative YAML schema for agent identity, capabilities, and operating rhythm",
+  "type": "object",
+  "required": ["agent"],
+  "properties": {
+    "agent": {
+      "type": "object",
+      "required": ["id", "responsibilities"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "model": { "type": "string", "enum": ["opus", "sonnet", "haiku", "auto"] },
+        "tools": { "type": "array", "items": { "type": "string" } },
+        "responsibilities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        "operating_rhythm": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "tools": { "type": "array", "items": { "type": "string" } },
+                "depends_on": { "type": "string" }
+              }
+            }
+          }
+        },
+        "deliverables": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+          }
+        },
+        "rules": { "type": "array", "items": { "type": "string" } },
+        "platforms": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

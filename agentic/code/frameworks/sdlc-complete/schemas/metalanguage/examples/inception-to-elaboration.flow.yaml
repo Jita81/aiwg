@@ -1,0 +1,59 @@
+flow:
+  id: inception-to-elaboration
+  name: Inception to Elaboration Transition
+  description: Orchestrate the transition from Inception to Elaboration phase
+  model: opus
+
+  entry_criteria:
+    gate: LOM
+    artifacts:
+      - path: .aiwg/requirements/vision-document.md
+        required: true
+      - path: .aiwg/intake/project-intake.md
+        required: true
+
+  steps:
+    - id: requirements-analysis
+      agent: requirements-analyst
+      parallel_group: reviews
+      inputs: [vision-document.md]
+      outputs:
+        - path: .aiwg/requirements/use-case-briefs/
+          type: directory
+      prompt: |
+        Analyze vision document, generate use case briefs
+        for all identified features.
+
+    - id: architecture-baseline
+      agent: architecture-designer
+      parallel_group: reviews
+      inputs: [vision-document.md]
+      outputs:
+        - path: .aiwg/architecture/architecture-baseline.md
+          type: file
+      prompt: |
+        Create initial architecture baseline from vision
+        document and project constraints.
+
+    - id: risk-assessment
+      agent: requirements-reviewer
+      parallel_group: reviews
+      inputs: [vision-document.md]
+      outputs:
+        - path: .aiwg/risks/initial-risk-register.md
+          type: file
+
+    - id: synthesis
+      agent: documentation-synthesizer
+      depends_on: [requirements-analysis, architecture-baseline, risk-assessment]
+      outputs:
+        - path: .aiwg/reports/abm-report.md
+          type: file
+
+  exit_criteria:
+    gate: ABM
+    decision: [GO, CONDITIONAL_GO, NO_GO]
+
+  next_flows:
+    GO: elaboration-to-construction
+    CONDITIONAL_GO: elaboration-to-construction
