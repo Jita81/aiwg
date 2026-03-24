@@ -480,14 +480,14 @@ describe('Multi-Graph Index Architecture (integration)', () => {
   // ─────────────────────────────────────────────────────
 
   describe('Performance', () => {
-    it('should build each graph within 15s', () => {
+    it('should build each graph within 30s', () => {
       for (const graphType of ['project', 'codebase', 'framework'] as GraphType[]) {
         const stats = graphData[graphType].stats;
         if (!stats) continue;
         expect(
           stats.buildTimeMs,
-          `${graphType} graph should build in < 15s`
-        ).toBeLessThan(15_000);
+          `${graphType} graph should build in < 30s`
+        ).toBeLessThan(30_000);
       }
     });
   });

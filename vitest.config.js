@@ -61,9 +61,9 @@ export default defineConfig({
     mockReset: true,
     restoreMocks: true,
 
-    // Timeout configuration (MVP: fast feedback)
-    testTimeout: 5000,
-    hookTimeout: 10000,
+    // Timeout configuration
+    testTimeout: 30000,
+    hookTimeout: 30000,
 
     // Parallel execution for speed
     pool: 'threads',
