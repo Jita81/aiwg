@@ -45,9 +45,70 @@ env:
   NODE_VERSION: '20'
 
 jobs:
+  build-and-publish-rc:
+    name: Build and Publish RC
+    # Publish pre-release tags (RC, beta, alpha) as --tag next
+    if: ${{ contains(github.ref, '-') && github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    container: node:20
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run type check
+        run: npm run typecheck
+
+      - name: Build TypeScript
+        run: npm run build
+
+      - name: Set RC version in package.json
+        id: rcversion
+        run: |
+          TAG_VERSION=${GITHUB_REF#refs/tags/v}
+          # Convert e.g. 2026.3.3-RC1 → 2026.3.3-rc.1 (npm semver prerelease)
+          NPM_VERSION=$(echo "$TAG_VERSION" | sed 's/-[Rr][Cc]\([0-9]*\)$/-rc.\1/')
+          npm version "$NPM_VERSION" --no-git-tag-version
+          echo "npm_version=$NPM_VERSION" >> $GITHUB_OUTPUT
+          echo "RC version: $NPM_VERSION"
+
+      - name: Publish RC to Gitea npm registry
+        run: |
+          cat > .npmrc << 'NPMRC'
+          //git.integrolabs.net/api/packages/roctinam/npm/:_authToken=${NODE_AUTH_TOKEN}
+          NPMRC
+          npm publish --registry=${{ env.GITEA_NPM_REGISTRY }} --tag next 2>&1 | tee publish-output.txt || {
+            if grep -qE "package version already exists|EPUBLISHCONFLICT|409" publish-output.txt; then
+              echo "✓ RC version already published to Gitea"
+            else
+              cat publish-output.txt; exit 1
+            fi
+          }
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish RC to public npmjs.org
+        run: |
+          cat > .npmrc << 'NPMRC'
+          //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}
+          NPMRC
+          npm publish --access public --tag next 2>&1 | tee publish-public-output.txt || {
+            if grep -qE "cannot publish over|EPUBLISHCONFLICT|403" publish-public-output.txt; then
+              echo "✓ RC version already published to npmjs.org"
+            else
+              cat publish-public-output.txt; exit 1
+            fi
+          }
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPMJS_TOKEN }}
+
   build-and-publish:
     name: Build and Publish
-    # Skip pre-release tags (RC, beta, alpha, etc.) — only publish final versions
+    # Only publish final tags (no pre-release suffix)
     if: ${{ !contains(github.ref, '-') }}
     runs-on: ubuntu-latest
     container: node:20
