@@ -70,7 +70,9 @@ jobs:
         run: npm ci
 
       - name: Run full test suite (non-blocking)
-        run: npm test
+        # Exit 0 always — Gitea marks the workflow failed when any job fails,
+        # even with continue-on-error: true. This job is visibility-only.
+        run: npm test || true
 
   build:
     name: Build
