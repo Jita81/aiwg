@@ -20,7 +20,7 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 | **Grounding agents** | Domain knowledge injection agents; 40% domain accuracy improvement on specialized claims (#184) |
 | **Hermes / MCP sidecar** | Token-optimized sidecar architecture, delegate_task skill (~200 tokens vs 3,000–8,000), two-model strategy |
 | **Quality & metrics modules** | Token-per-artifact tracking, budget management, pattern-based quality scoring, feedback A/B testing — 4 modules, 1,517 lines, full unit test coverage |
-| **Model evaluation suite** | Evaluate any Ollama or cloud model across 6 dimensions with scored pass/fail thresholds (#433) |
+| **Model evaluation suite** | Evaluate any Ollama or cloud model across 6 dimensions with scored pass/fail thresholds. Now backed by `@matric/eval-client` — standard matric benchmarks available when the binary is present (#433, #488) |
 | **YAML metalanguage schemas** | JSON Schema definitions for declarative flow, agent, rule, and skill YAML — foundation for 40–60% token reduction (#447) |
 | **Hybrid artifact addressing** | File path + semantic URN addressing — `@path`, `@?"query"`, `@#tags`, `@phase:type` (#187) |
 | **Verbalized sampling addon** | Diversity addon for varied AI output: content-diversifier agent, 3 prompt strategies (#20) |
@@ -60,6 +60,7 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 
 ### Changed
 
+- **`tools/eval` — matric-eval dependency** (`#488`) — `tools/eval/` now depends on `@matric/eval-client` from the private Gitea npm registry instead of reimplementing evaluation infrastructure. `EvalRunner` renamed to `AiwgEvalRunner` (composes `MatricEvalClient`); `EvalRunner` kept as backward-compat alias. When the `matric-eval` binary is present, standard benchmark scores are included in the eval report via `EvalReport.matricBenchmarks`. Added `tools/eval/.npmrc` to scope `@matric` packages to the Gitea registry.
 - **`aiwg sync` and `aiwg mc`** — new commands added to Maintenance and Orchestration categories respectively; command count 47 → 49
 - **`CommandCategory` type** — extended with `'orchestration'` for Mission Control
 - **`aiwg use` output** — modern clean progress UI replacing legacy verbose output (#428)

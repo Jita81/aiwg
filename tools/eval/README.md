@@ -10,6 +10,12 @@ npm install
 npx tsx src/index.ts hermes3:latest --verbose
 ```
 
+## Dependencies
+
+`tools/eval` depends on `@matric/eval-client` from the private Gitea npm registry. The `.npmrc` in this directory configures the `@matric` scope automatically — `npm install` picks it up without extra setup.
+
+`@matric/eval-client` is a TypeScript client for the Python [matric-eval](https://git.integrolabs.net/roctinam/matric-eval) framework. When the `matric-eval` binary is installed and on `$PATH`, standard benchmark scores (HumanEval, GSM8K, ARC, etc.) can be included alongside AIWG-specific dimension scores.
+
 ## Dimensions
 
 | Dimension | Weight | What it tests |
