@@ -233,11 +233,11 @@ describe('Feedback A/B Testing', () => {
     it('should include effect size', () => {
       const control: ABVariant = {
         name: 'control',
-        deltas: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
+        deltas: [4, 5, 5, 5, 5, 5, 5, 5, 5, 6],
       };
       const treatment: ABVariant = {
         name: 'treatment',
-        deltas: [15, 15, 15, 15, 15, 15, 15, 15, 15, 15],
+        deltas: [14, 15, 15, 15, 15, 15, 15, 15, 15, 16],
       };
 
       const result = runABTest(control, treatment);

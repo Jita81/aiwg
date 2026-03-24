@@ -325,6 +325,7 @@ describe.skipIf(!GIT_INIT_AVAILABLE)('Provider File Locations', () => {
         'CLAUDE.md',  // May be created as context file
         'AGENTS.md',  // May be requested
         'WARP.md',    // Warp aggregated file
+        'AIWG.md',    // AIWG hook file
         '.windsurfrules', // Windsurf rules file
       ];
 

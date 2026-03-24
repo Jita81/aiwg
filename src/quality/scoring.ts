@@ -129,7 +129,14 @@ export function scoreContent(
 
 export function matchPattern(content: string, rule: PatternRule): PatternMatch {
   try {
-    const regex = new RegExp(rule.pattern, 'gm');
+    let pattern = rule.pattern;
+    let flags = 'gm';
+    // Handle PCRE inline flag (?i) — strip it and add 'i' to RegExp flags
+    if (pattern.startsWith('(?i)')) {
+      pattern = pattern.slice(4);
+      flags = 'gmi';
+    }
+    const regex = new RegExp(pattern, flags);
     const matches = content.match(regex);
     return {
       rule,

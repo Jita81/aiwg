@@ -255,7 +255,7 @@ describe('Factory AI Integration', () => {
       ]);
 
       const droidsDir = path.join(TEST_FACTORY_DIR, 'droids');
-      const droids = await fs.readdir(droidsDir);
+      const droids = (await fs.readdir(droidsDir)).filter((d) => !d.endsWith('.soul.md'));
 
       for (const droid of droids) {
         const content = await fs.readFile(path.join(droidsDir, droid), 'utf-8');
