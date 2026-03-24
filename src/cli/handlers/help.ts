@@ -9,6 +9,7 @@
  */
 
 import type { CommandHandler, HandlerContext, HandlerResult } from './types.js';
+import * as ui from '../ui.js';
 
 /**
  * Help command handler
@@ -27,120 +28,94 @@ export const helpHandler: CommandHandler = {
 };
 
 /**
+ * Format a help group — bold header, aligned command/description pairs
+ */
+function helpGroup(title: string, commands: [string, string][]): void {
+  ui.header(`  ${title}`);
+  const maxCmd = Math.max(...commands.map(([cmd]) => cmd.length));
+  for (const [cmd, desc] of commands) {
+    console.log(`    ${ui.bold(cmd.padEnd(maxCmd + 2))}${ui.dimText(desc)}`);
+  }
+  console.log('');
+}
+
+/**
  * Display comprehensive help information
  */
 function displayHelp(): void {
-  console.log(`
-AIWG CLI
+  console.log('');
+  console.log(`  ${ui.bold('aiwg')} — AI Writing Guide CLI`);
+  console.log('');
+  console.log(`  ${ui.dimText('Usage:')} aiwg <command> [options]`);
+  console.log('');
 
-Usage: aiwg <command> [options]
+  helpGroup('FRAMEWORK', [
+    ['use <framework>', 'Deploy framework (sdlc, marketing, media-curator, research, writing, all)'],
+    ['list', 'List installed frameworks and addons'],
+    ['remove <id>', 'Remove a framework or addon'],
+  ]);
 
-Framework Management:
-  use <framework>       Install and deploy framework
-                        Frameworks: sdlc, marketing, media-curator, research, writing, all
-                        Options: --no-utils, --provider <provider>, --force
-  list                  List installed frameworks and addons
-  remove <id>           Remove a framework or addon
+  helpGroup('PROJECT', [
+    ['new <name>', 'Create new project with SDLC templates'],
+  ]);
 
-Project Setup:
-  -new                  Create new project with SDLC templates
-                        Options: --no-agents, --provider <...>
+  helpGroup('WORKSPACE', [
+    ['status', 'Show workspace health and installed frameworks'],
+    ['migrate-workspace', 'Migrate legacy .aiwg/ to framework-scoped structure'],
+    ['rollback-workspace', 'Rollback workspace migration from backup'],
+  ]);
 
-Workspace Management:
-  -status               Show workspace health and installed frameworks
-  -migrate-workspace    Migrate legacy .aiwg/ to framework-scoped structure
-  -rollback-workspace   Rollback workspace migration from backup
+  helpGroup('MCP SERVER', [
+    ['mcp serve', 'Start AIWG MCP server (stdio transport)'],
+    ['mcp install [target]', 'Generate MCP client config (claude, copilot, factory, cursor)'],
+    ['mcp info', 'Show MCP server capabilities'],
+  ]);
 
-MCP Server:
-  mcp serve             Start AIWG MCP server (stdio transport)
-  mcp install [target]  Generate MCP client config (claude, copilot, factory, cursor)
-  mcp info              Show MCP server capabilities
+  helpGroup('TOOLSMITH', [
+    ['runtime-info', 'Show runtime environment summary'],
+    ['runtime-info --discover', 'Full tool discovery and catalog generation'],
+    ['runtime-info --check <tool>', 'Check specific tool availability'],
+  ]);
 
-Toolsmith (Runtime Discovery):
-  runtime-info          Show runtime environment summary
-  runtime-info --discover        Full tool discovery and catalog generation
-  runtime-info --verify          Verify existing catalog accuracy
-  runtime-info --check <tool>    Check specific tool availability
-  runtime-info --json            Output as JSON
+  helpGroup('CATALOG', [
+    ['catalog list', 'List all models in catalog'],
+    ['catalog info <id>', 'Show detailed model information'],
+    ['catalog search <q>', 'Search models by query'],
+  ]);
 
-Model Catalog:
-  catalog list          List all models in catalog
-  catalog info <id>     Show detailed model information
-  catalog search <q>    Search models by query
-                        Options: --provider, --status, --tag, --min-context
+  helpGroup('SCAFFOLDING', [
+    ['add-agent <name>', 'Add agent to addon/framework'],
+    ['add-command <name>', 'Add command to addon/framework'],
+    ['add-skill <name>', 'Add skill to addon/framework'],
+    ['scaffold-addon <name>', 'Create new addon package'],
+    ['scaffold-framework <name>', 'Create new framework package'],
+  ]);
 
-Utilities:
-  -prefill-cards        Prefill SDLC card metadata from team profile
-  -contribute-start     Start AIWG contribution workflow
-  -validate-metadata    Validate plugin/agent metadata
+  helpGroup('RALPH LOOP', [
+    ['ralph "<task>"', 'Execute iterative task loop (--completion, --max-iterations)'],
+    ['ralph-status', 'Check current loop status'],
+    ['ralph-abort', 'Abort running loop'],
+    ['ralph-resume', 'Resume interrupted loop'],
+  ]);
 
-Plugin Packaging (for Claude Code marketplace):
-  -package-plugin <name>    Package specific plugin for Claude Code
-  -package-all-plugins      Package all plugins for Claude Code marketplace
-                            Options: --clean, --dry-run
+  helpGroup('MAINTENANCE', [
+    ['doctor', 'Check installation health'],
+    ['version', 'Show version and channel info'],
+    ['update', 'Check for updates'],
+    ['help', 'Show this help message'],
+  ]);
 
-Scaffolding:
-  add-agent <name>          Add agent to addon/framework (--to <target>, --template <simple|complex|orchestrator>)
-  add-command <name>        Add command to addon/framework (--to <target>, --template <utility|transform|orchestration>)
-  add-skill <name>          Add skill to addon/framework (--to <target>)
-  add-template <name>       Add template to addon/framework (--to <target>, --category <category>)
-  scaffold-addon <name>     Create new addon package
-  scaffold-extension <name> Create new extension package
-  scaffold-framework <name> Create new framework package
+  helpGroup('CHANNEL', [
+    ['--use-main', 'Switch to edge channel (bleeding edge)'],
+    ['--use-stable', 'Switch to stable channel (npm)'],
+  ]);
 
-Channel Management:
-  --use-main            Switch to edge channel (bleeding edge from main branch)
-  --use-stable          Switch to stable channel (npm package)
-
-Maintenance:
-  doctor                Check installation health and diagnose issues
-  -version              Show version and channel info
-  -update               Check for and apply updates
-  -help                 Show this help message
-
-Platform Options (--provider):
-  claude                Claude Code (default)
-  copilot               GitHub Copilot
-  factory               Factory AI
-  codex / openai        OpenAI Codex
-  cursor                Cursor IDE
-  opencode              OpenCode
-  warp                  Warp Terminal
-  windsurf              Windsurf
-
-Model Selection (for 'use' command):
-  --reasoning-model <name>   Override model for reasoning tier (opus-level agents)
-  --coding-model <name>      Override model for coding tier (sonnet-level agents)
-  --efficiency-model <name>  Override model for efficiency tier (haiku-level agents)
-  --filter <pattern>         Only deploy agents matching pattern (glob)
-  --filter-role <role>       Only deploy agents of role: reasoning|coding|efficiency
-  --save                     Save model selection to project models.json
-  --save-user                Save model selection to ~/.config/aiwg/models.json
-
-Ralph Loop (Iterative Execution):
-  ralph "<task>" --completion "<criteria>"
-                        Execute iterative task loop until criteria met
-                        Options: --max-iterations N, --timeout M, --interactive
-  ralph-status          Check current Ralph loop status
-  ralph-abort           Abort running Ralph loop
-  ralph-resume          Resume interrupted Ralph loop
-
-Examples:
-  aiwg use sdlc                    Install SDLC framework
-  aiwg use media-curator           Install Media Curator framework
-  aiwg use research                Install Research framework
-  aiwg use all --provider factory  Install all frameworks for Factory AI
-  aiwg use sdlc --reasoning-model opus-4-2   Deploy with custom reasoning model
-  aiwg use sdlc --coding-model sonnet-5 --save   Deploy with custom model and save
-  aiwg -new                        Create new project
-  aiwg doctor                      Check installation health
-  aiwg --use-main                  Switch to bleeding edge mode
-  aiwg mcp serve                   Start MCP server
-  aiwg mcp install claude          Configure Claude Code to use AIWG MCP
-  aiwg runtime-info --discover     Discover installed tools
-  aiwg runtime-info --check git    Check if git is available
-  aiwg catalog list                List available models
-  aiwg catalog info opus           Show model details
-  aiwg ralph "fix tests" --completion "npm test passes"   Run Ralph loop
-`);
+  console.log(`  ${ui.dimText('Providers:')} claude (default), copilot, factory, codex, cursor, opencode, warp, windsurf`);
+  console.log('');
+  console.log(`  ${ui.dimText('Examples:')}`);
+  console.log(`    aiwg use sdlc                  ${ui.dimText('Install SDLC framework')}`);
+  console.log(`    aiwg use all --provider factory ${ui.dimText('Install all for Factory AI')}`);
+  console.log(`    aiwg doctor                     ${ui.dimText('Check installation health')}`);
+  console.log(`    aiwg mcp serve                  ${ui.dimText('Start MCP server')}`);
+  console.log('');
 }

@@ -102,6 +102,9 @@ export interface ScriptRunnerOptions {
 
   /** Timeout in milliseconds */
   timeout?: number;
+
+  /** Capture stdout/stderr instead of inheriting (for quiet mode) */
+  capture?: boolean;
 }
 
 /**

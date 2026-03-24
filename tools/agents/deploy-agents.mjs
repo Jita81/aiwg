@@ -100,7 +100,8 @@ function parseArgs() {
     filterRole: null,       // Filter by role: reasoning|coding|efficiency
     save: false,            // Save model config to project models.json
     saveUser: false,        // Save model config to ~/.config/aiwg/models.json
-    verbose: false          // Show per-file deployment details
+    verbose: false,         // Show per-file deployment details
+    quiet: false            // Suppress all non-error output (for embedding in use.ts)
   };
   for (let i = 0; i < args.length; i++) {
     const a = args[i];
@@ -127,6 +128,7 @@ function parseArgs() {
     else if (a === '--save') cfg.save = true;
     else if (a === '--save-user') cfg.saveUser = true;
     else if (a === '--verbose' || a === '-v') cfg.verbose = true;
+    else if (a === '--quiet' || a === '-q') cfg.quiet = true;
     else if (a === '--help' || a === '-h') {
       printHelp();
       process.exit(0);
@@ -434,24 +436,26 @@ function deepMerge(target, source) {
     cfg.efficiencyModel = resolveShorthand(cfg.efficiencyModel, providerShorthand, modelsConfig, resolvedProvider, 'efficiency');
   }
 
-  console.log(`\n=== AIWG Agent Deployment ===`);
-  console.log(`Provider: ${cfg.provider}`);
-  console.log(`Source: ${srcRoot}`);
-  console.log(`Target: ${cfg.target}`);
-  console.log(`Mode: ${cfg.mode}`);
-  if (cfg.dryRun) console.log(`Dry run: enabled`);
-  if (cfg.filter) console.log(`Filter: ${cfg.filter}`);
-  if (cfg.filterRole) console.log(`Filter role: ${cfg.filterRole}`);
-  if (cfg.model) console.log(`Model (all tiers): ${cfg.model}`);
-  if (cfg.reasoningModel) console.log(`Reasoning model: ${cfg.reasoningModel}`);
-  if (cfg.codingModel) console.log(`Coding model: ${cfg.codingModel}`);
-  if (cfg.efficiencyModel) console.log(`Efficiency model: ${cfg.efficiencyModel}`);
-  if (cfg.save) console.log(`Save to project: enabled`);
-  if (cfg.saveUser) console.log(`Save to user config: enabled`);
+  if (!cfg.quiet) {
+    console.log(`\n=== AIWG Agent Deployment ===`);
+    console.log(`Provider: ${cfg.provider}`);
+    console.log(`Source: ${srcRoot}`);
+    console.log(`Target: ${cfg.target}`);
+    console.log(`Mode: ${cfg.mode}`);
+    if (cfg.dryRun) console.log(`Dry run: enabled`);
+    if (cfg.filter) console.log(`Filter: ${cfg.filter}`);
+    if (cfg.filterRole) console.log(`Filter role: ${cfg.filterRole}`);
+    if (cfg.model) console.log(`Model (all tiers): ${cfg.model}`);
+    if (cfg.reasoningModel) console.log(`Reasoning model: ${cfg.reasoningModel}`);
+    if (cfg.codingModel) console.log(`Coding model: ${cfg.codingModel}`);
+    if (cfg.efficiencyModel) console.log(`Efficiency model: ${cfg.efficiencyModel}`);
+    if (cfg.save) console.log(`Save to project: enabled`);
+    if (cfg.saveUser) console.log(`Save to user config: enabled`);
+  }
 
   // Load provider module
   const provider = await loadProvider(cfg.provider);
-  console.log(`\nLoaded provider: ${provider.name}`);
+  if (!cfg.quiet) console.log(`\nLoaded provider: ${provider.name}`);
 
   // Build options for provider
   const opts = {
@@ -475,7 +479,8 @@ function deepMerge(target, source) {
     filter: cfg.filter,
     filterRole: cfg.filterRole,
     save: cfg.save,
-    saveUser: cfg.saveUser
+    saveUser: cfg.saveUser,
+    verbose: cfg.verbose
   };
 
   // Delegate to provider
@@ -487,7 +492,7 @@ function deepMerge(target, source) {
       await saveModelConfig(cfg, provider.name);
     }
 
-    console.log(`\n=== Deployment complete ===\n`);
+    if (!cfg.quiet) console.log(`\n=== Deployment complete ===\n`);
   } catch (err) {
     console.error(`\nDeployment failed:`, err.message);
     if (cfg.dryRun) {

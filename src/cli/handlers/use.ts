@@ -10,12 +10,14 @@
  * @issue #33
  */
 
+import fs from 'fs/promises';
 import path from 'path';
 import { CommandHandler, HandlerContext, HandlerResult } from './types.js';
 import { createScriptRunner } from './script-runner.js';
 import { getFrameworkRoot } from '../../channel/manager.mjs';
 import { getRegistry } from '../../extensions/registry.js';
 import { registerDeployedExtensions } from '../../extensions/deployment-registration.js';
+import * as ui from '../ui.js';
 
 /**
  * Valid framework identifiers
@@ -136,10 +138,38 @@ const NEXT_STEPS: Record<string, string[]> = {
 
 function printNextSteps(framework: Framework): void {
   const steps = NEXT_STEPS[framework] ?? NEXT_STEPS.sdlc;
-  console.log('Next steps:');
-  for (const step of steps) {
-    console.log(`  ${step}`);
-  }
+  ui.section('Next steps:', steps);
+}
+
+/**
+ * Count deployed artifacts in target directories
+ */
+async function countDeployedArtifacts(
+  target: string,
+  paths: { agents: string; skills: string; commands: string; rules: string }
+): Promise<{ agents: number; commands: number; skills: number; rules: number }> {
+  const countMd = async (dir: string): Promise<number> => {
+    try {
+      const entries = await fs.readdir(path.join(target, dir));
+      return entries.filter(f => f.endsWith('.md')).length;
+    } catch {
+      return 0;
+    }
+  };
+  const countDirs = async (dir: string): Promise<number> => {
+    try {
+      const entries = await fs.readdir(path.join(target, dir), { withFileTypes: true });
+      return entries.filter(e => e.isDirectory()).length;
+    } catch {
+      return 0;
+    }
+  };
+  return {
+    agents: await countMd(paths.agents),
+    commands: await countMd(paths.commands),
+    skills: await countDirs(paths.skills),
+    rules: await countMd(paths.rules),
+  };
 }
 
 /**
@@ -189,21 +219,20 @@ export class UseHandler implements CommandHandler {
       if (provider) addonBaseArgs.push('--provider', provider);
       if (target) addonBaseArgs.push('--target', target);
 
-      console.log(`\nDeploying ${framework} addon...`);
+      ui.blank();
+      ui.header(`  Deploying ${framework} addon...`);
       const frameworkRoot = await getFrameworkRoot();
       const addonSource = path.join(frameworkRoot, ADDON_PATHS[framework as Addon]);
       const addonResult = await runner.run('tools/agents/deploy-agents.mjs', [
-        '--source', addonSource,
+        '--quiet', '--source', addonSource,
         ...addonBaseArgs,
-      ]);
+      ], { capture: true });
 
       if (addonResult.exitCode !== 0) {
         return addonResult;
       }
 
       // Register deployed extensions
-      console.log('');
-      console.log('Registering deployed extensions...');
       try {
         const registry = getRegistry();
         const paths = PROVIDER_PATHS[provider] || PROVIDER_PATHS.claude;
@@ -215,14 +244,15 @@ export class UseHandler implements CommandHandler {
           provider,
           cwd: target,
         });
-        console.log('Extension registration complete');
+        ui.success('Extension registration complete');
       } catch (error) {
-        console.error('Warning: Failed to register extensions:', error instanceof Error ? error.message : String(error));
+        ui.warn(`Failed to register extensions: ${error instanceof Error ? error.message : String(error)}`);
       }
 
+      ui.blank();
+      ui.success(`${framework} addon deployed`);
       return {
         exitCode: 0,
-        message: `Successfully deployed ${framework} addon`,
       };
     }
 
@@ -235,10 +265,8 @@ export class UseHandler implements CommandHandler {
     const verbose = remainingArgs.includes('--verbose') || remainingArgs.includes('-v');
     const filteredArgs = deployArgs.filter(a => a !== '--no-utils');
 
-    // TODO(#460): Pass --quiet to deploy-agents.mjs when not in verbose mode.
-    // Currently deploy-agents.mjs has no --quiet flag and script-runner uses
-    // stdio:'inherit', so per-file output always bleeds through regardless of
-    // this flag. Once #460 is resolved, add: if (!verbose) filteredArgs.push('--quiet')
+    // Pass --quiet to suppress deploy-agents.mjs header/footer in default mode (#460)
+    if (!verbose) filteredArgs.push('--quiet');
 
     // Extract provider and target from remainingArgs to pass to addon deployments
     const providerIdx = remainingArgs.findIndex(a => a === '--provider' || a === '--platform');
@@ -247,11 +275,15 @@ export class UseHandler implements CommandHandler {
     const target = targetIdx >= 0 && remainingArgs[targetIdx + 1] ? remainingArgs[targetIdx + 1] : process.cwd();
 
     // Deploy main framework
-    if (!verbose) {
-      console.log(`\nInstalling ${framework} framework...`);
+    const quiet = !verbose;
+    const captureOpts = quiet ? { capture: true } : {};
+    if (quiet) {
+      ui.blank();
+      ui.header(`  Installing ${framework} framework for ${provider === 'claude' ? 'Claude Code' : provider}...`);
+      ui.blank();
     }
     const runner = createScriptRunner(ctx.frameworkRoot);
-    const mainResult = await runner.run('tools/agents/deploy-agents.mjs', filteredArgs);
+    const mainResult = await runner.run('tools/agents/deploy-agents.mjs', filteredArgs, captureOpts);
 
     if (mainResult.exitCode !== 0) {
       return mainResult;
@@ -271,10 +303,8 @@ export class UseHandler implements CommandHandler {
       }
       const frameworkRoot = await getFrameworkRoot();
       const utilsSource = path.join(frameworkRoot, 'agentic/code/addons/aiwg-utils');
-      const utilsResult = await runner.run('tools/agents/deploy-agents.mjs', [
-        '--source', utilsSource,
-        ...addonBaseArgs,
-      ]);
+      const addonArgs = quiet ? ['--quiet', '--source', utilsSource, ...addonBaseArgs] : ['--source', utilsSource, ...addonBaseArgs];
+      const utilsResult = await runner.run('tools/agents/deploy-agents.mjs', addonArgs, captureOpts);
 
       if (utilsResult.exitCode !== 0) {
         return utilsResult;
@@ -289,10 +319,8 @@ export class UseHandler implements CommandHandler {
       }
       const frameworkRoot = await getFrameworkRoot();
       const ralphSource = path.join(frameworkRoot, 'agentic/code/addons/ralph');
-      const ralphResult = await runner.run('tools/agents/deploy-agents.mjs', [
-        '--source', ralphSource,
-        ...addonBaseArgs,
-      ]);
+      const ralphArgs = quiet ? ['--quiet', '--source', ralphSource, ...addonBaseArgs] : ['--source', ralphSource, ...addonBaseArgs];
+      const ralphResult = await runner.run('tools/agents/deploy-agents.mjs', ralphArgs, captureOpts);
 
       if (ralphResult.exitCode !== 0) {
         return ralphResult;
@@ -324,10 +352,15 @@ export class UseHandler implements CommandHandler {
     }
 
     // Show completion summary and next steps (default mode only)
-    if (!verbose) {
-      const providerLabel = provider === 'claude' ? 'Claude Code' : provider;
-      console.log(`\nAIWG ${framework} framework installed (${providerLabel})`);
-      console.log('');
+    if (quiet) {
+      // Count deployed artifacts
+      const paths = PROVIDER_PATHS[provider] || PROVIDER_PATHS.claude;
+      const counts = await countDeployedArtifacts(target, paths);
+      if (counts.agents > 0) ui.deployCount('Agents', counts.agents);
+      if (counts.commands > 0) ui.deployCount('Commands', counts.commands);
+      if (counts.skills > 0) ui.deployCount('Skills', counts.skills);
+      if (counts.rules > 0) ui.deployCount('Rules', counts.rules);
+      ui.blank();
       printNextSteps(framework as Framework);
     }
 

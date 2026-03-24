@@ -17,6 +17,7 @@ import { getFrameworkRoot } from '../channel/manager.mjs';
 import type { HandlerContext } from './handlers/types.js';
 import { HookRegistry, HookExecutor } from './hooks/index.js';
 import type { HookContext } from './hooks/index.js';
+import * as ui from './ui.js';
 
 // Cached loaded registry
 let cachedRegistry: LoadedRegistry | null = null;
@@ -91,8 +92,8 @@ export async function run(args: string[], options: { cwd?: string } = {}): Promi
   const commandId = registry.registry.resolveCommand(rawCommand);
 
   if (!commandId) {
-    console.error(`Unknown command: ${rawCommand}`);
-    console.log('Run `aiwg help` for usage information.');
+    ui.error(`Unknown command: ${rawCommand}`);
+    ui.info('Run `aiwg help` for usage information.');
     process.exit(1);
   }
 
@@ -100,7 +101,7 @@ export async function run(args: string[], options: { cwd?: string } = {}): Promi
   const handler = registry.handlerMap.get(commandId);
 
   if (!handler) {
-    console.error(`No handler found for command: ${commandId}`);
+    ui.error(`No handler found for command: ${commandId}`);
     process.exit(1);
   }
 
@@ -122,14 +123,14 @@ export async function run(args: string[], options: { cwd?: string } = {}): Promi
 
     // Check if execution was blocked
     if (preResult.blocked) {
-      console.error(preResult.message || `Command blocked by hook: ${preResult.blockingHook}`);
+      ui.error(preResult.message || `Command blocked by hook: ${preResult.blockingHook}`);
       process.exit(1);
     }
 
     // Report hook errors (but don't block execution)
     if (preResult.errors.length > 0) {
-      for (const { hook, error } of preResult.errors) {
-        console.error(`Warning: Hook ${hook} failed: ${error.message}`);
+      for (const { hook, error: hookError } of preResult.errors) {
+        ui.warn(`Hook ${hook} failed: ${hookError.message}`);
       }
     }
 
@@ -161,17 +162,17 @@ export async function run(args: string[], options: { cwd?: string } = {}): Promi
 
     // Report post-command hook errors
     if (postResult.errors.length > 0) {
-      for (const { hook, error } of postResult.errors) {
-        console.error(`Warning: Post-command hook ${hook} failed: ${error.message}`);
+      for (const { hook, error: hookError } of postResult.errors) {
+        ui.warn(`Post-command hook ${hook} failed: ${hookError.message}`);
       }
     }
 
     // Output message if present
     if (result.message) {
       if (result.exitCode !== 0) {
-        console.error(result.message);
+        ui.error(result.message);
       } else {
-        console.log(result.message);
+        ui.info(result.message);
       }
     }
 

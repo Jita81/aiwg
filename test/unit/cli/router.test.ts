@@ -139,8 +139,8 @@ describe('router', () => {
         }
 
         expect(consoleErrorCalls).toHaveLength(1);
-        expect(consoleErrorCalls[0][0]).toBe('Unknown command: unknown-command');
-        expect(consoleLogCalls).toContainEqual(['Run `aiwg help` for usage information.']);
+        expect(consoleErrorCalls[0][0]).toContain('Unknown command: unknown-command');
+        expect(consoleLogCalls.some(c => c[0].includes('aiwg help'))).toBe(true);
         expect(exitCode).toBe(1);
       });
 
@@ -242,8 +242,8 @@ describe('router', () => {
       }
 
       expect(consoleErrorCalls).toHaveLength(1);
-      expect(consoleErrorCalls[0][0]).toBe('Unknown command: nonexistent');
-      expect(consoleLogCalls).toContainEqual(['Run `aiwg help` for usage information.']);
+      expect(consoleErrorCalls[0][0]).toContain('Unknown command: nonexistent');
+      expect(consoleLogCalls.some(c => c[0].includes('aiwg help'))).toBe(true);
     });
   });
 });

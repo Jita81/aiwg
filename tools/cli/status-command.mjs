@@ -49,103 +49,15 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import chalk from 'chalk';
+import Table from 'cli-table3';
 import { PluginRegistry } from '../workspace/registry-manager.mjs';
 import { HealthChecker } from '../workspace/health-checker.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// ===========================
-// ASCII Table Formatting
-// ===========================
-
-/**
- * Format data as ASCII table with box-drawing characters
- *
- * @param {Object[]} data - Array of row objects
- * @param {Object} columns - Column configuration { columnName: { header, width, align } }
- * @returns {string} Formatted ASCII table
- *
- * @example
- * const data = [
- *   { id: 'sdlc-complete', version: '1.0.0', health: 'healthy' },
- *   { id: 'marketing-flow', version: '1.0.0', health: 'healthy' }
- * ];
- * const columns = {
- *   id: { header: 'ID', width: 16, align: 'left' },
- *   version: { header: 'Version', width: 7, align: 'left' },
- *   health: { header: 'Health', width: 15, align: 'left' }
- * };
- * console.log(formatTable(data, columns));
- */
-function formatTable(data, columns) {
-  if (data.length === 0) {
-    return '';
-  }
-
-  const lines = [];
-
-  // Column order
-  const columnKeys = Object.keys(columns);
-
-  // Top border
-  const topBorder = '┌' + columnKeys.map(key => '─'.repeat(columns[key].width + 2)).join('┬') + '┐';
-  lines.push(topBorder);
-
-  // Header row
-  const headerRow = '│' + columnKeys.map(key => {
-    const col = columns[key];
-    return ' ' + padString(col.header, col.width, col.align || 'left') + ' ';
-  }).join('│') + '│';
-  lines.push(headerRow);
-
-  // Header separator
-  const headerSeparator = '├' + columnKeys.map(key => '─'.repeat(columns[key].width + 2)).join('┼') + '┤';
-  lines.push(headerSeparator);
-
-  // Data rows
-  data.forEach(row => {
-    const dataRow = '│' + columnKeys.map(key => {
-      const col = columns[key];
-      const value = row[key] !== undefined && row[key] !== null ? String(row[key]) : '';
-      return ' ' + padString(value, col.width, col.align || 'left') + ' ';
-    }).join('│') + '│';
-    lines.push(dataRow);
-  });
-
-  // Bottom border
-  const bottomBorder = '└' + columnKeys.map(key => '─'.repeat(columns[key].width + 2)).join('┴') + '┘';
-  lines.push(bottomBorder);
-
-  return lines.join('\n');
-}
-
-/**
- * Pad string to specified width with alignment
- *
- * @param {string} str - String to pad
- * @param {number} width - Target width
- * @param {string} align - Alignment ('left' | 'right' | 'center')
- * @returns {string} Padded string
- */
-function padString(str, width, align = 'left') {
-  // Truncate if too long
-  if (str.length > width) {
-    return str.substring(0, width - 1) + '…';
-  }
-
-  const padding = width - str.length;
-
-  if (align === 'right') {
-    return ' '.repeat(padding) + str;
-  } else if (align === 'center') {
-    const leftPad = Math.floor(padding / 2);
-    const rightPad = padding - leftPad;
-    return ' '.repeat(leftPad) + str + ' '.repeat(rightPad);
-  } else {
-    return str + ' '.repeat(padding);
-  }
-}
+const isTTY = Boolean(process.stdout.isTTY);
 
 // ===========================
 // Formatting Helpers
@@ -158,15 +70,19 @@ function padString(str, width, align = 'left') {
  * @returns {string} Formatted health string with icon
  */
 function formatHealth(health) {
+  if (!isTTY) {
+    switch (health) {
+      case 'healthy': return 'OK HEALTHY';
+      case 'warning': return 'WARN WARNING';
+      case 'error': return 'ERR ERROR';
+      default: return '? UNKNOWN';
+    }
+  }
   switch (health) {
-    case 'healthy':
-      return '✓ HEALTHY';
-    case 'warning':
-      return '⚠️ WARNING';
-    case 'error':
-      return '❌ ERROR';
-    default:
-      return '? UNKNOWN';
+    case 'healthy': return chalk.green('✓ HEALTHY');
+    case 'warning': return chalk.yellow('⚠ WARNING');
+    case 'error': return chalk.red('✗ ERROR');
+    default: return chalk.dim('? UNKNOWN');
   }
 }
 
@@ -249,28 +165,23 @@ function abbreviateFramework(frameworkId) {
  * @param {Map<string, Object>} healthResults - Map of plugin ID to health check result
  */
 function displayFrameworksTable(frameworks, healthResults) {
-  const columns = {
-    id: { header: 'ID', width: 16, align: 'left' },
-    version: { header: 'Version', width: 7, align: 'left' },
-    installed: { header: 'Installed', width: 12, align: 'left' },
-    projects: { header: 'Projects', width: 8, align: 'right' },
-    health: { header: 'Health', width: 17, align: 'left' }
-  };
+  const head = isTTY
+    ? [chalk.bold('ID'), chalk.bold('Version'), chalk.bold('Installed'), chalk.bold('Projects'), chalk.bold('Health')]
+    : ['ID', 'Version', 'Installed', 'Projects', 'Health'];
+  const t = new Table({ head, style: { head: [], border: [] } });
 
-  const data = frameworks.map(plugin => {
+  for (const plugin of frameworks) {
     const healthResult = healthResults.get(plugin.id);
     const projectCount = plugin.projects ? plugin.projects.length : 0;
-
-    return {
-      id: truncateId(plugin.id),
-      version: plugin.version || 'N/A',
-      installed: formatDate(plugin['install-date']),
-      projects: String(projectCount),
-      health: formatHealth(healthResult?.status || plugin.health || 'unknown')
-    };
-  });
-
-  console.log(formatTable(data, columns));
+    t.push([
+      truncateId(plugin.id),
+      plugin.version || 'N/A',
+      formatDate(plugin['install-date']),
+      String(projectCount),
+      formatHealth(healthResult?.status || plugin.health || 'unknown')
+    ]);
+  }
+  console.log(t.toString());
 }
 
 /**
@@ -280,27 +191,22 @@ function displayFrameworksTable(frameworks, healthResults) {
  * @param {Map<string, Object>} healthResults - Map of plugin ID to health check result
  */
 function displayAddOnsTable(addOns, healthResults) {
-  const columns = {
-    id: { header: 'ID', width: 17, align: 'left' },
-    version: { header: 'Version', width: 7, align: 'left' },
-    installed: { header: 'Installed', width: 12, align: 'left' },
-    framework: { header: 'Framework', width: 12, align: 'left' },
-    health: { header: 'Health', width: 17, align: 'left' }
-  };
+  const head = isTTY
+    ? [chalk.bold('ID'), chalk.bold('Version'), chalk.bold('Installed'), chalk.bold('Framework'), chalk.bold('Health')]
+    : ['ID', 'Version', 'Installed', 'Framework', 'Health'];
+  const t = new Table({ head, style: { head: [], border: [] } });
 
-  const data = addOns.map(plugin => {
+  for (const plugin of addOns) {
     const healthResult = healthResults.get(plugin.id);
-
-    return {
-      id: truncateId(plugin.id, 17),
-      version: plugin.version || 'N/A',
-      installed: formatDate(plugin['install-date']),
-      framework: abbreviateFramework(plugin['parent-framework'] || 'N/A'),
-      health: formatHealth(healthResult?.status || plugin.health || 'unknown')
-    };
-  });
-
-  console.log(formatTable(data, columns));
+    t.push([
+      truncateId(plugin.id, 17),
+      plugin.version || 'N/A',
+      formatDate(plugin['install-date']),
+      abbreviateFramework(plugin['parent-framework'] || 'N/A'),
+      formatHealth(healthResult?.status || plugin.health || 'unknown')
+    ]);
+  }
+  console.log(t.toString());
 }
 
 /**
@@ -310,27 +216,22 @@ function displayAddOnsTable(addOns, healthResults) {
  * @param {Map<string, Object>} healthResults - Map of plugin ID to health check result
  */
 function displayExtensionsTable(extensions, healthResults) {
-  const columns = {
-    id: { header: 'ID', width: 17, align: 'left' },
-    version: { header: 'Version', width: 7, align: 'left' },
-    installed: { header: 'Installed', width: 12, align: 'left' },
-    extends: { header: 'Extends', width: 12, align: 'left' },
-    health: { header: 'Health', width: 17, align: 'left' }
-  };
+  const head = isTTY
+    ? [chalk.bold('ID'), chalk.bold('Version'), chalk.bold('Installed'), chalk.bold('Extends'), chalk.bold('Health')]
+    : ['ID', 'Version', 'Installed', 'Extends', 'Health'];
+  const t = new Table({ head, style: { head: [], border: [] } });
 
-  const data = extensions.map(plugin => {
+  for (const plugin of extensions) {
     const healthResult = healthResults.get(plugin.id);
-
-    return {
-      id: truncateId(plugin.id, 17),
-      version: plugin.version || 'N/A',
-      installed: formatDate(plugin['install-date']),
-      extends: abbreviateFramework(plugin.extends || 'N/A'),
-      health: formatHealth(healthResult?.status || plugin.health || 'unknown')
-    };
-  });
-
-  console.log(formatTable(data, columns));
+    t.push([
+      truncateId(plugin.id, 17),
+      plugin.version || 'N/A',
+      formatDate(plugin['install-date']),
+      abbreviateFramework(plugin.extends || 'N/A'),
+      formatHealth(healthResult?.status || plugin.health || 'unknown')
+    ]);
+  }
+  console.log(t.toString());
 }
 
 // ===========================
@@ -686,8 +587,8 @@ export async function statusCommand(args) {
     }
 
     // Display header
-    console.log('\nAIWG - Plugin Status');
-    console.log('='.repeat(80));
+    console.log('');
+    console.log(isTTY ? chalk.bold('  AIWG Status') : '  AIWG Status');
 
     // Group by type
     const frameworks = plugins.filter(p => p.type === 'framework');

@@ -10,6 +10,7 @@
 
 import type { CommandHandler, HandlerContext, HandlerResult } from './types.js';
 import { getVersionInfo } from '../../channel/manager.mjs';
+import * as ui from '../ui.js';
 
 /**
  * Version command handler
@@ -32,14 +33,14 @@ export const versionHandler: CommandHandler = {
  */
 async function displayVersion(): Promise<void> {
   const info = await getVersionInfo();
+  const channel = info.devMode ? 'dev' : info.channel;
 
-  console.log(`aiwg version: ${info.version}`);
-  console.log(`Channel: ${info.channel}${info.devMode ? ' (dev)' : ''}`);
+  console.log(`${ui.bold('aiwg')} ${ui.bold(info.version)}  ${ui.channelLabel(channel)}`);
 
   if (info.channel === 'edge' && info.gitHash) {
-    console.log(`Git: ${info.gitHash} (${info.gitBranch})`);
-    console.log(`Edge path: ${info.edgePath}`);
+    ui.dim(`  git: ${info.gitHash} (${info.gitBranch})`);
+    ui.dim(`  path: ${info.edgePath}`);
   } else {
-    console.log(`Package root: ${info.packageRoot}`);
+    ui.dim(`  ${info.packageRoot}`);
   }
 }

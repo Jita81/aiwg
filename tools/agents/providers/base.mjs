@@ -349,7 +349,7 @@ export function deployFiles(files, destDir, opts, transformFn) {
     seen.add(dest);
   }
 
-  const verbose = opts.verbose !== false;
+  const verbose = opts.verbose === true;
   for (const a of actions) {
     if (a.type === 'deploy') {
       if (dryRun) console.log(`[dry-run] deploy ${a.src} -> ${a.dest} (${a.reason})`);
@@ -377,7 +377,7 @@ export function deploySoulCompanions(soulFiles, destDir, opts) {
  */
 export function deploySkillDir(skillDir, destDir, opts) {
   const { force = false, dryRun = false } = opts;
-  const verbose = opts.verbose !== false;
+  const verbose = opts.verbose === true;
   const skillName = path.basename(skillDir);
   const destSkillDir = path.join(destDir, skillName);
 

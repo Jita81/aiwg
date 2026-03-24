@@ -7,6 +7,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { execSync } from 'child_process';
+import chalk from 'chalk';
 
 const AIWG_ROOT = process.env.AIWG_ROOT ||
   path.join(process.env.HOME || '', '.local/share/ai-writing-guide');
@@ -27,8 +28,9 @@ async function fileExists(filePath) {
 }
 
 async function runDoctor() {
+  const isTTY = Boolean(process.stdout.isTTY);
   console.log('');
-  console.log('🔍 AIWG Doctor - Checking installation health...');
+  console.log(isTTY ? chalk.bold('  AIWG Doctor') : '  AIWG Doctor');
   console.log('');
 
   // 1. Check AIWG installation
@@ -106,44 +108,39 @@ async function runDoctor() {
   }
 
   // Print results
-  console.log('Results:');
   console.log('');
 
-  const statusSymbols = {
-    ok: '✓',
-    warn: '⚠',
-    error: '✗',
-    info: '○'
+  const statusSymbols = { ok: '✓', warn: '⚠', error: '✗', info: '○' };
+  const colorFns = {
+    ok: isTTY ? chalk.green : (s) => s,
+    warn: isTTY ? chalk.yellow : (s) => s,
+    error: isTTY ? chalk.red : (s) => s,
+    info: isTTY ? chalk.cyan : (s) => s
   };
-
-  const statusColors = {
-    ok: '\x1b[32m',    // green
-    warn: '\x1b[33m',  // yellow
-    error: '\x1b[31m', // red
-    info: '\x1b[36m'   // cyan
-  };
-
-  const reset = '\x1b[0m';
 
   for (const { name, status, message } of checks) {
     const symbol = statusSymbols[status];
-    const color = statusColors[status];
-    console.log(`  ${color}${symbol}${reset} ${name}: ${message}`);
+    const colorFn = colorFns[status] || ((s) => s);
+    console.log(`  ${colorFn(symbol)} ${name}: ${message}`);
   }
 
   // Summary
+  const pass = checks.filter(c => c.status === 'ok').length;
   const errors = checks.filter(c => c.status === 'error').length;
   const warnings = checks.filter(c => c.status === 'warn').length;
 
   console.log('');
 
   if (errors > 0) {
-    console.log(`❌ ${errors} error(s) found. Please fix before continuing.`);
+    const msg = `${errors} error(s), ${warnings} warning(s), ${pass} passed`;
+    console.log(isTTY ? chalk.red(`  ✗ ${msg}`) : `  FAIL ${msg}`);
+    console.log('');
     process.exit(1);
   } else if (warnings > 0) {
-    console.log(`⚠️  ${warnings} warning(s). AIWG should work but check warnings.`);
+    const msg = `${warnings} warning(s), ${pass} passed`;
+    console.log(isTTY ? chalk.yellow(`  ⚠ ${msg}`) : `  WARN ${msg}`);
   } else {
-    console.log('✅ All checks passed! AIWG is ready to use.');
+    console.log(isTTY ? chalk.green(`  ✓ All ${pass} checks passed`) : `  OK All ${pass} checks passed`);
   }
 
   console.log('');

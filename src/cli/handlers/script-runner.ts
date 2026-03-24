@@ -36,16 +36,23 @@ export class DefaultScriptRunner implements ScriptRunner {
     const fullPath = path.join(this.frameworkRoot, scriptPath);
 
     return new Promise((resolve) => {
-      // NOTE: stdio: 'inherit' passes subprocess stdout/stderr directly to the
-      // terminal. This means any output from deploy-agents.mjs or other scripts
-      // cannot be intercepted or suppressed by the caller. To implement quiet
-      // mode, the underlying script must accept a --quiet flag and self-suppress.
-      // See issue #460 for the planned fix.
+      // When capture mode is enabled, stdout/stderr are piped back to the
+      // caller so that quiet-mode callers can suppress output. When not
+      // capturing, stdio: 'inherit' lets subprocess output flow directly to
+      // the terminal (verbose mode).
+      const stdio = options.capture ? 'pipe' as const : 'inherit' as const;
       const child = spawn('node', [fullPath, ...args], {
-        stdio: 'inherit',
+        stdio,
         cwd: options.cwd || process.cwd(),
         env: { ...process.env, ...options.env },
       });
+
+      let capturedStderr = '';
+      if (options.capture && child.stderr) {
+        child.stderr.on('data', (data: Buffer) => {
+          capturedStderr += data.toString();
+        });
+      }
 
       const timeout = options.timeout;
       let timeoutId: ReturnType<typeof setTimeout> | undefined;
@@ -63,9 +70,17 @@ export class DefaultScriptRunner implements ScriptRunner {
 
       child.on('close', (code) => {
         if (timeoutId) clearTimeout(timeoutId);
-        resolve({
-          exitCode: code ?? 0,
-        });
+        // On failure in capture mode, surface the captured stderr
+        if (options.capture && code !== 0 && capturedStderr) {
+          resolve({
+            exitCode: code ?? 1,
+            message: capturedStderr.trim(),
+          });
+        } else {
+          resolve({
+            exitCode: code ?? 0,
+          });
+        }
       });
 
       child.on('error', (err) => {

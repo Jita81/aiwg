@@ -164,8 +164,7 @@ describe('CLI Router Integration Tests', () => {
       const output = await runCli(['version']);
 
       const stdout = output.stdout.join('\n');
-      expect(stdout).toMatch(/aiwg version:/i);
-      expect(stdout).toMatch(/Channel:/i);
+      expect(stdout).toMatch(/aiwg\s+\d+\.\d+\.\d+/);
       expect(output.exitCode).toBeUndefined(); // Success
     });
 
@@ -303,14 +302,14 @@ describe('CLI Router Integration Tests', () => {
     });
 
     it('should include Framework Management section', () => {
-      expect(helpOutput).toMatch(/Framework Management/i);
+      expect(helpOutput).toMatch(/FRAMEWORK/i);
       expect(helpOutput).toMatch(/use/i);
       expect(helpOutput).toMatch(/list/i);
       expect(helpOutput).toMatch(/remove/i);
     });
 
     it('should include Project Setup section', () => {
-      expect(helpOutput).toMatch(/Project Setup/i);
+      expect(helpOutput).toMatch(/PROJECT/i);
       expect(helpOutput).toMatch(/new/i);
     });
 
@@ -347,15 +346,15 @@ describe('CLI Router Integration Tests', () => {
       const output = await runCli(['version']);
       const stdout = output.stdout.join('\n');
 
-      expect(stdout).toMatch(/aiwg version: \d+\.\d+\.\d+/);
-      expect(stdout).toMatch(/Channel: (stable|edge)/);
+      expect(stdout).toMatch(/aiwg\s+\d+\.\d+\.\d+/);
+      expect(stdout).toMatch(/\[(stable|edge|dev)\]/);
     });
 
     it('should show package root or git info', async () => {
       const output = await runCli(['version']);
       const stdout = output.stdout.join('\n');
 
-      expect(stdout).toMatch(/(Package root|Git):/i);
+      expect(stdout).toMatch(/(path:|git:|Package root|Git:)/i);
     });
 
     it('should exit successfully', async () => {
@@ -529,7 +528,7 @@ describe('CLI Router Integration Tests', () => {
 
       // Legacy router shows version info
       const stdout = output.stdout.join('\n');
-      expect(stdout).toMatch(/version:/i);
+      expect(stdout).toMatch(/aiwg\s+\d+\.\d+\.\d+/);
       expect(output.exitCode).toBeUndefined();
     });
 
