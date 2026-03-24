@@ -1,0 +1,16 @@
+{
+  "id": "ring-check",
+  "type": "skill",
+  "name": "Ring Check",
+  "version": "1.0.0",
+  "description": "Enforce four-layer Ring Methodology verification when features are completed",
+  "platforms": ["claude-code", "hermes"],
+  "triggers": [
+    "feature complete",
+    "run ring check",
+    "ring health",
+    "check circuit breaker",
+    "session end",
+    "what is the spectral gap"
+  ]
+}

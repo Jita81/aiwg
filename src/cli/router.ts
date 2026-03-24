@@ -17,6 +17,7 @@ import { getFrameworkRoot } from '../channel/manager.mjs';
 import type { HandlerContext } from './handlers/types.js';
 import { HookRegistry, HookExecutor } from './hooks/index.js';
 import type { HookContext } from './hooks/index.js';
+import { tryExecuteCliExtension } from './cli-extension-loader.js';
 import * as ui from './ui.js';
 
 // Cached loaded registry
@@ -92,6 +93,24 @@ export async function run(args: string[], options: { cwd?: string } = {}): Promi
   const commandId = registry.registry.resolveCommand(rawCommand);
 
   if (!commandId) {
+    // Fallthrough: check for addon-contributed CLI extensions
+    const cwd = options.cwd || process.cwd();
+    const frameworkRoot = await getFrameworkRoot();
+    const extResult = await tryExecuteCliExtension(rawCommand, commandArgs, cwd, frameworkRoot);
+    if (extResult) {
+      if (extResult.message) {
+        if (extResult.exitCode !== 0) {
+          ui.error(extResult.message);
+        } else {
+          ui.info(extResult.message);
+        }
+      }
+      if (extResult.exitCode !== 0) {
+        process.exit(extResult.exitCode);
+      }
+      return;
+    }
+
     ui.error(`Unknown command: ${rawCommand}`);
     ui.info('Run `aiwg help` for usage information.');
     process.exit(1);

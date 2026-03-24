@@ -127,6 +127,11 @@ SDLC rules enforce workflow quality when the SDLC framework is deployed via `aiw
 **When to apply**: Starting SDLC phase work, modifying artifacts, assessing project state, navigating dependencies
 **Full rule**: @agentic/code/frameworks/sdlc-complete/rules/artifact-discovery.md
 
+#### self-maintenance
+**Summary**: Agents MUST use AIWG CLI commands (not file writes) for all installation/deployment tasks. Run `aiwg sync --dry-run` at start of long sessions. Use Mission Control (`aiwg mc`) for parallel background work. Delegate complex maintenance to AIWG Steward agent. CLI-first principle prevents registry drift and provider mismatch.
+**When to apply**: Framework deployment, version updates, provider changes, long orchestration sessions, background task dispatch
+**Full rule**: @agentic/code/frameworks/sdlc-complete/rules/self-maintenance.md
+
 ### MEDIUM
 
 #### hitl-patterns
@@ -245,9 +250,11 @@ Research rules manage the research corpus. Deployed when research features are a
 | **Multi-agent work** | auto-reply-chains, criticality-panel-sizing, sdlc-orchestration, subagent-scoping |
 | **Interactive commands** | native-ux-tools, instruction-comprehension |
 | **Versioning/release** | versioning, no-attribution |
+| **Self-maintenance** | self-maintenance, research-before-decision |
+| **Background orchestration** | self-maintenance, sdlc-orchestration |
 | **Research** | research-metadata, index-generation, citation-policy |
 
 ---
 
-*Generated from manifest.json v2.0.0 — 37 rules across 4 tiers*
+*Generated from manifest.json v2.0.0 — 38 rules across 4 tiers*
 *Full rule files: @agentic/code/frameworks/sdlc-complete/rules/*

@@ -35,12 +35,14 @@ async function displayVersion(): Promise<void> {
   const info = await getVersionInfo();
   const channel = info.devMode ? 'dev' : info.channel;
 
-  console.log(`${ui.bold('aiwg')} ${ui.bold(info.version)}  ${ui.channelLabel(channel)}`);
+  ui.blank();
+  console.log(`  ${ui.brandMark()} ${ui.bold('aiwg')}  ${ui.bold(info.version)}  ${ui.channelLabel(channel)}`);
 
   if (info.channel === 'edge' && info.gitHash) {
-    ui.dim(`  git: ${info.gitHash} (${info.gitBranch})`);
-    ui.dim(`  path: ${info.edgePath}`);
+    ui.dim(`    git: ${info.gitHash} (${info.gitBranch})`);
+    ui.dim(`    path: ${info.edgePath}`);
   } else {
-    ui.dim(`  ${info.packageRoot}`);
+    ui.dim(`    path: ${info.packageRoot}`);
   }
+  ui.blank();
 }

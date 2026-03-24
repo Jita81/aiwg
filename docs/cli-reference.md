@@ -23,10 +23,12 @@ Complete reference for all `aiwg` CLI commands.
 - [Utility Commands](#utility-commands)
 - [Plugin Commands](#plugin-commands)
 - [Scaffolding Commands](#scaffolding-commands)
+- [Mission Control Commands](#mission-control-commands)
 - [Ralph Commands](#ralph-commands)
 - [Documentation Commands](#documentation-commands)
 - [SDLC Orchestration Commands](#sdlc-orchestration-commands)
 - [Index Commands](#index-commands)
+- [Addon Commands](#addon-commands)
 
 ---
 
@@ -145,6 +147,74 @@ aiwg --use-main
 
 # Switch back to stable
 aiwg --use-stable
+```
+
+---
+
+### sync
+
+Sync AIWG to latest version and re-deploy all frameworks to active provider.
+
+```bash
+aiwg sync
+aiwg --sync
+```
+
+**Capabilities:** cli, sync, maintenance, deploy, self-maintenance
+**Platforms:** All
+**Tools:** Bash, Read
+
+**Actions:**
+- Detects active provider (claude-code, copilot, cursor, etc.)
+- Checks current AIWG version
+- Updates package to latest (unless `--skip-update`)
+- Re-deploys all installed frameworks (or specific ones)
+- Runs health check via `aiwg doctor`
+
+**Flags:**
+| Flag | Description |
+|------|-------------|
+| `--dry-run` | Show what would change without making changes |
+| `--quiet` | Machine-readable JSON output (for orchestration) |
+| `--skip-update` | Skip npm update, only re-deploy frameworks |
+| `--provider <name>` | Target specific provider (default: auto-detect) |
+| `--channel <name>` | Update channel (stable, main) |
+| `--frameworks <list>` | Comma-separated frameworks to re-deploy |
+
+**Examples:**
+```bash
+# Full sync (update + re-deploy + verify)
+aiwg sync
+
+# Check what would change
+aiwg sync --dry-run
+
+# Sync to specific provider
+aiwg sync --provider copilot
+
+# Re-deploy only SDLC framework, skip update
+aiwg sync --skip-update --frameworks sdlc
+
+# Quiet mode for agent orchestration
+aiwg sync --quiet
+```
+
+**Example output:**
+```
+◆ aiwg sync
+──────────────────────────────
+ℹ Detecting provider...
+✓ Provider: claude
+ℹ Checking version...
+✓ Version check complete
+ℹ Checking for updates...
+✓ Package up to date
+ℹ Re-deploying frameworks...
+✓ Deployed: all
+ℹ Running health check...
+✓ Health check passed
+──────────────────────────────
+✓ Sync complete
 ```
 
 ---
@@ -997,6 +1067,71 @@ agentic/code/frameworks/security-framework/
 ├── templates/
 └── docs/
 ```
+
+---
+
+## Mission Control Commands
+
+Mission Control provides multi-loop background orchestration for parallel long-running agents.
+
+### mc
+
+Multi-loop background orchestration dashboard.
+
+```bash
+aiwg mc <subcommand> [options]
+aiwg mission-control <subcommand> [options]
+```
+
+**Capabilities:** cli, orchestration, ralph, background, multi-loop, mission-control
+**Platforms:** All
+**Tools:** Bash, Read, Write
+
+**Subcommands:**
+
+| Subcommand | Description |
+|------------|-------------|
+| `start` | Start a new Mission Control session |
+| `dispatch <id> "<objective>"` | Add a background mission to session |
+| `status [<id>] [--json]` | View mission status dashboard |
+| `watch [<id>]` | Live monitor (streaming) |
+| `abort <session> <mission>` | Abort a specific mission |
+| `pause [<id>]` | Pause active session |
+| `resume [<id>]` | Resume paused session |
+| `stop [<id>] [--drain]` | Shut down session |
+| `list [--json]` | List all sessions |
+
+**Examples:**
+```bash
+# Start a named session
+aiwg mc start --name "Construction Sprint 4"
+
+# Dispatch missions
+aiwg mc dispatch mc-abc123 "Fix auth service" --completion "tests pass" --priority high
+aiwg mc dispatch mc-abc123 "Add pagination" --completion "paginated responses"
+
+# Monitor
+aiwg mc status mc-abc123
+aiwg mc status mc-abc123 --json
+
+# Drain and stop (let running missions finish)
+aiwg mc stop mc-abc123 --drain
+```
+
+**Example output:**
+```
+◆ MISSION CONTROL — Construction Sprint 4  [mc-abc123]
+──────────────────────────────────────────────────────────
+  #    Mission                       Status       Loop     Started
+──────────────────────────────────────────────────────────
+  1    Fix auth service              ✓ DONE       4/10     14:22
+  2    Add pagination                ⏳ RUNNING   3/10     14:25
+  3    Write integration tests       ⏺ QUEUED     —        —
+──────────────────────────────────────────────────────────
+  3 missions  |  1 done  |  1 running  |  1 queued  |  0 failed
+```
+
+**State persistence:** Session state is stored in `.aiwg/ralph-external/mc/sessions/` and survives context resets.
 
 ---
 
@@ -1872,6 +2007,130 @@ aiwg index stats --graph framework
 
 ---
 
+## Addon Commands
+
+Commands contributed by installed addons. Available after running `aiwg use <addon>`.
+
+### ring (requires `aiwg use ring`)
+
+Ring methodology lifecycle commands. Enforces the four-layer verification ring, measures process health via spectral gap, and manages circuit breaker state.
+
+```bash
+aiwg ring <subcommand>
+aiwg ring --help
+```
+
+**Requires:** `aiwg use ring` in your project
+
+**Artifacts:** `.aiwg/working/ring/` (features.jsonl, kernels.jsonl, perinoesis.jsonl, session-state.json)
+
+---
+
+#### ring check
+
+Validate four-layer ring completion for the current feature. Reads the latest entry from `features.jsonl` and checks all four layers (A/B/C/D).
+
+```bash
+aiwg ring check
+```
+
+**Exit 0:** All four layers verified — safe to declare feature complete.
+
+**Exit 1:** One or more layers incomplete. Output names each failing layer with remediation:
+```
+Ring check for: my-feature
+HALT: Layer C (User Surface Reality) not complete.
+  → Test from ~, via installed command, in login shell.
+  → bash -lc "tool --version" from home directory.
+```
+
+Layer C passes if `layer_c_first === true` OR retries ≤ 3. Layer D always required.
+
+Graceful first-run: exits 0 if no `features.jsonl` exists yet.
+
+**Hook event:** `FeatureComplete`
+
+---
+
+#### ring circuit-breaker
+
+Check spectral gap and consecutive failure thresholds. Writes current health snapshot to `session-state.json`.
+
+```bash
+aiwg ring circuit-breaker
+```
+
+**Health phases (φ-derived thresholds):**
+
+| Phase | Spectral Gap | Behavior |
+|-------|-------------|----------|
+| PEAK | ≥ 61.8% | Exit 0 — healthy |
+| STABLE | ≥ 38.2% | Exit 0 — healthy |
+| DEGRADED | ≥ 23.6% | Exit 0 — warning printed |
+| CRITICAL | < 23.6% | Exit 1 — soft halt |
+
+Consecutive failures on the same feature (≥ 2 kernels) trigger hard HALT (exit 1) regardless of spectral gap.
+
+**Hook event:** `Stop`
+
+---
+
+#### ring session-start
+
+Surface prior session state at the start of a session. Always exits 0 (informational only).
+
+```bash
+aiwg ring session-start
+```
+
+Reports:
+- Prior health phase and spectral gap %
+- Unresolved KENOPHORIA (blocked state from previous session)
+- DEGRADED or CRITICAL health phase warnings
+- Pending perinoetic review (3+ features since last review)
+
+**Hook event:** `SessionStart`
+
+---
+
+#### ring session-end
+
+Log session metrics to `perinoesis.jsonl`. Computes spectral gap, morpholepsis signal frequencies, and kernel stats for the session.
+
+```bash
+aiwg ring session-end
+```
+
+Appends a structured reflection record including: features attempted, ring-complete count, spectral gap, kernel count, unique archetypes, morpholepsis signals, kenophoria carry-forward flag.
+
+**Hook event:** `SessionEnd`
+
+---
+
+#### ring status
+
+Show the ring methodology health dashboard.
+
+```bash
+aiwg ring status
+```
+
+**Example output:**
+```
+Ring Methodology — Project Health
+
+  Health:       STABLE (spectral gap: 54.2%)
+  Features:     12 tracked, 11 ring-complete
+  Kernels:      8 extracted (3 archetypes)
+  Last review:  2 features ago
+
+  Morpholepsis signals: retry-escalation (3), success-arrest (1)
+```
+
+Shows HALTED status and reason if circuit breaker has fired. Shows KENOPHORIA notice if blocked on external dependency. Shows "Not Initialized" message if no features tracked yet.
+
+---
+
 ## Extension System
 
 ### Unified Extension Schema
@@ -1920,8 +2179,9 @@ All commands are registered as extensions in the unified schema. This enables:
 | **Code Analysis** | 1 | cleanup-audit |
 | **Index** | 1 | index (4 subcommands) |
 | **Reproducibility** | 4 | execution-mode, snapshot, checkpoint, reproducibility-validate |
+| **Addon: ring** | 5 | ring check, ring circuit-breaker, ring session-start, ring session-end, ring status |
 
-**Total:** 47 commands
+**Total:** 47 built-in + addon commands (addon commands require `aiwg use <addon>`)
 
 ---
 

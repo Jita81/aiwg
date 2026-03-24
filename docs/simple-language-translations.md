@@ -104,6 +104,27 @@ Maps natural language requests to AIWG rules, skills, and workflows. Used by the
 | "work on issue 17 interactively" | Interactive single issue | `address-issues 17 --interactive` |
 | "address all bugs with branches" | Branch-per-issue bug loop | `address-issues --filter "label:bug" --branch-per-issue` |
 
+## Self-Maintenance & Orchestration
+
+| User Says | Maps To | Skill/Command |
+|-----------|---------|---------------|
+| "make sure AIWG is up to date" | Sync to latest version + re-deploy | `aiwg sync` |
+| "is AIWG current?" | Check version without changes | `aiwg sync --dry-run` |
+| "check AIWG version" | Version check | `aiwg sync --dry-run` |
+| "deploy the latest to copilot" | Provider-targeted sync | `aiwg sync --provider copilot` |
+| "health check" | Installation health | `aiwg doctor` |
+| "is everything working?" | Installation health | `aiwg doctor` |
+| "install the SDLC framework" | Framework deployment | `aiwg use sdlc` |
+| "remove the marketing framework" | Framework removal | `aiwg remove media-marketing-kit` |
+| "what frameworks do I have?" | List installed frameworks | `aiwg list` |
+| "what's installed?" | List installed frameworks | `aiwg list` |
+| "run these tasks in the background" | Background orchestration | `aiwg mc start` + `aiwg mc dispatch` |
+| "orchestrate X and Y in parallel" | Multi-mission dispatch | `aiwg mc start` + `aiwg mc dispatch` |
+| "monitor background tasks" | Mission status | `aiwg mc status` / `aiwg mc watch` |
+| "stop background work" | Stop missions | `aiwg mc stop` |
+| "deploy SDLC to all providers" | Multi-provider deployment | AIWG Steward agent |
+| "repair the AIWG installation" | Full health + fix cycle | AIWG Steward agent |
+
 ## Incident & Urgency
 
 | User Says | Maps To | Skill/Command |
@@ -133,6 +154,8 @@ When these patterns are detected, the corresponding rules are activated in the a
 | Code modification without prior search | `research-before-decision` | Agent is reminded to research first |
 | User repeats same instruction | `instruction-comprehension` | Drift detection triggered |
 | Multiple failed attempts at same action | `research-before-decision` | Whack-a-mole detection triggered |
+| AIWG maintenance/sync/deploy keywords | `self-maintenance` | CLI-first principle enforced; pre-flight check reminded |
+| Background orchestration keywords | `self-maintenance` | Mission Control pattern activated |
 
 ## References
 
@@ -142,3 +165,5 @@ When these patterns are detected, the corresponding rules are activated in the a
 - @agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md - Thought types
 - @.claude/commands/address-issues.md - Issue-driven ralph loop command
 - @.claude/skills/issue-driven-ralph/SKILL.md - Issue-driven ralph skill
+- @agentic/code/frameworks/sdlc-complete/rules/self-maintenance.md - Self-maintenance rule
+- @agentic/code/agents/aiwg-steward.md - AIWG Steward agent

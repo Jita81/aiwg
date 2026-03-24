@@ -45,11 +45,13 @@
   "skills": [
     "ralph-loop",
     "reflection-injection",
-    "auto-test-execution"
+    "auto-test-execution",
+    "mission-control"
   ],
   "agents": [
     "ralph-loop",
-    "ralph-verifier"
+    "ralph-verifier",
+    "mc-conductor"
   ],
   "hooks": [
     "ralph-loop",

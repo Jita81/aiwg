@@ -17,6 +17,7 @@ import { createScriptRunner } from './script-runner.js';
 import { getFrameworkRoot } from '../../channel/manager.mjs';
 import { getRegistry } from '../../extensions/registry.js';
 import { registerDeployedExtensions } from '../../extensions/deployment-registration.js';
+import { registerCliCommands, registerHooks } from '../cli-extension-loader.js';
 import * as ui from '../ui.js';
 
 /**
@@ -41,7 +42,7 @@ const MODE_MAP: Record<Framework, string> = {
 /**
  * Valid addon identifiers (deployed independently via `aiwg use <addon>`)
  */
-const VALID_ADDONS = ['rlm'] as const;
+const VALID_ADDONS = ['rlm', 'ring'] as const;
 type Addon = typeof VALID_ADDONS[number];
 
 /**
@@ -49,6 +50,7 @@ type Addon = typeof VALID_ADDONS[number];
  */
 const ADDON_PATHS: Record<Addon, string> = {
   rlm: 'agentic/code/addons/rlm',
+  ring: 'agentic/code/addons/ring-methodology',
 };
 
 /**
@@ -203,7 +205,7 @@ export class UseHandler implements CommandHandler {
     if (!isFramework && !isAddon) {
       return {
         exitCode: 1,
-        message: `Error: Unknown target '${framework}'\nFrameworks: ${VALID_FRAMEWORKS.join(', ')}\nAddons: ${VALID_ADDONS.join(', ')}`,
+        message: `Error: Unknown target '${framework}'\nFrameworks: ${VALID_FRAMEWORKS.join(', ')}\nAddons: ${VALID_ADDONS.join(', ')}\n\nRun 'aiwg help' for usage information.`,
       };
     }
 
@@ -249,6 +251,36 @@ export class UseHandler implements CommandHandler {
         ui.warn(`Failed to register extensions: ${error instanceof Error ? error.message : String(error)}`);
       }
 
+      // Register CLI commands if addon declares them
+      try {
+        const manifestPath = path.join(addonSource, 'manifest.json');
+        const manifestContent = await fs.readFile(manifestPath, 'utf-8');
+        const manifest = JSON.parse(manifestContent);
+
+        if (manifest.cli_commands?.namespace && manifest.cli_commands?.subcommands) {
+          const cmds = manifest.cli_commands;
+          const commandsSource = path.join(addonSource, cmds.entry || 'commands/');
+          await registerCliCommands(
+            target,
+            cmds.namespace,
+            cmds.description || `${framework} addon commands`,
+            commandsSource,
+            cmds.subcommands
+          );
+          ui.success(`CLI namespace '${cmds.namespace}' registered (${Object.keys(cmds.subcommands).length} subcommands)`);
+
+          // Register Claude Code hooks for subcommands with hook_event
+          if (provider === 'claude') {
+            const registeredHooks = await registerHooks(target, cmds.namespace, cmds.subcommands);
+            for (const hook of registeredHooks) {
+              ui.success(`Hook registered: ${hook}`);
+            }
+          }
+        }
+      } catch (error) {
+        ui.warn(`Failed to register CLI commands: ${error instanceof Error ? error.message : String(error)}`);
+      }
+
       ui.blank();
       ui.success(`${framework} addon deployed`);
       return {
@@ -279,7 +311,7 @@ export class UseHandler implements CommandHandler {
     const captureOpts = quiet ? { capture: true } : {};
     if (quiet) {
       ui.blank();
-      ui.header(`  Installing ${framework} framework for ${provider === 'claude' ? 'Claude Code' : provider}...`);
+      console.log(`  ${ui.brandMark()} ${ui.bold(`Installing ${framework} framework`)}  ${ui.dimText(`for ${provider === 'claude' ? 'Claude Code' : provider}`)}`);
       ui.blank();
     }
     const runner = createScriptRunner(ctx.frameworkRoot);

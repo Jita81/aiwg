@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "FeatureRecord",
+  "description": "Ring completion tracking — one entry per feature. Appended to .aiwg/working/ring/features.jsonl",
+  "type": "object",
+  "required": ["feature", "timestamp", "layer_a", "layer_b", "ring_complete"],
+  "properties": {
+    "feature": {
+      "type": "string",
+      "description": "Name or description of the feature"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of record creation"
+    },
+    "layer_a": {
+      "type": "boolean",
+      "description": "Developer reality — syntax, imports, unit tests pass"
+    },
+    "layer_b": {
+      "type": "boolean",
+      "description": "Integration reality — system tests, CLI subcommands, API endpoints pass"
+    },
+    "layer_c_first": {
+      "type": "boolean",
+      "default": false,
+      "description": "User surface reality — passed on first attempt from user environment"
+    },
+    "layer_c_retries": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0,
+      "description": "Number of Layer C retry attempts before passing"
+    },
+    "layer_d": {
+      "oneOf": [
+        { "$ref": "layer-d-artifact.json" },
+        { "type": "null" }
+      ],
+      "description": "Generative reflection artifact — null means Layer D was skipped (ring violation)"
+    },
+    "kernels_extracted": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "Kernel summaries extracted during this feature's development"
+    },
+    "morpholepsis_signals": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "tool_fixation",
+          "layer_confusion",
+          "category_lock",
+          "omega_occlusion",
+          "pleromatic_collapse",
+          "morpholeptic_loop",
+          "success_arrest"
+        ]
+      },
+      "default": [],
+      "description": "Morpholepsis signals that fired during this feature"
+    },
+    "ring_complete": {
+      "type": "boolean",
+      "description": "true iff layer_a AND layer_b AND (layer_c_first OR layer_c_retries <= 3) AND layer_d != null"
+    }
+  },
+  "additionalProperties": false
+}

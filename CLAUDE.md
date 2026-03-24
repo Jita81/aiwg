@@ -131,7 +131,7 @@ aiwg new my-project    # Scaffold new project
 aiwg help              # Show all commands
 aiwg doctor            # Check installation health
 
-# See @docs/cli-reference.md for all 47 commands
+# See @docs/cli-reference.md for all 49 commands
 ```
 
 ## Project Artifacts (.aiwg/)
@@ -190,7 +190,7 @@ AIWG uses a unified extension system for all extension types:
 
 | Category | Commands |
 |----------|----------|
-| **Maintenance** (4) | help, version, doctor, update |
+| **Maintenance** (5) | help, version, doctor, update, sync |
 | **Framework** (3) | use, list, remove |
 | **Project** (1) | new |
 | **Workspace** (3) | status, migrate-workspace, rollback-workspace |
@@ -200,6 +200,7 @@ AIWG uses a unified extension system for all extension types:
 | **Utility** (3) | prefill-cards, contribute-start, validate-metadata |
 | **Plugin** (5) | install-plugin, uninstall-plugin, plugin-status, package-plugin, package-all-plugins |
 | **Scaffolding** (7) | add-agent, add-command, add-skill, add-template, scaffold-addon, scaffold-extension, scaffold-framework |
+| **Orchestration** (1) | mc (start, dispatch, status, watch, abort, pause, resume, stop, list) |
 | **Ralph** (7) | ralph, ralph-status, ralph-abort, ralph-resume, ralph-external, ralph-memory, ralph-config |
 | **Metrics** (3) | cost-report, cost-history, metrics-tokens |
 | **Documentation** (1) | doc-sync |
@@ -220,6 +221,7 @@ aiwg update                  # Check for updates
 # Framework and addon management
 aiwg use sdlc                # Deploy SDLC framework
 aiwg use rlm                 # Deploy RLM addon
+aiwg use ring                # Deploy Ring Methodology addon
 aiwg use sdlc --provider copilot  # Deploy to GitHub Copilot
 aiwg list                    # List installed frameworks
 aiwg remove sdlc             # Remove framework
@@ -273,6 +275,19 @@ aiwg index query "authentication" --json # Search artifacts
 aiwg index deps .aiwg/requirements/UC-001.md --json  # Show dependencies
 aiwg index stats --json                  # Index statistics
 
+# Self-maintenance
+aiwg sync                    # Sync to latest version + re-deploy all frameworks
+aiwg sync --dry-run          # Check what would change (no side effects)
+aiwg sync --provider copilot # Sync to specific provider
+aiwg doctor                  # Health check + diagnostics
+
+# Background orchestration (Mission Control)
+aiwg mc start                # Start Mission Control session
+aiwg mc dispatch <id> "..."  # Add background mission
+aiwg mc status               # View all missions
+aiwg mc watch                # Live monitor (streaming)
+aiwg mc stop <id>            # Shut down session
+
 # Reproducibility
 aiwg execution-mode          # Show/set execution mode
 aiwg snapshot                # Create execution snapshot
@@ -294,6 +309,7 @@ aiwg reproducibility-validate  # Validate workflow reproducibility
 | **Media Curator** | `@agentic/code/frameworks/media-curator/README.md` |
 | **Research Complete** | `@agentic/code/frameworks/research-complete/README.md` |
 | **RLM Addon** | `@agentic/code/addons/rlm/README.md` |
+| **Ring Methodology Addon** | `@agentic/code/addons/ring-methodology/README.md` |
 | **Daemon Mode** | `@docs/daemon-guide.md` |
 | **Messaging Integration** | `@docs/messaging-guide.md` |
 | **Voice Profiles** | `@agentic/code/addons/voice-framework/voices/templates/` |

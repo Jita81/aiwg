@@ -82,7 +82,8 @@
     "context-regenerator",
     "aiwg-developer",
     "consortium-coordinator",
-    "self-debug"
+    "self-debug",
+    "aiwg-steward"
   ],
   "skills": [
     "project-awareness",
@@ -90,7 +91,8 @@
     "soul-validate",
     "soul-enhance",
     "soul-apply",
-    "soul-blend"
+    "soul-blend",
+    "aiwg-sync"
   ],
   "rules": [
     "agent-deployment",

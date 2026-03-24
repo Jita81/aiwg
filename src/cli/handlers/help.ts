@@ -43,11 +43,12 @@ function helpGroup(title: string, commands: [string, string][]): void {
  * Display comprehensive help information
  */
 function displayHelp(): void {
-  console.log('');
-  console.log(`  ${ui.bold('aiwg')} — AI Writing Guide CLI`);
-  console.log('');
-  console.log(`  ${ui.dimText('Usage:')} aiwg <command> [options]`);
-  console.log('');
+  ui.blank();
+  console.log(`  ${ui.brandMark()} ${ui.bold('aiwg')}  ${ui.dimText('AI Writing Guide CLI')}`);
+  ui.rule();
+  ui.blank();
+  console.log(`  ${ui.dimText('Usage:')} aiwg ${ui.accent('<command>')} ${ui.dimText('[options]')}`);
+  ui.blank();
 
   helpGroup('FRAMEWORK', [
     ['use <framework>', 'Deploy framework (sdlc, marketing, media-curator, research, writing, all)'],
@@ -110,12 +111,14 @@ function displayHelp(): void {
     ['--use-stable', 'Switch to stable channel (npm)'],
   ]);
 
+  ui.rule();
+  ui.blank();
   console.log(`  ${ui.dimText('Providers:')} claude (default), copilot, factory, codex, cursor, opencode, warp, windsurf`);
-  console.log('');
+  ui.blank();
   console.log(`  ${ui.dimText('Examples:')}`);
   console.log(`    aiwg use sdlc                  ${ui.dimText('Install SDLC framework')}`);
   console.log(`    aiwg use all --provider factory ${ui.dimText('Install all for Factory AI')}`);
   console.log(`    aiwg doctor                     ${ui.dimText('Check installation health')}`);
   console.log(`    aiwg mcp serve                  ${ui.dimText('Start MCP server')}`);
-  console.log('');
+  ui.blank();
 }

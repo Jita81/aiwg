@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "LayerDArtifact",
+  "description": "Structured residue from Layer D (Generative Reflection) — one entry per feature, appended to .aiwg/working/ring/layer_d.jsonl",
+  "type": "object",
+  "required": ["feature", "timestamp"],
+  "properties": {
+    "feature": {
+      "type": "string",
+      "description": "Name or description of the feature built"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of reflection"
+    },
+    "spec_assumptions_invalidated": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "What the spec assumed that turned out wrong during implementation"
+    },
+    "environment_assumptions_found": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "Proprioceptive discoveries: port, PATH, interpreter, stale state, shell behavior"
+    },
+    "unexpected_interactions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "How this feature touched other features unexpectedly"
+    },
+    "adversarial_cases": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "What would break this feature — candidate new test cases or gates"
+    },
+    "archetype_if_failed": {
+      "type": ["string", "null"],
+      "default": null,
+      "description": "Which failure archetype was triggered, or null if no failure occurred"
+    }
+  },
+  "additionalProperties": false
+}

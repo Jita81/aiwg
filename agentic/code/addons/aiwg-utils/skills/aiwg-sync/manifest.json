@@ -1,0 +1,16 @@
+{
+  "id": "aiwg-sync",
+  "type": "skill",
+  "name": "AIWG Sync",
+  "version": "1.0.0",
+  "description": "Ensure AIWG is up-to-date and correctly deployed to the active provider",
+  "platforms": ["claude-code", "hermes"],
+  "triggers": [
+    "sync aiwg",
+    "update aiwg",
+    "is aiwg up to date",
+    "make sure aiwg is current",
+    "refresh the framework",
+    "deploy latest aiwg"
+  ]
+}

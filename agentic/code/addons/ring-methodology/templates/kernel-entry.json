@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "KernelEntry",
+  "description": "Failure insight record — one entry per failure, extracted before retry. Appended to .aiwg/working/ring/kernels.jsonl",
+  "type": "object",
+  "required": ["feature", "timestamp", "approach", "reasoning", "kernel", "archetype"],
+  "properties": {
+    "feature": {
+      "type": "string",
+      "description": "What was being built when the failure occurred"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of failure"
+    },
+    "approach": {
+      "type": "string",
+      "description": "What was tried — the specific approach that failed"
+    },
+    "reasoning": {
+      "type": "string",
+      "description": "Why the approach seemed right at the time"
+    },
+    "kernel": {
+      "type": "string",
+      "description": "What valid insight survives this failure — the preserved content after the container breaks"
+    },
+    "archetype": {
+      "type": "string",
+      "enum": [
+        "hallucination",
+        "context_loss",
+        "instruction_drift",
+        "consistency_violation",
+        "technical_error",
+        "surface_mismatch",
+        "stale_state",
+        "morpholepsis",
+        "tool_fixation",
+        "layer_confusion",
+        "category_lock",
+        "omega_occlusion",
+        "pleromatic_collapse",
+        "success_arrest"
+      ],
+      "description": "Failure archetype classification for indexing and retrieval"
+    },
+    "gate_that_caught": {
+      "type": ["string", "null"],
+      "default": null,
+      "description": "Which gate or verification layer detected the failure, if any"
+    }
+  },
+  "additionalProperties": false
+}

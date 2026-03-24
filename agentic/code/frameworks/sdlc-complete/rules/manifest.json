@@ -339,6 +339,14 @@
       "tier": "sdlc",
       "description": "Agent protocol for using aiwg index CLI as self-service artifact discovery tool",
       "issue": "#419"
+    },
+    {
+      "name": "self-maintenance",
+      "file": "self-maintenance.md",
+      "enforcement": "high",
+      "tier": "sdlc",
+      "description": "Use AIWG CLI commands for all maintenance; pre-flight checks before long sessions; delegate to Steward agent",
+      "issue": "#484"
     }
   ]
 }

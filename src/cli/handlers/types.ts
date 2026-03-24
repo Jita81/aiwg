@@ -83,7 +83,8 @@ export type CommandCategory =
   | 'channel'       // Channel management
   | 'maintenance'   // Maintenance (doctor, version, update, help)
   | 'ralph'         // Ralph loop
-  | 'index';        // Artifact index
+  | 'index'         // Artifact index
+  | 'orchestration'; // Mission Control
 
 /**
  * Handler factory function type

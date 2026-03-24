@@ -20,11 +20,37 @@ const isCI = Boolean(
   process.env.GITEA_ACTIONS
 );
 
+// Brand palette
+const BRAND_HEX = '#818CF8';   // indigo-400 — brand mark / accent
+const SUCCESS_HEX = '#34D399'; // emerald-400 — success indicators
+
+/**
+ * Brand mark — ◆ in brand indigo color
+ */
+export function brandMark(): string {
+  return isTTY ? chalk.hex(BRAND_HEX)('◆') : '◆';
+}
+
+/**
+ * Brand-colored text for inline use
+ */
+export function accent(text: string): string {
+  return isTTY ? chalk.hex(BRAND_HEX)(text) : text;
+}
+
+/**
+ * Horizontal rule separator
+ */
+export function rule(width = 42): void {
+  const line = '─'.repeat(width);
+  console.log(isTTY ? chalk.dim(`  ${line}`) : `  ${'-'.repeat(width)}`);
+}
+
 /**
  * Styled message output functions
  */
 export function success(msg: string): void {
-  console.log(isTTY ? chalk.green(`  ✓ ${msg}`) : `  OK ${msg}`);
+  console.log(isTTY ? chalk.hex(SUCCESS_HEX)(`  ✓ ${msg}`) : `  OK ${msg}`);
 }
 
 export function error(msg: string): void {
@@ -36,7 +62,7 @@ export function warn(msg: string): void {
 }
 
 export function info(msg: string): void {
-  console.log(isTTY ? chalk.dim(`  → ${msg}`) : `  ${msg}`);
+  console.log(isTTY ? chalk.dim(`  › ${msg}`) : `  ${msg}`);
 }
 
 export function header(msg: string): void {
@@ -52,12 +78,12 @@ export function blank(): void {
 }
 
 /**
- * Section — a labeled block with indented items
+ * Section — a labeled block with › prefixed items
  */
 export function section(title: string, items: string[]): void {
-  console.log(isTTY ? chalk.bold(title) : title);
+  console.log(isTTY ? chalk.bold(`  ${title}`) : `  ${title}`);
   for (const item of items) {
-    console.log(`  ${item}`);
+    console.log(isTTY ? `    ${chalk.dim('›')} ${item}` : `    › ${item}`);
   }
 }
 
@@ -78,7 +104,7 @@ export function keyValue(pairs: Record<string, string>): void {
 export function deployCount(label: string, count: number): void {
   const padded = label.padEnd(12);
   if (isTTY) {
-    console.log(chalk.green('  ✓ ') + chalk.bold(padded) + chalk.dim(`${count} deployed`));
+    console.log(chalk.hex(SUCCESS_HEX)('  ✓ ') + chalk.bold(padded) + chalk.dim(`${count} deployed`));
   } else {
     console.log(`  OK ${padded}${count} deployed`);
   }
@@ -191,7 +217,7 @@ export function summaryBar(pass: number, warnings: number, errors: number): void
     console.log(isTTY ? chalk.yellow(`  ⚠ ${msg}`) : `  WARN ${msg}`);
   } else {
     const msg = `${pass} passed`;
-    console.log(isTTY ? chalk.green(`  ✓ All ${msg}`) : `  OK All ${msg}`);
+    console.log(isTTY ? chalk.hex(SUCCESS_HEX)(`  ✓ All ${msg}`) : `  OK All ${msg}`);
   }
 }
 
@@ -228,4 +254,4 @@ export function cyan(text: string): string {
   return isTTY ? chalk.cyan(text) : text;
 }
 
-export { isTTY, isCI };
+export { isTTY, isCI, BRAND_HEX };

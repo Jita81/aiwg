@@ -5,55 +5,72 @@ All notable changes to AIWG project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with npm-compatible format (`YYYY.M.PATCH`).
 
-## [2026.3.3] - 2026-03-23 – "Agent Intelligence, SOUL.md & Hook Architecture" Release
+## [2026.3.3] - 2026-03-24 – "Identity, Ring & Mission Control"
 
 | What changed | Why you care |
-|--------------|--------------|
-| **SOUL.md system** | First-class agent identity/persona files with full command suite (create, validate, enable, disable, status, enhance, apply, blend) |
-| **AIWG.md hook file architecture** | AIWG context decoupled from CLAUDE.md — enable/disable without uninstalling; manifest-driven content includes only what you have installed |
+|---|---|
+| **Ring Methodology addon** | Four-layer verification framework: Developer → Integration → User Surface → Generative Reflection. Spectral gap health metric, circuit breaker, morpholepsis detection, kenophoria state. `aiwg use ring` |
+| **AIWG self-maintenance** | `aiwg sync` — update + redeploy + verify in one command. `aiwg mc` — dispatch and monitor parallel Ralph loops from a dashboard. AIWG Steward agent for complex repairs. |
+| **Mission Control** | Multi-loop background orchestration: start a session, dispatch missions, monitor all from a status dashboard, drain or abort on demand. State persists across context resets. |
+| **Hermes as first-class platform** | Hermes graduates from MCP sidecar to `--provider hermes` deployment target. 96 skills declare platform compatibility. Full quickstart guide and token-optimized setup. |
+| **CLI UI modernization** | Shared display module (chalk/ora/cli-table3), brand mark, quiet mode (JSON output), TTY/CI-aware degradation. Consistent across all 49 commands. |
+| **SOUL.md — agent identity** | First-class agent identity files: worldview, opinions, character traits. Full command suite (create, validate, enable, disable, status, enhance, apply, blend). Four SDLC agents ship with pre-built souls. |
+| **AIWG.md hook file architecture** | AIWG context decoupled from CLAUDE.md into a toggleable `AIWG.md`. CLAUDE.md shrinks from 488+ lines to a 12-line wrapper. |
 | **Agent constraint learning** | Agents learn domain rules from reviewer corrections and persist them across sessions (#146) |
-| **Grounding agents** | Domain knowledge injection agents enforce project-specific constraints at generation time (#184) |
-| **Hermes / MCP sidecar** | Full Hermes integration: MCP sidecar architecture, delegate_task pattern for zero-cost child contexts, minimal tool surface, token-optimized AGENTS.md |
-| **Quality & metrics modules** | Token-per-artifact tracking, budget management, pattern-based quality scoring, feedback accuracy measurement — all with unit test coverage |
-| **Model evaluation suite** | Configurable eval framework for local and cloud models (#433) |
-| **YAML metalanguage schemas** | JSON Schema definitions for declarative flow and outcome expression (#447) |
-| **Verbalized sampling addon** | Diversity addon for varied AI output generation (#20) |
-| **Hybrid artifact addressing** | File path + semantic URN addressing system for cross-artifact references (#187) |
-| **Native UX tools rule** | Agents prefer platform-native interaction tools (e.g., AskUserQuestion) over plain text output (#448) |
-| **Local/Ollama as first-class provider** | Ollama provider on equal footing with cloud providers; local model support documented (#434) |
+| **Grounding agents** | Domain knowledge injection agents; 40% domain accuracy improvement on specialized claims (#184) |
+| **Hermes / MCP sidecar** | Token-optimized sidecar architecture, delegate_task skill (~200 tokens vs 3,000–8,000), two-model strategy |
+| **Quality & metrics modules** | Token-per-artifact tracking, budget management, pattern-based quality scoring, feedback A/B testing — 4 modules, 1,517 lines, full unit test coverage |
+| **Model evaluation suite** | Evaluate any Ollama or cloud model across 6 dimensions with scored pass/fail thresholds (#433) |
+| **YAML metalanguage schemas** | JSON Schema definitions for declarative flow, agent, rule, and skill YAML — foundation for 40–60% token reduction (#447) |
+| **Hybrid artifact addressing** | File path + semantic URN addressing — `@path`, `@?"query"`, `@#tags`, `@phase:type` (#187) |
+| **Verbalized sampling addon** | Diversity addon for varied AI output: content-diversifier agent, 3 prompt strategies (#20) |
+| **Native UX tools rule** | Agents prefer platform-native interaction tools; platform capability matrix (#448) |
+| **Local/Ollama as first-class provider** | Ollama on equal footing with cloud providers; local model support documented (#434) |
 
 ### Added
 
-- **SOUL.md system** — extension type `soul`; deploy `.soul.md` companion files alongside agents; Phase 1 commands: `soul-create`, `soul-validate`, `soul-enable`, `soul-disable`, `soul-status`; Phase 2 commands: `soul-enhance`, `soul-apply`, voice bridge; Phase 3: `soul-blend` skill and SDLC agent soul files (#437, #438)
-- **AIWG.md hook file** — decouples AIWG context injection from CLAUDE.md; `hook-enable` / `hook-disable` toggle context without uninstalling; `hook-regenerate` rebuilds AIWG.md from installed manifests; `migrate-hook` migrates existing projects; `--full-claude` opt-in flag for full CLAUDE.md injection; multi-provider hook file equivalents for all 8 providers (#439–#446)
-- **Agent constraint learning** (`#146`) — agents learn and persist domain rules from reviewer feedback corrections across sessions
-- **Grounding agents** (`#184`) — domain knowledge injection agents enforce project-specific constraints at artifact generation time
-- **Hermes MCP sidecar** — MCP sidecar architecture (#449), minimal tool surface (#451), `delegate_task` pattern for zero-cost child contexts (#452), Hermes platform support in SDLC skill frontmatter (#453); MCP templates, skill, and quickstart guide; `platforms` field added to all skills; token-optimized AGENTS.md template (#450)
-- **Token metrics modules** — token-per-artifact-line tracking (#173), token budget management (#144), pattern-based quality scoring (#192), feedback accuracy measurement (#148); unit tests for all four modules
-- **Model evaluation suite** — eval framework with configurable test suites for local and cloud models (#433)
-- **YAML metalanguage schemas** — JSON Schema definitions for declarative flow/outcome expression (#447)
-- **Verbalized sampling addon** (`agentic/code/addons/verbalized-sampling/`) — diversity addon for varied AI output generation (#20)
-- **Hybrid artifact addressing** (`#187`) — hybrid system combining file path and semantic URN addressing for cross-artifact references
-- **`native-ux-tools` rule** — agents must prefer platform-native interaction tools; includes platform capability matrix and fallback to formatted markdown (#448)
+- **Ring Methodology addon** (`agentic/code/addons/ring-methodology/`) — four-layer verification: Layer A (Developer), B (Integration), C (User Surface from `~`), D (Generative Reflection); spectral gap health metric with φ-derived thresholds (PEAK ≥ 61.8%, STABLE ≥ 38.2%, DEGRADED ≥ 23.6%, CRITICAL < 23.6%); circuit breaker halts on consecutive failures; morpholepsis detection for recurring work-arrest patterns; kenophoria state for external-blocked tracking; kernel extraction for reusable failure insights; perinoesis (periodic review) every 3 features; 6 enforcement rules; 5 CLI commands: `aiwg ring check`, `ring status`, `ring circuit-breaker`, `ring session-start`, `ring session-end`; hook wiring for SessionStart/Stop/SessionEnd (#481–#484)
+- **`aiwg sync`** — one-command session sync: detect provider → update package → re-deploy all frameworks → health check; flags: `--dry-run`, `--quiet`, `--skip-update`, `--provider`, `--channel`, `--frameworks`; quiet mode emits JSON for orchestration agents (#482)
+- **Mission Control (`aiwg mc`)** — multi-loop background orchestration dashboard; 9 subcommands: `start`, `dispatch`, `status`, `watch`, `abort`, `pause`, `resume`, `stop`, `list`; persistent sessions at `.aiwg/ralph-external/mc/sessions/`; JSONL event log per session; `--json` flag on status/list for machine-readable output; `--drain` on stop lets running missions finish while cancelling queued (#483)
+- **AIWG Steward agent** (`agentic/code/agents/personas/aiwg-steward.md`) — custodian agent for installation health; uses AIWG CLI for all operations; DETECT → BASELINE → CHECK → PLAN → CONFIRM → EXECUTE → VERIFY → REPORT decision logic (#481)
+- **MC Conductor agent** (`agentic/code/agents/personas/mc-conductor.md`) — live orchestrator inside Mission Control sessions; dispatches missions from work items, monitors completions, handles failures, reports aggregate status (#483)
+- **Self-maintenance rule** (`agentic/code/frameworks/sdlc-complete/rules/self-maintenance.md`) — CLI-first maintenance principle, pre-flight trigger table, NL pattern translations, proactive AIWG.md guidance (#484)
+- **CLI shared display module** (`src/cli/ui.ts`) — chalk/ora/cli-table3 with TTY/CI-aware degradation; brand mark `◆`, `success()`, `info()`, `warn()`, `error()`, `dim()`, `rule()`, `bold()`, `accent()`, `blank()`; quiet mode for machine-readable JSON output across all commands
+- **Hermes as full deployment platform** — `aiwg use sdlc --provider hermes` deploys full artifact set; 96 skills declare `platforms: [claude-code, hermes]`; 17 Claude-specific skills correctly scoped to `platforms: [claude-code]`; Hermes-specific templates at `agentic/code/frameworks/sdlc-complete/templates/hermes/`; full quickstart guide at `docs/integrations/hermes-quickstart.md`
+- **SOUL.md system** — extension type `soul`; deploy `.soul.md` companion files alongside agents; Phase 1 commands: `soul-create`, `soul-validate`, `soul-enable`, `soul-disable`, `soul-status`; Phase 2 commands: `soul-enhance`, `soul-apply`, voice bridge; Phase 3: `soul-blend` skill and SDLC agent soul files; four pre-built agent souls (test-engineer, security-auditor, architecture-designer, requirements-analyst) (#437, #438)
+- **AIWG.md hook file** — decouples AIWG context injection from CLAUDE.md; `hook-enable` / `hook-disable` toggle context without uninstalling; `hook-regenerate` rebuilds AIWG.md from installed manifests; `migrate-hook` migrates existing projects; multi-provider hook file equivalents for all 8 providers (#439–#446)
+- **Agent constraint learning** (`#146`) — agents learn and persist domain rules from reviewer feedback corrections across sessions; `FeedbackCollector` clusters recurring errors into versioned constraint proposals at `.aiwg/feedback/{agent}/`
+- **Domain grounding agents** (`#184`) — four grounding agents inject verified domain knowledge: security, performance, compliance, technology; `verify_claim` and `retrieve_knowledge` interfaces; 40% domain accuracy improvement
+- **Hermes MCP sidecar architecture** — MCP sidecar (#449), minimal 5-tool whitelist (~3,000 token schema vs 12,000+ full surface) (#451), `delegate_task` pattern (~200 tokens vs 3,000–8,000 direct) (#452), Hermes platform frontmatter on skills (#453), token-optimized AGENTS.md template (#450)
+- **Token metrics modules** — token-per-artifact-line tracking (#173), token budget management with 70/30 split (#144), pattern-based quality scoring with JSON patterns per artifact type (#192), feedback A/B testing infrastructure (#148); unit tests for all four modules
+- **Model evaluation suite** (`tools/eval/`) — configurable eval framework for local and cloud models; 6 dimensions, 9 initial test cases; Markdown and JSON reports (#433)
+- **YAML metalanguage schemas** (`agentic/code/frameworks/sdlc-complete/schemas/metalanguage/`) — flow, agent, rule, skill JSON Schema definitions (#447)
+- **Verbalized sampling addon** (`agentic/code/addons/verbalized-sampling/`) — content-diversifier agent, diversity-tuning skill, 3 prompt strategies, diversity-awareness rule (#20)
+- **`native-ux-tools` rule** — agents must prefer platform-native interaction tools; platform capability matrix; fallback to formatted markdown (#448)
 - **Local/Ollama provider** — first-class provider with local model support documentation and catalog entries (#434)
+- **Hybrid artifact addressing** (`#187`) — hybrid system combining file path and semantic URN addressing for cross-artifact references; sub-100ms in-memory index
+- **`aiwg index` enhancements** — flexible graph types, deploy next-steps, verbose mode (#426)
 - **Community model testing guide** — contribution guide for community model testing (#435)
-- **`aiwg index` enhancements** — flexible graph types, deploy next-steps, verbose mode; extensible graph type system (#426)
 - **Diagram generation rule elevated** — `diagram-generation` promoted to standard utility rule (#430)
 - **Complete docset generation enforcement** (`#429`) — rule enforcing full documentation artifact generation per release
 - **Claude Code memory-mapped @-link best practices** (`#427`) — guidance for @-link usage in agent memory contexts
 
 ### Changed
 
+- **`aiwg sync` and `aiwg mc`** — new commands added to Maintenance and Orchestration categories respectively; command count 47 → 49
+- **`CommandCategory` type** — extended with `'orchestration'` for Mission Control
 - **`aiwg use` output** — modern clean progress UI replacing legacy verbose output (#428)
 - **`aiwg index stats`** — `--graph` flag now optional; flexible graph type support (#425, #426)
 - **`aiwg index`** — deploy next-steps guidance added to post-build output; verbose mode flag
+- **All CLI commands** — consistent output via shared `ui.ts` module
 
 ### Fixed
 
-- **Factory provider command injection** — `$ARGUMENTS` and `argument-hint` now injected into deployed commands (#454)
+- **Factory provider command injection** — `$ARGUMENTS` and `argument-hint` now injected at deploy time; static-only execution silently dropped user input before (#454)
 - **`commit-and-push`** — oversized prompt trimmed; local model documentation added (#436)
 - **`aiwg index stats` without `--graph`** — no longer crashes when graph flag is omitted (#425)
 - **SnapshotManager API mismatch** in External Ralph causing fatal crash on loop execution (#424)
+- **`sync.ts` unused variable warnings** — removed unused `providerResult` and `versionResult` assignments
 
 ---
 

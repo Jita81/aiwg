@@ -868,6 +868,36 @@ export interface AddonMetadata {
     templates?: string[];
     prompts?: string[];
   };
+
+  /**
+   * CLI commands contributed to the `aiwg` binary
+   *
+   * Addon-contributed commands are dispatched as `aiwg <namespace> <subcommand>`.
+   * Each subcommand maps to an mjs file that exports a default async function.
+   * The `hook_event` field enables automatic Claude Code hook registration on deploy.
+   *
+   * @example
+   * ```json
+   * {
+   *   "namespace": "ring",
+   *   "description": "Ring methodology lifecycle operations",
+   *   "entry": "commands/",
+   *   "subcommands": {
+   *     "check": { "file": "commands/ring-check.mjs", "description": "Validate ring completion" }
+   *   }
+   * }
+   * ```
+   */
+  cli_commands?: {
+    namespace: string;
+    description: string;
+    entry: string;
+    subcommands: Record<string, {
+      file: string;
+      description: string;
+      hook_event?: string;
+    }>;
+  };
 }
 
 /**

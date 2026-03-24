@@ -122,6 +122,39 @@ export const updateCommand: Extension = {
   } satisfies CommandMetadata,
 };
 
+export const syncCommand: Extension = {
+  id: 'sync',
+  type: 'command',
+  name: 'Sync',
+  description: 'Sync AIWG to latest version and re-deploy all frameworks to active provider',
+  version: '1.0.0',
+  capabilities: ['cli', 'sync', 'maintenance', 'deploy', 'self-maintenance'],
+  keywords: ['sync', 'refresh', 'update', 'redeploy', 'current', 'latest'],
+  category: 'maintenance',
+  platforms: {
+    claude: 'full',
+    generic: 'full',
+  },
+  deployment: {
+    pathTemplate: '.{platform}/commands/{id}.md',
+    core: true,
+  },
+  metadata: {
+    type: 'command',
+    template: 'utility',
+    allowedTools: ['Bash', 'Read'],
+    argumentHint: '[--provider <name>] [--dry-run] [--frameworks <list>] [--channel <stable|next>] [--skip-update] [--quiet]',
+    executionSteps: [
+      'Detect active provider via runtime-info',
+      'Check current version vs latest on channel',
+      'Update package if newer available',
+      'Re-deploy all installed frameworks to provider',
+      'Run doctor health check',
+      'Output sync summary',
+    ],
+  } satisfies CommandMetadata,
+};
+
 // Framework Management Commands
 
 export const useCommand: Extension = {
@@ -894,6 +927,114 @@ export const ralphResumeCommand: Extension = {
   } satisfies CommandMetadata,
 };
 
+export const ralphExternalCommand: Extension = {
+  id: 'ralph-external',
+  type: 'command',
+  name: 'Ralph External',
+  description: 'Crash-resilient external loop with state persistence and CI/CD integration',
+  version: '1.0.0',
+  capabilities: ['cli', 'ralph', 'orchestration', 'external', 'crash-recovery'],
+  keywords: ['ralph', 'external', 'crash', 'recovery', 'persistent', 'background', 'cicd'],
+  category: 'ralph',
+  platforms: {
+    claude: 'full',
+    generic: 'full',
+  },
+  deployment: {
+    pathTemplate: '.{platform}/commands/{id}.md',
+    core: true,
+  },
+  metadata: {
+    type: 'command',
+    template: 'utility',
+    allowedTools: ['Bash', 'Read', 'Write'],
+    argumentHint: '"<objective>" --completion "<criteria>"',
+  } satisfies CommandMetadata,
+};
+
+export const ralphMemoryCommand: Extension = {
+  id: 'ralph-memory',
+  type: 'command',
+  name: 'Ralph Memory',
+  description: 'Manage Ralph semantic memory entries (list, query, clear)',
+  version: '1.0.0',
+  capabilities: ['cli', 'ralph', 'memory', 'semantic'],
+  keywords: ['ralph', 'memory', 'semantic', 'learning', 'list', 'query'],
+  category: 'ralph',
+  platforms: {
+    claude: 'full',
+    generic: 'full',
+  },
+  deployment: {
+    pathTemplate: '.{platform}/commands/{id}.md',
+    core: true,
+  },
+  metadata: {
+    type: 'command',
+    template: 'utility',
+    allowedTools: ['Read', 'Write'],
+    argumentHint: '<list|query|clear> [options]',
+  } satisfies CommandMetadata,
+};
+
+export const ralphConfigCommand: Extension = {
+  id: 'ralph-config',
+  type: 'command',
+  name: 'Ralph Config',
+  description: 'View and configure Ralph loop settings (show, set, reset, preset)',
+  version: '1.0.0',
+  capabilities: ['cli', 'ralph', 'configuration'],
+  keywords: ['ralph', 'config', 'configuration', 'settings', 'show', 'set', 'reset'],
+  category: 'ralph',
+  platforms: {
+    claude: 'full',
+    generic: 'full',
+  },
+  deployment: {
+    pathTemplate: '.{platform}/commands/{id}.md',
+    core: true,
+  },
+  metadata: {
+    type: 'command',
+    template: 'utility',
+    allowedTools: ['Read', 'Write'],
+    argumentHint: '<show|set|reset|preset> [key] [value]',
+  } satisfies CommandMetadata,
+};
+
+// Mission Control Commands
+
+export const mcCommand: Extension = {
+  id: 'mc',
+  type: 'command',
+  name: 'Mission Control',
+  description: 'Multi-loop background orchestration dashboard (start, dispatch, status, watch, stop)',
+  version: '1.0.0',
+  capabilities: ['cli', 'orchestration', 'ralph', 'background', 'multi-loop', 'mission-control'],
+  keywords: ['mission', 'control', 'mc', 'background', 'parallel', 'orchestration', 'dispatch', 'monitor'],
+  category: 'orchestration',
+  platforms: {
+    claude: 'full',
+    generic: 'full',
+  },
+  deployment: {
+    pathTemplate: '.{platform}/commands/{id}.md',
+    core: true,
+  },
+  metadata: {
+    type: 'command',
+    template: 'orchestration',
+    allowedTools: ['Bash', 'Read', 'Write'],
+    argumentHint: '<subcommand> [options]',
+    executionSteps: [
+      'Parse subcommand (start, dispatch, status, watch, abort, pause, resume, stop, list)',
+      'Route to appropriate subcommand handler',
+      'Read/write session state from .aiwg/ralph-external/mc/',
+      'Display results or status dashboard',
+    ],
+  } satisfies CommandMetadata,
+};
+
 // Cost & Metrics Commands
 
 export const costReportCommand: Extension = {
@@ -1203,11 +1344,12 @@ export const reproducibilityValidateCommand: Extension = {
  * - Reproducibility (4): execution-mode, snapshot, checkpoint, reproducibility-validate
  */
 export const commandDefinitions: Extension[] = [
-  // Maintenance (4)
+  // Maintenance (5)
   helpCommand,
   versionCommand,
   doctorCommand,
   updateCommand,
+  syncCommand,
 
   // Framework (3)
   useCommand,
@@ -1252,11 +1394,17 @@ export const commandDefinitions: Extension[] = [
   scaffoldExtensionCommand,
   scaffoldFrameworkCommand,
 
-  // Ralph (4)
+  // Ralph (7)
   ralphCommand,
   ralphStatusCommand,
   ralphAbortCommand,
   ralphResumeCommand,
+  ralphExternalCommand,
+  ralphMemoryCommand,
+  ralphConfigCommand,
+
+  // Mission Control (1)
+  mcCommand,
 
   // Metrics (3)
   costReportCommand,

@@ -27,10 +27,16 @@ async function fileExists(filePath) {
   }
 }
 
+const BRAND_HEX = '#818CF8';
+
 async function runDoctor() {
   const isTTY = Boolean(process.stdout.isTTY);
+  const mark = isTTY ? chalk.hex(BRAND_HEX)('◆') : '◆';
+  const rule = isTTY ? chalk.dim('  ' + '─'.repeat(42)) : '  ' + '-'.repeat(42);
+
   console.log('');
-  console.log(isTTY ? chalk.bold('  AIWG Doctor') : '  AIWG Doctor');
+  console.log(isTTY ? `  ${mark} ${chalk.bold('AIWG Doctor')}` : '  ◆ AIWG Doctor');
+  console.log(rule);
   console.log('');
 
   // 1. Check AIWG installation
@@ -129,6 +135,7 @@ async function runDoctor() {
   const errors = checks.filter(c => c.status === 'error').length;
   const warnings = checks.filter(c => c.status === 'warn').length;
 
+  console.log(rule);
   console.log('');
 
   if (errors > 0) {

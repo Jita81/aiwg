@@ -398,6 +398,62 @@ export function createRalphResumeHandler(): CommandHandler {
 }
 
 /**
+ * Ralph External handler
+ *
+ * Crash-resilient external loop with full state persistence.
+ * Equivalent to `ralph` with crash-recovery enabled by default.
+ */
+export const ralphExternalHandler: CommandHandler = {
+  id: 'ralph-external',
+  name: 'Ralph External',
+  description: 'Crash-resilient external loop with state persistence and CI/CD integration',
+  category: 'ralph',
+  aliases: ['--ralph-external'],
+
+  async execute(ctx: HandlerContext): Promise<HandlerResult> {
+    const runner = createScriptRunner(ctx.frameworkRoot);
+    // Delegate to the external Ralph supervisor script
+    return runner.run('tools/ralph-external/index.mjs', ctx.args);
+  },
+};
+
+/**
+ * Ralph Memory handler
+ *
+ * Manage semantic memory entries for Ralph loop learning.
+ */
+export const ralphMemoryHandler: CommandHandler = {
+  id: 'ralph-memory',
+  name: 'Ralph Memory',
+  description: 'Manage Ralph semantic memory entries (list, query, clear)',
+  category: 'ralph',
+  aliases: ['--ralph-memory'],
+
+  async execute(ctx: HandlerContext): Promise<HandlerResult> {
+    const runner = createScriptRunner(ctx.frameworkRoot);
+    return runner.run('tools/ralph-external/memory-manager.mjs', ['--cli', ...ctx.args]);
+  },
+};
+
+/**
+ * Ralph Config handler
+ *
+ * View and set Ralph loop configuration values.
+ */
+export const ralphConfigHandler: CommandHandler = {
+  id: 'ralph-config',
+  name: 'Ralph Config',
+  description: 'View and configure Ralph loop settings (show, set, reset, preset)',
+  category: 'ralph',
+  aliases: ['--ralph-config'],
+
+  async execute(ctx: HandlerContext): Promise<HandlerResult> {
+    const runner = createScriptRunner(ctx.frameworkRoot);
+    return runner.run('tools/ralph-external/orchestrator.mjs', ['--config', ...ctx.args]);
+  },
+};
+
+/**
  * Export handler instances
  */
 export const ralphHandler = new RalphHandler();
@@ -413,4 +469,7 @@ export const ralphHandlers: CommandHandler[] = [
   ralphStatusHandler,
   ralphAbortHandler,
   ralphResumeHandler,
+  ralphExternalHandler,
+  ralphMemoryHandler,
+  ralphConfigHandler,
 ];

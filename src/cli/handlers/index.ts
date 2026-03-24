@@ -45,6 +45,9 @@ import {
   ralphStatusHandler,
   ralphAbortHandler,
   ralphResumeHandler,
+  ralphExternalHandler,
+  ralphMemoryHandler,
+  ralphConfigHandler,
   ralphHandlers,
 } from './ralph.js';
 import {
@@ -62,6 +65,8 @@ import {
   subcommandHandlers,
 } from './subcommands.js';
 import { runtimeInfoHandler } from './runtime-info.js';
+import { syncHandler } from './sync.js';
+import { mcHandler, mcHandlers } from './mc.js';
 
 import type { CommandHandler } from './types.js';
 
@@ -72,6 +77,7 @@ export {
   versionHandler,
   doctorHandler,
   updateHandler,
+  syncHandler,
 
   // Framework management
   useHandler,
@@ -118,6 +124,12 @@ export {
   ralphStatusHandler,
   ralphAbortHandler,
   ralphResumeHandler,
+  ralphExternalHandler,
+  ralphMemoryHandler,
+  ralphConfigHandler,
+
+  // Mission Control
+  mcHandler,
 };
 
 // Re-export handler arrays
@@ -127,6 +139,7 @@ export {
   scaffoldingHandlers,
   ralphHandlers,
   subcommandHandlers,
+  mcHandlers,
 };
 
 /**
@@ -140,6 +153,7 @@ export const allHandlers: CommandHandler[] = [
   versionHandler,
   doctorHandler,
   updateHandler,
+  syncHandler,
 
   // Framework management
   useHandler,
@@ -175,6 +189,9 @@ export const allHandlers: CommandHandler[] = [
 
   // Ralph loop
   ...ralphHandlers,
+
+  // Mission Control
+  ...mcHandlers,
 ];
 
 /**
