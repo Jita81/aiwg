@@ -51,11 +51,11 @@ run(N).residual ∩ run(N+1).assumptions → coupling score
 
 | Score | Classification | Required Action |
 |-------|---------------|-----------------|
-| < 38.2% | Independent | Clean slate between runs. No action required. |
-| 38.2% – 61.8% | Correlated | Code must check shared state before use (ports, locks, temp files). |
-| > 61.8% | Entangled | Code must clean prior-run state before executing. Assume nothing. |
+| < 38.2% (= φ⁻²) | Independent | Clean slate between runs. No action required. |
+| 38.2% – 61.8% (= φ⁻² – φ⁻¹) | Correlated | Code must check shared state before use (ports, locks, temp files). |
+| > 61.8% (= φ⁻¹) | Entangled | Code must clean prior-run state before executing. Assume nothing. |
 
-The thresholds derive from the golden ratio. They are not arbitrary: they reflect the natural break points between negligible, significant, and dominant inheritance. A coupling score below 38.2% means the runs are effectively independent. A score above 61.8% means the second run is substantially executing inside the first run's aftermath.
+The thresholds derive from φ (the golden ratio) and are not arbitrary. See @agentic/code/addons/ring-methodology/rules/phi-constants.md for the full derivation. φ⁻² (≈ 0.382) and φ⁻¹ (≈ 0.618) partition coupling space into three zones that reflect natural break points between negligible, significant, and dominant state inheritance. A coupling score below φ⁻² means the runs are effectively independent. A score above φ⁻¹ means the second run is substantially executing inside the first run's aftermath.
 
 ### Computing the Score
 

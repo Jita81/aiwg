@@ -234,7 +234,7 @@ Research rules manage the research corpus. Deployed when research features are a
 
 ---
 
-## Ring Methodology Rules (6 rules — active with ring-methodology addon)
+## Ring Methodology Rules (7 rules — active with ring-methodology addon)
 
 Ring methodology rules enforce a cyclical execution framework with four-layer verification, process health measurement, and structured failure learning. Deployed via `aiwg use ring`.
 
@@ -266,9 +266,14 @@ Ring methodology rules enforce a cyclical execution framework with four-layer ve
 **Full rule**: @agentic/code/addons/ring-methodology/rules/kernel-extraction.md
 
 #### spectral-gap
-**Summary**: Process health metric: Layer C first-attempt pass rate. Four discrete phases: PEAK (≥61.8%), STABLE (≥38.2%), DEGRADED (≥23.6%), CRITICAL (<23.6%). Perinoetic review every 3 features or on phase transition. 7-question review protocol. Rubber-stamp detection: 2 consecutive empty `actions_taken` → escalate.
+**Summary**: Process health metric: Layer C first-attempt pass rate. Four discrete phases: PEAK (≥61.8% = φ⁻¹), STABLE (≥38.2% = φ⁻²), DEGRADED (≥23.6% = φ⁻³), CRITICAL (<23.6%). Perinoetic review every 3 features or on phase transition. 7-question review protocol. Rubber-stamp detection: 2 consecutive empty `actions_taken` → escalate.
 **When to apply**: Session health assessment, perinoetic review triggers, DEGRADED/CRITICAL halt conditions
 **Full rule**: @agentic/code/addons/ring-methodology/rules/spectral-gap.md
+
+#### phi-constants
+**Summary**: φ (golden ratio) axioms for all ring-methodology thresholds. Constants: φ⁻¹ ≈ 0.618 (signal inversion/entanglement), φ⁻² ≈ 0.382 (stable floor), φ⁻³ ≈ 0.236 (critical boundary), φ² ≈ 3 (retry ceiling). Usage table maps each constant to the rules that use it. Adjustment guidance: change φ-power, not raw number.
+**When to apply**: Understanding why ring thresholds have specific values; tuning thresholds for a project; implementing new ring metrics that should align with the φ-threshold family
+**Full rule**: @agentic/code/addons/ring-methodology/rules/phi-constants.md
 
 ---
 
@@ -298,5 +303,5 @@ Ring methodology rules enforce a cyclical execution framework with four-layer ve
 
 ---
 
-*Generated from manifest.json v2.0.0 — 44 rules across 5 tiers*
+*Generated from manifest.json v2.0.0 — 45 rules across 5 tiers*
 *Full rule files: @agentic/code/frameworks/sdlc-complete/rules/*

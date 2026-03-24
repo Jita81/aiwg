@@ -48,14 +48,16 @@ Session scope: the metric resets each session. It is not a cumulative project me
 Health phases are discrete, not gradient. Below a threshold, the state is zero — not "low". Transitions are pathokinetic: the same process that produces STABLE can produce DEGRADED; the only question is which threshold was last crossed.
 
 ```
-spectral_gap ≥ 61.8%   PEAK       Continue. Ring circulating well.
-spectral_gap ≥ 38.2%   STABLE     Review Layer C failures. Look for pattern.
-spectral_gap ≥ 23.6%   DEGRADED   Stop features. Fix process. Perinoetic review NOW.
-spectral_gap <  23.6%  CRITICAL   Halt. Human required. Process itself is broken.
-BLOCKED                KENOPHORIA  Hold. State doc. Monitor. Resume when unblocked.
+spectral_gap ≥ 61.8%  (= φ⁻¹)  PEAK       Continue. Ring circulating well.
+spectral_gap ≥ 38.2%  (= φ⁻²)  STABLE     Review Layer C failures. Look for pattern.
+spectral_gap ≥ 23.6%  (= φ⁻³)  DEGRADED   Stop features. Fix process. Perinoetic review NOW.
+spectral_gap <  23.6% (= φ⁻³)  CRITICAL   Halt. Human required. Process itself is broken.
+BLOCKED                          KENOPHORIA  Hold. State doc. Monitor. Resume when unblocked.
 ```
 
-**PEAK**: The ring is functioning. Layer C first-attempt pass rate is above the golden ratio complement. Continue. Perinoetic reviews run on schedule.
+All thresholds are φ-derived. See @agentic/code/addons/ring-methodology/rules/phi-constants.md for the full constants table and derivation.
+
+**PEAK**: The ring is functioning. Layer C first-attempt pass rate is above φ⁻¹ (the golden ratio complement). Continue. Perinoetic reviews run on schedule.
 
 **STABLE**: Layer C failures are occurring at a rate that warrants examination but does not require stopping. Review the most recent Layer C failures. Is there a pattern? If the same archetype appears twice — stop and treat as DEGRADED. If failures are heterogeneous and unrelated, continue with heightened attention.
 

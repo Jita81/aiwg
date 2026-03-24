@@ -36,7 +36,8 @@
     "kenophoria-state",
     "temporal-coupling",
     "kernel-extraction",
-    "spectral-gap"
+    "spectral-gap",
+    "phi-constants"
   ],
   "cli_commands": {
     "namespace": "ring",

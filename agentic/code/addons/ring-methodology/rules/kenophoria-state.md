@@ -186,18 +186,20 @@ Circuit breakers are conditions that trigger an immediate or soft transition fro
 
 | Condition | Threshold | Halt Type | Action |
 |-----------|-----------|-----------|--------|
-| Consecutive failures on the same issue | >= 2 | Immediate halt | Stop, preserve state, notify human |
-| Red-flag pattern rate in session window | > 61.8% | Immediate halt | Stop, preserve state, notify human |
+| Consecutive failures on the same issue | >= 2 (= φ²/1.3) | Immediate halt | Stop, preserve state, notify human |
+| Red-flag pattern rate in session window | > 61.8% (= φ⁻¹) | Immediate halt | Stop, preserve state, notify human |
 | Security operation without prior approval | Any occurrence | Immediate halt | Stop, do not proceed, notify human |
 | Ambiguous or conflicting requirements | Any occurrence | Soft halt | Pause, ask human for clarification |
-| Process health (spectral gap) | < 23.6% | Soft halt | Pause, report health metric, ask human |
+| Process health (spectral gap) | < 23.6% (= φ⁻³) | Soft halt | Pause, report health metric, ask human |
 | External dependency encountered | Any occurrence | KENOPHORIA (not halt) | Follow KENOPHORIA entry protocol |
 
-**Notes on thresholds**:
+**Notes on thresholds** (see @agentic/code/addons/ring-methodology/rules/phi-constants.md for full derivation):
 
-The 61.8% red-flag rate threshold is derived from the golden ratio complement (1 - 0.618). When more than 61.8% of recent actions are flagged, the signal-to-noise ratio has inverted: anomalous behavior has become the norm. This is a systemic condition, not an isolated failure, and requires human assessment.
+The **61.8% (= φ⁻¹)** red-flag rate threshold is the golden ratio reciprocal. When more than φ⁻¹ of recent actions are flagged, the signal-to-noise ratio has inverted: anomalous behavior has become the norm. This is a systemic condition, not an isolated failure, and requires human assessment.
 
-The 23.6% spectral gap threshold corresponds to the square of the golden ratio reciprocal (0.618^2 ≈ 0.382, complement ≈ 0.618, second complement ≈ 0.236). Below this threshold the agent's execution trace no longer shows a clean separation between healthy and unhealthy patterns.
+The **23.6% (= φ⁻³)** spectral gap threshold is the third power of the golden ratio reciprocal. Below this threshold the agent's execution trace no longer shows a clean separation between healthy and unhealthy patterns. It is the critical boundary of the φ-threshold family.
+
+The consecutive-failure threshold of 2 is intentionally low. A single failure on an issue may be an isolated event. Two consecutive failures on the same issue indicate a structural problem that the agent is not resolving through its own iteration. Further autonomous attempts are unlikely to succeed and risk worsening the situation.
 
 The consecutive-failure threshold of 2 is intentionally low. A single failure on an issue may be an isolated event. Two consecutive failures on the same issue indicate a structural problem that the agent is not resolving through its own iteration. Further autonomous attempts are unlikely to succeed and risk worsening the situation.
 
