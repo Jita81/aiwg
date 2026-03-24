@@ -141,15 +141,131 @@ This is the single most important quality criterion. Every section should contri
 | `/soul-enable` | Wire SOUL.md into session context and deploy enforcement rule |
 | `/soul-disable` | Remove soul enforcement (preserves SOUL.md file) |
 | `/soul-status` | Show enforcement state across all providers |
+| `/soul-enhance` | Improve an existing SOUL.md — sharpen vague statements, generate missing sections, add calibration examples |
+| `/soul-apply` | Apply a soul profile to content generation, incorporating worldview, opinions, and character |
+| `/soul-blend` | Merge two or more soul files into a composite persona |
+
+### soul-enhance
+
+Analyzes an existing SOUL.md and makes targeted improvements without rewriting the file from scratch. Runs `soul-validate` internally as its first step, then enhances based on the validation results.
+
+**What it improves:**
+
+| Category | What Happens |
+|----------|-------------|
+| Vague statements | Identifies generic language ("I value quality") and prompts for specifics |
+| Missing sections | Generates drafts for Boundaries, Tensions, and Vocabulary sections inferred from existing content |
+| Opinion strength | Checks that each opinion is falsifiable and persona-specific |
+| Vocabulary extraction | Scans for terms used in specific ways and adds them to the Vocabulary section |
+| Calibration examples | Generates `examples/good-outputs.md` and `examples/bad-outputs.md` |
+| Context budget | Flags sections that exceed recommended sizes and suggests moving detail to companion files |
+
+```bash
+# Full enhancement with interactive sharpening questions
+/soul-enhance --interactive
+
+# Enhance specific sections
+/soul-enhance --sections "opinions,vocabulary,boundaries"
+
+# Generate calibration examples only
+/soul-enhance --generate-examples
+
+# Preview without applying
+/soul-enhance --dry-run
+
+# Enhance a per-agent soul file
+/soul-enhance .claude/agents/test-engineer.soul.md
+```
+
+After enhancement, the score typically improves significantly (5/10 → 8/10 is a common result). Review changes with `git diff SOUL.md`.
+
+### soul-apply
+
+Applies the loaded SOUL.md to any content generation task. Unlike `/voice-apply` which adjusts writing style, `/soul-apply` incorporates identity — worldview shapes arguments, opinions influence recommendations, vocabulary infuses the text, and boundaries constrain what gets said.
+
+**Application layers:**
+
+| Layer | Source Section |
+|-------|---------------|
+| How arguments are framed | Worldview |
+| Which positions are taken | Opinions |
+| Which terms are used | Vocabulary |
+| What the agent won't say | Boundaries |
+| Where the agent acknowledges complexity | Tensions |
+
+```bash
+# Apply soul to a content generation task
+/soul-apply "Write a recommendation for our database migration strategy"
+
+# Revise existing content through the soul
+/soul-apply --revise docs/architecture-decision.md
+
+# High intensity — strong opinions, distinctive voice
+/soul-apply --intensity high "Review this PR's architectural approach"
+
+# Use a specific soul file
+/soul-apply --soul .claude/agents/security-auditor.soul.md "Assess this auth flow"
+
+# Compare before/after
+/soul-apply --revise --compare docs/team-practices.md
+```
+
+**Intensity levels:** `low` (subtle vocabulary and tone shift), `medium` (default — clear character, worldview shapes framing), `high` (full character — strong opinions, boundaries enforced, contradictions surfaced).
+
+When soul enforcement is active via `/soul-enable`, the soul is passively applied to all content. Use `/soul-apply` explicitly for revising existing content or switching soul files mid-session.
+
+### soul-blend
+
+Merges two or more SOUL.md files into a composite persona. Useful for team-level agents or cross-functional personas that need to combine multiple perspectives.
+
+**Conflict resolution strategies:**
+
+| Strategy | Behavior | Use When |
+|----------|----------|----------|
+| `weighted` (default) | Primary soul takes precedence on conflicts | One soul is dominant, others add flavor |
+| `union` | Both sides of each conflict become a Tension | Building a deliberately complex persona |
+| `consensus` | Keep only opinions both souls share | Building a team consensus persona |
+| `interactive` | Ask user to resolve each conflict | Precision matters |
+
+```bash
+# Blend two agent souls
+/soul-blend .claude/agents/test-engineer.soul.md .claude/agents/security-auditor.soul.md
+
+# Weighted blend with primary soul
+/soul-blend --primary engineer.soul.md engineer.soul.md designer.soul.md
+
+# Interactive conflict resolution
+/soul-blend --strategy interactive soul-a.md soul-b.md soul-c.md
+
+# Team consensus persona
+/soul-blend --strategy consensus team-member-*.soul.md --output team-soul.md
+```
+
+The blended output includes `<!-- from: filename -->` attribution comments to trace where each element originated. Use `--strip-attribution` to remove them.
+
+#### Companion File Deployment
+
+Individual agents can have a companion `.soul.md` file deployed alongside their main definition:
+
+```
+.claude/agents/test-engineer.md         # Operational instructions
+.claude/agents/test-engineer.soul.md    # Identity/personality
+```
+
+Per-agent souls take precedence over the project SOUL.md during that agent's sessions. To create a soul for a specific agent without affecting the project soul, point `/soul-create`, `/soul-enhance`, or `/soul-apply` at the agent-specific path.
 
 ## Voice Framework Integration
 
 SOUL.md and voice profiles are complementary:
 
 - **Voice → Soul**: Use `/soul-create --from-voice <profile>` to generate a SOUL.md that produces content matching an existing voice profile
-- **Soul → Voice**: Use the voice framework to extract a voice profile from a SOUL.md (planned for Phase 2)
+- **Soul → Voice**: Use `/soul-to-voice` to extract a voice profile from a SOUL.md
+- **Voice → Soul**: Use `/voice-to-soul` to convert a voice profile into a soul file starting point
+- **Blending**: `/soul-blend` and `/voice-blend` are parallel operations — blend both when combining agents that have both soul files and voice profiles
 
 When both are active, the soul file defines *who* the agent is, and the voice profile fine-tunes *how* the output sounds. The soul has higher precedence on tone and character; the voice profile has higher precedence on syntax and structure.
+
+If `/soul-enhance` finds vocabulary that conflicts with the voice profile's avoid-list, it flags the conflict for resolution.
 
 ## Multi-Platform Support
 

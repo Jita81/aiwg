@@ -5,6 +5,58 @@ All notable changes to AIWG project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with npm-compatible format (`YYYY.M.PATCH`).
 
+## [2026.3.3] - 2026-03-23 – "Agent Intelligence, SOUL.md & Hook Architecture" Release
+
+| What changed | Why you care |
+|--------------|--------------|
+| **SOUL.md system** | First-class agent identity/persona files with full command suite (create, validate, enable, disable, status, enhance, apply, blend) |
+| **AIWG.md hook file architecture** | AIWG context decoupled from CLAUDE.md — enable/disable without uninstalling; manifest-driven content includes only what you have installed |
+| **Agent constraint learning** | Agents learn domain rules from reviewer corrections and persist them across sessions (#146) |
+| **Grounding agents** | Domain knowledge injection agents enforce project-specific constraints at generation time (#184) |
+| **Hermes / MCP sidecar** | Full Hermes integration: MCP sidecar architecture, delegate_task pattern for zero-cost child contexts, minimal tool surface, token-optimized AGENTS.md |
+| **Quality & metrics modules** | Token-per-artifact tracking, budget management, pattern-based quality scoring, feedback accuracy measurement — all with unit test coverage |
+| **Model evaluation suite** | Configurable eval framework for local and cloud models (#433) |
+| **YAML metalanguage schemas** | JSON Schema definitions for declarative flow and outcome expression (#447) |
+| **Verbalized sampling addon** | Diversity addon for varied AI output generation (#20) |
+| **Hybrid artifact addressing** | File path + semantic URN addressing system for cross-artifact references (#187) |
+| **Native UX tools rule** | Agents prefer platform-native interaction tools (e.g., AskUserQuestion) over plain text output (#448) |
+| **Local/Ollama as first-class provider** | Ollama provider on equal footing with cloud providers; local model support documented (#434) |
+
+### Added
+
+- **SOUL.md system** — extension type `soul`; deploy `.soul.md` companion files alongside agents; Phase 1 commands: `soul-create`, `soul-validate`, `soul-enable`, `soul-disable`, `soul-status`; Phase 2 commands: `soul-enhance`, `soul-apply`, voice bridge; Phase 3: `soul-blend` skill and SDLC agent soul files (#437, #438)
+- **AIWG.md hook file** — decouples AIWG context injection from CLAUDE.md; `hook-enable` / `hook-disable` toggle context without uninstalling; `hook-regenerate` rebuilds AIWG.md from installed manifests; `migrate-hook` migrates existing projects; `--full-claude` opt-in flag for full CLAUDE.md injection; multi-provider hook file equivalents for all 8 providers (#439–#446)
+- **Agent constraint learning** (`#146`) — agents learn and persist domain rules from reviewer feedback corrections across sessions
+- **Grounding agents** (`#184`) — domain knowledge injection agents enforce project-specific constraints at artifact generation time
+- **Hermes MCP sidecar** — MCP sidecar architecture (#449), minimal tool surface (#451), `delegate_task` pattern for zero-cost child contexts (#452), Hermes platform support in SDLC skill frontmatter (#453); MCP templates, skill, and quickstart guide; `platforms` field added to all skills; token-optimized AGENTS.md template (#450)
+- **Token metrics modules** — token-per-artifact-line tracking (#173), token budget management (#144), pattern-based quality scoring (#192), feedback accuracy measurement (#148); unit tests for all four modules
+- **Model evaluation suite** — eval framework with configurable test suites for local and cloud models (#433)
+- **YAML metalanguage schemas** — JSON Schema definitions for declarative flow/outcome expression (#447)
+- **Verbalized sampling addon** (`agentic/code/addons/verbalized-sampling/`) — diversity addon for varied AI output generation (#20)
+- **Hybrid artifact addressing** (`#187`) — hybrid system combining file path and semantic URN addressing for cross-artifact references
+- **`native-ux-tools` rule** — agents must prefer platform-native interaction tools; includes platform capability matrix and fallback to formatted markdown (#448)
+- **Local/Ollama provider** — first-class provider with local model support documentation and catalog entries (#434)
+- **Community model testing guide** — contribution guide for community model testing (#435)
+- **`aiwg index` enhancements** — flexible graph types, deploy next-steps, verbose mode; extensible graph type system (#426)
+- **Diagram generation rule elevated** — `diagram-generation` promoted to standard utility rule (#430)
+- **Complete docset generation enforcement** (`#429`) — rule enforcing full documentation artifact generation per release
+- **Claude Code memory-mapped @-link best practices** (`#427`) — guidance for @-link usage in agent memory contexts
+
+### Changed
+
+- **`aiwg use` output** — modern clean progress UI replacing legacy verbose output (#428)
+- **`aiwg index stats`** — `--graph` flag now optional; flexible graph type support (#425, #426)
+- **`aiwg index`** — deploy next-steps guidance added to post-build output; verbose mode flag
+
+### Fixed
+
+- **Factory provider command injection** — `$ARGUMENTS` and `argument-hint` now injected into deployed commands (#454)
+- **`commit-and-push`** — oversized prompt trimmed; local model documentation added (#436)
+- **`aiwg index stats` without `--graph`** — no longer crashes when graph flag is omitted (#425)
+- **SnapshotManager API mismatch** in External Ralph causing fatal crash on loop execution (#424)
+
+---
+
 ## [2026.3.2] - 2026-03-04 – Service Release
 
 | What changed | Why you care |
