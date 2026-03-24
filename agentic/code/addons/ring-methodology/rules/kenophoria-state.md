@@ -1,29 +1,40 @@
-# Kenophoria State
+# Kenophoria & Liminal States
 
 **Enforcement Level**: HIGH
 **Scope**: All agents
 **Addon**: ring-methodology
-**Issue**: #470
+**Issue**: #470, #492
 
 ## Overview
 
-This rule defines the three-state execution model for ring-methodology agents and specifies the protocols governing transitions between those states. The central concept — kenophoria — names the productive void that occurs when an agent is blocked on an external dependency. Kenophoria is not failure. It is the system's capacity to hold space for an answer that has not yet arrived, without collapsing that space by filling it prematurely.
+This rule defines the four-state execution model for ring-methodology agents and specifies the protocols governing transitions between those states. Two states name distinct forms of productive non-execution: **kenophoria** — the productive void of external blocking, and **liminal** — the necessary pause of internal reorientation.
 
-Agents operating under this rule maintain disciplined state boundaries, produce structured records when blocked, and escalate via circuit breakers only when the situation warrants human involvement.
+Kenophoria names the discipline required when the agent is blocked on an external dependency: bearing the emptiness without filling it with fabricated progress. Liminal names the discipline required when the agent's current frame is wrong: stopping before continuing incorrectly, extracting what was learned, and re-entering execution with a new frame.
+
+Agents operating under this rule maintain disciplined state boundaries, produce structured records when blocked or reorienting, and escalate via circuit breakers only when the situation warrants human involvement.
 
 ## Problem Statement
 
-Autonomous agents face three fundamentally different operational conditions:
+Autonomous agents face four fundamentally different operational conditions:
 
 1. Normal execution — the agent is working.
-2. Blocked execution — the agent cannot proceed because something outside its control has not resolved.
-3. Halted execution — the agent has encountered a condition that requires human decision.
+2. Internal reorientation — the agent's current frame is wrong and must be corrected before continuing.
+3. Blocked execution — the agent cannot proceed because something outside its control has not resolved.
+4. Halted execution — the agent has encountered a condition that requires human decision.
 
-Most systems collapse conditions 2 and 3 into a single failure state, producing one of two bad outcomes: the agent halts unnecessarily (treating external dependencies as errors), or the agent continues blindly (ignoring real failure conditions). This rule separates the two, giving each condition its own protocol.
+Most systems collapse conditions 2, 3, and 4 into a single failure state. This produces three bad outcomes: the agent halts unnecessarily (treating external dependencies or frame errors as terminal), the agent continues blindly (ignoring real failure conditions), or the agent loops forever (re-entering a failed frame without extracting what it learned). This rule separates all four, giving each condition its own protocol.
+
+The distinction between LIMINAL (internal reorientation) and KENOPHORIA (external blocking) is the key refinement. An agent in the wrong frame needs to stop and reframe — not wait for something external to change. An agent waiting on an external dependency needs to hold space — not thrash through incorrect approaches.
 
 The term **kenophoria** — from the Greek *kenos* (empty) and *phoria* (bearing, carrying) — captures the discipline required in state 2: the agent bears the emptiness of an unresolved dependency without filling it with fabricated progress, forced workarounds, or premature termination.
 
 ## Vocabulary
+
+**Liminal** — From the Latin *limen* (threshold). The state of being between frames: the agent has recognized that its current approach is wrong and has stepped back from it, but has not yet entered the new frame. LIMINAL is productive — it is the moment of kernel extraction and frame construction. It is not failure. It exits to EXECUTING via a declared frame shift.
+
+**Frame shift** — A declared change in the agent's decomposition of the current task. A frame shift is not a retry. It is a fundamentally different approach, justified by the kernel extracted from the failed frame. A frame shift must name: what the prior frame assumed, why that assumption was wrong, and what the new frame assumes instead.
+
+**Ω-occlusion** — (Omega-occlusion) A specific LIMINAL entry condition: the correct path forward is obscured by a layer of false assumptions accumulated over multiple incorrect tool uses. The agent cannot see the solution not because it lacks capability but because its view is blocked by what it has falsely concluded. LIMINAL clears the occlusion; EXECUTING through the occlusion deepens it.
 
 **Kenophoria** — Bearing emptiness without filling it. The productive void between executing and halted. The system's capacity to hold space for an answer that has not arrived, without manufacturing a false resolution.
 
@@ -43,19 +54,24 @@ The term **kenophoria** — from the Greek *kenos* (empty) and *phoria* (bearing
 
 ## State Machine
 
-The ring-methodology execution model contains exactly three states.
+The ring-methodology execution model contains exactly four states.
 
 ```
-  +-------------+
-  |  EXECUTING  |<--------------------------------------------+
-  +-------------+                                             |
-        |                                                     |
-        | External dependency                 Unblocking      |
-        | encountered                         condition met   |
-        v                                                     |
-  +-------------+   Duration gate             +---> Reload checkpoint
-  | KENOPHORIA  |   exceeded (3x mean)        |     Perinoetic check
-  +-------------+---> Soft halt ------------> |     Resume
+  +-------------+   Morpholeptic loop     +---------+
+  |  EXECUTING  |---> or Ω-occlusion ---> |  LIMINAL |
+  +-------------+   detected              +---------+
+        ^                                      |
+        |                       Frame shift    |
+        +<-------------------------------------+
+        |                       declared +
+        |                       kernel extracted
+        |
+        | External dependency
+        | encountered
+        v
+  +-------------+   Duration gate         +---> Reload checkpoint
+  | KENOPHORIA  |   exceeded (3x mean)    |     Perinoetic check
+  +-------------+---> Soft halt --------> |     Resume
         |
         | Circuit breaker
         | tripped
@@ -69,33 +85,33 @@ The ring-methodology execution model contains exactly three states.
 
 ```
                     +-----------+
-                    |           |
-         +--------->  EXECUTING <---------+
-         |          |           |         |
-         |          +-----+-----+         |
-         |                |               |
-         |  Unblocking    | External      |
-         |  condition     | dependency    |
-         |  met + check   | encountered   |
-         |  passes        |               |
-         |          +-----v-----+         |
-         |          |           |         |
-         +----------| KENOPHORIA|         |
-                    |           |         |
-                    +-----+-----+         |
-                          |               |
-              +-----------+-----------+   |
-              |                       |   |
-   Duration   |             Circuit   |   |
-   gate       |             breaker   |   |
-   exceeded   |             tripped   |   |
-   (3x mean)  |                       |   |
-              v                       v   |
-         Soft halt              +---------+-+
-              |                 |           |
-              | Human           |  HALTED   |
-              | answers         |           |
-              |                 +-----------+
+                    |           |<----------------------------+
+         +--------->  EXECUTING |                             |
+         |          |           |                             |
+         |          +-----+--+--+                             |
+         |                |  |                                |
+         |  Unblocking    |  | Morpholeptic loop /    Frame   |
+         |  condition     |  | Ω-occlusion           shift + |
+         |  met + check   |  | detected              kernel  |
+         |  passes        |  v                       extracted|
+         |          +-----+-----+    +----------+            |
+         |          |           |    |          |            |
+         +----------| KENOPHORIA|    |  LIMINAL |------------+
+                    |           |    |          |
+                    +-----+-----+    +----------+
+                          |
+              +-----------+-----------+
+              |                       |
+   Duration   |             Circuit   |
+   gate       |             breaker   |
+   exceeded   |             tripped   |
+   (3x mean)  |                       |
+              v                       v
+         Soft halt              +---------+
+              |                 |         |
+              | Human           | HALTED  |
+              | answers         |         |
+              |                 +---------+
               +-----------------------------> (resume or abort)
 ```
 
@@ -104,8 +120,43 @@ The ring-methodology execution model contains exactly three states.
 Normal operation. The agent is making progress on its assigned work. No special protocol applies beyond the ring-methodology's standard execution rules.
 
 **Transitions out**:
+- To LIMINAL: a morpholeptic loop is detected, consecutive failures on the same frame reach the threshold (≥ 2), or Ω-occlusion is identified (the agent recognizes its accumulated assumptions are blocking the correct path).
 - To KENOPHORIA: an external dependency is encountered that the agent cannot resolve autonomously.
 - To HALTED: a circuit breaker condition is detected (see Circuit Breakers section).
+
+### LIMINAL
+
+Internal reorientation. The agent has recognized that its current frame is wrong and must be corrected before continuing. LIMINAL is not failure. It is the productive work of extracting what was learned, constructing a corrected frame, and returning to execution on firmer ground.
+
+**Entry conditions** (any one triggers LIMINAL):
+
+1. **Morpholeptic loop**: The same approach has been retried ≥ 2 times without meaningful variation. The consecutive-failure threshold is the same as the circuit breaker threshold, but the cause is internal (wrong frame), not external (blocked dependency).
+2. **Ω-occlusion detected**: The agent has identified that its accumulated false assumptions are obscuring the correct path. The correct approach exists but cannot be seen through the current frame.
+3. **Protonoia escalation**: A protonoia check (see `morpholepsis-detection.md`) has detected that the next tool use would repeat a pattern flagged in the kernel library, and the agent cannot articulate a reason the outcome would differ.
+
+**Entry protocol** (all three steps are mandatory):
+
+1. **Declare the frame exit** — State explicitly: "Entering LIMINAL. Current frame: [describe the approach that failed]. Entry condition: [morpholeptic loop | Ω-occlusion | protonoia escalation]."
+2. **Extract the kernel** — Apply the kernel extraction protocol (see `kernel-extraction.md`). Record what was valid in the failed approach, what the failure reveals, and what assumption was wrong. Write the kernel to `kernels.jsonl` before proceeding.
+3. **Declare the frame shift** — State: "Frame shift: [new approach]. Prior assumption: [what was assumed]. Corrected assumption: [what the kernel revealed]. Re-entering EXECUTING."
+
+**Transitions out**:
+- To EXECUTING: frame shift is declared and kernel is extracted. No external event is required. The transition is entirely within the agent's control.
+
+**LIMINAL is not**:
+- A retry. Returning to the same approach with minor parameter variation is not a frame shift — it is continued morpholepsis.
+- A pause for external input. If the agent needs human input, it transitions to KENOPHORIA or HALTED, not LIMINAL.
+- Infinite. If consecutive LIMINAL entries on the same task exceed 3 without meaningful frame progress, the circuit breaker for consecutive failures trips and the agent transitions to HALTED.
+
+**Distinction from KENOPHORIA**:
+
+| Dimension | LIMINAL | KENOPHORIA |
+|-----------|---------|------------|
+| Cause | Internal frame error | External dependency |
+| Resolution | Self-directed (kernel + reframe) | Externally triggered (unblocking condition) |
+| Agent can resolve autonomously? | Yes | No |
+| Duration | Short (one extraction cycle) | Indefinite (depends on external) |
+| Exit trigger | Declared frame shift | Unblocking condition met |
 
 ### KENOPHORIA
 
@@ -227,6 +278,34 @@ The state document is a required artifact produced on KENOPHORIA entry. It is wr
 - `unblocking_condition`: Must be a condition that a human could verify independently. "When the API is ready" is not acceptable. "When `curl https://auth.staging.internal/v2/token` returns HTTP 200" is acceptable.
 - `circuit_breakers_evaluated`: Must reflect the actual values at the time of KENOPHORIA entry, not placeholders.
 
+## LIMINAL State Record
+
+The LIMINAL state does not write a JSON file to the checkpoint directory (it is a brief transition, not a session-spanning state). Instead, the agent emits a structured inline record as part of its reasoning trace.
+
+```
+[LIMINAL ENTRY]
+Entry condition: <morpholeptic_loop | omega_occlusion | protonoia_escalation>
+Failed frame: <description of the approach that was abandoned>
+Consecutive failures on this frame: <N>
+
+[KERNEL EXTRACTED]
+Kernel ID: <reference to kernels.jsonl entry>
+Valid component: <what was correct in the failed approach>
+Failure signal: <what the failure reveals>
+Wrong assumption: <the assumption that caused the failure>
+
+[FRAME SHIFT]
+New frame: <description of the corrected approach>
+Corrected assumption: <what the kernel revealed instead>
+Re-entering EXECUTING.
+```
+
+**Inline record requirements**:
+- Must appear in the agent's output before any tool use in the new frame.
+- The kernel must be written to `kernels.jsonl` before the frame shift declaration.
+- The new frame must be meaningfully different from the failed frame — cosmetic variation does not qualify.
+- If the agent cannot articulate a new frame that is genuinely different, the entry condition for HALTED (consecutive LIMINAL entries without progress) applies.
+
 ## Integration
 
 ### Hook Integration
@@ -276,10 +355,13 @@ The `circuit-breaker.py` hook evaluates whether KENOPHORIA entries are backed by
 
 - @agentic/code/addons/ring-methodology/hooks/circuit-breaker.py — Circuit breaker hook implementation
 - @agentic/code/addons/ring-methodology/hooks/session-health-check.py — Session start health check
+- @agentic/code/addons/ring-methodology/rules/kernel-extraction.md — Kernel extraction protocol (required during LIMINAL entry)
+- @agentic/code/addons/ring-methodology/rules/morpholepsis-detection.md — Detection signals that trigger LIMINAL entry; protonoia escalation
 - @agentic/code/frameworks/sdlc-complete/rules/failure-mitigation.md — Agent-internal failure archetypes (distinct from external blocking)
-- @agentic/code/frameworks/sdlc-complete/rules/anti-laziness.md — Prevents misuse of KENOPHORIA to avoid difficult work
+- @agentic/code/frameworks/sdlc-complete/rules/anti-laziness.md — Prevents misuse of KENOPHORIA or LIMINAL to avoid difficult work
 - @agentic/code/frameworks/sdlc-complete/rules/hitl-gates.md — Human-in-the-loop gate protocol for soft halt resolution
-- #470 — Implementation issue
+- #470 — Original kenophoria implementation issue
+- #492 — LIMINAL state addition
 
 ---
 

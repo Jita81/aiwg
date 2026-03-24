@@ -234,15 +234,53 @@ Research rules manage the research corpus. Deployed when research features are a
 
 ---
 
+## Ring Methodology Rules (6 rules — active with ring-methodology addon)
+
+Ring methodology rules enforce a cyclical execution framework with four-layer verification, process health measurement, and structured failure learning. Deployed via `aiwg use ring`.
+
+### HIGH
+
+#### verification-ring
+**Summary**: Four-layer A→B→C→D verification ring. Layer A: developer tests. Layer B: integration tests. Layer C: user surface from `~`, login shell, installed command. Layer D: structured reflection artifact. One Feature, One Full Ring — never batch. C failure = feature incomplete. D always runs. Enforced by `ring-check` hook on FeatureComplete.
+**When to apply**: Every feature completion, any deliverable type (CLI, library, API, app), output verification
+**Full rule**: @agentic/code/addons/ring-methodology/rules/verification-ring.md
+
+#### morpholepsis-detection
+**Summary**: Wrong-frame detection via 7-signal table. Fires during execution before retry ceiling. Signals: tool fixation, layer confusion, category lock, Ω-occlusion, pleromatic collapse, morpholeptic loop, success arrest. Highest-value: success arrest (Layer A passes, B/C/D skipped). Intervention = reframe, not retry. Does not consume retry slot.
+**When to apply**: Repeated failures, same approach with minor variations, feature declared done without full ring
+**Full rule**: @agentic/code/addons/ring-methodology/rules/morpholepsis-detection.md
+
+#### kenophoria-state
+**Summary**: Four-state execution model: EXECUTING ↔ LIMINAL (internal reorientation loop), EXECUTING → KENOPHORIA → HALTED. LIMINAL = agent's frame is wrong — stop, extract kernel, declare frame shift, re-enter EXECUTING. KENOPHORIA = blocked on external dependency (not failure). Circuit breakers: consecutive failures ≥2, red-flag rate >61.8% (=φ⁻¹), spectral gap <23.6% (=φ⁻³). Duration gate: 3× mean feature time escalates to soft halt.
+**When to apply**: External blocking (API down, credential missing, human decision needed), internal frame error detected, morpholeptic loop, Ω-occlusion, circuit breaker evaluation, session resume
+**Full rule**: @agentic/code/addons/ring-methodology/rules/kenophoria-state.md
+
+#### temporal-coupling
+**Summary**: Run-to-run state entanglement model. Coupling score: residual ∩ assumptions. Three zones: Independent (<38.2%), Correlated (38.2–61.8%), Entangled (>61.8%). Gate 15: idempotency — two consecutive runs without cleanup must both succeed. STEWARD THE GROUND protocol: Verify → Clean → Bind → Register → On Exit.
+**When to apply**: Resource-binding code (ports, locks, PIDs, temp files), second-run failures, iterative loop state
+**Full rule**: @agentic/code/addons/ring-methodology/rules/temporal-coupling.md
+
+#### kernel-extraction
+**Summary**: Mandatory failure insight preservation before any retry. Extract kernel (valid insight from failed approach) to append-only `kernels.jsonl`. Query library before retry and before decomposition. Monotonic growth — no deletion, contradictions preserved. Non-monotonic quality tracking: stop at peak, not final iteration.
+**When to apply**: Any failure before retry, task decomposition planning, morpholeptic loop detection
+**Full rule**: @agentic/code/addons/ring-methodology/rules/kernel-extraction.md
+
+#### spectral-gap
+**Summary**: Process health metric: Layer C first-attempt pass rate. Four discrete phases: PEAK (≥61.8%), STABLE (≥38.2%), DEGRADED (≥23.6%), CRITICAL (<23.6%). Perinoetic review every 3 features or on phase transition. 7-question review protocol. Rubber-stamp detection: 2 consecutive empty `actions_taken` → escalate.
+**When to apply**: Session health assessment, perinoetic review triggers, DEGRADED/CRITICAL halt conditions
+**Full rule**: @agentic/code/addons/ring-methodology/rules/spectral-gap.md
+
+---
+
 ## Quick Reference by Context
 
 | Task Type | Relevant Rules |
 |-----------|---------------|
 | **Writing code** | no-attribution, executable-feedback, research-before-decision, anti-laziness, token-security, agent-friendly-code, agent-generation-guardrails |
-| **Running tests** | executable-feedback, anti-laziness, reproducibility, reproducibility-validation |
+| **Running tests** | executable-feedback, anti-laziness, reproducibility, reproducibility-validation, verification-ring, temporal-coupling |
 | **Creating artifacts** | mention-wiring, provenance-tracking, qualified-references, progressive-disclosure, artifact-discovery, diagram-generation |
 | **Phase transitions** | hitl-gates, sdlc-orchestration, human-gate-display |
-| **Ralph loops** | tao-loop, actionable-feedback, best-output-selection, anti-laziness |
+| **Ralph loops** | tao-loop, actionable-feedback, best-output-selection, anti-laziness, kernel-extraction, morpholepsis-detection |
 | **Agent design** | few-shot-examples, conversable-agent-interface, agent-fallback, thought-protocol, native-ux-tools |
 | **Documentation** | citation-policy, no-attribution, reasoning-sections, research-metadata, diagram-generation |
 | **Security review** | token-security, failure-mitigation, research-before-decision |
@@ -253,8 +291,12 @@ Research rules manage the research corpus. Deployed when research features are a
 | **Self-maintenance** | self-maintenance, research-before-decision |
 | **Background orchestration** | self-maintenance, sdlc-orchestration |
 | **Research** | research-metadata, index-generation, citation-policy |
+| **Ring methodology** | verification-ring, morpholepsis-detection, kenophoria-state, temporal-coupling, kernel-extraction, spectral-gap |
+| **Feature completion** | verification-ring, morpholepsis-detection (success arrest), spectral-gap |
+| **Failure recovery** | kernel-extraction, morpholepsis-detection, kenophoria-state, anti-laziness, failure-mitigation |
+| **Process health** | spectral-gap, kernel-extraction, temporal-coupling |
 
 ---
 
-*Generated from manifest.json v2.0.0 — 38 rules across 4 tiers*
+*Generated from manifest.json v2.0.0 — 44 rules across 5 tiers*
 *Full rule files: @agentic/code/frameworks/sdlc-complete/rules/*
