@@ -112,6 +112,35 @@ npm view aiwg version
 # Should show: 2026.1.5
 ```
 
+## Release Candidates (RC Tags)
+
+RC tags are **internal pipeline checkpoints** — not public releases.
+
+```bash
+# Tag an RC for internal testing
+git tag -m "v2026.1.5-RC1" v2026.1.5-RC1
+git push origin v2026.1.5-RC1
+# CI publishes to npm --tag next (opt-in only, never default install)
+```
+
+### What RC means
+
+- Used to validate the publish pipeline and let a small group test before the stable tag
+- Published to npm with `--tag next` so users only get them via `npm install aiwg@next`
+- **No release announcement** — RCs are not public releases
+- **No new CHANGELOG entry** — the stable release CHANGELOG covers everything
+- **No Gitea/GitHub release** — only the stable tag gets a release page
+- CHANGELOG and `docs/releases/` docs are written once, for the stable tag, and cover everything that accumulated across all RCs
+
+### RC → Stable flow
+
+```
+RC1 → test → fix → RC2 → test → fix → RC3 → stable tag
+                                              ↓
+                                   CHANGELOG + announcement
+                                   written once here
+```
+
 ## Version Progression Examples
 
 ### Within a Month
