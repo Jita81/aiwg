@@ -112,33 +112,46 @@ npm view aiwg version
 # Should show: 2026.1.5
 ```
 
-## Release Candidates (RC Tags)
+## Pre-release Tags (alpha/beta)
 
-RC tags are **internal pipeline checkpoints** — not public releases.
+Pre-release tags are **internal pipeline checkpoints** — not public releases.
 
 ```bash
-# Tag an RC for internal testing
-git tag -m "v2026.1.5-RC1" v2026.1.5-RC1
-git push origin v2026.1.5-RC1
+# Tag a pre-release for internal testing
+git tag -m "v2026.1.5-alpha.1" v2026.1.5-alpha.1
+git push origin v2026.1.5-alpha.1
 # CI publishes to npm --tag next (opt-in only, never default install)
+
+# Progress through alpha → beta → stable
+git tag -m "v2026.1.5-alpha.2" v2026.1.5-alpha.2
+git tag -m "v2026.1.5-beta.1" v2026.1.5-beta.1
+git tag -m "v2026.1.5" v2026.1.5
 ```
 
-### What RC means
+### Naming Convention
+
+| Stage | Format | Example | Meaning |
+|-------|--------|---------|---------|
+| Alpha | `vYYYY.M.PATCH-alpha.N` | `v2026.1.5-alpha.1` | Early testing, pipeline validation |
+| Beta | `vYYYY.M.PATCH-beta.N` | `v2026.1.5-beta.1` | Feature-complete, broader testing |
+| Stable | `vYYYY.M.PATCH` | `v2026.1.5` | Public release |
+
+### What pre-release means
 
 - Used to validate the publish pipeline and let a small group test before the stable tag
 - Published to npm with `--tag next` so users only get them via `npm install aiwg@next`
-- **No release announcement** — RCs are not public releases
+- **No release announcement** — pre-releases are not public releases
 - **No new CHANGELOG entry** — the stable release CHANGELOG covers everything
 - **No Gitea/GitHub release** — only the stable tag gets a release page
-- CHANGELOG and `docs/releases/` docs are written once, for the stable tag, and cover everything that accumulated across all RCs
+- CHANGELOG and `docs/releases/` docs are written once, for the stable tag, and cover everything that accumulated across all pre-releases
 
-### RC → Stable flow
+### Pre-release → Stable flow
 
 ```
-RC1 → test → fix → RC2 → test → fix → RC3 → stable tag
-                                              ↓
-                                   CHANGELOG + announcement
-                                   written once here
+alpha.1 → test → fix → alpha.2 → test → beta.1 → test → stable tag
+                                                             ↓
+                                                  CHANGELOG + announcement
+                                                  written once here
 ```
 
 ## Version Progression Examples

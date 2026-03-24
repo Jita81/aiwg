@@ -45,9 +45,9 @@ env:
   NODE_VERSION: '20'
 
 jobs:
-  build-and-publish-rc:
-    name: Build and Publish RC
-    # Publish pre-release tags (RC, beta, alpha) as --tag next
+  build-and-publish-prerelease:
+    name: Build and Publish Pre-release
+    # Publish pre-release tags (alpha, beta) as --tag next
     if: ${{ contains(github.ref, '-') && github.event_name == 'push' }}
     runs-on: ubuntu-latest
     container: node:20
@@ -66,17 +66,21 @@ jobs:
       - name: Build TypeScript
         run: npm run build
 
-      - name: Set RC version in package.json
+      - name: Set pre-release version in package.json
         id: rcversion
         run: |
           TAG_VERSION=${GITHUB_REF#refs/tags/v}
-          # Convert e.g. 2026.3.3-RC1 → 2026.3.3-rc.1 (npm semver prerelease)
-          NPM_VERSION=$(echo "$TAG_VERSION" | sed 's/-[Rr][Cc]\([0-9]*\)$/-rc.\1/')
+          # Normalize pre-release suffix to npm semver format (add dot if missing)
+          # e.g. 2026.3.3-alpha1 → 2026.3.3-alpha.1  (already-dotted form passes through)
+          NPM_VERSION=$(echo "$TAG_VERSION" | sed -E \
+            's/-([Aa]lpha)([0-9]+)$/-alpha.\2/;
+             s/-([Bb]eta)([0-9]+)$/-beta.\2/;
+             s/-[Rr][Cc]([0-9]+)$/-rc.\1/')
           npm version "$NPM_VERSION" --no-git-tag-version
           echo "npm_version=$NPM_VERSION" >> $GITHUB_OUTPUT
-          echo "RC version: $NPM_VERSION"
+          echo "Pre-release version: $NPM_VERSION"
 
-      - name: Publish RC to Gitea npm registry
+      - name: Publish pre-release to Gitea npm registry
         run: |
           cat > .npmrc << 'NPMRC'
           //git.integrolabs.net/api/packages/roctinam/npm/:_authToken=${NODE_AUTH_TOKEN}
@@ -91,7 +95,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Publish RC to public npmjs.org
+      - name: Publish pre-release to public npmjs.org
         run: |
           cat > .npmrc << 'NPMRC'
           //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}

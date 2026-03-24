@@ -485,13 +485,13 @@ This is intentional - issues found while dogfooding become improvements to the f
 | GitHub Release | Public release notes | Condensed highlights + install instructions |
 | Gitea Release | Internal release notes | Same as GitHub |
 
-### RC (Release Candidate) Tags — Internal Testing Only
+### Pre-release Tags (alpha/beta) — Internal Testing Only
 
-RC tags (`v2026.3.3-RC1`, `-RC2`, etc.) are **internal pipeline checkpoints**, not public releases. They exist to validate the publish workflow and let a small group test before the stable tag is cut.
+Pre-release tags (`v2026.3.3-alpha.1`, `-alpha.2`, `-beta.1`, etc.) are **internal pipeline checkpoints**, not public releases. They exist to validate the publish workflow and let a small group test before the stable tag is cut.
 
-**Do NOT create release announcements, CHANGELOG entries, or Gitea/GitHub releases for RC tags.** The CHANGELOG and `docs/releases/` announcement are written once for the stable release and cover everything that accumulated across all RCs.
+**Do NOT create release announcements, CHANGELOG entries, or Gitea/GitHub releases for pre-release tags.** The CHANGELOG and `docs/releases/` announcement are written once for the stable release and cover everything that accumulated across all pre-release iterations.
 
-RC tags publish to npm with `--tag next` so they are opt-in only (`npm install aiwg@next`). They are never the default install.
+Pre-release tags publish to npm with `--tag next` so they are opt-in only (`npm install aiwg@next`). They are never the default install.
 
 ### Release Checklist
 
