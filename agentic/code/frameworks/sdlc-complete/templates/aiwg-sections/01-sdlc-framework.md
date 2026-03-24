@@ -1,0 +1,52 @@
+## AIWG SDLC Framework
+
+This project uses the **AIWG SDLC framework** for software development lifecycle management.
+
+### What is AIWG?
+
+AIWG is a comprehensive SDLC framework providing:
+
+- **58 specialized agents** covering all lifecycle phases (Inception → Elaboration → Construction → Transition → Production)
+- **42+ commands** for project management, security, testing, deployment, and traceability
+- **100+ templates** for requirements, architecture, testing, security, deployment artifacts
+- **Phase-based workflows** with gate criteria and milestone tracking
+- **Multi-agent orchestration** patterns for collaborative artifact generation
+
+### Installation and Access
+
+**AIWG Installation Path**: `{AIWG_ROOT}`
+
+**Agent Access**: Claude Code agents have read access to AIWG templates and documentation via allowed-tools configuration.
+
+**Verify Installation**:
+
+```bash
+# Check AIWG is accessible
+ls {AIWG_ROOT}/agentic/code/frameworks/sdlc-complete/
+
+# Available resources:
+# - agents/     → 58 SDLC role agents
+# - commands/   → 42+ slash commands
+# - templates/  → 100+ artifact templates
+# - flows/      → Phase workflow documentation
+```
+
+### Project Artifacts Directory: .aiwg/
+
+All SDLC artifacts (requirements, architecture, testing, etc.) are stored in **`.aiwg/`**:
+
+```text
+.aiwg/
+├── intake/              # Project intake forms
+├── requirements/        # User stories, use cases, NFRs
+├── architecture/        # SAD, ADRs, diagrams
+├── planning/            # Phase and iteration plans
+├── risks/               # Risk register and mitigation
+├── testing/             # Test strategy, plans, results
+├── security/            # Threat models, security artifacts
+├── quality/             # Code reviews, retrospectives
+├── deployment/          # Deployment plans, runbooks
+├── team/                # Team profile, agent assignments
+├── working/             # Temporary scratch (safe to delete)
+└── reports/             # Generated reports and indices
+```

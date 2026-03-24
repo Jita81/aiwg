@@ -1,0 +1,75 @@
+{
+  "description": "Ordered sections for AIWG.md assembly. Each section is a standalone markdown fragment. The hook-regenerate command reads this manifest and concatenates sections (with optional filtering) to produce AIWG.md.",
+  "sections": [
+    {
+      "id": "sdlc-framework",
+      "file": "01-sdlc-framework.md",
+      "title": "AIWG SDLC Framework",
+      "required": true,
+      "description": "What AIWG is, installation path, .aiwg/ directory layout"
+    },
+    {
+      "id": "orchestrator-role",
+      "file": "02-orchestrator-role.md",
+      "title": "Core Platform Orchestrator Role",
+      "required": true,
+      "description": "Orchestration responsibilities, multi-agent workflow pattern, NL translations, available commands"
+    },
+    {
+      "id": "aiwg-rules",
+      "file": "03-aiwg-rules.md",
+      "title": "AIWG-Specific Rules",
+      "required": true,
+      "description": "Seven enforcement rules for artifact location, templates, orchestration, traceability"
+    },
+    {
+      "id": "reference-docs",
+      "file": "04-reference-docs.md",
+      "title": "Reference Documentation",
+      "required": true,
+      "description": "At-links to framework docs, orchestrator architecture, agent catalog"
+    },
+    {
+      "id": "self-maintenance",
+      "file": "05-self-maintenance.md",
+      "title": "AIWG Self-Maintenance",
+      "required": false,
+      "description": "CLI self-maintenance triggers, Steward agent, Mission Control, pre-flight checklist"
+    },
+    {
+      "id": "phase-overview",
+      "file": "06-phase-overview.md",
+      "title": "Phase Overview",
+      "required": true,
+      "description": "Inception, Elaboration, Construction, Transition, Production phase summaries"
+    },
+    {
+      "id": "quick-start",
+      "file": "07-quick-start.md",
+      "title": "Quick Start",
+      "required": true,
+      "description": "Step-by-step getting started guide"
+    },
+    {
+      "id": "common-patterns",
+      "file": "08-common-patterns.md",
+      "title": "Common Patterns",
+      "required": false,
+      "description": "Risk management, architecture evolution, security review, test execution patterns"
+    },
+    {
+      "id": "troubleshooting",
+      "file": "09-troubleshooting.md",
+      "title": "Troubleshooting",
+      "required": false,
+      "description": "Template not found, agent access denied, command not found, disabling context"
+    },
+    {
+      "id": "resources",
+      "file": "10-resources.md",
+      "title": "Resources",
+      "required": false,
+      "description": "Links to repo, framework docs, support channels"
+    }
+  ]
+}

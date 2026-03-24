@@ -62,17 +62,26 @@ For each installed framework, read its `contextContributions` from `manifest.jso
 {
   "contextContributions": {
     "hookFragment": "templates/project/AIWG-sdlc-fragment.md",
-    "priority": 10,
-    "sections": [
-      { "id": "orchestrator-role", "required": true },
-      { "id": "commands-reference", "required": true },
-      { "id": "agent-catalog", "required": false }
-    ]
+    "sectionsDir": "templates/aiwg-sections",
+    "sectionsManifest": "templates/aiwg-sections/manifest.json",
+    "priority": 10
   }
 }
 ```
 
-Load the fragment file at `{AIWG_ROOT}/{framework_path}/{hookFragment}`.
+**If `sectionsManifest` is present** (preferred — sections-based assembly):
+
+1. Read `{AIWG_ROOT}/{framework_path}/{sectionsManifest}`
+2. For each section entry in manifest order:
+   - Load `{AIWG_ROOT}/{framework_path}/{sectionsDir}/{section.file}`
+   - Append to fragment buffer, followed by a blank line
+3. Write assembled buffer to `{hookFragment}` (keeps the pre-assembled copy current)
+
+**If only `hookFragment` is present** (legacy — single-file fragment):
+
+Load the fragment file directly at `{AIWG_ROOT}/{framework_path}/{hookFragment}`.
+
+**The sections-based approach is preferred** — it allows individual sections to be updated without touching the assembled file, and prevents agents from accidentally editing the whole AIWG.md content as a monolith.
 
 **Always include** (regardless of installed frameworks):
 - AIWG CLI core reference (always)

@@ -14,6 +14,8 @@
   ],
   "contextContributions": {
     "hookFragment": "templates/project/AIWG-sdlc-fragment.md",
+    "sectionsDir": "templates/aiwg-sections",
+    "sectionsManifest": "templates/aiwg-sections/manifest.json",
     "priority": 10,
     "description": "SDLC framework context: orchestration, NL translations, phase overview, commands"
   }
