@@ -97,6 +97,93 @@ Record each signal activation in the debug memory session under `morpholepsis_si
 
 ---
 
+## Early Warning: Protonoia
+
+Morpholepsis detection is **reactive** — it fires after a failure pattern has manifested. Protonoia is its **proactive** complement: a check that runs **before each tool invocation** and evaluates whether the agent is about to enter a known failure pattern.
+
+**Protonoia does not block tool use.** It emits a notice that the agent must consciously assess before proceeding. This creates a visible record, slows the descent into morpholepsis, and preserves agency.
+
+The word protonoia (Greek *proto* + *nous*: first mind, prior knowing) names the capacity to recognize a mistake before it occurs.
+
+### When Protonoia Runs
+
+Before every tool invocation (Read, Write, Edit, Bash, Grep, Glob, etc.), run the four checks:
+
+#### Check 1: Repetition
+
+Has this tool been called with structurally similar parameters in the last 3 invocations?
+
+- Structurally similar = same tool, same target file or command pattern, same intent
+- Cosmetic variation does not break similarity: `cat file.ts` and `cat file.ts | head -20` are similar
+- If yes → emit `[PROTONOIA: Repetition]`
+
+#### Check 2: Frame
+
+Does this tool call serve the current decomposition goal, or is it addressing a sub-problem that has drifted from the stated task?
+
+- Frame drift: the agent is solving something adjacent to the task because the task itself became difficult
+- If the tool call cannot be directly traced to a stated sub-task → emit `[PROTONOIA: Frame]`
+
+#### Check 3: Layer
+
+Is this tool operating at the correct ring verification layer for the current execution phase?
+
+- Layer A tools: test runners, unit test files
+- Layer B tools: integration test runners, service start/stop
+- Layer C tools: CLI execution from `~`, shell invocation, installed binary testing
+- Layer D tools: documentation, reflection artifacts
+- If the tool belongs to a layer that should not be active in the current phase → emit `[PROTONOIA: Layer]`
+
+#### Check 4: Kernel Library
+
+Does the kernel library contain an entry that matches the current approach?
+
+- Query `kernels.jsonl` for entries with matching `feature`, `approach`, or `archetype`
+- If a kernel entry matches and its `kernel` field warns against repeating this approach → emit `[PROTONOIA: Kernel]`
+
+### Protonoia Notice Format
+
+When any check fires, emit this notice before proceeding:
+
+```
+[PROTONOIA: <check-name>] <one-sentence description of the concern>
+Kernel match: <kernel ID if applicable, or "none">
+Proceeding — <brief statement of why this tool call is still appropriate, OR correction to apply>
+```
+
+**Examples**:
+
+```
+[PROTONOIA: Repetition] Third Bash call targeting npm install in this session.
+Kernel match: kernel-007 — npm install loops masked a missing .npmrc
+Proceeding — but verifying tools/eval/.npmrc exists first.
+```
+
+```
+[PROTONOIA: Frame] This Grep is searching for test output, but the stated task is to fix the deployment script.
+Kernel match: none
+Proceeding — re-anchoring: the deployment script failure produces this output pattern.
+```
+
+```
+[PROTONOIA: Layer] Running a Layer B integration test during Layer C verification phase.
+Kernel match: none
+Proceeding — this is intentional: Layer C failure indicates Layer B regression worth confirming.
+```
+
+### Protonoia vs. Morpholepsis Detection
+
+| Mechanism | Timing | Trigger | Purpose |
+|-----------|--------|---------|---------|
+| Protonoia | Before each tool use | Always | Prevent entering morpholepsis |
+| Morpholepsis detection | After failure | Retry ceiling approached | Diagnose and intervene in active morpholepsis |
+
+Protonoia does not replace morpholepsis detection. If protonoia fires and the agent proceeds anyway (with explicit reasoning), morpholepsis detection remains active and will fire if the concern materializes into a failure pattern.
+
+A protonoia notice that is dismissed without reasoning, then followed by the predicted failure, constitutes a signal escalation: the kernel entry gains a `dismissed_warning: true` flag, and the next occurrence of the same pattern triggers morpholepsis detection directly.
+
+---
+
 ## Integration with Failure Recovery
 
 Morpholepsis detection is inserted into the failure recovery sequence before the retry ceiling is consumed.
