@@ -3,7 +3,7 @@
 **Enforcement Level**: HIGH
 **Scope**: All code-generating agents
 **Research Basis**: REF-071 METR Reward Hacking, REF-072 Anthropic Misalignment, REF-073 Microsoft Taxonomy, REF-074 Lazy Learners
-**Issue**: #264
+**Issue**: #264, #490
 
 ## Overview
 
@@ -266,6 +266,94 @@ try {
 }
 ```
 
+### Rule 8: Never Suppress CI/Pipeline Signals
+
+**FORBIDDEN**:
+```yaml
+# NEVER do this - hiding CI failures in workflow files
+
+# Swallowing exit codes
+- run: npm test || true
+- run: npm run lint || :
+- run: npm run build || echo "ignored"
+
+# Making failing jobs non-blocking
+- name: Run tests
+  continue-on-error: true
+  run: npm test
+
+# Suppressing error output
+- run: npm test 2>/dev/null
+
+# Disabling error propagation before test blocks
+- run: |
+    set +e
+    npm test
+    set -e
+```
+
+Removing a failing job from the workflow entirely is equally forbidden. The job exists because someone identified a quality gate worth enforcing. If it fails, the gate is doing its job.
+
+**REQUIRED**:
+```yaml
+# Fix the underlying cause
+- name: Run tests
+  run: npm test
+
+# For genuinely flaky tests, add targeted retry - not blanket suppression
+- name: Run tests
+  uses: nick-fields/retry@v2
+  with:
+    command: npm test
+    max_attempts: 3
+    timeout_minutes: 10
+
+# If a test is flaky, fix the flakiness
+# If a lint rule is failing, fix the code
+# If a build is broken, fix the build
+```
+
+**Detection Patterns**:
+- Diffs to workflow files (`.github/workflows/`, `.gitea/workflows/`, CI configs) that reduce failure visibility
+- Addition of `|| true`, `|| :`, `|| echo` after test/lint/build commands
+- New `continue-on-error: true` on previously blocking jobs
+- Removal of jobs or steps from CI pipelines
+- Redirection of stderr to `/dev/null` for test commands
+- `set +e` introduced before test execution blocks
+
+**When Suppression is Legitimate**:
+- Informational jobs that were never quality gates (e.g., optional coverage reporting)
+- Removing jobs for features that have been intentionally decommissioned (documented as feature removal)
+- Replacing a job with a stricter alternative
+
+**Recovery**:
+1. Identify which tests or checks are failing
+2. Categorize the failure (code bug, test bug, environment issue, flaky test)
+3. Fix the root cause for each failure
+4. For flaky tests: add targeted retry with bounded attempts, then fix the flakiness
+5. Never apply blanket suppression as a workaround
+
+## Test Analysis
+
+Test failure investigation is an analysis process, not a binary pass/fail decision. When tests fail, the correct response is diagnosis, not suppression.
+
+**Failure Categories**:
+
+| Category | Description | Correct Response |
+|----------|-------------|-----------------|
+| **Code bug** | Production code does not meet its specification | Fix the production code |
+| **Test bug** | Test has incorrect expectations or setup | Fix the test expectations while preserving intent |
+| **Environment issue** | Test depends on external state, timing, or resources | Isolate the dependency, mock or stabilize it |
+| **Flaky test** | Test passes intermittently without code changes | Identify the non-determinism source and eliminate it |
+
+**Key Principles**:
+
+- One failing test may reveal multiple distinct issues. Splitting it into focused tests that each validate one behavior is valid investigation, not avoidance.
+- A test that fails for the wrong reason still contains signal. Understand what it was guarding before changing it.
+- "The tests are wrong" is sometimes true, but requires the same rigor as "the code is wrong." Demonstrate why the expectation is incorrect, then fix the expectation.
+- Flaky tests are bugs. They deserve root cause analysis and targeted fixes, not retry loops that mask the underlying problem indefinitely.
+- None of the correct responses to any failure category involve suppression, deletion, or skipping.
+
 ## Detection Mechanisms
 
 ### Pattern Catalog
@@ -286,6 +374,7 @@ All detection patterns stored in:
 | **Validation Bypass** | Removed checks, early returns | Deleted `if (!input) throw` |
 | **Error Suppression** | Empty catch blocks, removed logging | `catch (e) {}` |
 | **Workaround Addition** | Hardcoded values, special cases | `if (user.id === 123) return true` |
+| **CI/Pipeline Suppression** | Exit code swallowing, `continue-on-error`, job removal | `npm test` exit suppressed |
 
 ### Detection Agent
 
@@ -480,6 +569,7 @@ You MUST NOT:
 - Weaken assertions or validation
 - Add workarounds instead of fixes
 - Suppress errors or remove logging
+- Modify CI/pipeline files to hide failures
 
 If you cannot fix an issue, say so. Do NOT take shortcuts.
 ```
@@ -557,6 +647,7 @@ Range: 0.0 (complete avoidance) to 1.0 (perfect persistence)
 | Recovery success rate | >80% | <70% |
 | Premature abandonment | <5% | >10% |
 | Escalation quality | >90% useful | <80% |
+| CI signal suppression | 0% | >1% |
 | False positive rate | <5% | >10% |
 
 ### Trend Analysis
@@ -616,6 +707,7 @@ Before completing any code task:
 - [ ] No features removed (or removal documented)
 - [ ] No assertions weakened
 - [ ] No errors suppressed
+- [ ] No CI/pipeline signals suppressed
 - [ ] If stuck, escalated with full context
 - [ ] Iteration quality tracked
 - [ ] Reflection memory updated
@@ -635,4 +727,4 @@ Before completing any code task:
 ---
 
 **Rule Status**: ACTIVE
-**Last Updated**: 2026-02-02
+**Last Updated**: 2026-03-24

@@ -1058,6 +1058,7 @@ export const costReportCommand: Extension = {
     type: 'command',
     template: 'utility',
     allowedTools: ['Read', 'Bash'],
+    cliDisabled: true,
   } satisfies CommandMetadata,
 };
 
@@ -1082,6 +1083,7 @@ export const costHistoryCommand: Extension = {
     type: 'command',
     template: 'utility',
     allowedTools: ['Read'],
+    cliDisabled: true,
   } satisfies CommandMetadata,
 };
 
@@ -1106,6 +1108,7 @@ export const metricsTokensCommand: Extension = {
     type: 'command',
     template: 'utility',
     allowedTools: ['Read', 'Bash'],
+    cliDisabled: true,
   } satisfies CommandMetadata,
 };
 
@@ -1141,6 +1144,7 @@ export const docSyncCommand: Extension = {
       'Apply auto-fixes and Ralph refinement',
       'Validate changes',
     ],
+    cliDisabled: true,
   } satisfies CommandMetadata,
 };
 
@@ -1176,6 +1180,7 @@ export const cleanupAuditCommand: Extension = {
       'Check manifest entries',
       'Compile confidence-rated report',
     ],
+    cliDisabled: true,
   } satisfies CommandMetadata,
 };
 
@@ -1239,6 +1244,7 @@ export const executionModeCommand: Extension = {
     template: 'utility',
     argumentHint: '<mode> [--seed <value>]',
     allowedTools: ['Read', 'Write'],
+    cliDisabled: true,
   } satisfies CommandMetadata,
 };
 
@@ -1264,6 +1270,7 @@ export const snapshotCommand: Extension = {
     template: 'utility',
     argumentHint: '<list|show|capture> [options]',
     allowedTools: ['Read', 'Write', 'Bash'],
+    cliDisabled: true,
   } satisfies CommandMetadata,
 };
 
@@ -1289,6 +1296,7 @@ export const checkpointCommand: Extension = {
     template: 'utility',
     argumentHint: '<list|recover|create> [options]',
     allowedTools: ['Read', 'Write', 'Bash'],
+    cliDisabled: true,
   } satisfies CommandMetadata,
 };
 
@@ -1314,6 +1322,7 @@ export const reproducibilityValidateCommand: Extension = {
     template: 'utility',
     argumentHint: '<workflow-id> [--runs <count>] [--threshold <value>]',
     allowedTools: ['Read', 'Bash'],
+    cliDisabled: true,
   } satisfies CommandMetadata,
 };
 

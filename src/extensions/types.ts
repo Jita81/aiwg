@@ -548,6 +548,12 @@ export interface CommandMetadata {
    * Success criteria
    */
   successCriteria?: string[];
+
+  /**
+   * When true, this command is slash-command-only and has no CLI handler.
+   * Exempts it from handler coverage checks.
+   */
+  cliDisabled?: boolean;
 }
 
 /**
