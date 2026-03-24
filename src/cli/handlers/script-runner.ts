@@ -36,6 +36,11 @@ export class DefaultScriptRunner implements ScriptRunner {
     const fullPath = path.join(this.frameworkRoot, scriptPath);
 
     return new Promise((resolve) => {
+      // NOTE: stdio: 'inherit' passes subprocess stdout/stderr directly to the
+      // terminal. This means any output from deploy-agents.mjs or other scripts
+      // cannot be intercepted or suppressed by the caller. To implement quiet
+      // mode, the underlying script must accept a --quiet flag and self-suppress.
+      // See issue #460 for the planned fix.
       const child = spawn('node', [fullPath, ...args], {
         stdio: 'inherit',
         cwd: options.cwd || process.cwd(),

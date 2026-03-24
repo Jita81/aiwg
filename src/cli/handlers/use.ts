@@ -235,11 +235,10 @@ export class UseHandler implements CommandHandler {
     const verbose = remainingArgs.includes('--verbose') || remainingArgs.includes('-v');
     const filteredArgs = deployArgs.filter(a => a !== '--no-utils');
 
-    // Pass verbose through (add if not already present)
-    if (!verbose) {
-      // Default: quiet mode — suppress per-file output
-      // No --verbose flag needed, providers default to verbose=false when not passed
-    }
+    // TODO(#460): Pass --quiet to deploy-agents.mjs when not in verbose mode.
+    // Currently deploy-agents.mjs has no --quiet flag and script-runner uses
+    // stdio:'inherit', so per-file output always bleeds through regardless of
+    // this flag. Once #460 is resolved, add: if (!verbose) filteredArgs.push('--quiet')
 
     // Extract provider and target from remainingArgs to pass to addon deployments
     const providerIdx = remainingArgs.findIndex(a => a === '--provider' || a === '--platform');
