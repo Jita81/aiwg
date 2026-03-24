@@ -1,11 +1,14 @@
 /**
- * Evaluation Runner — orchestrates test execution across dimensions
- * Pattern from matric-eval: @matric-memory/evals/src/runner.ts
+ * AIWG Evaluation Runner — orchestrates test execution across AIWG-specific dimensions,
+ * with optional delegation to the matric-eval framework for standard benchmarks.
+ *
+ * Extends matric-eval via composition: @matric/eval-client
  */
 
 import { promises as fs } from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
+import { createClient, type MatricEvalClient, type EvalSummary } from '@matric/eval-client';
 import type { GenerationModel, TestCase, EvalResult, DimensionScore, EvalReport } from './models/types.js';
 import { DIMENSION_WEIGHTS, scoreTier, calculateOverall } from './scoring/weights.js';
 
@@ -13,15 +16,19 @@ export interface RunnerOptions {
   dimensions?: string[];
   outputFormat?: 'json' | 'markdown';
   verbose?: boolean;
+  /** Include standard matric-eval benchmark scores when matric-eval binary is available */
+  includeMatricBenchmarks?: boolean;
 }
 
-export class EvalRunner {
+export class AiwgEvalRunner {
   private model: GenerationModel;
   private datasetsDir: string;
+  private matricClient: MatricEvalClient;
 
   constructor(model: GenerationModel, datasetsDir: string) {
     this.model = model;
     this.datasetsDir = datasetsDir;
+    this.matricClient = createClient();
   }
 
   async run(options: RunnerOptions = {}): Promise<EvalReport> {
@@ -68,6 +75,17 @@ export class EvalRunner {
     const overall = calculateOverall(dimScoreMap);
     const totalLatency = results.reduce((s, r) => s + r.latencyMs, 0);
 
+    // Optionally include standard matric-eval benchmark scores
+    let matricSummary: EvalSummary | undefined;
+    if (options.includeMatricBenchmarks && (await this.matricClient.isAvailable())) {
+      if (options.verbose) console.log('\nRunning standard matric-eval benchmarks...');
+      matricSummary = await this.matricClient.run({
+        models: [this.model.name],
+        tier: 'smoke',
+        logLevel: options.verbose ? 'INFO' : 'WARNING',
+      });
+    }
+
     return {
       model: this.model.name,
       backend: 'ollama',
@@ -77,6 +95,9 @@ export class EvalRunner {
       overall,
       overallTier: scoreTier(overall),
       totalLatencyMs: totalLatency,
+      matricBenchmarks: matricSummary
+        ? matricSummary.results.find((r) => r.model === this.model.name)
+        : undefined,
     };
   }
 
@@ -133,6 +154,9 @@ export class EvalRunner {
     }
   }
 }
+
+/** Backward-compatible alias — use AiwgEvalRunner for new code */
+export const EvalRunner = AiwgEvalRunner;
 
 function scoreResponse(response: string, testCase: TestCase): { score: number; maxScore: number; details: Record<string, unknown> } {
   const scoring = testCase.scoring;

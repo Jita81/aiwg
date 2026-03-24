@@ -1,6 +1,6 @@
 /**
  * Ollama API client for AIWG eval suite
- * Pattern from matric-eval: @matric-memory/evals/src/models/ollama.ts
+ * Implements GenerationModel interface for use with AiwgEvalRunner (@matric/eval-client)
  */
 
 import type { GenerationModel, GenerationOptions, GenerationResult } from './types.js';

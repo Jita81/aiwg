@@ -1,6 +1,6 @@
 /**
  * Model types for AIWG evaluation suite
- * Follows matric-eval patterns from @matric-memory/evals
+ * Extends matric-eval types from @matric/eval-client
  */
 
 export interface GenerationOptions {
@@ -58,4 +58,6 @@ export interface EvalReport {
   overall: number;
   overallTier: 'opus' | 'sonnet' | 'haiku' | 'not-recommended';
   totalLatencyMs: number;
+  /** Standard benchmark scores from matric-eval, present when --include-matric-benchmarks is set */
+  matricBenchmarks?: import('@matric/eval-client').ModelResult;
 }
