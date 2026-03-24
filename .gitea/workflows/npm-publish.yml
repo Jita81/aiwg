@@ -47,7 +47,7 @@ env:
 jobs:
   build-and-publish-prerelease:
     name: Build and Publish Pre-release
-    # Publish pre-release tags (alpha, beta) as --tag next
+    # Publish pre-release tags (nightly, alpha, beta) — nightly → --tag nightly, others → --tag next
     if: ${{ contains(github.ref, '-') && github.event_name == 'push' }}
     runs-on: ubuntu-latest
     container: node:20
@@ -71,23 +71,31 @@ jobs:
         run: |
           TAG_VERSION=${GITHUB_REF#refs/tags/v}
           # Normalize pre-release suffix to npm semver format (add dot if missing)
-          # e.g. 2026.3.3-alpha1 → 2026.3.3-alpha.1  (already-dotted form passes through)
+          # Already-dotted forms (alpha.1, beta.1, nightly.20260324) pass through unchanged
           NPM_VERSION=$(echo "$TAG_VERSION" | sed -E \
-            's/-([Aa]lpha)([0-9]+)$/-alpha.\2/;
+            's/-([Nn]ightly)([0-9]+)$/-nightly.\2/;
+             s/-([Aa]lpha)([0-9]+)$/-alpha.\2/;
              s/-([Bb]eta)([0-9]+)$/-beta.\2/;
              s/-[Rr][Cc]([0-9]+)$/-rc.\1/')
+          # Determine npm dist-tag: nightly gets its own channel; others go to next
+          if echo "$NPM_VERSION" | grep -qiE '\-nightly\.'; then
+            NPM_TAG=nightly
+          else
+            NPM_TAG=next
+          fi
           npm version "$NPM_VERSION" --no-git-tag-version
           echo "npm_version=$NPM_VERSION" >> $GITHUB_OUTPUT
-          echo "Pre-release version: $NPM_VERSION"
+          echo "npm_tag=$NPM_TAG" >> $GITHUB_OUTPUT
+          echo "Pre-release version: $NPM_VERSION (tag: $NPM_TAG)"
 
       - name: Publish pre-release to Gitea npm registry
         run: |
           cat > .npmrc << 'NPMRC'
           //git.integrolabs.net/api/packages/roctinam/npm/:_authToken=${NODE_AUTH_TOKEN}
           NPMRC
-          npm publish --registry=${{ env.GITEA_NPM_REGISTRY }} --tag next 2>&1 | tee publish-output.txt || {
+          npm publish --registry=${{ env.GITEA_NPM_REGISTRY }} --tag ${{ steps.rcversion.outputs.npm_tag }} 2>&1 | tee publish-output.txt || {
             if grep -qE "package version already exists|EPUBLISHCONFLICT|409" publish-output.txt; then
-              echo "✓ RC version already published to Gitea"
+              echo "✓ Pre-release version already published to Gitea"
             else
               cat publish-output.txt; exit 1
             fi
@@ -100,9 +108,9 @@ jobs:
           cat > .npmrc << 'NPMRC'
           //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}
           NPMRC
-          npm publish --access public --tag next 2>&1 | tee publish-public-output.txt || {
+          npm publish --access public --tag ${{ steps.rcversion.outputs.npm_tag }} 2>&1 | tee publish-public-output.txt || {
             if grep -qE "cannot publish over|EPUBLISHCONFLICT|403" publish-public-output.txt; then
-              echo "✓ RC version already published to npmjs.org"
+              echo "✓ Pre-release version already published to npmjs.org"
             else
               cat publish-public-output.txt; exit 1
             fi

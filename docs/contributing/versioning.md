@@ -117,29 +117,48 @@ npm view aiwg version
 Pre-release tags are **internal pipeline checkpoints** — not public releases.
 
 ```bash
-# Tag a pre-release for internal testing
+# Nightly — automated or ad-hoc; date-stamped
+git tag -m "v2026.1.5-nightly.20260324" v2026.1.5-nightly.20260324
+git push origin v2026.1.5-nightly.20260324
+# CI publishes to npm --tag nightly → npm install aiwg@nightly
+
+# Alpha — early feature testing
 git tag -m "v2026.1.5-alpha.1" v2026.1.5-alpha.1
 git push origin v2026.1.5-alpha.1
-# CI publishes to npm --tag next (opt-in only, never default install)
+# CI publishes to npm --tag next → npm install aiwg@next
 
-# Progress through alpha → beta → stable
-git tag -m "v2026.1.5-alpha.2" v2026.1.5-alpha.2
+# Beta — feature-complete, broader testing
 git tag -m "v2026.1.5-beta.1" v2026.1.5-beta.1
+git push origin v2026.1.5-beta.1
+# CI publishes to npm --tag next → npm install aiwg@next
+
+# Stable
 git tag -m "v2026.1.5" v2026.1.5
+git push origin v2026.1.5
+# CI publishes to npm --tag latest (default install)
 ```
 
 ### Naming Convention
 
-| Stage | Format | Example | Meaning |
-|-------|--------|---------|---------|
-| Alpha | `vYYYY.M.PATCH-alpha.N` | `v2026.1.5-alpha.1` | Early testing, pipeline validation |
-| Beta | `vYYYY.M.PATCH-beta.N` | `v2026.1.5-beta.1` | Feature-complete, broader testing |
-| Stable | `vYYYY.M.PATCH` | `v2026.1.5` | Public release |
+| Stage | Format | Example | npm tag | Meaning |
+|-------|--------|---------|---------|---------|
+| Nightly | `vYYYY.M.PATCH-nightly.YYYYMMDD` | `v2026.1.5-nightly.20260324` | `nightly` | Automated or ad-hoc snapshot |
+| Alpha | `vYYYY.M.PATCH-alpha.N` | `v2026.1.5-alpha.1` | `next` | Early testing, pipeline validation |
+| Beta | `vYYYY.M.PATCH-beta.N` | `v2026.1.5-beta.1` | `next` | Feature-complete, broader testing |
+| Stable | `vYYYY.M.PATCH` | `v2026.1.5` | `latest` | Public release |
+
+**Install by channel:**
+
+```bash
+npm install -g aiwg              # stable (default)
+npm install -g aiwg@next         # alpha/beta
+npm install -g aiwg@nightly      # nightly snapshots
+```
 
 ### What pre-release means
 
 - Used to validate the publish pipeline and let a small group test before the stable tag
-- Published to npm with `--tag next` so users only get them via `npm install aiwg@next`
+- Nightly builds are automated snapshots; alphas/betas are intentional testing milestones
 - **No release announcement** — pre-releases are not public releases
 - **No new CHANGELOG entry** — the stable release CHANGELOG covers everything
 - **No Gitea/GitHub release** — only the stable tag gets a release page
@@ -148,10 +167,10 @@ git tag -m "v2026.1.5" v2026.1.5
 ### Pre-release → Stable flow
 
 ```
-alpha.1 → test → fix → alpha.2 → test → beta.1 → test → stable tag
-                                                             ↓
-                                                  CHANGELOG + announcement
-                                                  written once here
+nightly → nightly → alpha.1 → fix → alpha.2 → beta.1 → test → stable tag
+                                                                     ↓
+                                                          CHANGELOG + announcement
+                                                          written once here
 ```
 
 ## Version Progression Examples

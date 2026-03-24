@@ -487,11 +487,15 @@ This is intentional - issues found while dogfooding become improvements to the f
 
 ### Pre-release Tags (alpha/beta) — Internal Testing Only
 
-Pre-release tags (`v2026.3.3-alpha.1`, `-alpha.2`, `-beta.1`, etc.) are **internal pipeline checkpoints**, not public releases. They exist to validate the publish workflow and let a small group test before the stable tag is cut.
+Pre-release tags (`v2026.3.3-nightly.20260324`, `-alpha.1`, `-beta.1`, etc.) are **internal pipeline checkpoints**, not public releases. They exist to validate the publish workflow and let a small group test before the stable tag is cut.
 
 **Do NOT create release announcements, CHANGELOG entries, or Gitea/GitHub releases for pre-release tags.** The CHANGELOG and `docs/releases/` announcement are written once for the stable release and cover everything that accumulated across all pre-release iterations.
 
-Pre-release tags publish to npm with `--tag next` so they are opt-in only (`npm install aiwg@next`). They are never the default install.
+| Tag type | npm dist-tag | Install via |
+|----------|-------------|-------------|
+| `nightly` | `nightly` | `npm install aiwg@nightly` |
+| `alpha`, `beta` | `next` | `npm install aiwg@next` |
+| stable | `latest` | `npm install aiwg` (default) |
 
 ### Release Checklist
 
