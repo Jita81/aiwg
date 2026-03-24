@@ -455,12 +455,15 @@ describe('Ralph Command Handlers', () => {
       const { ralphHandlers } = await import('../../../../src/cli/handlers/ralph.js');
 
       expect(ralphHandlers).toBeDefined();
-      expect(ralphHandlers).toHaveLength(4);
+      expect(ralphHandlers).toHaveLength(7);
       expect(ralphHandlers.map((h) => h.id)).toEqual([
         'ralph',
         'ralph-status',
         'ralph-abort',
         'ralph-resume',
+        'ralph-external',
+        'ralph-memory',
+        'ralph-config',
       ]);
     });
 

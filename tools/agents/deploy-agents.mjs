@@ -20,7 +20,7 @@
  *   --rules-only             Deploy only rules (skip agents)
  *   --dry-run                Show what would be deployed without writing
  *   --force                  Overwrite existing files
- *   --provider <name>        Target provider: claude (default), openai, codex, cursor, opencode, copilot, factory, warp, or windsurf
+ *   --provider <name>        Target provider: claude (default), openai, codex, cursor, opencode, copilot, factory, warp, windsurf, or hermes
  *   --model <name>            Override model for all tiers (blanket)
  *   --reasoning-model <name> Override model for reasoning tasks
  *   --coding-model <name>    Override model for coding tasks
@@ -69,7 +69,7 @@ const PROVIDER_ALIASES = {
   'openai': 'codex'
 };
 
-const AVAILABLE_PROVIDERS = ['claude', 'factory', 'codex', 'opencode', 'copilot', 'cursor', 'warp', 'windsurf'];
+const AVAILABLE_PROVIDERS = ['claude', 'factory', 'codex', 'opencode', 'copilot', 'cursor', 'warp', 'windsurf', 'hermes'];
 
 // ============================================================================
 // Argument Parsing
@@ -208,6 +208,9 @@ Providers (all deploy agents, commands, skills, and rules):
               Paths: .warp/agents/, .warp/commands/, .warp/skills/, .warp/rules/ + WARP.md
   windsurf  - Windsurf
               Paths: .windsurf/agents/, .windsurf/workflows/, .windsurf/skills/, .windsurf/rules/
+  hermes    - Hermes Agent (MCP-based integration)
+              Skills: ~/.hermes/skills/ (user-global) | Agents: AGENTS.md (lean routing guide)
+              Commands/Rules: served via MCP, not file-deployed
 
 Modes:
   general       - Writing-quality addon agents and commands (alias: writing)

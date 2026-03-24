@@ -12,6 +12,7 @@
 
 import fs from 'fs/promises';
 import path from 'path';
+import os from 'os';
 import { CommandHandler, HandlerContext, HandlerResult } from './types.js';
 import { createScriptRunner } from './script-runner.js';
 import { getFrameworkRoot } from '../../channel/manager.mjs';
@@ -105,41 +106,112 @@ const PROVIDER_PATHS: Record<string, { agents: string; skills: string; commands:
     commands: '.windsurf/workflows',
     rules: '.windsurf/rules',
   },
+  hermes: {
+    agents: '',                                            // Aggregated into AGENTS.md at project root
+    skills: path.join(os.homedir(), '.hermes', 'skills'), // User-global skills
+    commands: '',                                          // Served via MCP, not file-deployed
+    rules: '',                                             // Not applicable — Hermes uses AGENTS.md
+  },
 };
 
 /**
  * Framework-specific next steps guidance
+ *
+ * Keyed as `<provider>/<framework>` with fallback to `<framework>`.
+ * The 'claude' provider is the default (shown for all unrecognized providers).
  */
 const NEXT_STEPS: Record<string, string[]> = {
-  sdlc: [
+  // Claude Code (default)
+  'sdlc': [
     'Start a project:   aiwg sdlc-accelerate "Your project idea"',
+    'Or open Claude:    claude (then use /sdlc-accelerate in the session)',
     'Check health:      aiwg doctor',
-    'View commands:     aiwg help',
   ],
-  marketing: [
-    'Start a campaign:  /campaign-kickoff',
-    'Marketing intake:  /marketing-intake',
-    'Check health:      aiwg doctor',
+  'marketing': [
+    'Open Claude Code and use:  /campaign-kickoff',
+    'Marketing intake:          /marketing-intake',
+    'Check health:              aiwg doctor',
   ],
   'media-curator': [
-    'Analyze artist:    /analyze-artist "Artist Name"',
-    'Find sources:      /find-sources "query"',
+    'Open Claude Code and use:  /analyze-artist "Artist Name"',
+    'Find sources:              /find-sources "query"',
+    'Check health:              aiwg doctor',
+  ],
+  'research': [
+    'Open Claude Code and use:  /research-discover "topic"',
+    'Research workflow:         /research-workflow',
+    'Check health:              aiwg doctor',
+  ],
+  'all': [
+    'Start a project:   aiwg sdlc-accelerate "Your project idea"',
+    'Or open Claude:    claude (then use /sdlc-accelerate in the session)',
     'Check health:      aiwg doctor',
   ],
-  research: [
-    'Discover papers:   /research-discover "topic"',
-    'Research workflow:  /research-workflow',
-    'Check health:      aiwg doctor',
+
+  // Hermes Agent (MCP-based)
+  'hermes/sdlc': [
+    'Configure MCP:     Add aiwg to ~/.hermes/config.yaml (see aiwg mcp info)',
+    'Start Hermes:      hermes chat "Create an architecture decision for..."',
+    'MCP guide:         docs/integrations/hermes-quickstart.md',
   ],
-  all: [
+  'hermes/marketing': [
+    'Configure MCP:     Add aiwg to ~/.hermes/config.yaml (see aiwg mcp info)',
+    'Start Hermes:      hermes chat "Create a marketing campaign for..."',
+    'MCP guide:         docs/integrations/hermes-quickstart.md',
+  ],
+  'hermes/all': [
+    'Configure MCP:     Add aiwg to ~/.hermes/config.yaml (see aiwg mcp info)',
+    'Start Hermes:      hermes chat',
+    'AIWG MCP guide:   docs/integrations/hermes-quickstart.md',
+  ],
+
+  // Factory AI
+  'factory/sdlc': [
+    'Open Factory:      factory (droids are deployed and ready)',
     'Start a project:   aiwg sdlc-accelerate "Your project idea"',
     'Check health:      aiwg doctor',
-    'View commands:     aiwg help',
+  ],
+
+  // Cursor
+  'cursor/sdlc': [
+    'Open Cursor:       cursor . (agents are in .cursor/agents/)',
+    'Start a project:   aiwg sdlc-accelerate "Your project idea"',
+    'Check health:      aiwg doctor',
+  ],
+
+  // Warp Terminal
+  'warp/sdlc': [
+    'Open Warp:         warp (agents and commands loaded from .warp/)',
+    'Start a project:   aiwg sdlc-accelerate "Your project idea"',
+    'Check health:      aiwg doctor',
+  ],
+
+  // GitHub Copilot
+  'copilot/sdlc': [
+    'Open VS Code:      code . (Copilot agents in .github/agents/)',
+    'Copilot chat:      @workspace use the SDLC workflow agents',
+    'Check health:      aiwg doctor',
+  ],
+
+  // OpenAI Codex
+  'codex/sdlc': [
+    'Open Codex:        codex (agents in .codex/agents/, prompts in ~/.codex/prompts/)',
+    'Start a project:   aiwg sdlc-accelerate "Your project idea"',
+    'Check health:      aiwg doctor',
+  ],
+
+  // Windsurf
+  'windsurf/sdlc': [
+    'Open Windsurf:     AGENTS.md and .windsurf/ are ready',
+    'Start a project:   Ask Cascade: "sdlc-accelerate my project"',
+    'Check health:      aiwg doctor',
   ],
 };
 
-function printNextSteps(framework: Framework): void {
-  const steps = NEXT_STEPS[framework] ?? NEXT_STEPS.sdlc;
+function printNextSteps(framework: Framework, provider: string = 'claude'): void {
+  // Try provider-specific first, fall back to generic
+  const providerKey = `${provider}/${framework}`;
+  const steps = NEXT_STEPS[providerKey] ?? NEXT_STEPS[framework] ?? NEXT_STEPS.sdlc;
   ui.section('Next steps:', steps);
 }
 
@@ -393,7 +465,7 @@ export class UseHandler implements CommandHandler {
       if (counts.skills > 0) ui.deployCount('Skills', counts.skills);
       if (counts.rules > 0) ui.deployCount('Rules', counts.rules);
       ui.blank();
-      printNextSteps(framework as Framework);
+      printNextSteps(framework as Framework, provider);
     }
 
     return {

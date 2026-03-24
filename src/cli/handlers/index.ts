@@ -67,6 +67,7 @@ import {
 import { runtimeInfoHandler } from './runtime-info.js';
 import { syncHandler } from './sync.js';
 import { mcHandler, mcHandlers } from './mc.js';
+import { sdlcAccelerateHandler } from './sdlc-accelerate.js';
 
 import type { CommandHandler } from './types.js';
 
@@ -130,6 +131,9 @@ export {
 
   // Mission Control
   mcHandler,
+
+  // SDLC Orchestration
+  sdlcAccelerateHandler,
 };
 
 // Re-export handler arrays
@@ -192,6 +196,9 @@ export const allHandlers: CommandHandler[] = [
 
   // Mission Control
   ...mcHandlers,
+
+  // SDLC Orchestration
+  sdlcAccelerateHandler,
 ];
 
 /**
