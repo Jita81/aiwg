@@ -47,6 +47,8 @@ env:
 jobs:
   build-and-publish:
     name: Build and Publish
+    # Skip pre-release tags (RC, beta, alpha, etc.) — only publish final versions
+    if: ${{ !contains(github.ref, '-') }}
     runs-on: ubuntu-latest
     container: node:20
     timeout-minutes: 15

@@ -51,13 +51,11 @@ const RECORDS_FILE = 'records.json';
 // ============================================================================
 
 export class FeedbackTracker {
-  private projectPath: string;
   private feedbackDir: string;
   private records: FeedbackRecord[];
   private nextId: number;
 
   constructor(projectPath: string) {
-    this.projectPath = projectPath;
     this.feedbackDir = path.join(projectPath, FEEDBACK_DIR);
     this.records = [];
     this.nextId = 1;

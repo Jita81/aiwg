@@ -35,16 +35,25 @@ jobs:
       - name: Verify package version matches tag
         run: |
           TAG_VERSION=${GITHUB_REF#refs/tags/v}
+          # Strip pre-release suffix (e.g. -RC1, -rc.1, -beta.2) before comparing
+          BASE_VERSION=${TAG_VERSION%%-*}
           PKG_VERSION=$(node -p "require('./package.json').version")
-          if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
-            echo "Error: Tag version ($TAG_VERSION) does not match package.json version ($PKG_VERSION)"
+          if [ "$BASE_VERSION" != "$PKG_VERSION" ]; then
+            echo "Error: Tag base version ($BASE_VERSION) does not match package.json version ($PKG_VERSION)"
             exit 1
           fi
-          echo "Version verified: $PKG_VERSION"
+          echo "Version verified: $PKG_VERSION (tag: $TAG_VERSION)"
 
       - name: Create or reuse Gitea release
         run: |
           VERSION=${{ steps.version.outputs.version }}
+          # Mark as prerelease if tag contains a suffix (RC, beta, alpha, etc.)
+          BASE=${VERSION%%-*}
+          if [ "$VERSION" != "$BASE" ]; then
+            PRERELEASE=true
+          else
+            PRERELEASE=false
+          fi
 
           curl -X POST \
             -H "Authorization: token ${{ secrets.NPM_TOKEN }}" \
@@ -55,5 +64,5 @@ jobs:
               \"name\": \"v${VERSION}\",
               \"body\": \"## Installation\\n\\n\\\`\\\`\\\`bash\\nnpm install -g aiwg@${VERSION}\\n\\\`\\\`\\\`\\n\\nAlso available from Gitea registry:\\n\\\`\\\`\\\`bash\\nnpm install -g aiwg@${VERSION} --registry=https://git.integrolabs.net/api/packages/roctinam/npm/\\n\\\`\\\`\\\`\\n\\n## Notes\\n\\nGitea release is auto-created on tag push. GitHub releases are managed manually.\",
               \"draft\": false,
-              \"prerelease\": false
+              \"prerelease\": ${PRERELEASE}
             }" || echo "Release may already exist"

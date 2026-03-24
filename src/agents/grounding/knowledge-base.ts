@@ -125,7 +125,6 @@ export class KnowledgeStore {
    * Verify a claim against domain knowledge
    */
   verifyClaim(claim: string, domain?: string): VerificationResult {
-    const claimTerms = claim.toLowerCase().split(/\s+/).filter((t) => t.length > 2);
     const fragments = this.search(claim, { domain, limit: 3 });
 
     if (fragments.length === 0) {
