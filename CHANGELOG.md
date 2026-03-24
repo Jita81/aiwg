@@ -26,6 +26,7 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 | **Verbalized sampling addon** | Diversity addon for varied AI output: content-diversifier agent, 3 prompt strategies (#20) |
 | **Native UX tools rule** | Agents prefer platform-native interaction tools; platform capability matrix (#448) |
 | **Local/Ollama as first-class provider** | Ollama on equal footing with cloud providers; local model support documented (#434) |
+| **`sdlc-accelerate` handler fix** | Primary CTA after `aiwg use sdlc` was broken — "No handler found" error. Handler now spawns Claude Code with the sdlc-accelerate skill. |
 
 ### Added
 
@@ -54,6 +55,8 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 - **Diagram generation rule elevated** — `diagram-generation` promoted to standard utility rule (#430)
 - **Complete docset generation enforcement** (`#429`) — rule enforcing full documentation artifact generation per release
 - **Claude Code memory-mapped @-link best practices** (`#427`) — guidance for @-link usage in agent memory contexts
+- **Skills in proper addon source directories** — `aiwg-sync` (aiwg-utils addon), `mission-control` (ralph addon), `ring-check` (ring-methodology addon) written to `agentic/code/addons/*/skills/` so they deploy correctly via `aiwg use`; previously only existed in gitignored `.claude/skills/` deployment output
+- **Agent personas in proper addon source directories** — `aiwg-steward` (aiwg-utils addon) and `mc-conductor` (ralph addon) written to `agentic/code/addons/*/agents/` so they deploy via `aiwg use`
 
 ### Changed
 
@@ -63,6 +66,7 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 - **`aiwg index stats`** — `--graph` flag now optional; flexible graph type support (#425, #426)
 - **`aiwg index`** — deploy next-steps guidance added to post-build output; verbose mode flag
 - **All CLI commands** — consistent output via shared `ui.ts` module
+- **`aiwg use` post-deploy guidance** — `NEXT_STEPS` refactored to `<provider>/<framework>` keys; all 8 providers now receive platform-appropriate next steps after `aiwg use` (Hermes gets MCP setup instructions, Copilot gets `.github/agents/` paths, etc.)
 
 ### Fixed
 
@@ -71,6 +75,10 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 - **`aiwg index stats` without `--graph`** — no longer crashes when graph flag is omitted (#425)
 - **SnapshotManager API mismatch** in External Ralph causing fatal crash on loop execution (#424)
 - **`sync.ts` unused variable warnings** — removed unused `providerResult` and `versionResult` assignments
+- **`aiwg sdlc-accelerate` — no handler** — `aiwg sdlc-accelerate "project"` returned "No handler found for command: sdlc-accelerate"; `SdlcAccelerateHandler` implemented in `src/cli/handlers/sdlc-accelerate.ts`, spawns `claude "/sdlc-accelerate <args>"` interactively
+- **`aiwg ralph-external`, `ralph-memory`, `ralph-config` — no handlers** — three ralph commands documented in CLI reference had no registered handlers; all three implemented in `src/cli/handlers/ralph.ts` and registered in `allHandlers`; ralph-external delegates to `tools/ralph-external/index.mjs`, ralph-memory to `tools/ralph-external/memory-manager.mjs --cli`, ralph-config to `tools/ralph-external/orchestrator.mjs --config`
+- **`aiwg use sdlc --provider hermes` — unknown provider error** — Hermes was missing from both `AVAILABLE_PROVIDERS` in `deploy-agents.mjs` and `PROVIDER_PATHS` in `use.ts`; `tools/agents/providers/hermes.mjs` added; skills deploy to `~/.hermes/skills/`, agents aggregate into lean AGENTS.md
+- **Post-deploy next steps showed Claude-specific guidance regardless of provider** — `NEXT_STEPS` in `use.ts` was a flat map keyed only by framework; refactored to `<provider>/<framework>` composite keys so each provider receives appropriate guidance
 
 ---
 
