@@ -367,10 +367,12 @@ export class UseHandler implements CommandHandler {
     // Check flags
     const skipUtils = remainingArgs.includes('--no-utils');
     const verbose = remainingArgs.includes('--verbose') || remainingArgs.includes('-v');
+    const dryRun = remainingArgs.includes('--dry-run');
     const filteredArgs = deployArgs.filter(a => a !== '--no-utils');
 
     // Pass --quiet to suppress deploy-agents.mjs header/footer in default mode (#460)
-    if (!verbose) filteredArgs.push('--quiet');
+    // Dry-run must not capture output — its purpose is to show what would happen
+    if (!verbose && !dryRun) filteredArgs.push('--quiet');
 
     // Extract provider and target from remainingArgs to pass to addon deployments
     const providerIdx = remainingArgs.findIndex(a => a === '--provider' || a === '--platform');
@@ -379,7 +381,7 @@ export class UseHandler implements CommandHandler {
     const target = targetIdx >= 0 && remainingArgs[targetIdx + 1] ? remainingArgs[targetIdx + 1] : process.cwd();
 
     // Deploy main framework
-    const quiet = !verbose;
+    const quiet = !verbose && !dryRun;
     const captureOpts = quiet ? { capture: true } : {};
     if (quiet) {
       ui.blank();

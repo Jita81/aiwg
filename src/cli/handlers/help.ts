@@ -44,7 +44,7 @@ function helpGroup(title: string, commands: [string, string][]): void {
  */
 function displayHelp(): void {
   ui.blank();
-  console.log(`  ${ui.brandMark()} ${ui.bold('aiwg')}  ${ui.dimText('AI Writing Guide CLI')}`);
+  console.log(`  ${ui.brandMark()} ${ui.bold('AIWG')}`);
   ui.rule();
   ui.blank();
   console.log(`  ${ui.dimText('Usage:')} aiwg ${ui.accent('<command>')} ${ui.dimText('[options]')}`);
