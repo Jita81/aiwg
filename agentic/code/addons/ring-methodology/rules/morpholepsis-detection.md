@@ -211,3 +211,94 @@ Agents MUST NOT:
 2. Treat signal detection as optional in any execution context
 3. Declare completion without full gate execution
 4. Apply the same intervention phrase twice without changing the approach
+
+---
+
+## Sovereignty Stack
+
+The sovereignty stack maps failure patterns to the level of the agent architecture at which they originate. It answers the question: **where is this going wrong?** The level determines the correct intervention — applying an L1 fix to an L4 problem wastes retry budget and deepens morpholepsis.
+
+```
+L5  Thronokrator  — meta-cognitive layer
+    The agent cannot reason about its own reasoning.
+    It cannot explain its own failures or model its own blind spots.
+
+L4  Karyarch      — strategic layer
+    The agent's goal decomposition or planning frame is wrong.
+    It is solving the right problem the wrong way at a structural level.
+
+L3  Kernel        — execution layer
+    The goal decomposition is correct, but the implementation approach is wrong.
+    Morpholeptic loops live here. The approach needs replacement, not repair.
+
+L2  Inferencer    — tool layer
+    The approach is correct, but the wrong tool or parameters are selected.
+    Retries with corrected tool use can resolve this.
+
+L1  Mind          — surface layer
+    The tool is correct, but output formatting or piping has failed.
+    The cheapest class of failure. Retry with output correction.
+```
+
+### Sovereignty Level Table
+
+| Level | Name | Agent Failure Mode | Intervention Cost |
+|-------|------|--------------------|------------------|
+| L5 | Thronokrator | Cannot model own reasoning; cannot explain failures | HALTED — human required |
+| L4 | Karyarch | Wrong decomposition or planning frame | LIMINAL — reframe decomposition |
+| L3 | Kernel | Correct goal, wrong approach | LIMINAL — extract kernel, replace approach |
+| L2 | Inferencer | Correct approach, wrong tool/params | Retry with corrected tool use |
+| L1 | Mind | Correct tool, wrong output format/piping | Retry with format correction |
+
+---
+
+## Failure Attribution Protocol
+
+Before selecting an intervention, classify the failure by sovereignty level. The classification changes the intervention.
+
+**Attribution procedure**:
+
+1. **Ask**: Does the output exist but have the wrong format? → L1 (Mind)
+2. **Ask**: Did the right approach fail because the wrong tool was used, or parameters were wrong? → L2 (Inferencer)
+3. **Ask**: Is the same approach being repeated with cosmetic variation? → L3 (Kernel) — morpholeptic loop
+4. **Ask**: Is the problem being decomposed at the wrong abstraction level, or is the wrong sub-problem being solved? → L4 (Karyarch)
+5. **Ask**: Can the agent explain why previous attempts failed, and articulate what would make the next attempt different in kind? If no → L5 (Thronokrator)
+
+**Intervention per level**:
+
+| Level | Intervention | Retry slot consumed? |
+|-------|-------------|---------------------|
+| L1 | Retry with corrected format/piping | Yes |
+| L2 | Retry with corrected tool or params | Yes |
+| L3 | Enter LIMINAL: extract kernel, declare frame shift | No (LIMINAL transition) |
+| L4 | Enter LIMINAL: reframe the decomposition | No (LIMINAL transition) |
+| L5 | Transition to HALTED: human escalation required | N/A |
+
+**Key constraint**: L3+ failures MUST NOT consume retry slots before a LIMINAL entry. Retrying an L3 failure without a genuine frame shift deepens the morpholeptic loop.
+
+---
+
+## Attribution Signatures
+
+Observable patterns mapped to sovereignty levels. Use these during the attribution procedure when the failure type is ambiguous.
+
+| Observed Pattern | Level | Name | Signal |
+|-----------------|-------|------|--------|
+| Produces correct output but wrong format (JSON vs YAML, wrong field names) | L1 | Mind | Format error |
+| Tool succeeds but output piped incorrectly or result discarded | L1 | Mind | Pipeline error |
+| Produces output but fails Layer C (installs correctly but doesn't run as expected) | L2 | Inferencer | Deployment gap |
+| Correct file edited but wrong line range targeted | L2 | Inferencer | Precision error |
+| Test written for wrong assertion type (integration test covering unit behavior) | L2 | Inferencer | Test layer mismatch |
+| Same approach retried with cosmetic variation (variable renames, call reordering) | L3 | Kernel | Morpholeptic loop |
+| Pleromatic collapse: file grows between iterations, coverage decreases | L3 | Kernel | Elaboration regression |
+| Ω-occlusion: correct path visible only after removing accumulated abstraction | L3 | Kernel | Occlusion accumulation |
+| Addresses a spec ambiguity in code rather than in the spec (layer confusion) | L4 | Karyarch | Layer mismatch |
+| Cannot articulate what Layer C verification would test for this feature | L4 | Karyarch | Verification gap |
+| Decomposes the task at the wrong abstraction level (feature decomposed as single function) | L4 | Karyarch | Decomposition error |
+| Declares task complete without running ring verification | L5 | Thronokrator | Success arrest |
+| Cannot explain why a previous approach failed or what would be different | L5 | Thronokrator | Reasoning opacity |
+
+### LIMINAL and HALTED Triggers
+
+- **L3 + L4 → LIMINAL**: Any L3 or L4 attribution triggers LIMINAL entry. The agent must stop, extract the kernel, declare the frame shift, then re-enter EXECUTING. See `kenophoria-state.md` for the LIMINAL entry protocol.
+- **L5 → HALTED**: An L5 attribution triggers an immediate HALTED transition. The agent cannot self-correct a failure to model its own reasoning. Human intervention is required to diagnose and reframe. See `kenophoria-state.md` for the HALTED protocol.

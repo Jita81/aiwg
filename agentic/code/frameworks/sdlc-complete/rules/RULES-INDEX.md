@@ -246,8 +246,8 @@ Ring methodology rules enforce a cyclical execution framework with four-layer ve
 **Full rule**: @agentic/code/addons/ring-methodology/rules/verification-ring.md
 
 #### morpholepsis-detection
-**Summary**: Wrong-frame detection via 7-signal table. Fires during execution before retry ceiling. Signals: tool fixation, layer confusion, category lock, Ω-occlusion, pleromatic collapse, morpholeptic loop, success arrest. Highest-value: success arrest (Layer A passes, B/C/D skipped). Intervention = reframe, not retry. Does not consume retry slot.
-**When to apply**: Repeated failures, same approach with minor variations, feature declared done without full ring
+**Summary**: Wrong-frame detection via 7-signal table + 5-level sovereignty stack. Signals: tool fixation, layer confusion, category lock, Ω-occlusion, pleromatic collapse, morpholeptic loop, success arrest. Sovereignty stack (L1 Mind → L5 Thronokrator) maps failures to causal depth — L3/L4 trigger LIMINAL, L5 triggers HALTED. 13 attribution signatures for level classification. Intervention = reframe, not retry. Does not consume retry slot.
+**When to apply**: Repeated failures, same approach with minor variations, feature declared done without full ring; classifying failure depth before choosing intervention
 **Full rule**: @agentic/code/addons/ring-methodology/rules/morpholepsis-detection.md
 
 #### kenophoria-state
