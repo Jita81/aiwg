@@ -318,13 +318,13 @@ describe('CodexAdapter', () => {
   });
 
   describe('model mapping', () => {
-    it('maps generic model names to Codex models', () => {
+    it('maps all generic aliases to gpt-5.3-codex (mini models are API-only)', () => {
       const mappings = [
-        { input: 'opus', expected: 'gpt-5.3-codex' },
-        { input: 'sonnet', expected: 'codex-mini-latest' },
-        { input: 'haiku', expected: 'gpt-5-codex-mini' },
-        { input: 'OPUS', expected: 'gpt-5.3-codex' }, // case-insensitive
-        { input: 'Sonnet', expected: 'codex-mini-latest' }, // case-insensitive
+        { input: 'opus',   expected: 'gpt-5.3-codex' },
+        { input: 'sonnet', expected: 'gpt-5.3-codex' },
+        { input: 'haiku',  expected: 'gpt-5.3-codex' },
+        { input: 'OPUS',   expected: 'gpt-5.3-codex' },
+        { input: 'Sonnet', expected: 'gpt-5.3-codex' },
       ];
 
       for (const { input, expected } of mappings) {
@@ -407,7 +407,7 @@ describe('CodexAdapter', () => {
         agent: 'ralph-output-analyzer',
       });
       expect(args).toContain('--model');
-      expect(args).toContain('codex-mini-latest');
+      expect(args).toContain('gpt-5.3-codex');
       expect(args).not.toContain('--agent');
     });
   });
