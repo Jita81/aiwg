@@ -65,6 +65,9 @@ export class CodexAdapter extends ProviderAdapter {
    */
   buildSessionArgs(options) {
     const args = [
+      // Codex requires the 'exec' subcommand for non-interactive (headless) use.
+      // Running `codex --full-auto` without 'exec' fails with "stdin is not a terminal".
+      'exec',
       // SECURITY: --full-auto bypasses ALL permission prompts in Codex
       // Equivalent to Claude's --dangerously-skip-permissions
       '--full-auto',
@@ -119,6 +122,7 @@ export class CodexAdapter extends ProviderAdapter {
    */
   buildAnalysisArgs(options) {
     const args = [
+      'exec',
       '--full-auto',
       '--quiet',
     ];

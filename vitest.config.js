@@ -12,9 +12,13 @@ export default defineConfig({
       'agentic/code/frameworks/*/test/**/*.spec.ts'
     ],
 
-    // Exclude .mjs test files that use node:test runner (run with `node --test`)
+    // Exclude .mjs test files (use node:test runner) and all UAT tests.
+    // UAT tests run in their own vitest config to avoid thread-pool conflicts
+    // caused by ESM dynamic imports in the stub UAT fixtures.
+    // CI runs stub UAT separately via: npm run uat
     exclude: [
       'test/**/*.test.mjs',
+      'test/uat/**',
       'node_modules/**',
       'dist/**'
     ],

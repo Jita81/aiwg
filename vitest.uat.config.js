@@ -2,18 +2,15 @@ import { defineConfig } from 'vitest/config';
 import path from 'path';
 
 /**
- * Vitest config for UAT tests.
+ * Vitest config for stub UAT tests (no real agent invoked — CI-safe).
  *
- * Run on demand:
- *   npm run uat
- *   npx vitest run --config vitest.uat.config.js
- *
- * UAT tests exercise real code paths with stub providers — they are not
- * included in CI (test:ci) or the default test run (npm test).
+ * Included in CI via test:ci script.
+ * Also runnable on demand: npm run uat
  */
 export default defineConfig({
   test: {
-    include: ['test/uat/**/*.uat.ts', 'test/uat/**/*.test.ts'],
+    include: ['test/uat/ralph-external.uat.ts'],
+    exclude: ['test/uat/ralph-live-*.uat.ts'],
     environment: 'node',
     globals: false,
     clearMocks: true,
