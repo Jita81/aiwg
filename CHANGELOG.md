@@ -5,10 +5,11 @@ All notable changes to AIWG project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with npm-compatible format (`YYYY.M.PATCH`).
 
-## [2026.3.3] - 2026-03-24 – "Identity, Ring & Mission Control"
+## [2026.3.3] - 2026-03-25 – "Identity, Ring & Mission Control"
 
 | What changed | Why you care |
 |---|---|
+| **README overhaul** | SEO-optimized homepage with full six-component deep dive, 90+ research citations with GRADE-sorted ordering, corrected nav anchors, and external links to all platform vendors |
 | **Ring Methodology addon** | Four-layer verification framework: Developer → Integration → User Surface → Generative Reflection. Spectral gap health metric, circuit breaker, morpholepsis detection, kenophoria state. `aiwg use ring` |
 | **AIWG self-maintenance** | `aiwg sync` — update + redeploy + verify in one command. `aiwg mc` — dispatch and monitor parallel Ralph loops from a dashboard. AIWG Steward agent for complex repairs. |
 | **Mission Control** | Multi-loop background orchestration: start a session, dispatch missions, monitor all from a status dashboard, drain or abort on demand. State persists across context resets. |
@@ -65,6 +66,7 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 - **dev extension** (`agentic/code/extensions/dev/`) — CI/CD pipelines, build automation, fleet-wide tooling; `requires: ["ops-complete"]`; 2 rules (`dev-pipeline-safety` CRITICAL, `dev-ci-self-contained` HIGH); 3 templates (pipeline, ci-builder-dockerfile, ci-builder-workflow); 2 skills (`dev-ci-builder`, `dev-pipeline-audit`); installed via `aiwg use ops --ext dev`
 - **stream extension** (`agentic/code/extensions/stream/`) — streaming infrastructure, transcoders, platform integrations; `requires: ["ops-complete"]`; 1 rule (`stream-safety` CRITICAL); 1 template (stream-service); 1 skill (`stream-health`); installed via `aiwg use ops --ext stream`
 - **Composable RULES-INDEX hierarchy** (`#496–#500`) — two-level rules index architecture: each component owns `rules/RULES-INDEX.md`; global `agentic/code/RULES-INDEX.md` is an aggregator template; `assembleRulesIndex()` in `tools/agents/providers/base.mjs` discovers all installed component indexes and concatenates them at deploy time; component manifests declare `consolidation.rulesIndex` and `consolidation.deployIndexOnly` so the CLI knows which addons ship indexes instead of individual rule files; component indexes created for `ring-methodology` (7 rules) and `aiwg-utils` (7 rules); `sdlc-complete` RULES-INDEX scoped to its own 33 rules with cross-references to addon indexes; duplicates `instruction-comprehension.md` and `research-before-decision.md` removed from `sdlc-complete/rules/` (canonical home is `aiwg-utils/rules/`); ADR at `.aiwg/architecture/adr-rules-index-hierarchy.md`
+- **README documentation overhaul** — SEO-optimized homepage with keyword-rich feature sections; six-component deep dive; 90+ research citations across 18 topic categories sorted by GRADE evidence quality; fixed nav anchor links; external links for all 10 platform entries (#501)
 
 ### Changed
 
