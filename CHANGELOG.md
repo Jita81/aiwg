@@ -90,6 +90,16 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 - **`aiwg ralph-external`, `ralph-memory`, `ralph-config` — no handlers** — three ralph commands documented in CLI reference had no registered handlers; all three implemented in `src/cli/handlers/ralph.ts` and registered in `allHandlers`; ralph-external delegates to `tools/ralph-external/index.mjs`, ralph-memory to `tools/ralph-external/memory-manager.mjs --cli`, ralph-config to `tools/ralph-external/orchestrator.mjs --config`
 - **`aiwg use sdlc --provider hermes` — unknown provider error** — Hermes was missing from both `AVAILABLE_PROVIDERS` in `deploy-agents.mjs` and `PROVIDER_PATHS` in `use.ts`; `tools/agents/providers/hermes.mjs` added; skills deploy to `~/.hermes/skills/`, agents aggregate into lean AGENTS.md
 - **Post-deploy next steps showed Claude-specific guidance regardless of provider** — `NEXT_STEPS` in `use.ts` was a flat map keyed only by framework; refactored to `<provider>/<framework>` composite keys so each provider receives appropriate guidance
+- **External Ralph loop silently dying on startup** — `SemanticMemory`, `MemoryPromotion`, and `MemoryRetrieval` constructors each take a path string but `orchestrator.mjs` was passing `{ storagePath: path }` objects; `path.join()` threw "path argument must be of type string", crashing the background process immediately after the PID was written to the registry — loops appeared to start but were always dead on arrival
+- **`--dangerous` flag passed after prompt in agent spawn** — `buildAgentArgs()` was appending the dangerous flag after the prompt string; moved before the prompt so it is treated as a CLI flag to the provider binary, not as content; e.g. `claude --dangerously-skip-permissions "<prompt>"` instead of `claude "<prompt>" --dangerously-skip-permissions`
+- **Incorrect provider configs** — Hermes was listed as a spawnable binary (it is not; it is model-series-only accessible via Ollama or MCP); OpenCode's `promptPrefix` was missing `['run']`, causing invocations without the required subcommand
+
+### Added (RC5)
+
+- **MCP sidecar integration docs for all 8 providers** (#503–#510) — full integration guides at `docs/integrations/{provider}-mcp-sidecar.md` covering two-layer model (permission + tooling), config file formats, and quickstart steps; minimal + full config templates for cursor, opencode, warp, windsurf; MCP sidecar section appended to all 8 provider quickstart guides
+- **`aiwg mcp install windsurf` and `aiwg mcp install warp`** — two missing install targets added to `aiwg mcp install`; generate `~/.codeium/windsurf/mcp_config.json` and `~/.warp/mcp.json` respectively; guidance messages in `agent-spawn.ts` for cursor/warp/windsurf updated to reference `aiwg mcp install <target>`
+- **`aiwg ralph --attach`** — stay attached to a ralph loop's output after launch; streams `daemon-output.log` to stdout in real time; Ctrl+C detaches without stopping the background loop
+- **`aiwg ralph-attach [--loop-id <id>]`** — re-attach to any running Ralph loop's output stream from any terminal session; 50-command count now 50
 
 ---
 
