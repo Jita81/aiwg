@@ -19,7 +19,7 @@ aiwg use sdlc        # deploy SDLC framework
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org)
 [![8 Platforms](https://img.shields.io/badge/Platforms-8-purple?style=flat-square)](#-platform-support)
 
-[**Get Started**](#-quick-start) · [**Features**](#-what-you-get) · [**Agents**](#agents-162) · [**CLI Reference**](#-cli-reference-47-commands) · [**Documentation**](#-documentation) · [**Community**](#-community--support)
+[**Get Started**](#quick-start) · [**Features**](#what-you-get) · [**Agents**](#agents-162) · [**CLI Reference**](#cli-reference-47-commands) · [**Documentation**](#documentation) · [**Community**](#community--support)
 
 [![Discord](https://img.shields.io/badge/Discord-Join-5865F2?logo=discord&logoColor=white&style=flat-square)](https://discord.gg/BuAusFMxdA)
 [![Telegram](https://img.shields.io/badge/Telegram-Join-26A5E4?logo=telegram&logoColor=white&style=flat-square)](https://t.me/+oJg9w2lE6A5lOGFh)
