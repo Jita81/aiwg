@@ -163,17 +163,23 @@ export function parseAgentSpawnFlags(args: string[]): {
  */
 export function buildAgentArgs(prompt: string, opts: AgentSpawnOptions): string[] {
   const config = getProviderConfig(opts.provider ?? 'claude');
-  // Some providers use a subcommand before the prompt (e.g. `opencode run "<prompt>"`)
-  const args: string[] = [...(config.promptPrefix ?? []), prompt];
+  const args: string[] = [];
 
-  if (opts.dangerous) {
-    if (config.dangerousFlag) {
-      args.push(config.dangerousFlag);
-    }
-    // If provider has no dangerous flag, the flag is silently ignored —
-    // callers should warn the user via warnIfDangerousUnsupported().
+  // Dangerous flag must precede the prompt — it is a CLI flag to the binary,
+  // not content to pass to the agent. e.g. `claude --dangerously-skip-permissions "<prompt>"`
+  if (opts.dangerous && config.dangerousFlag) {
+    args.push(config.dangerousFlag);
+    // If provider has no dangerous flag, silently ignored —
+    // callers should warn via dangerousWarning().
   }
 
+  // Some providers require a subcommand before the prompt (e.g. `opencode run "<prompt>"`)
+  args.push(...(config.promptPrefix ?? []));
+
+  // The prompt
+  args.push(prompt);
+
+  // User passthrough params — appended after the prompt verbatim
   if (opts.params) {
     args.push(...splitParams(opts.params));
   }
