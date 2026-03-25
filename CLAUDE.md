@@ -347,6 +347,10 @@ Never delete tests to make them pass. Never skip tests. Never remove features in
 
 Execute tests before returning code. Track execution history. Retry on failure with root cause analysis (max 3 attempts).
 
+### UAT Before Release (HIGH)
+
+Run `npm run uat` before every stable release tag. All 9 UAT tests must pass. UAT validates the external Ralph loop end-to-end with a stub provider and catches runtime failures that unit tests (which mock the session launcher) cannot detect. See the Release Checklist below for the full gate sequence.
+
 ### Failure Mitigation (HIGH)
 
 Apply mitigations for known LLM failure archetypes: hallucination, context loss, instruction drift, consistency violations, and technical errors.
@@ -514,10 +518,15 @@ Before pushing a version tag:
    - Code examples
    - Migration notes (if applicable)
    - Links to relevant documentation
-4. **Commit and tag** - `git tag -m "vX.X.X" vX.X.X`
-5. **Push tag to Gitea** - `git push origin main --tags` (automatically creates Gitea Release)
-6. **Optionally mirror to GitHub** - `git push github main --tags`
-7. **Update/Create GitHub Release manually** - via `gh release create|edit`
+4. **Run UAT suite** (REQUIRED before tagging):
+   ```bash
+   npm run uat
+   ```
+   All 9 tests must pass. UAT validates the external Ralph loop end-to-end with a stub provider — it catches runtime API mismatches that unit tests cannot (they mock the session launcher). Do not tag if any UAT test fails.
+5. **Commit and tag** - `git tag -m "vX.X.X" vX.X.X`
+6. **Push tag to Gitea** - `git push origin main --tags` (automatically creates Gitea Release)
+7. **Optionally mirror to GitHub** - `git push github main --tags`
+8. **Update/Create GitHub Release manually** - via `gh release create|edit`
 
 ### Version Format
 
