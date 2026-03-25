@@ -32,7 +32,209 @@ aiwg use sdlc        # deploy SDLC framework
 
 AIWG is a cognitive architecture that gives AI coding assistants structured memory, multi-agent ensemble validation, and closed-loop self-correction. It deploys specialized agents, workflow commands, enforcement rules, and artifact templates to any of 8 AI platforms with a single CLI command.
 
+If you have used AI coding assistants and thought "this is amazing for small tasks but falls apart on anything complex," AIWG is the missing infrastructure layer that scales AI assistance to multi-week projects.
+
 Unlike prompt libraries or ad-hoc workflows, AIWG implements research-backed patterns from cognitive science (Miller 1956, Sweller 1988), multi-agent systems (Jacobs et al. 1991, MetaGPT, AutoGen), and software engineering (Cooper's stage-gate, FAIR Principles, W3C PROV). The system addresses the hard problems in AI-augmented development: recovering from failures, maintaining context across sessions, preventing hallucinated citations, and ensuring reproducible workflows.
+
+---
+
+## What Problems Does AIWG Solve?
+
+Base AI assistants (Claude, GPT-4, Copilot without frameworks) have three fundamental limitations:
+
+### 1. No Memory Across Sessions
+
+Each conversation starts fresh. The assistant has no idea what happened yesterday, what requirements you documented, or what decisions you made last week. You re-explain context every morning.
+
+**Without AIWG**: Projects stall as context rebuilding eats time. A three-month project requires continuity, not fresh starts every session.
+
+**With AIWG**: The `.aiwg/` directory maintains 50-100+ interconnected artifacts across days, weeks, and months. Week 12 builds on weeks 1-11 automatically because memory persists. Agents read prior work via `@-mentions` instead of regenerating from scratch.
+
+### 2. No Recovery Patterns
+
+When AI generates broken code or flawed designs, you manually intervene, explain the problem, and hope the next attempt works. There is no systematic learning from failures, no structured retry, no checkpoint-and-resume.
+
+**Without AIWG**: Research shows 47% of AI workflows produce inconsistent outputs without reproducibility constraints (R-LAM, Sureshkumar et al. 2026). Debugging is trial-and-error.
+
+**With AIWG**: The Ralph loop implements closed-loop self-correction — execute, verify, learn from failure, adapt strategy, retry. External Ralph survives crashes and runs for 6-8+ hours autonomously. Debug memory accumulates failure patterns so the agent doesn't repeat mistakes.
+
+### 3. No Quality Gates
+
+Base assistants optimize for "sounds plausible" not "actually works." A general assistant critiques security, performance, and maintainability simultaneously — poorly. No domain specialization, no multi-perspective review, no human approval checkpoints.
+
+**Without AIWG**: Production code ships without architectural review, security validation, or operational feasibility assessment.
+
+**With AIWG**: 162 specialized agents provide domain expertise — Security Auditor reviews security, Test Architect reviews testability, Performance Engineer reviews scalability. Multi-agent review panels with synthesis. Human-in-the-loop gates at every phase transition. Research shows 84% cost reduction keeping humans on high-stakes decisions versus fully autonomous systems (Agent Laboratory, Schmidgall et al. 2025).
+
+---
+
+## The Six Core Components
+
+### 1. Memory — Structured Semantic Memory
+
+The `.aiwg/` directory is a persistent artifact repository storing requirements, architecture decisions, test strategies, risk registers, and deployment plans across sessions. This implements Retrieval-Augmented Generation patterns (Lewis et al., 2020) — agents retrieve from an evolving knowledge base rather than regenerating from scratch.
+
+Each artifact is discoverable via `@-mentions` (e.g., `@.aiwg/requirements/UC-001-login.md`). Context sharing between agents happens through artifacts: the requirements analyst writes use cases, the architecture designer reads them.
+
+### 2. Reasoning — Multi-Agent Deliberation with Synthesis
+
+Instead of a single general-purpose assistant, AIWG provides 162 specialized agents organized by domain. Complex artifacts go through multi-agent review panels:
+
+```
+Architecture Document Creation:
+  1. Architecture Designer drafts SAD
+  2. Review Panel (3-5 agents run in parallel):
+     - Security Auditor    → threat perspective
+     - Performance Engineer → scalability perspective
+     - Test Architect       → testability perspective
+     - Technical Writer     → clarity and consistency
+  3. Documentation Synthesizer merges all feedback
+  4. Human approval gate → accept, iterate, or escalate
+```
+
+Research shows 17.9% accuracy improvement with multi-path review on complex tasks (Wang et al., GSM8K benchmarks, 2023). Agent specialization means security review is done by a security specialist, not a generalist.
+
+### 3. Learning — Closed-Loop Self-Correction (Ralph)
+
+Ralph executes tasks iteratively, learns from failures, and adapts strategy based on error patterns. Research from Roig (2025) shows recovery capability — not initial correctness — predicts agentic task success.
+
+```
+Ralph Iteration:
+  1. Execute task with current strategy
+  2. Verify results (tests pass, lint clean, types check)
+  3. If failure: analyze root cause → extract structured learning → adapt strategy
+  4. Log iteration state (checkpoint for resume)
+  5. Repeat until success or escalate to human after 3 failed attempts
+```
+
+External Ralph adds crash resilience: PID file tracking, automatic restart, cross-session persistence. Tasks run for 6-8+ hours surviving terminal disconnects and system reboots.
+
+### 4. Verification — Bidirectional Traceability
+
+AIWG maintains links between documentation and code to ensure artifacts stay synchronized:
+
+```typescript
+// src/auth/login.ts
+/**
+ * @implements @.aiwg/requirements/UC-001-login.md
+ * @architecture @.aiwg/architecture/SAD.md#section-4.2
+ * @tests @test/unit/auth/login.test.ts
+ */
+export function authenticateUser(credentials: Credentials): Promise<AuthResult> {
+```
+
+Verification types: Doc → Code, Code → Doc, Code → Tests, Citations → Sources. The retrieval-first citation architecture reduces citation hallucination from 56% to 0% (LitLLM benchmarks, ServiceNow 2025).
+
+### 5. Planning — Phase Gates with Cognitive Load Management
+
+AIWG structures work using Cooper's Stage-Gate methodology (1990), breaking multi-month projects into bounded phases with explicit quality criteria and human approval:
+
+```
+Inception → Elaboration → Construction → Transition → Production
+   LOM          ABM            IOC            PR
+```
+
+Cognitive load optimization follows Miller's 7±2 limits (1956) and Sweller's worked examples approach (1988):
+- 4 phases (not 12)
+- 3-5 artifacts per phase (not 20)
+- 5-7 section headings per template (not 15)
+- 3-5 reviewers per panel (not 10)
+
+### 6. Style — Controllable Voice Generation
+
+Voice profiles provide continuous control over AI writing style using 12 parameters (formality, technical depth, sentence variety, jargon density, personal tone, humor, directness, examples ratio, uncertainty acknowledgment, opinion strength, transition style, authenticity markers).
+
+Built-in voices: `technical-authority` (docs, RFCs), `friendly-explainer` (tutorials), `executive-brief` (summaries), `casual-conversational` (blogs, social). Create custom voices from your existing content with `/voice-create`.
+
+---
+
+## A Real Project Walkthrough
+
+Here is how the six components work together across a typical multi-week project:
+
+### Week 1: Inception
+
+```bash
+/intake-wizard "Build customer portal with real-time chat" --interactive
+```
+
+**Memory**: Intake forms capture goals, constraints, stakeholders in `.aiwg/intake/`
+**Planning**: Executive Orchestrator guides through structured questionnaire
+**Reasoning**: Requirements Analyst drafts initial use cases, Product Designer reviews UX
+**Verification**: Requirements reference intake forms, ensuring alignment
+**Human Gate**: Stakeholder reviews intake → approves transition to Elaboration
+
+### Weeks 2-4: Elaboration
+
+```bash
+/flow-inception-to-elaboration
+```
+
+**Memory**: Architecture doc, ADRs, threat model, test strategy accumulate in `.aiwg/`
+**Reasoning**: Multi-agent review panel — Architecture Designer drafts, Security Auditor + Performance Engineer + Test Architect critique in parallel, Documentation Synthesizer merges
+**Learning**: Ralph iterates on ADRs (generate options, evaluate against constraints, refine)
+**Style**: Technical documents use `technical-authority`, stakeholder summaries use `executive-brief`
+**Human Gate**: Architect reviews SAD, security team approves threat model
+
+### Weeks 5-10: Construction
+
+```bash
+/flow-elaboration-to-construction
+/ralph "Implement authentication module" --completion "npm test passes"
+```
+
+**Learning**: Ralph handles implementation iterations — execute, verify (run tests), learn ("async race condition in token refresh"), adapt (add synchronization), retry
+**Verification**: Code references requirements (`@implements UC-001`), tests reference code
+**Memory**: Test plans, implementation, deployment scripts accumulate across iterations
+**Human Gate**: Code review approves merges, QA approves test results
+
+### Weeks 11-12: Transition
+
+```bash
+/flow-deploy-to-production
+/flow-hypercare-monitoring 14
+```
+
+**Planning**: Deployment checklist — monitoring, rollback plan, incident response
+**Learning**: Ralph retries deployment steps if validation fails
+**Verification**: Deployment scripts reference architecture (which services, what order)
+**Human Gate**: Operations team reviews deployment plan → approves production release
+
+---
+
+## Quantified Claims and Evidence
+
+AIWG makes specific, falsifiable claims backed by peer-reviewed research:
+
+| Claim | Evidence | Source |
+|-------|----------|--------|
+| 84% cost reduction with human-in-the-loop vs fully autonomous | Agent Laboratory study | Schmidgall et al. (2025) |
+| 47% workflow failure rate without reproducibility constraints | R-LAM evaluation | Sureshkumar et al. (2026) |
+| 0% citation hallucination with retrieval-first vs 56% generation-only | LitLLM benchmarks | ServiceNow (2025) |
+| 17.9% accuracy improvement with multi-path review | GSM8K benchmarks | Wang et al. (2023) |
+| 18.5x improvement with tree search on planning tasks | Game of 24 results | Yao et al. (2023) |
+
+Full references: [docs/research/](docs/research/)
+
+---
+
+## When to Use AIWG (and When Not To)
+
+### Good Fit
+
+Multi-week or multi-month projects where requirements evolve, multiple stakeholders have different concerns, quality gates are required, auditability matters, or context exceeds conversation limits.
+
+**Examples**: New product features with architecture/security/operational implications, legacy system migrations requiring phased rollback strategies, research projects needing literature review and reproducibility, compliance-heavy domains (healthcare, finance, aerospace) needing audit trails.
+
+### Not the Best Fit
+
+Single-session tasks where no memory is needed, quality gates are overkill, and overhead exceeds value.
+
+**Examples**: "Write a Python script to parse this CSV," "Fix this typo," "Explain how this code works."
+
+### The Trade-off
+
+AIWG adds structure (templates, phases, gates) that slows trivial tasks but scales to complex multi-week workflows. If your project fits in a single conversation, use a base assistant. If it spans days, weeks, or months, AIWG provides the infrastructure to maintain quality and context.
 
 ```
 User intent → AIWG CLI → Deploy agents + rules + templates → AI platform

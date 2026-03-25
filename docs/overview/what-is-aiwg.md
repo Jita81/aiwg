@@ -79,7 +79,7 @@ Each artifact is discoverable via `@-mentions` (like `@.aiwg/requirements/use-ca
 
 ### 2. Reasoning: Multi-Agent Deliberation with Synthesis
 
-**What It Is**: Instead of a single general-purpose assistant, AIWG provides 53 specialized agents organized into 8 role categories. Complex artifacts (architecture docs, security assessments) go through multi-agent review panels with synthesis.
+**What It Is**: Instead of a single general-purpose assistant, AIWG provides 162 specialized agents across 5 frameworks (SDLC, Forensics, Marketing, Research, Media Curator). Complex artifacts (architecture docs, security assessments) go through multi-agent review panels with synthesis.
 
 **The Research Foundation**: Mixture of Experts pattern (Jacobs et al., 1991) and Self-Consistency reasoning (Wang et al., 2023)—sampling multiple reasoning paths and aggregating improves accuracy by 15-20% on complex tasks.
 
@@ -115,34 +115,49 @@ Architecture Document Creation:
 
 **What It Is**: Ralph is a closed-loop self-correction system that executes tasks iteratively, learns from failures, and adapts strategy based on error patterns.
 
-**The Research Foundation**: Control theory principles and findings from Roig (2025) showing recovery capability—not initial correctness—predicts agentic task success.
+**The Research Foundation**: Control theory principles and findings from Roig (2025) showing recovery capability—not initial correctness—predicts agentic task success. Self-Refine (Madaan et al., NeurIPS 2023) and Reflexion (Shinn et al., 2023) provide the iterative improvement patterns.
 
 **How It Works**:
 ```
-Ralph Loop:
+Ralph Loop (TAO: Thought → Action → Observation):
   1. Execute task with current strategy
   2. Verify results (test pass, lint pass, format valid)
   3. If failure:
      a. Analyze root cause (what specific error occurred)
-     b. Extract structured learning (add to knowledge base)
-     c. Adapt strategy (try different approach)
+     b. Extract structured learning (add to debug memory)
+     c. Adapt strategy (try different approach informed by accumulated learnings)
      d. Log iteration state (checkpoint for resume)
   4. Repeat until success or iteration limit
   5. Terminate gracefully (provide human-readable summary)
 ```
 
+**Two Execution Modes**:
+
+| Mode | Duration | Resilience | Use Case |
+|------|----------|-----------|----------|
+| **In-Session Ralph** | Minutes to hours | Within single session | Fix tests, reach coverage target, refactor module |
+| **External Ralph** | Hours to days | Crash-resilient (PID file, checkpoints, auto-restart) | TypeScript migration, full test suite repair, multi-file refactor |
+
+External Ralph runs as a **persistent background process** that survives terminal disconnects, process crashes, and system reboots. State persists in `.aiwg/ralph-external/` with checkpoint-and-resume capability.
+
+**Issue-Driven Ralph**: The `/issue-driven-ralph` command drives issues with 2-way human-AI collaboration — the agent posts cycle status to issue threads and incorporates human feedback at each iteration.
+
+**Scheduled Agents**: Recurring autonomous tasks via `/schedule` — daily code reviews, weekly dependency updates, continuous monitoring with completion criteria and automatic evaluation.
+
 **Failure Modes Addressed** (from Roig 2025):
-- Archetype 1: Ungrounded Reasoning - Ralph grounds with external verification (run tests, check types)
-- Archetype 3: Context Pollution - Ralph uses focused iterations to avoid distractor interference
-- Archetype 4: Fragile Execution Under Load - Ralph saves checkpoints, enabling resume after interruption
+- Archetype 1: Ungrounded Reasoning — Ralph grounds with external verification (run tests, check types)
+- Archetype 3: Context Pollution — Ralph uses focused iterations to avoid distractor interference
+- Archetype 4: Fragile Execution Under Load — Ralph saves checkpoints, enabling resume after interruption
 
 **What This Enables**:
 - Automatic retry with strategy modification (not blind "try again")
-- Learning accumulation (failure patterns inform future attempts)
+- Learning accumulation (debug memory persists failure patterns across iterations)
 - Reproducibility (execution logs enable replay and debugging)
 - Graceful degradation (terminate with useful partial results if full success impossible)
+- Long-horizon autonomous operation (6-8+ hours with crash recovery)
+- Human-in-the-loop iteration (issue-driven mode with feedback incorporation)
 
-**The Difference**: Base assistants fail once and wait for you to fix the problem. Ralph tries multiple strategies, documents what did not work, and presents options when stuck.
+**The Difference**: Base assistants fail once and wait for you to fix the problem. Ralph tries multiple strategies, documents what did not work, learns from each failure, and presents options when stuck. External Ralph does this for hours without supervision.
 
 ---
 
@@ -277,6 +292,12 @@ AIWG aligns with internationally recognized standards to ensure professional cre
 | **W3C PROV** | W3C Recommendation (2013) | Artifact provenance tracking (wasDerivedFrom chains) |
 | **GRADE** | 100+ organizations (WHO, Cochrane, NICE) | Source quality assessment (high/moderate/low evidence) |
 | **MCP** | Linux Foundation (10,000+ servers) | Tool/resource exposure via Model Context Protocol |
+| **NIST SP 800-86** | U.S. National Institute of Standards | Digital forensics evidence handling |
+| **MITRE ATT&CK** | MITRE Corporation | Threat technique mapping in forensics framework |
+| **STIX 2.1** | OASIS Open | Indicator of Compromise formatting |
+| **Sigma Rules** | SigmaHQ community | Threat detection rule format |
+| **IEEE 830** | IEEE Standards Association | Requirements specification traceability |
+| **CalVer** | Community convention | Calendar versioning (YYYY.M.PATCH) |
 
 **Why Standards Matter**: They provide established vocabulary, proven patterns, and institutional validation. AIWG does not reinvent data management or provenance tracking—it implements research-backed best practices.
 
@@ -375,18 +396,109 @@ Consider a typical multi-week project:
 
 ---
 
+## Beyond SDLC: Five Complete Frameworks
+
+While the walkthrough above focuses on the SDLC framework, AIWG provides five complete frameworks — each deployable independently:
+
+### Frameworks
+
+| Framework | Agents | What It Covers |
+|-----------|--------|---------------|
+| **SDLC Complete** | 98 | Full software development lifecycle — Inception through Production with 23 enforcement rules, 150+ templates, 24 flow commands, DORA metrics |
+| **Forensics Complete** | 13 | Digital forensics & incident response — NIST SP 800-86 evidence handling, MITRE ATT&CK mapping, Sigma rule hunting, STIX 2.1 IOC formatting, timeline reconstruction |
+| **Media/Marketing Kit** | 37 | End-to-end marketing operations — strategy, content creation, campaign management, brand compliance, analytics, 87+ templates |
+| **Research Complete** | 8 | Academic research automation — paper discovery, citation management, RAG-based summarization, GRADE quality scoring, FAIR compliance, W3C PROV provenance |
+| **Media Curator** | 6 | Intelligent media archive management — discography analysis, source discovery, quality filtering, metadata curation, export to Plex/Jellyfin/MPD |
+
+### Key Addons
+
+| Addon | What It Adds |
+|-------|-------------|
+| **RLM (Recursive Language Models)** | Process 10M+ tokens via sub-agent delegation with parallel fan-out — handles codebases and documents far beyond any model's context window |
+| **Testing Quality** | TDD enforcement via pre-commit hooks, mutation testing, flaky test detection and repair, coverage gates |
+| **Writing Quality** | Content validation, AI pattern detection, authentic voice enforcement |
+| **Voice Framework** | 4 built-in voice profiles with create/analyze/blend/apply skills using 12 continuous parameters |
+| **UAT-MCP Toolkit** | User acceptance testing with MCP-powered test execution, coverage tracking, regression detection |
+| **AIWG Evals** | Agent evaluation framework — archetype resistance testing (Roig 2025), performance benchmarks, quality scoring (target >=85%) |
+
+### Multi-Platform Deployment
+
+All frameworks deploy to 8 AI platforms with a single command:
+
+```bash
+aiwg use sdlc                          # Claude Code (default)
+aiwg use sdlc --provider copilot       # GitHub Copilot
+aiwg use sdlc --provider cursor        # Cursor
+aiwg use sdlc --provider warp          # Warp Terminal
+aiwg use sdlc --provider factory       # Factory AI
+aiwg use sdlc --provider opencode      # OpenCode
+aiwg use sdlc --provider openai        # OpenAI/Codex
+aiwg use sdlc --provider windsurf      # Windsurf
+```
+
+Each platform receives agents, commands, skills, and rules adapted to its conventions automatically. Write once, deploy everywhere.
+
+### YAML Metalanguage (Declarative Workflow Definitions)
+
+AIWG is pioneering a declarative YAML metalanguage for multi-agent workflow orchestration. Schema-validated YAML (JSON Schema 2020-12) defines agent topology, workflow DAGs, gate conditions, and artifact contracts — while natural language handles behavioral logic.
+
+```yaml
+flow:
+  id: inception-to-elaboration
+  model: opus
+  steps:
+    - id: requirements-analysis
+      agent: requirements-analyst
+      parallel_group: reviews
+    - id: architecture-baseline
+      agent: architecture-designer
+      parallel_group: reviews
+    - id: synthesis
+      agent: documentation-synthesizer
+      depends_on: [requirements-analysis, architecture-baseline]
+  exit_criteria:
+    gate: ABM
+    decision: [GO, CONDITIONAL_GO, NO_GO]
+```
+
+Schema definitions for `flow.yaml`, `agent.yaml`, `rule.yaml`, and `skill.yaml` enable static validation, IDE autocompletion, and constrained generation of valid workflow definitions.
+
+### 47 CLI Commands
+
+AIWG provides a complete CLI for framework management, project scaffolding, iterative execution, metrics, and reproducibility:
+
+```bash
+aiwg use sdlc              # Deploy framework
+aiwg new my-project        # Scaffold project
+aiwg doctor                # Health check
+aiwg ralph "Fix tests"     # Iterative execution
+aiwg ralph-external "..."  # Crash-resilient long-running
+aiwg index build           # Artifact discovery
+aiwg doc-sync              # Bidirectional doc sync
+aiwg sdlc-accelerate "..." # Idea to construction-ready
+aiwg cost-report           # Token cost tracking
+```
+
+Full reference: `@docs/cli-reference.md`
+
+---
+
 ## What Makes AIWG Different
 
 ### Compared to Base AI Assistants (Claude, GPT-4, Copilot)
 
 | Feature | Base Assistant | AIWG |
 |---------|----------------|------|
-| Memory across sessions | ✗ None | ✓ Persistent `.aiwg/` artifacts |
-| Specialized agents | ✗ General assistant | ✓ 53 role-specific agents |
-| Quality gates | ✗ Ad-hoc | ✓ Phase gates with criteria |
-| Recovery patterns | ✗ Manual retry | ✓ Ralph closed-loop learning |
-| Citation integrity | ✗ Can hallucinate | ✓ Retrieval-first (0% hallucination) |
-| Standards compliance | ✗ None | ✓ FAIR, OAIS, PROV, GRADE, MCP |
+| Memory across sessions | None | Persistent `.aiwg/` artifacts (50-100+ per project) |
+| Specialized agents | General assistant | 162 role-specific agents across 5 frameworks |
+| Quality gates | Ad-hoc | Phase gates with entry/exit criteria + human approval |
+| Recovery patterns | Manual retry | Ralph closed-loop learning (in-session + crash-resilient external) |
+| Long-running tasks | Babysit the terminal | External Ralph runs 6-8+ hours autonomously |
+| Citation integrity | Can hallucinate | Retrieval-first (0% hallucination rate) |
+| Standards compliance | None | FAIR, OAIS, PROV, GRADE, MCP, NIST, MITRE ATT&CK |
+| Platform support | Single platform | 8 platforms (Claude Code, Copilot, Cursor, Warp, Factory, OpenCode, Codex, Windsurf) |
+| Reproducibility | Non-deterministic | Strict mode (temperature=0), checkpoints, validation |
+| Context beyond window | Lost | RLM recursive decomposition (10M+ tokens) |
 
 ---
 
@@ -398,7 +510,9 @@ Consider a typical multi-week project:
 | Cost control | Token limits | Phase gates prevent runaway |
 | Auditability | Limited provenance | Full W3C PROV chain of custody |
 | Reproducibility | Non-deterministic | Checkpointing, execution logs |
-| Cross-platform | Single environment | Claude, Cursor, Copilot, etc. |
+| Cross-platform | Single environment | 8 platforms (Claude, Cursor, Copilot, Warp, Factory, OpenCode, Codex, Windsurf) |
+| Long-running tasks | Token limit = hard stop | External Ralph with crash recovery (hours to days) |
+| Scheduled agents | Not supported | Cron-based recurring tasks with completion criteria |
 
 **Key Difference**: AIWG prioritizes reliability and auditability over full autonomy. Research shows 84% cost reduction keeping humans on high-stakes decisions rather than removing them.
 
@@ -499,9 +613,10 @@ Chain-of-thought reasoning requires large models (>100B parameters). AIWG assume
 ### For Practitioners: Quick Start
 
 1. Install AIWG: `npm install -g aiwg`
-2. Deploy framework: `aiwg use sdlc`
-3. Start project: Follow Inception phase questionnaire
-4. Read: `@docs/quickstart.md` for hands-on walkthrough
+2. Deploy framework: `aiwg use sdlc` (or `forensics`, `marketing`, `media-curator`, `research`, `all`)
+3. Start project: `/intake-wizard "Your project description" --interactive`
+4. Check health: `aiwg doctor`
+5. Read: `@docs/quickstart.md` for hands-on walkthrough
 
 ### For Architects: Deep Dive
 
@@ -532,10 +647,15 @@ AIWG uses dual terminology (informal + professional) for accessibility and credi
 | Context stacks | Structured Semantic Memory | Working memory extended with external storage |
 | Multi-agent review | Ensemble Validation | Multiple specialized agents critique artifacts |
 | Ralph loop | Closed-Loop Self-Correction | Iterative execution with failure learning |
+| External Ralph | Crash-Resilient Autonomous Execution | Long-running agents with PID tracking and checkpoint recovery |
 | .aiwg/ directory | Artifact Repository | Persistent storage for project knowledge |
 | @-mentions | Traceability Links | References enabling provenance tracking |
 | Phase gates | Stage-Gate Process | Quality checkpoints with human approval |
 | Voice profiles | Continuous Style Representation | Parametric control of writing style |
+| RLM | Recursive Language Models | Sub-agent delegation for context beyond window limits |
+| YAML metalanguage | Declarative Workflow Schema | Schema-validated YAML for agent topology and workflow DAGs |
+| Debug memory | Executable Feedback Store | Accumulated failure patterns informing subsequent iterations |
+| Scheduled agents | Temporal Agency | Cron-based recurring autonomous tasks |
 
 Full glossary: `@docs/research/glossary.md`
 
@@ -551,7 +671,7 @@ This document draws on findings from:
 - **Memory & Retrieval**: Lewis et al. (2020), ServiceNow (2025)
 - **Standards**: Wilkinson et al. (2016), ISO 14721, W3C (2013), GRADE, MCP
 
-Full bibliography with paper analysis: `@.aiwg/research/paper-analysis/INDEX.md`
+Full bibliography with paper analysis: `@.aiwg/research/paper-analysis/INDEX.md` (138+ papers)
 
 ---
 
@@ -574,4 +694,4 @@ Full bibliography with paper analysis: `@.aiwg/research/paper-analysis/INDEX.md`
 - @docs/quickstart.md - Installation and first project guide
 - @docs/research/glossary.md - Professional terminology mapping
 - @.aiwg/planning/documentation-professionalization-plan.md - Documentation strategy
-- @.aiwg/research/paper-analysis/INDEX.md - Complete research corpus (35 papers analyzed)
+- @.aiwg/research/paper-analysis/INDEX.md - Complete research corpus (138+ papers analyzed)
