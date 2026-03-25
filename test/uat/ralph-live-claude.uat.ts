@@ -115,6 +115,6 @@ describe('UAT [LIVE-CLAUDE]: Orchestrator — real claude provider', () => {
     const sm = new StateManager(testDir);
     const state = sm.load();
     expect(state).not.toBeNull();
-    expect(['completed', 'failed', 'max_iterations']).toContain(state.status);
+    expect(['completed', 'failed', 'limit_reached']).toContain(state.status);
   }, 300000);
 });

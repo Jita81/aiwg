@@ -58,16 +58,13 @@ export class ClaudeAdapter extends ProviderAdapter {
       '--dangerously-skip-permissions',
       '--print',
       '--output-format', 'stream-json',
+      // stream-json always requires --verbose (CLI enforces this)
+      '--verbose',
     ];
 
     // Session tracking
     if (options.sessionId) {
       args.push('--session-id', options.sessionId);
-    }
-
-    // Verbose mode
-    if (options.verbose) {
-      args.push('--verbose');
     }
 
     // Model selection (Claude passes through directly)

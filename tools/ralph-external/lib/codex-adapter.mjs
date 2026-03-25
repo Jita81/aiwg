@@ -124,7 +124,6 @@ export class CodexAdapter extends ProviderAdapter {
     const args = [
       'exec',
       '--full-auto',
-      '--quiet',
     ];
 
     // Model selection

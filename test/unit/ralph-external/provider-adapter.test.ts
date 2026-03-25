@@ -328,8 +328,9 @@ describe('CodexAdapter', () => {
   });
 
   describe('buildSessionArgs', () => {
-    it('uses --full-auto instead of --dangerously-skip-permissions', () => {
+    it('uses exec subcommand and --full-auto instead of --dangerously-skip-permissions', () => {
       const args = adapter.buildSessionArgs({ prompt: 'task' });
+      expect(args[0]).toBe('exec');
       expect(args).toContain('--full-auto');
       expect(args).not.toContain('--dangerously-skip-permissions');
       expect(args).not.toContain('--print');
@@ -376,10 +377,11 @@ describe('CodexAdapter', () => {
   });
 
   describe('buildAnalysisArgs', () => {
-    it('uses --full-auto and --quiet', () => {
+    it('uses exec subcommand and --full-auto', () => {
       const args = adapter.buildAnalysisArgs({ prompt: 'analyze' });
+      expect(args[0]).toBe('exec');
       expect(args).toContain('--full-auto');
-      expect(args).toContain('--quiet');
+      expect(args).not.toContain('--quiet');
       expect(args).not.toContain('--dangerously-skip-permissions');
     });
 
