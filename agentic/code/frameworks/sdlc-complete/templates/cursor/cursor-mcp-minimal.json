@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "aiwg": {
+      "command": "aiwg",
+      "args": ["mcp", "serve"],
+      "tools": {
+        "include": [
+          "workflow-run",
+          "artifact-read",
+          "artifact-write",
+          "template-render",
+          "agent-list"
+        ],
+        "prompts": false,
+        "resources": false
+      }
+    }
+  }
+}

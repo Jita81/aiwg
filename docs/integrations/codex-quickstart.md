@@ -308,3 +308,15 @@ ls .codex/agents/
 ls .codex/rules/
 cat AGENTS.md | head -20
 ```
+
+---
+
+## MCP Sidecar (AIWG Tooling Layer)
+
+For structured AIWG tool access beyond what `--full-auto` provides, connect the MCP sidecar:
+
+```bash
+aiwg mcp install codex
+```
+
+See the [Codex MCP Sidecar Guide](codex-mcp-sidecar.md) for the two-layer model and setup details.

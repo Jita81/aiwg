@@ -106,3 +106,9 @@ git push
 ```bash
 aiwg use sdlc --provider copilot --force
 ```
+
+---
+
+## MCP Sidecar (Status: Research)
+
+MCP support for Copilot Chat is not yet confirmed. See the [Copilot MCP Sidecar Feasibility Assessment](copilot-mcp-sidecar.md) for current status and alternatives.

@@ -81,3 +81,9 @@ See [Ralph Guide](../ralph-guide.md) for full documentation including `--provide
 aiwg use sdlc --provider factory --force
 # Then: droid . → /droids → I → A → Enter
 ```
+
+---
+
+## MCP Sidecar (Status: Research)
+
+Factory AI's cloud-based architecture requires network-accessible MCP servers. See the [Factory MCP Sidecar Feasibility Assessment](factory-mcp-sidecar.md) for current status and alternatives.

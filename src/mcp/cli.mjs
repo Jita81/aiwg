@@ -36,6 +36,8 @@ Targets for 'install':
   codex     Generate config for OpenAI Codex (~/.codex/config.toml)
   cursor    Generate config for Cursor (.cursor/mcp.json)
   opencode  Generate config for OpenCode (opencode.json)
+  windsurf  Generate config for Windsurf (~/.codeium/windsurf/mcp_config.json)
+  warp      Generate config for Warp Terminal (~/.warp/mcp.json)
 
 Examples:
   # Start MCP server with stdio (default)
@@ -178,6 +180,44 @@ enabled_tools = [
       // Alias for codex
       path: path.join(homeDir, '.codex/config.toml'),
       alias: 'codex'
+    },
+    windsurf: {
+      // Windsurf stores MCP config at ~/.codeium/windsurf/mcp_config.json
+      path: path.join(homeDir, '.codeium/windsurf/mcp_config.json'),
+      content: {
+        mcpServers: {
+          aiwg: {
+            command: 'aiwg',
+            args: ['mcp', 'serve']
+          }
+        }
+      },
+      merge: (existing, content) => ({
+        ...existing,
+        mcpServers: {
+          ...(existing.mcpServers || {}),
+          ...content.mcpServers
+        }
+      })
+    },
+    warp: {
+      // Warp Terminal stores MCP config at ~/.warp/mcp.json
+      path: path.join(homeDir, '.warp/mcp.json'),
+      content: {
+        mcpServers: {
+          aiwg: {
+            command: 'aiwg',
+            args: ['mcp', 'serve']
+          }
+        }
+      },
+      merge: (existing, content) => ({
+        ...existing,
+        mcpServers: {
+          ...(existing.mcpServers || {}),
+          ...content.mcpServers
+        }
+      })
     },
     opencode: {
       // OpenCode stores MCP config in opencode.json at project root or .opencode/
@@ -381,7 +421,9 @@ export async function main(args = process.argv.slice(2)) {
           openai: path.join(homeDir, '.codex/config.toml'),
           opencode: (projectDir === '.' || projectDir === 'global')
             ? 'opencode.json'
-            : path.join(projectDir, 'opencode.json')
+            : path.join(projectDir, 'opencode.json'),
+          windsurf: path.join(homeDir, '.codeium/windsurf/mcp_config.json'),
+          warp: path.join(homeDir, '.warp/mcp.json')
         };
         console.log(`[DRY RUN] Config file: ${configPaths[target] || 'unknown'}`);
         break;

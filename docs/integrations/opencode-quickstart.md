@@ -109,3 +109,15 @@ aiwg use sdlc --provider opencode --force
 ```bash
 aiwg mcp serve
 ```
+
+---
+
+## MCP Sidecar (Unrestricted AIWG Access)
+
+OpenCode has no confirmed dangerous mode flag. The MCP sidecar is the recommended path for unrestricted AIWG tool access:
+
+```bash
+aiwg mcp install opencode
+```
+
+See the [OpenCode MCP Sidecar Guide](opencode-mcp-sidecar.md) for complete setup.

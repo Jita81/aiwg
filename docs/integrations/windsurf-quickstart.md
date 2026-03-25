@@ -260,6 +260,18 @@ See [Ralph Guide](../ralph-guide.md) for full documentation including `--provide
 
 ---
 
+## MCP Sidecar (Unrestricted AIWG Access)
+
+Windsurf has no dangerous mode flag. The MCP sidecar is the only path to unrestricted AIWG tool access:
+
+```bash
+aiwg mcp install windsurf
+```
+
+See the [Windsurf MCP Sidecar Guide](windsurf-mcp-sidecar.md) for complete setup including tool whitelisting and context optimization.
+
+---
+
 ## Additional Resources
 
 **Windsurf Documentation**: [windsurf.ai/docs](https://windsurf.ai/docs)

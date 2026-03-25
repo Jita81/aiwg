@@ -97,3 +97,15 @@ See [Ralph Guide](../ralph-guide.md) for full documentation including `--provide
 ```bash
 aiwg use sdlc --provider cursor --force
 ```
+
+---
+
+## MCP Sidecar (Unrestricted AIWG Access)
+
+For full unrestricted AIWG tool access (artifact management, workflow execution, template rendering), connect the AIWG MCP server as a sidecar:
+
+```bash
+aiwg mcp install cursor
+```
+
+See the [Cursor MCP Sidecar Guide](cursor-mcp-sidecar.md) for complete setup including tool whitelisting and context optimization.

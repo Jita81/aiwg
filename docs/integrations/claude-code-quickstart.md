@@ -171,3 +171,15 @@ See [Ralph Guide](../ralph-guide.md) for full documentation.
 | `voice@aiwg` | Voice profiles for consistent writing | `/plugin install voice@aiwg` |
 | `writing@aiwg` | AI pattern detection, validation | `/plugin install writing@aiwg` |
 | `hooks@aiwg` | Workflow tracing, observability | `/plugin install hooks@aiwg` |
+
+---
+
+## MCP Sidecar (AIWG Tooling Layer)
+
+For structured AIWG tool access (artifact management, workflow execution, template rendering), connect the AIWG MCP server:
+
+```bash
+aiwg mcp install claude
+```
+
+The sidecar complements `--dangerously-skip-permissions` — use both for the full AIWG experience. See the [Claude MCP Sidecar Guide](claude-mcp-sidecar.md) for details.

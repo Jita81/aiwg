@@ -105,3 +105,15 @@ See [Ralph Guide](../ralph-guide.md) for full documentation including `--provide
 ```bash
 aiwg use sdlc --provider warp --force
 ```
+
+---
+
+## MCP Sidecar (Unrestricted AIWG Access)
+
+Warp Terminal has no dangerous mode flag. The MCP sidecar is the only path to unrestricted AIWG tool access:
+
+```bash
+aiwg mcp install warp
+```
+
+See the [Warp MCP Sidecar Guide](warp-mcp-sidecar.md) for complete setup including tool whitelisting and context optimization.

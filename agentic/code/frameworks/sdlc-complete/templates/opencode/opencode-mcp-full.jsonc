@@ -1,0 +1,10 @@
+{
+  // OpenCode + AIWG MCP — Full Configuration
+  // Includes all tools with prompts and resources enabled
+  "mcp": {
+    "aiwg": {
+      "type": "local",
+      "command": ["aiwg", "mcp", "serve"]
+    }
+  }
+}

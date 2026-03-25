@@ -80,7 +80,9 @@ export const PROVIDER_CONFIGS: Record<string, ProviderConfig> = {
     name: 'Cursor',
     guidanceMessage:
       'Cursor is IDE-integrated and cannot be spawned from the CLI.\n' +
-      'Open Cursor and run the skill or command from the AI panel.',
+      'For unrestricted AIWG tool access, use the MCP sidecar:\n' +
+      '  aiwg mcp install cursor && aiwg mcp serve\n' +
+      'See: docs/integrations/cursor-mcp-sidecar.md',
   },
   factory: {
     binary: null,
@@ -95,8 +97,10 @@ export const PROVIDER_CONFIGS: Record<string, ProviderConfig> = {
     dangerousFlag: null,
     name: 'Warp Terminal',
     guidanceMessage:
-      'Warp Terminal is a terminal application and cannot be spawned programmatically.\n' +
-      'Open Warp and run the skill from the AI Command Palette.',
+      'Warp Terminal cannot be spawned programmatically.\n' +
+      'For unrestricted AIWG tool access, use the MCP sidecar:\n' +
+      '  aiwg mcp install warp && aiwg mcp serve\n' +
+      'See: docs/integrations/warp-mcp-sidecar.md',
   },
   windsurf: {
     binary: null,
@@ -104,7 +108,9 @@ export const PROVIDER_CONFIGS: Record<string, ProviderConfig> = {
     name: 'Windsurf',
     guidanceMessage:
       'Windsurf is IDE-integrated and cannot be spawned from the CLI.\n' +
-      'Open Windsurf and run the command from the Cascade panel.',
+      'For unrestricted AIWG tool access, use the MCP sidecar:\n' +
+      '  aiwg mcp install windsurf && aiwg mcp serve\n' +
+      'See: docs/integrations/windsurf-mcp-sidecar.md',
   },
 };
 
