@@ -34,12 +34,18 @@ import {
   addAgentHandler,
   addCommandHandler,
   addSkillHandler,
+  addBehaviorHandler,
   addTemplateHandler,
   scaffoldAddonHandler,
   scaffoldExtensionHandler,
   scaffoldFrameworkHandler,
   scaffoldingHandlers,
 } from './scaffolding.js';
+import {
+  behaviorHandler,
+  daemonInitHandler,
+  daemonHandlers,
+} from './daemon.js';
 import {
   ralphHandler,
   ralphStatusHandler,
@@ -116,10 +122,15 @@ export {
   addAgentHandler,
   addCommandHandler,
   addSkillHandler,
+  addBehaviorHandler,
   addTemplateHandler,
   scaffoldAddonHandler,
   scaffoldExtensionHandler,
   scaffoldFrameworkHandler,
+
+  // Daemon
+  behaviorHandler,
+  daemonInitHandler,
 
   // Ralph
   ralphHandler,
@@ -146,6 +157,7 @@ export {
   ralphHandlers,
   subcommandHandlers,
   mcHandlers,
+  daemonHandlers,
 };
 
 /**
@@ -201,6 +213,9 @@ export const allHandlers: CommandHandler[] = [
 
   // SDLC Orchestration
   sdlcAccelerateHandler,
+
+  // Daemon
+  ...daemonHandlers,
 ];
 
 /**

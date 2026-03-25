@@ -979,6 +979,44 @@ aiwg add-skill <name>
 
 ---
 
+### add-behavior
+
+Scaffold a new behavior with BEHAVIOR.md and scripts.
+
+```bash
+aiwg add-behavior <name> [options]
+```
+
+**Arguments:**
+- `<name>` - Behavior name (kebab-case recommended)
+
+**Options:**
+- `--description, -d` - Behavior description
+- `--hooks` - Comma-separated hook events (default: `on_file_write`). Available: `on_file_write`, `on_tool_complete`, `on_schedule`, `on_commit`, `on_pr_open`, `on_deploy`, `on_session_start`, `on_session_end`
+- `--category` - Behavior category (default: `general`)
+- `--dry-run, -n` - Preview what would be created
+
+**Capabilities:** cli, scaffolding, behavior
+**Platforms:** Claude Code, OpenClaw
+**Tools:** Read, Write
+
+**Creates:**
+```
+agentic/code/behaviors/<name>/
+├── BEHAVIOR.md          # Pre-filled with hooks and triggers
+└── scripts/
+    └── main.sh          # Entry point stub
+```
+
+**Examples:**
+```bash
+aiwg add-behavior security-scanner
+aiwg add-behavior test-watcher --hooks on_file_write,on_schedule --category testing
+aiwg add-behavior deploy-guard --hooks on_deploy --description "Pre-deploy validation"
+```
+
+---
+
 ### add-template
 
 Add template to addon/framework.
@@ -1067,6 +1105,60 @@ agentic/code/frameworks/security-framework/
 ├── templates/
 └── docs/
 ```
+
+---
+
+## Daemon Commands
+
+Commands for managing the AIWG daemon and its subsystems.
+
+### behavior
+
+Manage behavior YAML bundles that bind directives and toolsets to agent types.
+
+```bash
+aiwg behavior <list|info|apply|remove> [name] [options]
+```
+
+**Subcommands:**
+- `list` - List all available behaviors
+- `info <name>` - Show behavior details (BEHAVIOR.md content)
+- `apply <name>` - Apply a behavior to the daemon
+- `remove <name>` - Remove a behavior from the daemon
+
+**Capabilities:** cli, behavior, daemon, configuration
+**Platforms:** Claude Code
+**Tools:** Read, Bash, Write
+
+**Examples:**
+```bash
+aiwg behavior list
+aiwg behavior info security-sentinel
+```
+
+---
+
+### daemon-init
+
+Initialize daemon config from a profile template.
+
+```bash
+aiwg daemon-init [profile-name] [--force]
+```
+
+**Arguments:**
+- `[profile-name]` - Profile template to use (default: `manager`)
+
+**Options:**
+- `--force` - Overwrite existing config
+
+**Capabilities:** cli, daemon, configuration, scaffolding
+**Platforms:** Claude Code
+**Tools:** Bash, Read, Write
+
+**Creates:**
+- `.aiwg/daemon.yaml` from the selected profile template
+- `.env.example` with required environment variables
 
 ---
 
@@ -2213,7 +2305,8 @@ All commands are registered as extensions in the unified schema. This enables:
 | **Toolsmith** | 1 | runtime-info |
 | **Utility** | 3 | prefill-cards, contribute-start, validate-metadata |
 | **Plugin** | 5 | install-plugin, uninstall-plugin, plugin-status, package-plugin, package-all-plugins |
-| **Scaffolding** | 7 | add-agent, add-command, add-skill, add-template, scaffold-addon, scaffold-extension, scaffold-framework |
+| **Scaffolding** | 8 | add-agent, add-command, add-skill, add-behavior, add-template, scaffold-addon, scaffold-extension, scaffold-framework |
+| **Daemon** | 2 | behavior, daemon-init |
 | **Ralph** | 8 | ralph, ralph-status, ralph-abort, ralph-resume, ralph-attach, ralph-external, ralph-memory, ralph-config |
 | **Mission Control** | 1 | mc (9 subcommands) |
 | **Metrics** | 3 | cost-report, cost-history, metrics-tokens |
@@ -2224,7 +2317,7 @@ All commands are registered as extensions in the unified schema. This enables:
 | **Reproducibility** | 4 | execution-mode, snapshot, checkpoint, reproducibility-validate |
 | **Addon: ring** | 5 | ring check, ring circuit-breaker, ring session-start, ring session-end, ring status |
 
-**Total:** 50 built-in + addon commands (addon commands require `aiwg use <addon>`)
+**Total:** 53 built-in + addon commands (addon commands require `aiwg use <addon>`)
 
 ---
 

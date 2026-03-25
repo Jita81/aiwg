@@ -1,0 +1,9 @@
+node_modules
+.git
+.aiwg/daemon
+.aiwg/working
+.aiwg/ralph
+.aiwg/ralph-external
+test-temp-*
+*.log
+.env

@@ -27,7 +27,8 @@ export type ExtensionType =
   | 'addon'
   | 'template'
   | 'prompt'
-  | 'soul';
+  | 'soul'
+  | 'behavior';
 
 /**
  * Extension lifecycle status
@@ -75,6 +76,9 @@ export interface PlatformCompatibility {
 
   /** Generic / Warp */
   generic?: PlatformSupport;
+
+  /** OpenClaw */
+  openclaw?: PlatformSupport;
 }
 
 /**
@@ -400,7 +404,8 @@ export type ExtensionMetadata =
   | AddonMetadata
   | TemplateMetadata
   | PromptMetadata
-  | SoulMetadata;
+  | SoulMetadata
+  | BehaviorMetadata;
 
 /**
  * Agent-specific metadata
@@ -1036,6 +1041,118 @@ export interface SoulMetadata {
   estimatedTokens?: number;
 }
 
+/**
+ * Behavior hook event types
+ *
+ * Events that behaviors can subscribe to on platforms with hook support.
+ * Platforms without hook support ignore the hooks section and degrade
+ * the behavior to a skill (NLP triggers only).
+ */
+export type BehaviorHookEvent =
+  | 'on_file_write'
+  | 'on_tool_complete'
+  | 'on_schedule'
+  | 'on_commit'
+  | 'on_pr_open'
+  | 'on_deploy'
+  | 'on_session_start'
+  | 'on_session_end';
+
+/**
+ * Behavior hook action configuration
+ */
+export interface BehaviorHookAction {
+  /** Glob filter for file-based events */
+  filter?: string;
+  /** Tool name filter for on_tool_complete events */
+  tool?: string;
+  /** Cron expression for on_schedule events */
+  cron?: string;
+  /** Action to take when the hook fires */
+  action: 'run_script' | 'notify' | 'log';
+  /** Script to execute (relative to behavior directory) */
+  script?: string;
+}
+
+/**
+ * Behavior structured input definition
+ */
+export interface BehaviorInput {
+  /** Input parameter name */
+  name: string;
+  /** Input type */
+  type: 'string' | 'number' | 'boolean' | 'enum' | 'path';
+  /** Whether this input is required */
+  required?: boolean;
+  /** Description of the input */
+  description?: string;
+  /** Default value */
+  default?: string | number | boolean;
+  /** Allowed values (for enum type) */
+  values?: string[];
+}
+
+/**
+ * Behavior-specific metadata
+ *
+ * Behaviors are reactive capabilities with scripts + hooks + structured inputs.
+ * They extend beyond skills by subscribing to system events via hooks.
+ * On platforms without hook support, behaviors degrade to skills gracefully.
+ */
+export interface BehaviorMetadata {
+  type: 'behavior';
+
+  /**
+   * Natural language trigger phrases (invocation path — same as skills)
+   *
+   * @example ["run security scan", "check for vulnerabilities"]
+   */
+  triggerPhrases?: string[];
+
+  /**
+   * Structured input parameters
+   */
+  inputs?: BehaviorInput[];
+
+  /**
+   * Event hook subscriptions (reactive path — what makes it a behavior)
+   *
+   * Keyed by hook event type, each containing an array of hook actions.
+   */
+  hooks?: Partial<Record<BehaviorHookEvent, BehaviorHookAction[]>>;
+
+  /**
+   * Scripts associated with this behavior
+   *
+   * Keyed by logical name, value is the relative path from the behavior directory.
+   *
+   * @example { "main": "scripts/main.sh", "lint": "scripts/lint-on-write.sh" }
+   */
+  scripts?: Record<string, string>;
+
+  /**
+   * Behavior manifest — richer metadata than skills
+   */
+  manifest?: {
+    /** Category for discovery */
+    category?: string;
+    /** Runtime requirements */
+    requires?: {
+      /** Required binaries */
+      bins?: string[];
+      /** Required environment variables */
+      env?: string[];
+    };
+    /** Output descriptions */
+    outputs?: Array<{
+      type: string;
+      path: string;
+    }>;
+    /** Behaviors this composes with */
+    composable_with?: string[];
+  };
+}
+
 // ============================================
 // Capability Index
 // ============================================
@@ -1424,4 +1541,11 @@ export function isPromptExtension(ext: Extension): ext is Extension & { metadata
  */
 export function isSoulExtension(ext: Extension): ext is Extension & { metadata: SoulMetadata } {
   return ext.type === 'soul' && ext.metadata.type === 'soul';
+}
+
+/**
+ * Type guard for behavior extensions
+ */
+export function isBehaviorExtension(ext: Extension): ext is Extension & { metadata: BehaviorMetadata } {
+  return ext.type === 'behavior' && ext.metadata.type === 'behavior';
 }

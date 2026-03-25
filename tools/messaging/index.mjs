@@ -41,10 +41,12 @@ import { COMMANDS, EventTopic } from './types.mjs';
  * @param {Object} [options.adapterConfigs] - Per-adapter config overrides
  * @param {string[]} [options.writeUsers] - User IDs with write permission
  * @param {import('./chat-handler.mjs').ChatHandlerOptions} [options.chatHandler] - Chat handler config (enables 2-way AI chat)
+ * @param {import('./room-manager.mjs').RoomManager} [options.roomManager] - Room manager for multi-room routing
+ * @param {Object} [options.messagingConfig] - Messaging config from daemon.yaml
  * @returns {Promise<MessagingHub|null>} null if no adapters enabled
  */
 export async function createMessagingHub(options = {}) {
-  const { adapterConfigs = {}, writeUsers = [], chatHandler: chatHandlerConfig } = options;
+  const { adapterConfigs = {}, writeUsers = [], chatHandler: chatHandlerConfig, roomManager, messagingConfig } = options;
 
   // Discover and load adapters
   initializeRegistry();
@@ -65,7 +67,7 @@ export async function createMessagingHub(options = {}) {
   }
 
   // Register default command handlers
-  registerDefaultHandlers(router, bus);
+  registerDefaultHandlers(router, bus, roomManager);
 
   // Wire adapters: EventBus → format → send to all adapters
   bus.subscribe('*', async (event) => {
@@ -179,6 +181,7 @@ export async function createMessagingHub(options = {}) {
     bus,
     router,
     chatHandler,
+    roomManager,
     adapterCount: adapters.size,
 
     /**
@@ -225,8 +228,9 @@ export async function createMessagingHub(options = {}) {
  *
  * @param {CommandRouter} router
  * @param {EventBus} bus
+ * @param {import('./room-manager.mjs').RoomManager} [roomManager]
  */
-function registerDefaultHandlers(router, bus) {
+function registerDefaultHandlers(router, bus, roomManager) {
   // /help — list available commands
   router.registerHandler('help', async (_args, _context) => {
     return {
@@ -381,6 +385,70 @@ function registerDefaultHandlers(router, bus) {
 
     return { success: true, message: `Gate ${gateId} rejected: ${reason}` };
   });
+
+  // Room management commands (require roomManager)
+  if (roomManager) {
+    // /join — dynamically add this chat as a room
+    router.registerHandler('join', async (_args, context) => {
+      const chatId = context.chatId || context.channelId;
+      if (!chatId) {
+        return { success: false, error: 'Could not determine chat ID' };
+      }
+      const room = roomManager.addRoom(context.platform, chatId, {
+        label: context.chatTitle || chatId,
+        purpose: 'interactive',
+        isDefault: false,
+        source: 'dynamic',
+      });
+      return { success: true, message: `Room "${room.label}" joined (${room.id})` };
+    });
+
+    // /leave — remove this chat from rooms
+    router.registerHandler('leave', async (_args, context) => {
+      const chatId = context.chatId || context.channelId;
+      if (!chatId) {
+        return { success: false, error: 'Could not determine chat ID' };
+      }
+      const removed = roomManager.removeRoom(context.platform, chatId);
+      return { success: true, message: removed ? 'Left room' : 'Room not found' };
+    });
+
+    // /rooms — list all active rooms
+    router.registerHandler('rooms', async (_args, _context) => {
+      const allRooms = roomManager.getRooms();
+      if (allRooms.length === 0) {
+        return { success: true, message: 'No rooms configured' };
+      }
+      const lines = allRooms.map(r =>
+        `${r.platform}:${r.platformRoomId} — ${r.label} (${r.purpose}${r.isDefault ? ', default' : ''})`
+      );
+      return { success: true, message: `Rooms (${allRooms.length}):\n${lines.join('\n')}` };
+    });
+
+    // /subscribe — receive task updates in this room
+    router.registerHandler('subscribe', async (args, context) => {
+      const taskId = args[0];
+      if (!taskId) {
+        return { success: false, error: 'Usage: /subscribe <taskId>' };
+      }
+      const chatId = context.chatId || context.channelId;
+      if (!chatId) {
+        return { success: false, error: 'Could not determine chat ID' };
+      }
+      roomManager.bindTask(taskId, context.platform, chatId);
+      return { success: true, message: `Subscribed to task ${taskId}` };
+    });
+
+    // /unsubscribe — stop receiving task updates
+    router.registerHandler('unsubscribe', async (args, _context) => {
+      const taskId = args[0];
+      if (!taskId) {
+        return { success: false, error: 'Usage: /unsubscribe <taskId>' };
+      }
+      roomManager.unbindTask(taskId);
+      return { success: true, message: `Unsubscribed from task ${taskId}` };
+    });
+  }
 }
 
 export default createMessagingHub;

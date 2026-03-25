@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import YAML from 'yaml';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -86,8 +87,20 @@ export class Config {
   }
 
   load() {
+    // Try YAML first, then JSON, then defaults
+    const yamlPath = this.configPath.replace(/\.json$/, '.yaml');
+    const ymlPath = this.configPath.replace(/\.json$/, '.yml');
+
     try {
-      if (fs.existsSync(this.configPath)) {
+      if (fs.existsSync(yamlPath)) {
+        const content = fs.readFileSync(yamlPath, 'utf8');
+        this.config = YAML.parse(content);
+        this.configPath = yamlPath;
+      } else if (fs.existsSync(ymlPath)) {
+        const content = fs.readFileSync(ymlPath, 'utf8');
+        this.config = YAML.parse(content);
+        this.configPath = ymlPath;
+      } else if (fs.existsSync(this.configPath)) {
         const content = fs.readFileSync(this.configPath, 'utf8');
         this.config = JSON.parse(content);
       } else {
@@ -133,6 +146,32 @@ export class Config {
 
     if (this.config.schedule?.enabled && !Array.isArray(this.config.schedule.jobs)) {
       errors.push('schedule.jobs must be an array');
+    }
+
+    // Validate modes section
+    if (this.config.modes?.autonomous?.enabled) {
+      if (!Array.isArray(this.config.modes.autonomous.allowed_actions)) {
+        errors.push('modes.autonomous.allowed_actions must be an array');
+      }
+      if (typeof this.config.modes.autonomous.budget_cap_usd !== 'number' || this.config.modes.autonomous.budget_cap_usd < 0) {
+        errors.push('modes.autonomous.budget_cap_usd must be a non-negative number');
+      }
+    }
+
+    // Validate messaging rooms
+    if (this.config.messaging) {
+      for (const [platform, pConfig] of Object.entries(this.config.messaging)) {
+        if (pConfig?.rooms && !Array.isArray(pConfig.rooms)) {
+          errors.push(`messaging.${platform}.rooms must be an array`);
+        }
+      }
+    }
+
+    // Validate docker section
+    if (this.config.docker?.enabled) {
+      if (!this.config.docker.image) {
+        errors.push('docker.image is required when docker is enabled');
+      }
     }
 
     return errors;

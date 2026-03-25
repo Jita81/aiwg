@@ -20,7 +20,7 @@
  *   --rules-only             Deploy only rules (skip agents)
  *   --dry-run                Show what would be deployed without writing
  *   --force                  Overwrite existing files
- *   --provider <name>        Target provider: claude (default), openai, codex, cursor, opencode, copilot, factory, warp, windsurf, or hermes
+ *   --provider <name>        Target provider: claude (default), openai, codex, cursor, opencode, copilot, factory, warp, windsurf, hermes, or openclaw
  *   --model <name>            Override model for all tiers (blanket)
  *   --reasoning-model <name> Override model for reasoning tasks
  *   --coding-model <name>    Override model for coding tasks
@@ -48,6 +48,7 @@
  *   cursor    - Cursor IDE - .cursor/agents/, .cursor/commands/, .cursor/skills/, .cursor/rules/
  *   warp      - Warp Terminal - .warp/agents/, .warp/commands/, .warp/skills/, .warp/rules/ + WARP.md
  *   windsurf  - Windsurf - .windsurf/agents/, .windsurf/workflows/, .windsurf/skills/, .windsurf/rules/
+ *   openclaw  - OpenClaw - ~/.openclaw/agents/, ~/.openclaw/commands/, ~/.openclaw/skills/, ~/.openclaw/rules/, ~/.openclaw/behaviors/
  *
  * Defaults:
  *   --source resolves relative to this script's repo root (../..)
@@ -69,7 +70,7 @@ const PROVIDER_ALIASES = {
   'openai': 'codex'
 };
 
-const AVAILABLE_PROVIDERS = ['claude', 'factory', 'codex', 'opencode', 'copilot', 'cursor', 'warp', 'windsurf', 'hermes'];
+const AVAILABLE_PROVIDERS = ['claude', 'factory', 'codex', 'opencode', 'copilot', 'cursor', 'warp', 'windsurf', 'hermes', 'openclaw'];
 
 // ============================================================================
 // Argument Parsing

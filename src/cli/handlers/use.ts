@@ -112,6 +112,12 @@ const PROVIDER_PATHS: Record<string, { agents: string; skills: string; commands:
     commands: '',                                          // Served via MCP, not file-deployed
     rules: '',                                             // Not applicable — Hermes uses AGENTS.md
   },
+  openclaw: {
+    agents: path.join(os.homedir(), '.openclaw', 'agents'),
+    skills: path.join(os.homedir(), '.openclaw', 'skills'),
+    commands: path.join(os.homedir(), '.openclaw', 'commands'),
+    rules: path.join(os.homedir(), '.openclaw', 'rules'),
+  },
 };
 
 /**
@@ -205,6 +211,23 @@ const NEXT_STEPS: Record<string, string[]> = {
     'Open Windsurf:     AGENTS.md and .windsurf/ are ready',
     'Start a project:   Ask Cascade: "sdlc-accelerate my project"',
     'Check health:      aiwg doctor',
+  ],
+
+  // OpenClaw
+  'openclaw/sdlc': [
+    'Configure MCP:     Add aiwg to ~/.openclaw/config.yaml (see docs/openclaw-guide.md)',
+    'Start OpenClaw:    openclaw (agents, skills, commands, rules, behaviors deployed)',
+    'Verify:            openclaw skills list | grep aiwg',
+  ],
+  'openclaw/marketing': [
+    'Configure MCP:     Add aiwg to ~/.openclaw/config.yaml (see docs/openclaw-guide.md)',
+    'Start OpenClaw:    openclaw (marketing agents and skills deployed)',
+    'Verify:            openclaw skills list | grep aiwg',
+  ],
+  'openclaw/all': [
+    'Configure MCP:     Add aiwg to ~/.openclaw/config.yaml (see docs/openclaw-guide.md)',
+    'Start OpenClaw:    openclaw (all frameworks deployed)',
+    'Full guide:        docs/openclaw-guide.md',
   ],
 };
 

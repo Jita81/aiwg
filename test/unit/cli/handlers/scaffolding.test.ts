@@ -17,6 +17,7 @@ import {
   addAgentHandler,
   addCommandHandler,
   addSkillHandler,
+  addBehaviorHandler,
   addTemplateHandler,
   scaffoldAddonHandler,
   scaffoldExtensionHandler,
@@ -212,10 +213,11 @@ describe('Scaffolding Handlers', () => {
 
   describe('scaffoldingHandlers array', () => {
     it('should export all handlers in array', () => {
-      expect(scaffoldingHandlers).toHaveLength(7);
+      expect(scaffoldingHandlers).toHaveLength(8);
       expect(scaffoldingHandlers).toContain(addAgentHandler);
       expect(scaffoldingHandlers).toContain(addCommandHandler);
       expect(scaffoldingHandlers).toContain(addSkillHandler);
+      expect(scaffoldingHandlers).toContain(addBehaviorHandler);
       expect(scaffoldingHandlers).toContain(addTemplateHandler);
       expect(scaffoldingHandlers).toContain(scaffoldAddonHandler);
       expect(scaffoldingHandlers).toContain(scaffoldExtensionHandler);

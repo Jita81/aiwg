@@ -73,8 +73,55 @@ export AIWG_SLACK_CHANNEL="#aiwg-notifications"  # Default channel for notificat
 
 ```bash
 export AIWG_DISCORD_TOKEN="your-bot-token"
-export AIWG_DISCORD_CHANNEL="channel-id"  # Right-click channel → Copy ID
+export AIWG_DISCORD_CHANNEL_ID="channel-id"  # Right-click channel → Copy ID
 ```
+
+To get a channel ID: enable Developer Mode in Discord (Settings → Advanced), then right-click any channel → **Copy Channel ID**.
+
+#### Multi-channel configuration
+
+Route different event types to separate Discord channels using `config.rooms` in your daemon configuration:
+
+```json
+{
+  "messaging": {
+    "discord": {
+      "botToken": "your-bot-token",
+      "rooms": [
+        {
+          "channel_id": "1234567890",
+          "label": "dev-notifications",
+          "is_default": true,
+          "purpose": "interactive"
+        },
+        {
+          "channel_id": "9876543210",
+          "label": "security-alerts",
+          "is_default": true,
+          "purpose": "notifications"
+        },
+        {
+          "channel_id": "1122334455",
+          "label": "debug-logs",
+          "is_default": false,
+          "purpose": "logs"
+        }
+      ]
+    }
+  }
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `channel_id` | Discord channel ID (also accepts `channelId`) |
+| `label` | Human-readable name for this channel |
+| `is_default` | When `true`, the channel receives all broadcast messages (e.g., Ralph completions, health alerts). When `false`, the channel only receives messages sent to it explicitly. Also accepts `isDefault`. |
+| `purpose` | Informational. `interactive` (commands), `notifications` (one-way events), `logs` (verbose output) |
+
+Rooms with `is_default: true` receive `broadcastToRooms()` messages. Multiple default rooms can exist — all receive the same broadcast. Rooms with `is_default: false` only receive messages sent via `sendToRoom(message, channelId)`.
+
+**Single-channel fallback**: If `rooms` is omitted, the adapter uses `AIWG_DISCORD_CHANNEL_ID` or `defaultChannelId` as the sole channel with `is_default: true`.
 
 ### Telegram
 
@@ -89,6 +136,43 @@ export AIWG_DISCORD_CHANNEL="channel-id"  # Right-click channel → Copy ID
 export AIWG_TELEGRAM_TOKEN="123456:ABCdef..."
 export AIWG_TELEGRAM_CHAT_ID="-1001234567890"
 ```
+
+#### Multi-room configuration
+
+Route different event types to separate Telegram chats or groups using `config.rooms`:
+
+```json
+{
+  "messaging": {
+    "telegram": {
+      "botToken": "123456:ABCdef...",
+      "rooms": [
+        {
+          "chat_id": "-1001234567890",
+          "label": "dev-team",
+          "is_default": true,
+          "purpose": "interactive"
+        },
+        {
+          "chat_id": "-1009876543210",
+          "label": "security-channel",
+          "is_default": true,
+          "purpose": "notifications"
+        }
+      ]
+    }
+  }
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `chat_id` | Telegram chat/group/channel ID (also accepts `chatId`) |
+| `label` | Human-readable name for this chat |
+| `is_default` | When `true`, receives broadcast messages. Also accepts `isDefault`. |
+| `purpose` | Informational. `interactive`, `notifications`, or `logs` |
+
+**Single-room fallback**: If `rooms` is omitted, the adapter uses `AIWG_TELEGRAM_CHAT_ID` or `defaultChatId` as the sole room with `is_default: true`.
 
 ## Commands
 

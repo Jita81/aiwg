@@ -1,0 +1,398 @@
+/**
+ * OpenClaw Provider
+ *
+ * OpenClaw uses an MCP-based integration model similar to Hermes, but with
+ * native support for all 5 artifact types including behaviors.
+ *
+ * What this provider deploys (all user-global, home directory):
+ *   - Agents:    ~/.openclaw/agents/     (native agent definitions)
+ *   - Commands:  ~/.openclaw/commands/   (slash commands)
+ *   - Skills:    ~/.openclaw/skills/     (NLP-triggered capabilities)
+ *   - Rules:     ~/.openclaw/rules/      (context-loaded constraints)
+ *   - Behaviors: ~/.openclaw/behaviors/  (reactive capabilities with hooks + scripts)
+ *
+ * OpenClaw is the first platform to support behaviors natively.
+ * Behaviors are a new AIWG artifact type: reactive capabilities with scripts
+ * and event hooks that fire automatically when system events occur.
+ *
+ * See: docs/openclaw-guide.md
+ */
+
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
+import {
+  ensureDir,
+  listMdFiles,
+  listMdFilesRecursive,
+  listSkillDirs,
+  deploySkillDir,
+  deployFiles,
+  getAddonAgentFiles,
+  getAddonCommandFiles,
+  getAddonSkillDirs,
+  getAddonRuleFiles,
+  assembleRulesIndex,
+  normalizeDeploymentMode,
+  collectFrameworkArtifacts,
+  cleanupOldRuleFiles,
+  filterAgentFiles,
+  filterCommandsAgainstSkills,
+} from './base.mjs';
+
+// ============================================================================
+// Provider Configuration
+// ============================================================================
+
+export const name = 'openclaw';
+export const aliases = [];
+
+const openclawHome = path.join(os.homedir(), '.openclaw');
+
+export const paths = {
+  agents: path.join(openclawHome, 'agents'),
+  commands: path.join(openclawHome, 'commands'),
+  skills: path.join(openclawHome, 'skills'),
+  rules: path.join(openclawHome, 'rules'),
+  behaviors: path.join(openclawHome, 'behaviors'),
+};
+
+export const support = {
+  agents: 'native',
+  commands: 'native',
+  skills: 'native',
+  rules: 'native',
+  behaviors: 'native',
+};
+
+export const capabilities = {
+  skills: true,
+  rules: true,
+  behaviors: true,
+  aggregatedOutput: false,
+  yamlFormat: false,
+  homeDirectoryDeploy: true,
+};
+
+// ============================================================================
+// Model Mapping (passthrough — OpenClaw uses its own model config)
+// ============================================================================
+
+export function mapModel(shorthand, modelCfg, modelsConfig) {
+  return shorthand;
+}
+
+// ============================================================================
+// Content Transformation (passthrough — OpenClaw uses AIWG native format)
+// ============================================================================
+
+export function transformAgent(srcPath, content, opts) {
+  return content;
+}
+
+export function transformCommand(srcPath, content, opts) {
+  return content;
+}
+
+// ============================================================================
+// Deployment Functions
+// ============================================================================
+
+/**
+ * Deploy agents to ~/.openclaw/agents/
+ */
+function deployAgents(agentFiles, opts) {
+  ensureDir(paths.agents, opts.dryRun);
+  return deployFiles(agentFiles, paths.agents, opts, transformAgent);
+}
+
+/**
+ * Deploy commands to ~/.openclaw/commands/
+ */
+function deployCommands(commandFiles, opts) {
+  ensureDir(paths.commands, opts.dryRun);
+  return deployFiles(commandFiles, paths.commands, opts, transformCommand);
+}
+
+/**
+ * Deploy skills to ~/.openclaw/skills/
+ * Skills are directories containing SKILL.md and supporting files.
+ */
+function deploySkills(skillDirs, opts) {
+  ensureDir(paths.skills, opts.dryRun);
+
+  for (const skillDir of skillDirs) {
+    deploySkillDir(skillDir, paths.skills, opts);
+  }
+}
+
+/**
+ * Deploy rules to ~/.openclaw/rules/
+ */
+function deployRules(ruleFiles, opts) {
+  ensureDir(paths.rules, opts.dryRun);
+  cleanupOldRuleFiles(paths.rules, opts);
+  return deployFiles(ruleFiles, paths.rules, opts, transformCommand);
+}
+
+/**
+ * Deploy behaviors to ~/.openclaw/behaviors/
+ *
+ * Behaviors are directories containing BEHAVIOR.md and a scripts/ subdirectory.
+ * Each behavior directory is copied wholesale to the target.
+ */
+function deployBehaviors(behaviorDirs, opts) {
+  ensureDir(paths.behaviors, opts.dryRun);
+
+  let count = 0;
+  for (const behaviorDir of behaviorDirs) {
+    const behaviorName = path.basename(behaviorDir);
+    const destDir = path.join(paths.behaviors, behaviorName);
+
+    if (opts.dryRun) {
+      console.log(`[dry-run] Would deploy behavior: ${behaviorName} -> ${destDir}`);
+      count++;
+      continue;
+    }
+
+    ensureDir(destDir);
+
+    // Copy BEHAVIOR.md
+    const behaviorMd = path.join(behaviorDir, 'BEHAVIOR.md');
+    if (fs.existsSync(behaviorMd)) {
+      fs.copyFileSync(behaviorMd, path.join(destDir, 'BEHAVIOR.md'));
+    }
+
+    // Copy scripts/ directory if it exists
+    const scriptsDir = path.join(behaviorDir, 'scripts');
+    if (fs.existsSync(scriptsDir)) {
+      const destScriptsDir = path.join(destDir, 'scripts');
+      ensureDir(destScriptsDir);
+
+      for (const entry of fs.readdirSync(scriptsDir)) {
+        const srcFile = path.join(scriptsDir, entry);
+        const destFile = path.join(destScriptsDir, entry);
+        if (fs.statSync(srcFile).isFile()) {
+          fs.copyFileSync(srcFile, destFile);
+          // Preserve executable permission for scripts
+          try { fs.chmodSync(destFile, 0o755); } catch { /* ignore on platforms without chmod */ }
+        }
+      }
+    }
+
+    count++;
+  }
+
+  return count;
+}
+
+// ============================================================================
+// Behavior Discovery
+// ============================================================================
+
+/**
+ * List behavior directories (directories containing BEHAVIOR.md)
+ */
+function listBehaviorDirs(dir) {
+  if (!fs.existsSync(dir)) return [];
+  return fs
+    .readdirSync(dir, { withFileTypes: true })
+    .filter((e) => e.isDirectory() && fs.existsSync(path.join(dir, e.name, 'BEHAVIOR.md')))
+    .map((e) => path.join(dir, e.name));
+}
+
+/**
+ * Collect behavior directories from all sources:
+ * - Cross-framework: agentic/code/behaviors/
+ * - Per-framework: agentic/code/frameworks/<name>/behaviors/
+ */
+function collectBehaviorDirs(srcRoot, mode) {
+  const dirs = [];
+
+  // Cross-framework behaviors
+  const globalBehaviorsDir = path.join(srcRoot, 'agentic', 'code', 'behaviors');
+  dirs.push(...listBehaviorDirs(globalBehaviorsDir));
+
+  // Per-framework behaviors
+  const frameworksDir = path.join(srcRoot, 'agentic', 'code', 'frameworks');
+  if (fs.existsSync(frameworksDir)) {
+    for (const entry of fs.readdirSync(frameworksDir, { withFileTypes: true })) {
+      if (!entry.isDirectory()) continue;
+      const fwBehaviorsDir = path.join(frameworksDir, entry.name, 'behaviors');
+      dirs.push(...listBehaviorDirs(fwBehaviorsDir));
+    }
+  }
+
+  return dirs;
+}
+
+// ============================================================================
+// File Extension
+// ============================================================================
+
+export function getFileExtension(type) {
+  return '.md';
+}
+
+// ============================================================================
+// Main Deploy Function
+// ============================================================================
+
+export async function deploy(opts) {
+  const {
+    srcRoot,
+    mode,
+    deployCommands: shouldDeployCommands,
+    deploySkills: shouldDeploySkills,
+    deployRules: shouldDeployRules,
+    commandsOnly,
+    skillsOnly,
+    rulesOnly,
+    dryRun,
+  } = opts;
+
+  const verbose = opts.verbose || false;
+
+  if (!opts.quiet) {
+    console.log(`\n=== OpenClaw Provider ===`);
+    console.log(`Deploy target: ${openclawHome}`);
+    console.log(`Mode: ${mode}`);
+    console.log(`Architecture: OpenClaw -> MCP -> AIWG`);
+    console.log('');
+  }
+
+  const normalizedMode = normalizeDeploymentMode(mode);
+
+  // ── Collect source artifacts ──────────────────────────────────────────────
+  const agentFiles = [];
+  const commandFiles = [];
+  const skillDirs = [];
+  const ruleFiles = [];
+
+  // Addon artifacts
+  if (normalizedMode === 'general' || normalizedMode === 'sdlc' || normalizedMode === 'both' || normalizedMode === 'all') {
+    agentFiles.push(...getAddonAgentFiles(srcRoot));
+    if (shouldDeployCommands || commandsOnly) commandFiles.push(...getAddonCommandFiles(srcRoot));
+    if (shouldDeploySkills || skillsOnly) skillDirs.push(...getAddonSkillDirs(srcRoot));
+    if (shouldDeployRules || rulesOnly) ruleFiles.push(...getAddonRuleFiles(srcRoot));
+  }
+
+  // Framework artifacts
+  const frameworkArtifacts = collectFrameworkArtifacts(srcRoot, normalizedMode, {
+    includeAgents: true,
+    includeCommands: shouldDeployCommands || commandsOnly,
+    includeSkills: shouldDeploySkills || skillsOnly,
+    includeRules: shouldDeployRules || rulesOnly,
+    recursiveCommands: true,
+    consolidatedSdlcRules: true,
+  });
+  agentFiles.push(...frameworkArtifacts.agents);
+  commandFiles.push(...frameworkArtifacts.commands);
+  skillDirs.push(...frameworkArtifacts.skills);
+  ruleFiles.push(...frameworkArtifacts.rules);
+
+  // Behaviors (OpenClaw-specific — first provider to support this)
+  const behaviorDirs = collectBehaviorDirs(srcRoot, normalizedMode);
+
+  // ── Deploy ────────────────────────────────────────────────────────────────
+  const counts = { agents: 0, commands: 0, skills: 0, rules: 0, behaviors: 0 };
+
+  // Agents
+  if (!commandsOnly && !skillsOnly && !rulesOnly) {
+    const filteredAgents = filterAgentFiles(agentFiles, opts);
+    if (verbose) console.log(`\nDeploying ${filteredAgents.length} agents to ${paths.agents}...`);
+    deployAgents(filteredAgents, opts);
+    counts.agents = filteredAgents.length;
+  }
+
+  // Commands (filter collisions with skills)
+  const filteredCommands = (shouldDeploySkills || skillsOnly)
+    ? filterCommandsAgainstSkills(commandFiles, skillDirs)
+    : commandFiles;
+
+  if (shouldDeployCommands || commandsOnly) {
+    if (verbose) console.log(`\nDeploying ${filteredCommands.length} commands to ${paths.commands}...`);
+    deployCommands(filteredCommands, opts);
+    counts.commands = filteredCommands.length;
+  }
+
+  // Skills
+  if (shouldDeploySkills || skillsOnly) {
+    if (verbose) console.log(`\nDeploying ${skillDirs.length} skills to ${paths.skills}...`);
+    deploySkills(skillDirs, opts);
+    counts.skills = skillDirs.length;
+  }
+
+  // Rules
+  if (shouldDeployRules || rulesOnly) {
+    const assembled = assembleRulesIndex(srcRoot);
+    if (assembled) {
+      const { tmpdir } = await import('os');
+      const tmpDir = path.join(tmpdir(), 'aiwg-rules-assembly');
+      fs.mkdirSync(tmpDir, { recursive: true });
+      const assembledPath = path.join(tmpDir, 'RULES-INDEX.md');
+      fs.writeFileSync(assembledPath, assembled);
+
+      const finalRuleFiles = [
+        assembledPath,
+        ...ruleFiles.filter(f => path.basename(f) !== 'RULES-INDEX.md'),
+      ];
+
+      if (verbose) console.log(`\nDeploying assembled RULES-INDEX.md + ${finalRuleFiles.length - 1} additional rule files...`);
+      deployRules(finalRuleFiles, opts);
+      counts.rules = finalRuleFiles.length;
+
+      try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch { /* ignore */ }
+    } else {
+      if (verbose) console.log(`\nDeploying ${ruleFiles.length} rules to ${paths.rules}...`);
+      deployRules(ruleFiles, opts);
+      counts.rules = ruleFiles.length;
+    }
+  }
+
+  // Behaviors (always deploy if available — OpenClaw is the first native behaviors platform)
+  if (!commandsOnly && !skillsOnly && !rulesOnly && behaviorDirs.length > 0) {
+    if (verbose) console.log(`\nDeploying ${behaviorDirs.length} behaviors to ${paths.behaviors}...`);
+    counts.behaviors = deployBehaviors(behaviorDirs, opts);
+  }
+
+  // ── Summary ───────────────────────────────────────────────────────────────
+  if (verbose) {
+    console.log('\n=== OpenClaw deployment complete ===\n');
+  } else {
+    const parts = [];
+    if (counts.agents > 0) parts.push(`${counts.agents} agents`);
+    if (counts.commands > 0) parts.push(`${counts.commands} commands`);
+    if (counts.skills > 0) parts.push(`${counts.skills} skills`);
+    if (counts.rules > 0) parts.push(`${counts.rules} rules`);
+    if (counts.behaviors > 0) parts.push(`${counts.behaviors} behaviors`);
+    if (parts.length > 0) {
+      console.log(`  Deployed: ${parts.join('  ')}`);
+    }
+  }
+
+  // ── Post-deployment hint ──────────────────────────────────────────────────
+  if (!opts.quiet) {
+    console.log('');
+    console.log('All artifacts deployed to ~/.openclaw/ (user-global).');
+    console.log('Next: configure ~/.openclaw/config.yaml to connect AIWG MCP server.');
+    console.log('See: docs/openclaw-guide.md');
+  }
+}
+
+// ============================================================================
+// Default Export
+// ============================================================================
+
+export default {
+  name,
+  aliases,
+  paths,
+  support,
+  capabilities,
+  transformAgent,
+  transformCommand,
+  mapModel,
+  getFileExtension,
+  deploy,
+};

@@ -172,6 +172,7 @@ export const useCommand: Extension = {
     factory: 'full',
     cursor: 'full',
     windsurf: 'full',
+    openclaw: 'full',
     generic: 'full',
   },
   deployment: {
@@ -714,6 +715,32 @@ export const addSkillCommand: Extension = {
   category: 'scaffolding',
   platforms: {
     claude: 'full',
+    generic: 'full',
+  },
+  deployment: {
+    pathTemplate: '.{platform}/commands/{id}.md',
+    core: true,
+  },
+  metadata: {
+    type: 'command',
+    template: 'orchestration',
+    argumentHint: '<name>',
+    allowedTools: ['Read', 'Write'],
+  } satisfies CommandMetadata,
+};
+
+export const addBehaviorCommand: Extension = {
+  id: 'add-behavior',
+  type: 'command',
+  name: 'Add Behavior',
+  description: 'Scaffold a new behavior with BEHAVIOR.md and scripts',
+  version: '1.0.0',
+  capabilities: ['cli', 'scaffolding', 'behavior'],
+  keywords: ['add', 'behavior', 'scaffold', 'create', 'hooks', 'reactive'],
+  category: 'scaffolding',
+  platforms: {
+    claude: 'full',
+    openclaw: 'full',
     generic: 'full',
   },
   deployment: {
@@ -1376,12 +1403,37 @@ export const behaviorCommand: Extension = {
   } satisfies CommandMetadata,
 };
 
+export const daemonInitCommand: Extension = {
+  id: 'daemon-init',
+  type: 'command',
+  name: 'Daemon Init',
+  description: 'Initialize daemon config from a profile template (default: manager)',
+  version: '1.0.0',
+  capabilities: ['cli', 'daemon', 'configuration', 'scaffolding'],
+  keywords: ['daemon', 'init', 'profile', 'manager', 'orchestrator', 'config'],
+  category: 'daemon',
+  platforms: {
+    claude: 'full',
+    generic: 'full',
+  },
+  deployment: {
+    pathTemplate: '.{platform}/commands/{id}.md',
+    core: false,
+  },
+  metadata: {
+    type: 'command',
+    template: 'utility',
+    argumentHint: '[profile-name] [--force]',
+    allowedTools: ['Bash', 'Read', 'Write'],
+  } satisfies CommandMetadata,
+};
+
 // ============================================
 // Aggregated Exports
 // ============================================
 
 /**
- * All command definitions (51 total)
+ * All command definitions (52 total)
  *
  * Organized by category:
  * - Maintenance (5): help, version, doctor, update, sync
@@ -1393,7 +1445,7 @@ export const behaviorCommand: Extension = {
  * - Toolsmith (1): runtime-info
  * - Utility (3): prefill-cards, contribute-start, validate-metadata
  * - Plugin (5): install-plugin, uninstall-plugin, plugin-status, package-plugin, package-all-plugins
- * - Scaffolding (7): add-agent, add-command, add-skill, add-template, scaffold-addon, scaffold-extension, scaffold-framework
+ * - Scaffolding (8): add-agent, add-command, add-skill, add-behavior, add-template, scaffold-addon, scaffold-extension, scaffold-framework
  * - Ralph (8): ralph, ralph-status, ralph-abort, ralph-resume, ralph-attach, ralph-external, ralph-memory, ralph-config
  * - Mission Control (1): mc
  * - Metrics (3): cost-report, cost-history, metrics-tokens
@@ -1402,7 +1454,7 @@ export const behaviorCommand: Extension = {
  * - SDLC Orchestration (1): sdlc-accelerate
  * - Index (1): index
  * - Reproducibility (4): execution-mode, snapshot, checkpoint, reproducibility-validate
- * - Daemon (1): behavior
+ * - Daemon (2): behavior, daemon-init
  */
 export const commandDefinitions: Extension[] = [
   // Maintenance (5)
@@ -1446,10 +1498,11 @@ export const commandDefinitions: Extension[] = [
   packagePluginCommand,
   packageAllPluginsCommand,
 
-  // Scaffolding (7)
+  // Scaffolding (8)
   addAgentCommand,
   addCommandCommand,
   addSkillCommand,
+  addBehaviorCommand,
   addTemplateCommand,
   scaffoldAddonCommand,
   scaffoldExtensionCommand,
@@ -1491,8 +1544,9 @@ export const commandDefinitions: Extension[] = [
   checkpointCommand,
   reproducibilityValidateCommand,
 
-  // Daemon (1)
+  // Daemon (2)
   behaviorCommand,
+  daemonInitCommand,
 ];
 
 // ============================================

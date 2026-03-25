@@ -59,6 +59,18 @@ class DaemonCLI {
       case 'task':
         await this.task();
         break;
+      case 'init':
+        await this.init();
+        break;
+      case 'rooms':
+        await this.rooms();
+        break;
+      case 'autonomous':
+        await this.autonomous();
+        break;
+      case 'schedule':
+        await this.schedule();
+        break;
       default:
         this.usage();
         process.exit(1);
@@ -66,6 +78,11 @@ class DaemonCLI {
   }
 
   async start() {
+    if (this.flags.docker) {
+      await this.startDocker();
+      return;
+    }
+
     if (this.isDaemonRunning()) {
       const pid = this.readPidFile();
       console.error(`Daemon is already running (PID: ${pid})`);
@@ -78,6 +95,28 @@ class DaemonCLI {
       await this.startForeground();
     } else {
       await this.startDetached();
+    }
+  }
+
+  async startDocker() {
+    try {
+      const { ContainerManager } = await import('../docker/container-manager.mjs');
+      const manager = new ContainerManager({
+        projectDir: process.cwd(),
+        webPort: parseInt(this.flags.port || '7474', 10),
+      });
+
+      if (!manager.isDockerAvailable()) {
+        console.error('Docker is not available. Install Docker or run without --docker.');
+        process.exit(1);
+      }
+
+      const { containerId, containerName } = manager.start();
+      console.log(`Daemon started in Docker container: ${containerName} (${containerId})`);
+      console.log(`Web UI: http://localhost:${this.flags.port || 7474}`);
+    } catch (error) {
+      console.error(`Failed to start Docker container: ${error.message}`);
+      process.exit(1);
     }
   }
 
@@ -349,6 +388,143 @@ class DaemonCLI {
     }
   }
 
+  async init() {
+    try {
+      const { initProfile, listProfiles } = await import('./init-profile.mjs');
+      const profileName = process.argv[3] || 'manager';
+
+      if (profileName === 'list') {
+        const profiles = listProfiles();
+        console.log('Available profiles:');
+        for (const p of profiles) {
+          console.log(`  ${p}`);
+        }
+        return;
+      }
+
+      const result = initProfile({
+        profile: profileName,
+        force: this.flags.force === true,
+      });
+
+      console.log(`Daemon config initialized from "${result.profile}" profile`);
+      console.log(`  Config: ${result.configPath}`);
+      if (result.envPath) {
+        console.log(`  Env template: ${result.envPath}`);
+      }
+      console.log('\nNext steps:');
+      console.log('  1. Edit .aiwg/daemon.yaml to configure messaging tokens and rooms');
+      console.log('  2. Copy .env.example to .env and fill in your values');
+      console.log('  3. Run: aiwg daemon start');
+    } catch (error) {
+      console.error(`Init failed: ${error.message}`);
+      process.exit(1);
+    }
+  }
+
+  async rooms() {
+    if (!this.isDaemonRunning()) {
+      console.error('Daemon is not running');
+      process.exit(1);
+    }
+
+    try {
+      const client = await createClient(SOCKET_PATH);
+      const status = await client.request('rooms.list');
+      client.disconnect();
+
+      if (!status || status.totalRooms === 0) {
+        console.log('No rooms configured');
+        return;
+      }
+
+      console.log(`Rooms: ${status.totalRooms} total, ${status.totalBindings} task binding(s)\n`);
+
+      for (const [platform, rooms] of Object.entries(status.platforms || {})) {
+        console.log(`${platform}:`);
+        for (const room of rooms) {
+          const defaultTag = room.isDefault ? ' [default]' : '';
+          const tasks = room.boundTasks.length > 0 ? ` (tasks: ${room.boundTasks.join(', ')})` : '';
+          console.log(`  ${room.label} (${room.id}) — ${room.purpose}${defaultTag}${tasks}`);
+        }
+      }
+    } catch (error) {
+      console.error(`Failed to list rooms: ${error.message}`);
+      process.exit(1);
+    }
+  }
+
+  async autonomous() {
+    const subcommand = process.argv[3];
+
+    if (!this.isDaemonRunning()) {
+      console.error('Daemon is not running');
+      process.exit(1);
+    }
+
+    try {
+      const client = await createClient(SOCKET_PATH);
+
+      switch (subcommand) {
+        case 'enable': {
+          const result = await client.request('autonomous.enable');
+          console.log(`Autonomous mode: ${result.enabled ? 'enabled' : 'disabled'}`);
+          break;
+        }
+        case 'disable': {
+          const result = await client.request('autonomous.disable');
+          console.log(`Autonomous mode: ${result.enabled ? 'enabled' : 'disabled'}`);
+          break;
+        }
+        case 'status':
+        default: {
+          const status = await client.request('autonomous.status');
+          console.log(`Autonomous mode: ${status.enabled ? 'enabled' : 'disabled'}`);
+          if (status.enabled) {
+            console.log(`  Running: ${status.running}`);
+            console.log(`  Daily tasks: ${status.dailyTaskCount}/${status.dailyTaskLimit}`);
+            console.log(`  Daily spend: $${status.dailySpendUsd.toFixed(2)}/$${status.budgetCapUsd.toFixed(2)}`);
+            console.log(`  Pending proposals: ${status.pendingProposals}`);
+            console.log(`  Require approval: ${status.requireApproval}`);
+            console.log(`  Allowed actions: ${status.allowedActions.join(', ')}`);
+          }
+          break;
+        }
+      }
+
+      client.disconnect();
+    } catch (error) {
+      console.error(`Failed: ${error.message}`);
+      process.exit(1);
+    }
+  }
+
+  async schedule() {
+    if (!this.isDaemonRunning()) {
+      console.error('Daemon is not running');
+      process.exit(1);
+    }
+
+    try {
+      const client = await createClient(SOCKET_PATH);
+      const status = await client.request('schedule.status');
+      client.disconnect();
+
+      console.log(`Scheduler: ${status.started ? 'running' : 'stopped'}`);
+      console.log(`Registered actions: ${status.registeredActions.join(', ')}`);
+
+      if (status.jobHistory.length > 0) {
+        console.log('\nJob history:');
+        for (const job of status.jobHistory) {
+          console.log(`  ${job.jobId}: ${job.action} (runs: ${job.runCount}, last: ${job.lastRun})`);
+        }
+      }
+    } catch (error) {
+      console.error(`Failed: ${error.message}`);
+      process.exit(1);
+    }
+  }
+
   async task() {
     const subcommand = process.argv[3];
     const args = process.argv.slice(4);
@@ -557,6 +733,7 @@ Options:
 Usage: aiwg daemon <command> [options]
 
 Commands:
+  init [profile]    Initialize daemon config from profile (default: manager)
   start             Start the daemon
   stop              Stop the daemon
   status            Show daemon status (live via IPC when available)
@@ -565,26 +742,34 @@ Commands:
   attach            Open tmux session with chat REPL and status pane
   chat <message>    Send a message to the daemon agent
   task <sub>        Manage agent tasks (submit, list, get, cancel, stats)
+  rooms             List connected messaging rooms
+  autonomous <sub>  Manage autonomous mode (status, enable, disable)
+  schedule          Show scheduled task status and history
 
 Options:
   --foreground      Run in foreground (for Docker/systemd)
+  --docker          Start daemon in Docker container
+  --force           Overwrite existing config (for init)
   --lines N         Show last N lines of logs (default: 50)
   --follow, -f      Follow log output in real-time
   --readonly        Attach to tmux in read-only mode
 
 Examples:
+  aiwg daemon init                     # Initialize with manager profile
+  aiwg daemon init list                # List available profiles
   aiwg daemon start
+  aiwg daemon start --docker           # Start in Docker container
   aiwg daemon start --foreground
   aiwg daemon stop
   aiwg daemon status
+  aiwg daemon rooms                    # List messaging rooms
+  aiwg daemon autonomous status        # Check autonomous mode
+  aiwg daemon autonomous enable        # Enable self-directed thinking
+  aiwg daemon schedule                 # Show scheduled tasks
   aiwg daemon attach
   aiwg daemon chat "Review the latest PR"
   aiwg daemon task submit "Run security audit"
   aiwg daemon task list
-  aiwg daemon task list --state running
-  aiwg daemon task get task-0001
-  aiwg daemon task cancel task-0001
-  aiwg daemon task stats
   aiwg daemon logs --follow
   aiwg daemon restart
     `.trim());

@@ -1,0 +1,150 @@
+# Manager / Local Orchestrator — Daemon Starter Profile
+#
+# The default daemon profile. Handles interactive requests, scheduled tasks,
+# and optional self-directed (autonomous) thinking. This is the base config
+# that many future daemon profiles will build upon.
+#
+# Usage:
+#   aiwg daemon init              # scaffolds .aiwg/daemon.yaml from this profile
+#   aiwg daemon init manager      # same, explicit
+#
+# After scaffolding, edit .aiwg/daemon.yaml to set tokens and room IDs.
+
+name: manager
+description: >
+  Manager/Local Orchestrator — handles user requests, scheduled tasks,
+  and optional autonomous thinking.
+version: "1.0.0"
+
+daemon:
+  heartbeat_interval_seconds: 30
+  max_parallel_actions: 4
+  action_timeout_minutes: 120
+  log:
+    max_size_mb: 50
+    max_files: 5
+    level: info
+
+# Three operational modes
+modes:
+  interactive:
+    enabled: true
+    # Chat messages get higher priority than scheduled/autonomous work
+    chat_priority: 5
+
+  scheduled:
+    enabled: true
+    jobs:
+      - id: health-check
+        cron: "0 */6 * * *"
+        action: doctor
+        description: "Run health check every 6 hours"
+        priority: 2
+      - id: artifact-audit
+        cron: "0 9 * * 1"
+        action: validate-metadata
+        description: "Audit artifact metadata weekly on Monday 9am"
+        priority: 1
+
+  autonomous:
+    enabled: false
+    thinking_interval_minutes: 30
+    max_daily_tasks: 10
+    budget_cap_usd: 5.00
+    require_approval: false
+    allowed_actions:
+      - self-review
+      - doc-sync
+      - test-sync
+      - cleanup-audit
+    blocked_actions:
+      - deploy
+      - release
+      - git-push
+      - git-force-push
+
+# Watch configuration
+watch:
+  enabled: true
+  paths:
+    - path: ".aiwg/"
+      events: [create, modify, delete]
+      ignore: ["*.tmp", "working/**", "daemon/**"]
+    - path: "src/"
+      events: [modify]
+      extensions: [".ts", ".js", ".mjs"]
+    - path: "test/"
+      events: [modify]
+      extensions: [".test.ts", ".test.js"]
+  debounce_ms: 2000
+
+# Messaging — multi-room support for Telegram and Discord
+messaging:
+  telegram:
+    enabled: false
+    # Set via AIWG_TELEGRAM_TOKEN env var or here
+    token: "${AIWG_TELEGRAM_TOKEN}"
+    rooms: []
+    # Example rooms:
+    #   - chat_id: "-1001234567890"
+    #     label: "ops-alerts"
+    #     is_default: true
+    #     purpose: interactive
+    #   - chat_id: "-1009876543210"
+    #     label: "dev-tasks"
+    #     is_default: false
+    #     purpose: notifications
+    dynamic_join: true
+    polling_enabled: true
+
+  discord:
+    enabled: false
+    # Set via AIWG_DISCORD_TOKEN env var or here
+    token: "${AIWG_DISCORD_TOKEN}"
+    rooms: []
+    # Example rooms:
+    #   - channel_id: "1234567890"
+    #     label: "aiwg-ops"
+    #     is_default: true
+    #     purpose: interactive
+    dynamic_join: true
+
+  slack:
+    enabled: false
+    rooms: []
+
+# Supervisor governance
+supervisor:
+  max_concurrent: 4
+  max_queue_depth: 20
+  restart_intensity:
+    max_restarts: 3
+    window_seconds: 300
+  circuit_breaker:
+    failure_threshold: 5
+    cooldown_ms: 120000
+  daily_budget_usd: 0
+  behaviors:
+    - ops-toolset
+
+# Web UI
+interface:
+  web:
+    enabled: true
+    port: 7474
+    host: "127.0.0.1"
+
+# Docker containerization (optional)
+docker:
+  enabled: false
+  image: "aiwg-daemon:latest"
+  workdir: /workspace
+  volumes:
+    - source: "."
+      target: /workspace
+      mode: rw
+  env_file: .env
+  network: host
+
+# Automation rules (empty by default — user adds as needed)
+rules: []

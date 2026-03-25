@@ -76,6 +76,11 @@ export const COMMANDS = Object.freeze({
   health: { permission: CommandPermission.READ, description: 'Run health check' },
   help: { permission: CommandPermission.READ, description: 'List available commands' },
   ask: { permission: CommandPermission.READ, description: 'Ask AI a question (e.g., /ask what is our test coverage?)' },
+  join: { permission: CommandPermission.WRITE, description: 'Add this chat as a room (dynamic join)' },
+  leave: { permission: CommandPermission.WRITE, description: 'Remove this chat from rooms' },
+  rooms: { permission: CommandPermission.READ, description: 'List all active rooms' },
+  subscribe: { permission: CommandPermission.WRITE, description: 'Subscribe this room to a task (e.g., /subscribe task-0001)' },
+  unsubscribe: { permission: CommandPermission.WRITE, description: 'Unsubscribe from a task' },
 });
 
 /**

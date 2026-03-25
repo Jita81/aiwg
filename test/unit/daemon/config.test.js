@@ -26,7 +26,11 @@ describe('Config', () => {
         watch: { enabled: true, paths: [] }
       };
 
-      vi.spyOn(fs, 'existsSync').mockReturnValue(true);
+      // YAML paths checked first, then JSON
+      vi.spyOn(fs, 'existsSync').mockImplementation((p) => {
+        if (p === testConfigPath) return true;
+        return false; // .yaml and .yml don't exist
+      });
       vi.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify(mockConfig));
 
       const result = config.load();
@@ -67,8 +71,12 @@ describe('Config', () => {
     it('should handle JSON parse errors gracefully', () => {
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-      vi.spyOn(fs, 'existsSync').mockReturnValue(true);
-      vi.spyOn(fs, 'readFileSync').mockReturnValue('invalid json{');
+      // Only JSON path exists (YAML paths return false)
+      vi.spyOn(fs, 'existsSync').mockImplementation((p) => {
+        if (p === testConfigPath) return true;
+        return false;
+      });
+      vi.spyOn(fs, 'readFileSync').mockReturnValue('{{invalid json');
 
       const result = config.load();
 

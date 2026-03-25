@@ -56,17 +56,45 @@ export class TelegramAdapter extends BaseAdapter {
     super('telegram');
 
     // Load from config or environment variables
-    this.#botToken = config.botToken || process.env.AIWG_TELEGRAM_TOKEN;
+    this.#botToken = config.botToken || config.token || process.env.AIWG_TELEGRAM_TOKEN;
     this.#defaultChatId = config.defaultChatId || process.env.AIWG_TELEGRAM_CHAT_ID;
-    this.#pollingEnabled = config.pollingEnabled ?? false;
+    this.#pollingEnabled = config.pollingEnabled ?? config.polling_enabled ?? false;
     this.#pollingTimeout = config.pollingTimeout ?? 30;
 
     if (!this.#botToken) {
       throw new Error('Telegram bot token is required (config.botToken or AIWG_TELEGRAM_TOKEN)');
     }
 
-    if (!this.#defaultChatId) {
-      throw new Error('Telegram default chat ID is required (config.defaultChatId or AIWG_TELEGRAM_CHAT_ID)');
+    // Multi-room: register rooms from config, or use defaultChatId as single room
+    if (Array.isArray(config.rooms) && config.rooms.length > 0) {
+      for (const room of config.rooms) {
+        const chatId = room.chat_id || room.chatId;
+        if (chatId) {
+          this.addRoom(chatId, {
+            label: room.label || room.name || chatId,
+            isDefault: room.is_default ?? room.isDefault ?? false,
+            purpose: room.purpose || 'interactive',
+          });
+        }
+      }
+      // Use first default room or first room as the fallback defaultChatId
+      if (!this.#defaultChatId) {
+        const defaultRoom = config.rooms.find(r => r.is_default || r.isDefault) || config.rooms[0];
+        this.#defaultChatId = defaultRoom.chat_id || defaultRoom.chatId;
+      }
+    }
+
+    if (!this.#defaultChatId && this.getRooms().size === 0) {
+      throw new Error('Telegram requires at least one chat ID (config.defaultChatId, config.rooms, or AIWG_TELEGRAM_CHAT_ID)');
+    }
+
+    // If we have a defaultChatId but no rooms registered, auto-create a single room
+    if (this.#defaultChatId && this.getRooms().size === 0) {
+      this.addRoom(this.#defaultChatId, {
+        label: 'default',
+        isDefault: true,
+        purpose: 'interactive',
+      });
     }
 
     this.#apiBase = `https://api.telegram.org/bot${this.#botToken}`;

@@ -12,8 +12,8 @@ This project uses the **AIWG SDLC framework** for software development lifecycle
 
 AIWG is a comprehensive SDLC framework providing:
 
-- **90+ specialized agents** covering all lifecycle phases (Inception → Elaboration → Construction → Transition → Production)
-- **50 commands** for project management, security, testing, deployment, and traceability
+- **58 specialized agents** covering all lifecycle phases (Inception → Elaboration → Construction → Transition → Production)
+- **42+ commands** for project management, security, testing, deployment, and traceability
 - **100+ templates** for requirements, architecture, testing, security, deployment artifacts
 - **Phase-based workflows** with gate criteria and milestone tracking
 - **Multi-agent orchestration** patterns for collaborative artifact generation
@@ -31,8 +31,8 @@ AIWG is a comprehensive SDLC framework providing:
 ls {AIWG_ROOT}/agentic/code/frameworks/sdlc-complete/
 
 # Available resources:
-# - agents/     → 90+ SDLC role agents
-# - commands/   → 50 slash commands
+# - agents/     → 58 SDLC role agents
+# - commands/   → 42+ slash commands
 # - templates/  → 100+ artifact templates
 # - flows/      → Phase workflow documentation
 ```
@@ -107,7 +107,7 @@ Task(
     subagent_type="architecture-designer",
     description="Create Software Architecture Document draft",
     prompt="""
-    Read template: $AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/analysis-design/software-architecture-doc-template.md
+    Read template: $AIWG_ROOT/templates/analysis-design/software-architecture-doc-template.md
     Read requirements from: .aiwg/requirements/
     Create initial SAD draft
     Save draft to: .aiwg/working/architecture/sad/drafts/v0.1-primary-draft.md
@@ -248,8 +248,6 @@ Starting orchestration..."
 - `/flow-test-strategy-execution` - Test suite execution and validation
 - `/flow-security-review-cycle` - Security validation and threat modeling
 - `/flow-performance-optimization` - Performance baseline and optimization
-- `/flow-discovery-track` - Discovery track for next iteration preparation
-- `/flow-delivery-track` - Delivery track with TDD, quality gates, and iteration assessment
 
 **Quality & Gates**:
 

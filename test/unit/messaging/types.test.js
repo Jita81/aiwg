@@ -81,8 +81,8 @@ describe('Messaging Types', () => {
   });
 
   describe('COMMANDS', () => {
-    it('exports all 7 commands', () => {
-      expect(Object.keys(COMMANDS)).toHaveLength(7);
+    it('exports all 12 commands', () => {
+      expect(Object.keys(COMMANDS)).toHaveLength(12);
     });
 
     it('defines status command', () => {
@@ -134,7 +134,7 @@ describe('Messaging Types', () => {
       });
     });
 
-    it('has 5 read commands and 2 write commands', () => {
+    it('has 6 read commands and 6 write commands', () => {
       const readCommands = Object.values(COMMANDS).filter(
         cmd => cmd.permission === 'read'
       );
@@ -142,8 +142,8 @@ describe('Messaging Types', () => {
         cmd => cmd.permission === 'write'
       );
 
-      expect(readCommands).toHaveLength(5);
-      expect(writeCommands).toHaveLength(2);
+      expect(readCommands).toHaveLength(6);
+      expect(writeCommands).toHaveLength(6);
     });
 
     it('all commands have required properties', () => {

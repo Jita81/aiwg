@@ -54,6 +54,9 @@ export class BaseAdapter {
   /** @type {Function[]} */
   #messageHandlers = [];
 
+  /** @type {Map<string, Object>} Room registry keyed by platform room ID */
+  #rooms = new Map();
+
   constructor(platform) {
     if (new.target === BaseAdapter) {
       throw new Error('BaseAdapter is abstract — instantiate a platform-specific adapter');
@@ -226,5 +229,79 @@ export class BaseAdapter {
    */
   hasMessageHandlers() {
     return this.#messageHandlers.length > 0;
+  }
+
+  // ========================================================================
+  // Multi-room methods
+  // ========================================================================
+
+  /**
+   * Register a room with this adapter.
+   *
+   * @param {string} roomId - Platform-native room/channel ID
+   * @param {Object} [config] - Room configuration
+   * @param {string} [config.label] - Human-readable name
+   * @param {boolean} [config.isDefault] - Receives broadcast messages
+   * @param {string} [config.purpose] - "interactive" | "notifications" | "logs"
+   */
+  addRoom(roomId, config = {}) {
+    this.#rooms.set(roomId, {
+      roomId,
+      label: config.label || roomId,
+      isDefault: config.isDefault ?? false,
+      purpose: config.purpose || 'interactive',
+    });
+  }
+
+  /**
+   * Remove a room from this adapter.
+   *
+   * @param {string} roomId
+   * @returns {boolean}
+   */
+  removeRoom(roomId) {
+    return this.#rooms.delete(roomId);
+  }
+
+  /**
+   * Get all registered rooms.
+   *
+   * @returns {Map<string, Object>}
+   */
+  getRooms() {
+    return this.#rooms;
+  }
+
+  /**
+   * Send a message to a specific room.
+   * Delegates to send() with the room ID as channel.
+   *
+   * @param {import('../message-formatter.mjs').AiwgMessage} message
+   * @param {string} roomId
+   * @returns {Promise<MessageResult>}
+   */
+  async sendToRoom(message, roomId) {
+    return this.send(message, roomId);
+  }
+
+  /**
+   * Broadcast a message to all default rooms.
+   *
+   * @param {import('../message-formatter.mjs').AiwgMessage} message
+   * @returns {Promise<MessageResult[]>}
+   */
+  async broadcastToRooms(message) {
+    const results = [];
+    for (const [roomId, config] of this.#rooms) {
+      if (config.isDefault) {
+        try {
+          const result = await this.send(message, roomId);
+          results.push(result);
+        } catch (error) {
+          this._recordError(error);
+        }
+      }
+    }
+    return results;
   }
 }

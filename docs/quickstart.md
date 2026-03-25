@@ -54,12 +54,29 @@ Then run `/aiwg-regenerate` to enable natural language commands. See the [Regene
 
 | Platform | Guide |
 |----------|-------|
+| OpenClaw | [Setup Guide](openclaw-guide.md) |
 | Factory AI | [Setup Guide](#integrations/factory-quickstart) |
 | Warp Terminal | [Setup Guide](#integrations/warp-terminal-quickstart) |
 | Cursor | [Setup Guide](#integrations/cursor-quickstart) |
 | GitHub Copilot | [Setup Guide](#integrations/copilot-quickstart) |
 | OpenCode | [Setup Guide](#integrations/opencode-quickstart) |
 | Codex | [Setup Guide](#integrations/codex-quickstart) |
+
+---
+
+## Artifact Types
+
+AIWG deploys five artifact types to every supported platform:
+
+| Type | What It Is | Deploy target |
+|------|-----------|---------------|
+| **Agents** | Specialized AI personas (Test Engineer, Security Auditor, etc.) | Platform agents dir |
+| **Commands** | Slash commands and CLI workflows | Platform commands dir |
+| **Skills** | NLP-triggered, single-step capabilities | Platform skills dir |
+| **Rules** | Context-loaded constraints and conventions | Platform rules dir |
+| **Behaviors** | Reactive capabilities with scripts + event hooks | Platform behaviors dir |
+
+Behaviors are new. They are the layer above skills — they subscribe to system events (file writes, deploys, schedules) and react automatically, in addition to being invocable on demand. [Behaviors Guide](behaviors-guide.md)
 
 ---
 

@@ -16,6 +16,8 @@ import { DaemonSupervisor } from '../ralph-external/daemon-supervisor.mjs';
 import { BehaviorRegistry } from '../ralph-external/lib/behavior-registry.mjs';
 import { WebServer } from './web-server.mjs';
 import { MessageRouter } from './message-router.mjs';
+import { ScheduledTaskRunner } from './scheduled-task-runner.mjs';
+import { AutonomousEngine } from './autonomous-engine.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -35,6 +37,9 @@ class DaemonMain {
     this.webServer = null;
     this.messageRouter = null;
     this.opsHandlersApi = null;
+    this.scheduledTaskRunner = null;
+    this.autonomousEngine = null;
+    this.roomManager = null;
     this.shutdownInProgress = false;
     this.isRotating = false;
     this.startTime = Date.now();
@@ -264,10 +269,27 @@ class DaemonMain {
       this.log('Cron scheduler started');
     }
 
+    // Initialize RoomManager for multi-room messaging
+    try {
+      const { RoomManager } = await import('../messaging/room-manager.mjs');
+      this.roomManager = new RoomManager();
+      const messagingConfig = this.config.get('messaging');
+      if (messagingConfig) {
+        this.roomManager.loadFromConfig(messagingConfig);
+        this.log(`RoomManager loaded ${this.roomManager.size} room(s)`);
+      }
+    } catch (error) {
+      this.log(`RoomManager init failed (non-fatal): ${error.message}`);
+    }
+
     // Initialize messaging subsystem if any adapters are configured
     try {
       const { createMessagingHub } = await import('../messaging/index.mjs');
-      this.messagingBus = await createMessagingHub();
+      const messagingConfig = this.config.get('messaging');
+      this.messagingBus = await createMessagingHub({
+        roomManager: this.roomManager,
+        messagingConfig,
+      });
       if (this.messagingBus) {
         this.log(`Messaging hub initialized with ${this.messagingBus.adapterCount} adapter(s)`);
       }
@@ -275,12 +297,41 @@ class DaemonMain {
       this.log(`Messaging subsystem not available: ${error.message}`);
     }
 
+    // Initialize ScheduledTaskRunner to bridge cron events to tasks
+    if (this.daemonSupervisor && this.eventRouter) {
+      this.scheduledTaskRunner = new ScheduledTaskRunner({
+        supervisor: this.daemonSupervisor,
+        eventRouter: this.eventRouter,
+        roomManager: this.roomManager,
+      });
+      this.scheduledTaskRunner.start();
+      this.log('ScheduledTaskRunner started');
+    }
+
+    // Initialize AutonomousEngine if enabled
+    const modesConfig = this.config.get('modes');
+    if (modesConfig?.autonomous && this.daemonSupervisor) {
+      this.autonomousEngine = new AutonomousEngine({
+        supervisor: this.daemonSupervisor,
+        config: modesConfig.autonomous,
+        roomManager: this.roomManager,
+      });
+      if (modesConfig.autonomous.enabled) {
+        this.autonomousEngine.start();
+        this.log('AutonomousEngine started');
+      } else {
+        this.log('AutonomousEngine initialized (disabled — enable via config or IPC)');
+      }
+    }
+
     // Start web server if configured
     const webConfig = this.config.get('interface.web');
     if (webConfig?.enabled) {
+      // In Docker mode, bind to 0.0.0.0 so port mapping works
+      const webHost = process.env.AIWG_DOCKER === '1' ? '0.0.0.0' : (webConfig.host ?? '127.0.0.1');
       this.webServer = new WebServer({
         port: webConfig.port ?? 7474,
-        host: webConfig.host ?? '127.0.0.1',
+        host: webHost,
         token: webConfig.token || process.env.AIWG_WEB_TOKEN || null,
         daemonSupervisor: this.daemonSupervisor,
         opsHandlers: this.opsHandlersApi,
@@ -419,6 +470,41 @@ class DaemonMain {
 
       // Ping for health checks
       'ping': () => ({ pong: true, timestamp: new Date().toISOString() }),
+
+      // Autonomous mode management
+      'autonomous.status': () => {
+        return this.autonomousEngine ? this.autonomousEngine.getStatus() : { enabled: false };
+      },
+
+      'autonomous.enable': () => {
+        if (!this.autonomousEngine) {
+          const err = new Error('Autonomous engine not initialized');
+          err.code = 'INVALID_STATE';
+          throw err;
+        }
+        this.autonomousEngine.enable();
+        return { enabled: true };
+      },
+
+      'autonomous.disable': () => {
+        if (!this.autonomousEngine) {
+          const err = new Error('Autonomous engine not initialized');
+          err.code = 'INVALID_STATE';
+          throw err;
+        }
+        this.autonomousEngine.disable();
+        return { enabled: false };
+      },
+
+      // Scheduled task runner
+      'schedule.status': () => {
+        return this.scheduledTaskRunner ? this.scheduledTaskRunner.getStatus() : { started: false };
+      },
+
+      // Room management
+      'rooms.list': () => {
+        return this.roomManager ? this.roomManager.getStatus() : { totalRooms: 0 };
+      },
     });
 
     // Register ops-toolset IPC methods
@@ -509,6 +595,9 @@ class DaemonMain {
           : 'unlimited',
       } : null,
       web_server: this.webServer ? { url: this.webServer.url } : null,
+      rooms: this.roomManager ? this.roomManager.getStatus() : null,
+      scheduled_tasks: this.scheduledTaskRunner ? this.scheduledTaskRunner.getStatus() : null,
+      autonomous: this.autonomousEngine ? this.autonomousEngine.getStatus() : null,
       health: {
         status: 'healthy',
         last_check: new Date().toISOString(),
@@ -530,6 +619,16 @@ class DaemonMain {
     if (this.cronScheduler) {
       this.cronScheduler.stop();
       this.cronScheduler = null;
+    }
+
+    if (this.scheduledTaskRunner) {
+      this.scheduledTaskRunner.stop();
+      this.scheduledTaskRunner = null;
+    }
+
+    if (this.autonomousEngine) {
+      this.autonomousEngine.stop();
+      this.autonomousEngine = null;
     }
   }
 

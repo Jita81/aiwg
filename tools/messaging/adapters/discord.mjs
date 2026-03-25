@@ -25,12 +25,29 @@ const DISCORD_COLORS = {
 const DISCORD_API_BASE = 'https://discord.com/api/v10';
 
 /**
+ * @typedef {Object} DiscordRoomConfig
+ * @property {string} channel_id - Discord channel ID (also accepts channelId)
+ * @property {string} [label] - Human-readable name for this channel
+ * @property {boolean} [is_default] - Whether this channel receives broadcast messages (also accepts isDefault)
+ * @property {string} [purpose] - "interactive" | "notifications" | "logs"
+ */
+
+/**
+ * @typedef {Object} DiscordConfig
+ * @property {string} [botToken] - Discord bot token
+ * @property {string} [defaultChannelId] - Default channel ID (single-channel fallback)
+ * @property {string} [guildId] - Discord guild (server) ID
+ * @property {DiscordRoomConfig[]} [rooms] - Multi-channel configuration
+ */
+
+/**
  * Discord adapter implementation.
  *
  * Configuration:
  * - botToken: Discord bot token
- * - defaultChannelId: Default channel for messages
+ * - defaultChannelId: Default channel for messages (single-channel mode)
  * - guildId: Discord guild (server) ID
+ * - rooms: Array of channel configs for multi-channel mode
  *
  * Environment variables:
  * - AIWG_DISCORD_TOKEN: Bot token (fallback)
@@ -56,10 +73,7 @@ export class DiscordAdapter extends BaseAdapter {
   /**
    * Create a Discord adapter.
    *
-   * @param {Object} config
-   * @param {string} [config.botToken] - Discord bot token
-   * @param {string} [config.defaultChannelId] - Default channel ID
-   * @param {string} [config.guildId] - Discord guild ID
+   * @param {DiscordConfig} config
    */
   constructor(config = {}) {
     super('discord');
@@ -72,8 +86,36 @@ export class DiscordAdapter extends BaseAdapter {
       throw new Error('Discord bot token required (config.botToken or AIWG_DISCORD_TOKEN)');
     }
 
-    if (!this.#defaultChannelId) {
-      throw new Error('Discord channel ID required (config.defaultChannelId or AIWG_DISCORD_CHANNEL_ID)');
+    // Multi-room: register rooms from config, or use defaultChannelId as single room
+    if (Array.isArray(config.rooms) && config.rooms.length > 0) {
+      for (const room of config.rooms) {
+        const channelId = room.channel_id || room.channelId;
+        if (channelId) {
+          this.addRoom(channelId, {
+            label: room.label || room.name || channelId,
+            isDefault: room.is_default ?? room.isDefault ?? false,
+            purpose: room.purpose || 'interactive',
+          });
+        }
+      }
+      // Use first default room or first room as the fallback defaultChannelId
+      if (!this.#defaultChannelId) {
+        const defaultRoom = config.rooms.find(r => r.is_default || r.isDefault) || config.rooms[0];
+        this.#defaultChannelId = defaultRoom.channel_id || defaultRoom.channelId;
+      }
+    }
+
+    if (!this.#defaultChannelId && this.getRooms().size === 0) {
+      throw new Error('Discord requires at least one channel ID (config.defaultChannelId, config.rooms, or AIWG_DISCORD_CHANNEL_ID)');
+    }
+
+    // If we have a defaultChannelId but no rooms registered, auto-create a single room
+    if (this.#defaultChannelId && this.getRooms().size === 0) {
+      this.addRoom(this.#defaultChannelId, {
+        label: 'default',
+        isDefault: true,
+        purpose: 'interactive',
+      });
     }
   }
 

@@ -71,7 +71,7 @@ Use `@path/to/file.md` in your message to load specific documentation:
 
 ## Multi-Platform Support
 
-All 8 providers receive all 4 artifact types (agents, commands, skills, rules). Support level indicates how the platform discovers artifacts: **native** (auto-discovered), **conventional** (AIWG directory), **aggregated** (single-file + discrete).
+All 9 providers receive all 4 artifact types (agents, commands, skills, rules). OpenClaw additionally receives behaviors. Support level indicates how the platform discovers artifacts: **native** (auto-discovered), **conventional** (AIWG directory), **aggregated** (single-file + discrete).
 
 | Platform | Agents | Commands | Skills | Rules | Command |
 |----------|--------|----------|--------|-------|---------|
@@ -83,12 +83,14 @@ All 8 providers receive all 4 artifact types (agents, commands, skills, rules). 
 | OpenCode | `.opencode/agent/` | `.opencode/command/` | `.opencode/skill/` | `.opencode/rule/` | `aiwg use sdlc --provider opencode` |
 | Warp Terminal | `.warp/agents/` + WARP.md | `.warp/commands/` | `.warp/skills/` | `.warp/rules/` | `aiwg use sdlc --provider warp` |
 | Windsurf | AGENTS.md | `.windsurf/workflows/` | `.windsurf/skills/` | `.windsurf/rules/` | `aiwg use sdlc --provider windsurf` |
+| OpenClaw | `~/.openclaw/agents/` | `~/.openclaw/commands/` | `~/.openclaw/skills/` | `~/.openclaw/rules/` | `aiwg use sdlc --provider openclaw` |
 
 **Special cases:**
 - **Codex**: Commands and skills deploy to home directory (`~/.codex/prompts/`, `~/.codex/skills/`) for user-level availability across all projects
 - **Copilot**: Commands are converted to YAML agent format and deployed alongside agents in `.github/agents/`
 - **Warp**: Agents and commands are also aggregated into `WARP.md` for single-file context loading
 - **Windsurf**: Agents are aggregated into `AGENTS.md` at project root
+- **OpenClaw**: All artifacts deploy to home directory (`~/.openclaw/`). First provider to support behaviors (`~/.openclaw/behaviors/`)
 
 ## Writing Principles
 

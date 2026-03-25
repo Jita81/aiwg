@@ -109,6 +109,18 @@ class ScaffoldExtensionHandler extends ScaffoldingHandler {
 }
 
 /**
+ * Add Behavior Handler
+ *
+ * Scaffolds a new behavior with BEHAVIOR.md and scripts/.
+ */
+class AddBehaviorHandler extends ScaffoldingHandler {
+  id = 'add-behavior';
+  name = 'Add Behavior';
+  description = 'Create a new behavior with hooks and scripts';
+  scriptPath = 'tools/scaffolding/add-behavior.mjs';
+}
+
+/**
  * Scaffold Framework Handler
  *
  * Scaffolds a complete AIWG framework with agents, commands, and docs.
@@ -126,6 +138,7 @@ class ScaffoldFrameworkHandler extends ScaffoldingHandler {
 export const addAgentHandler: CommandHandler = new AddAgentHandler();
 export const addCommandHandler: CommandHandler = new AddCommandHandler();
 export const addSkillHandler: CommandHandler = new AddSkillHandler();
+export const addBehaviorHandler: CommandHandler = new AddBehaviorHandler();
 export const addTemplateHandler: CommandHandler = new AddTemplateHandler();
 export const scaffoldAddonHandler: CommandHandler = new ScaffoldAddonHandler();
 export const scaffoldExtensionHandler: CommandHandler = new ScaffoldExtensionHandler();
@@ -138,6 +151,7 @@ export const scaffoldingHandlers: CommandHandler[] = [
   addAgentHandler,
   addCommandHandler,
   addSkillHandler,
+  addBehaviorHandler,
   addTemplateHandler,
   scaffoldAddonHandler,
   scaffoldExtensionHandler,
