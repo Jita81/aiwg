@@ -341,11 +341,12 @@ describe('CodexAdapter', () => {
   });
 
   describe('buildSessionArgs', () => {
-    it('uses exec subcommand and --full-auto instead of --dangerously-skip-permissions', () => {
+    it('uses exec subcommand with dangerous mode and skip-git-repo-check', () => {
       const args = adapter.buildSessionArgs({ prompt: 'task' });
       expect(args[0]).toBe('exec');
-      expect(args).toContain('--full-auto');
-      expect(args).not.toContain('--dangerously-skip-permissions');
+      expect(args).toContain('--dangerously-bypass-approvals-and-sandbox');
+      expect(args).toContain('--skip-git-repo-check');
+      expect(args).not.toContain('--full-auto');
       expect(args).not.toContain('--print');
       expect(args).not.toContain('--output-format');
     });
@@ -390,12 +391,13 @@ describe('CodexAdapter', () => {
   });
 
   describe('buildAnalysisArgs', () => {
-    it('uses exec subcommand and --full-auto', () => {
+    it('uses exec subcommand with dangerous mode and skip-git-repo-check', () => {
       const args = adapter.buildAnalysisArgs({ prompt: 'analyze' });
       expect(args[0]).toBe('exec');
-      expect(args).toContain('--full-auto');
+      expect(args).toContain('--dangerously-bypass-approvals-and-sandbox');
+      expect(args).toContain('--skip-git-repo-check');
+      expect(args).not.toContain('--full-auto');
       expect(args).not.toContain('--quiet');
-      expect(args).not.toContain('--dangerously-skip-permissions');
     });
 
     it('maps model names and silently skips unsupported agent flag', () => {

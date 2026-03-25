@@ -6,7 +6,8 @@
  *
  * Codex CLI differences from Claude:
  * - Binary: `codex` instead of `claude`
- * - Headless flag: `--full-auto` instead of `--dangerously-skip-permissions`
+ * - Headless flag: `--dangerously-bypass-approvals-and-sandbox` (full dangerous mode)
+ * - Requires `--skip-git-repo-check` for temp/non-git working directories
  * - No stream-json output format (text only)
  * - No session resume capability
  * - No --agent flag
@@ -66,11 +67,13 @@ export class CodexAdapter extends ProviderAdapter {
   buildSessionArgs(options) {
     const args = [
       // Codex requires the 'exec' subcommand for non-interactive (headless) use.
-      // Running `codex --full-auto` without 'exec' fails with "stdin is not a terminal".
       'exec',
-      // SECURITY: --full-auto bypasses ALL permission prompts in Codex
-      // Equivalent to Claude's --dangerously-skip-permissions
-      '--full-auto',
+      // SECURITY: bypass ALL confirmation prompts and sandboxing.
+      // Required for headless operation in temp directories (UAT, daemon tasks).
+      // Equivalent to Claude's --dangerously-skip-permissions.
+      '--dangerously-bypass-approvals-and-sandbox',
+      // Allow running outside a git repository (temp dirs used by UAT and daemon).
+      '--skip-git-repo-check',
     ];
 
     // Model selection (map generic to Codex-specific)
@@ -123,7 +126,8 @@ export class CodexAdapter extends ProviderAdapter {
   buildAnalysisArgs(options) {
     const args = [
       'exec',
-      '--full-auto',
+      '--dangerously-bypass-approvals-and-sandbox',
+      '--skip-git-repo-check',
     ];
 
     // Model selection

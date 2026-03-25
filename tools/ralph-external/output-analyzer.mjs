@@ -149,8 +149,19 @@ export class OutputAnalyzer {
         return null;
       }
 
-      // Parse JSON from output
-      const output = result.stdout.trim();
+      // Parse JSON from output.
+      // For providers that emit newline-delimited JSON events (e.g., opencode
+      // --format json), use the adapter's parseOutput() to extract the model's
+      // text response first, then look for embedded JSON within that text.
+      // For plain-text providers (codex, claude --output-format json), fall back
+      // to searching the raw stdout directly.
+      let output;
+      if (this.providerAdapter && typeof this.providerAdapter.parseOutput === 'function') {
+        const parsed = this.providerAdapter.parseOutput(result.stdout);
+        output = parsed?.text ?? result.stdout.trim();
+      } else {
+        output = result.stdout.trim();
+      }
 
       // Try to extract JSON from the output
       const jsonMatch = output.match(/\{[\s\S]*\}/);
