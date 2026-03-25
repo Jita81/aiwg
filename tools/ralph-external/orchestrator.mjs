@@ -162,11 +162,26 @@ export class Orchestrator {
   }
 
   /**
+   * Log a message only when verbose mode is enabled.
+   * @param {string} msg
+   * @param {*} [data]
+   */
+  verboseLog(msg, data) {
+    if (!this._verbose) return;
+    if (data !== undefined) {
+      console.log(`[External Ralph][VERBOSE] ${msg}`, typeof data === 'object' ? JSON.stringify(data, null, 2) : data);
+    } else {
+      console.log(`[External Ralph][VERBOSE] ${msg}`);
+    }
+  }
+
+  /**
    * Execute the external Ralph loop
    * @param {OrchestratorConfig} config
    * @returns {Promise<OrchestratorResult>}
    */
   async execute(config) {
+    this._verbose = config.verbose || false;
     // Initialize state with enhanced capture options
     const state = this.stateManager.initialize({
       objective: config.objective,
@@ -541,6 +556,13 @@ export class Orchestrator {
             join(iterationDir, 'state-assessment.json'),
             JSON.stringify(assessment, null, 2)
           );
+
+          this.verboseLog('Assessment result:', {
+            trend: assessment?.trend,
+            completionPercentage: assessment?.completionPercentage,
+            taskType: assessment?.taskType,
+            summary: assessment?.summary?.slice(0, 300),
+          });
         }
 
         // MemoryRetrieval: Get relevant cross-loop knowledge
@@ -567,6 +589,7 @@ export class Orchestrator {
             maxIterations: state.maxIterations,
           };
           strategy = this.strategyPlanner.plan(state.iterations || [], planMetrics);
+          this.verboseLog('Strategy:', strategy);
         }
 
         // PID Controller: Compute control signals
@@ -697,6 +720,11 @@ export class Orchestrator {
         mkdirSync(dirname(promptPath), { recursive: true });
         writeFileSync(promptPath, prompt);
 
+        this.verboseLog(`Prompt preview (first 600 chars):\n${prompt?.slice(0, 600)}`);
+        if (systemPrompt) {
+          this.verboseLog(`System prompt preview (first 300 chars):\n${systemPrompt.slice(0, 300)}`);
+        }
+
         // ========== START CHECKPOINT MANAGER ==========
         if (state.config.enableCheckpoints) {
           console.log('[External Ralph] Starting checkpoint manager...');
@@ -742,6 +770,16 @@ export class Orchestrator {
         console.log(`[External Ralph] Session completed (${Math.round(duration / 1000)}s, exit: ${sessionResult.exitCode})`);
         if (sessionResult.toolCallCount) {
           console.log(`[External Ralph] Tool calls: ${sessionResult.toolCallCount}, errors: ${sessionResult.errorCount || 0}`);
+        }
+
+        // Verbose: show session output tail
+        if (this._verbose && outputPaths.stdout) {
+          try {
+            const { readFileSync: readFS } = await import('fs');
+            const stdout = readFS(outputPaths.stdout, 'utf-8');
+            const tail = stdout.slice(-1200);
+            this.verboseLog(`Session output (last 1200 chars):\n${tail}`);
+          } catch (_) { /* file may not exist yet */ }
         }
 
         // Record session completion heartbeat

@@ -46,6 +46,8 @@ function parseRalphArgs(args: string[]): {
   dangerous?: boolean;
   params?: string;
   attach?: boolean;
+  verbose?: boolean;
+  logFile?: string;
 } {
   const result: ReturnType<typeof parseRalphArgs> = {};
   let i = 0;
@@ -94,6 +96,10 @@ function parseRalphArgs(args: string[]): {
       result.params = args[++i];
     } else if (arg === '--attach') {
       result.attach = true;
+    } else if (arg === '--verbose' || arg === '-v') {
+      result.verbose = true;
+    } else if (arg === '--log-file') {
+      result.logFile = args[++i];
     } else if (!arg.startsWith('-') && !result.objective) {
       result.objective = arg;
     }
@@ -170,6 +176,8 @@ export class RalphHandler implements CommandHandler {
         provider: parsed.provider,
         dangerous: parsed.dangerous,
         params: parsed.params,
+        verbose: parsed.verbose,
+        logFile: parsed.logFile,
       };
 
       const result = await launchExternalRalph(ctx.frameworkRoot, process.cwd(), options);
@@ -228,6 +236,11 @@ OPTIONS:
                           Appended after all other flags. Quoted segments preserved.
   --attach                Stay attached to the loop's output after launch.
                           Press Ctrl+C to detach (loop keeps running in background).
+  -v, --verbose           Enable verbose per-iteration detail in the daemon output:
+                          assessment results, planned strategy, and prompt preview.
+  --log-file <path>       Write a timestamped copy of all daemon output to <path>
+                          (in addition to the per-loop daemon-output.log). Useful
+                          for capturing a single readable log across all iterations.
                           Use 'aiwg ralph-attach' to re-attach later.
 
 RESEARCH-BACKED OPTIONS (REF-015, REF-021):

@@ -16,6 +16,7 @@
  */
 
 import { resolve } from 'path';
+import { createWriteStream } from 'fs';
 import { Orchestrator } from './orchestrator.mjs';
 import { StateManager } from './state-manager.mjs';
 import { isClaudeAvailable, getClaudeVersion } from './session-launcher.mjs';
@@ -52,6 +53,8 @@ function parseArgs(args) {
     enableBestOutput: true,       // Best output tracking (#168)
     enableEarlyStopping: true,    // Early stopping (#149)
     provider: 'claude',           // CLI provider (claude, codex)
+    verbose: false,               // Verbose per-iteration detail
+    logFile: null,                // Optional log file path
   };
 
   let i = 0;
@@ -95,6 +98,10 @@ function parseArgs(args) {
       options.enableEarlyStopping = false;
     } else if (arg === '--provider') {
       options.provider = args[++i];
+    } else if (arg === '--verbose' || arg === '-v') {
+      options.verbose = true;
+    } else if (arg === '--log-file') {
+      options.logFile = args[++i];
     } else if (!arg.startsWith('-') && !options.objective) {
       options.objective = arg;
     }
@@ -103,6 +110,32 @@ function parseArgs(args) {
   }
 
   return options;
+}
+
+/**
+ * Tee all console output to a log file with timestamps.
+ * Returns a cleanup function that closes the stream.
+ * @param {string} logFilePath
+ * @returns {() => void}
+ */
+function installConsoleTee(logFilePath) {
+  const stream = createWriteStream(logFilePath, { flags: 'a' });
+
+  function writeLine(level, args) {
+    const ts = new Date().toISOString();
+    const msg = args.map((a) => (typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' ');
+    stream.write(`${ts} [${level}] ${msg}\n`);
+  }
+
+  const origLog = console.log.bind(console);
+  const origError = console.error.bind(console);
+  const origWarn = console.warn.bind(console);
+
+  console.log = (...args) => { origLog(...args); writeLine('LOG', args); };
+  console.error = (...args) => { origError(...args); writeLine('ERR', args); };
+  console.warn = (...args) => { origWarn(...args); writeLine('WRN', args); };
+
+  return () => stream.end();
 }
 
 /**
@@ -160,6 +193,9 @@ RESEARCH-BACKED OPTIONS (REF-015, REF-021):
   --no-analytics          Disable iteration analytics
   --no-best-output        Disable best output selection (use final)
   --no-early-stopping     Disable early stopping on high confidence
+  -v, --verbose           Enable verbose per-iteration detail (assessment,
+                          strategy, prompt preview)
+  --log-file <path>       Write timestamped log to file (in addition to stdout)
 
 COMMANDS:
   -r, --resume            Resume interrupted loop
@@ -230,6 +266,13 @@ async function main() {
   const args = process.argv.slice(2);
   const options = parseArgs(args);
   const projectRoot = process.cwd();
+
+  // Install log file tee before any other output
+  let cleanupLogTee = null;
+  if (options.logFile) {
+    cleanupLogTee = installConsoleTee(options.logFile);
+    console.log(`[External Ralph] Log file: ${options.logFile}`);
+  }
 
   // Handle help
   if (options.help) {
@@ -335,6 +378,7 @@ async function main() {
         mcpConfig: options.mcpConfig,
         giteaIntegration: options.giteaIssue ? { enabled: true } : null,
         provider: options.provider,
+        verbose: options.verbose,
       });
     }
 
@@ -345,10 +389,12 @@ async function main() {
     console.log(`  Iterations: ${result.iterations}`);
     console.log(`  Loop ID: ${result.loopId}`);
 
+    if (cleanupLogTee) cleanupLogTee();
     process.exit(result.success ? 0 : 1);
 
   } catch (error) {
     console.error(`[External Ralph] Fatal error: ${error.message}`);
+    if (cleanupLogTee) cleanupLogTee();
     process.exit(1);
   }
 }

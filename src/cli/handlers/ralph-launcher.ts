@@ -55,6 +55,10 @@ export interface RalphLaunchOptions {
   dangerous?: boolean;
   /** Raw args to append verbatim to the agent invocation inside the loop */
   params?: string;
+  /** Enable verbose per-iteration detail (assessment, strategy, prompt preview) */
+  verbose?: boolean;
+  /** Write timestamped log to this file path (in addition to daemon-output.log) */
+  logFile?: string;
 }
 
 /**
@@ -168,6 +172,12 @@ export function buildArgs(options: RalphLaunchOptions): string[] {
   }
   if (options.params) {
     args.push('--params', options.params);
+  }
+  if (options.verbose) {
+    args.push('--verbose');
+  }
+  if (options.logFile) {
+    args.push('--log-file', options.logFile);
   }
 
   return args;
