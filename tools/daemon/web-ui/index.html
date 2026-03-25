@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIWG Daemon</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+
+<header>
+  <h1>&#9670; AIWG DAEMON</h1>
+  <span id="daemon-status-badge">connecting...</span>
+  <span class="spacer"></span>
+  <span id="uptime"></span>
+</header>
+
+<nav id="tabs">
+  <button class="active" data-tab="loops">Loops</button>
+  <button data-tab="output">Output</button>
+  <button data-tab="submit">Submit</button>
+  <button data-tab="resources">Resources</button>
+  <button data-tab="history">History</button>
+</nav>
+
+<main>
+
+  <!-- ==================== LOOPS ==================== -->
+  <section id="tab-loops" class="tab-panel active">
+    <h2>Running &amp; Queued</h2>
+    <div class="table-wrap">
+      <table id="loops-table">
+        <thead>
+          <tr>
+            <th>Loop ID</th>
+            <th>Status</th>
+            <th>Elapsed</th>
+            <th>PID</th>
+            <th>Task ID</th>
+            <th>Priority</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="loops-tbody">
+          <tr><td colspan="7" style="color:var(--text-muted);text-align:center">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ==================== OUTPUT ==================== -->
+  <section id="tab-output" class="tab-panel">
+    <div id="output-panel">
+      <div id="output-toolbar">
+        <span id="output-loop-id">No loop selected</span>
+        <button class="btn btn-sm" id="btn-pause-scroll">Pause scroll</button>
+        <button class="btn btn-sm" id="btn-clear-output">Clear</button>
+      </div>
+      <pre id="output-stream"><span style="color:var(--text-muted)">Select a loop from the Loops tab to stream output.</span></pre>
+    </div>
+  </section>
+
+  <!-- ==================== SUBMIT ==================== -->
+  <section id="tab-submit" class="tab-panel">
+    <div id="submit-panel">
+      <h2>Submit New Loop</h2>
+      <form id="submit-form" autocomplete="off">
+        <div class="form-group">
+          <label for="f-objective">Objective</label>
+          <textarea id="f-objective" name="objective" placeholder="Describe the task objective..." required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="f-completion">Completion Criteria</label>
+          <textarea id="f-completion" name="completion" placeholder="How will you know the task is done?"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="margin-bottom:0">
+            <label for="f-provider">Provider</label>
+            <select id="f-provider" name="provider">
+              <option value="claude">claude</option>
+              <option value="codex">codex</option>
+              <option value="copilot">copilot</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label for="f-max-iter">Max Iterations</label>
+            <input type="number" id="f-max-iter" name="maxIterations" value="10" min="1" max="100">
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label for="f-priority">Priority</label>
+            <input type="number" id="f-priority" name="priority" value="0" min="0" max="99">
+          </div>
+        </div>
+        <div style="margin-top:20px">
+          <button type="submit" class="btn btn-accent">Submit Loop</button>
+        </div>
+      </form>
+      <div id="submit-result"></div>
+    </div>
+  </section>
+
+  <!-- ==================== RESOURCES ==================== -->
+  <section id="tab-resources" class="tab-panel">
+    <div id="resources-panel">
+      <h2>System Resources</h2>
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="label">Memory Used</div>
+          <div class="value" id="res-mem-pct">—</div>
+          <div class="sub" id="res-mem-sub"></div>
+          <div class="progress-bar"><div class="progress-fill" id="res-mem-bar" style="width:0%"></div></div>
+        </div>
+        <div class="metric-card">
+          <div class="label">Load Avg (1m)</div>
+          <div class="value" id="res-load">—</div>
+          <div class="sub" id="res-load-sub"></div>
+        </div>
+        <div class="metric-card">
+          <div class="label">Queue Depth</div>
+          <div class="value" id="res-queue">—</div>
+          <div class="sub">loops waiting</div>
+        </div>
+        <div class="metric-card">
+          <div class="label">Budget Remaining</div>
+          <div class="value" id="res-budget">—</div>
+          <div class="sub">USD</div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--text-muted)">Auto-refreshes every 5 seconds.</p>
+    </div>
+  </section>
+
+  <!-- ==================== HISTORY ==================== -->
+  <section id="tab-history" class="tab-panel">
+    <h2>Completed Loops</h2>
+    <div class="table-wrap">
+      <table id="history-table">
+        <thead>
+          <tr>
+            <th>Loop ID</th>
+            <th>Outcome</th>
+            <th>Completed At</th>
+            <th>Error</th>
+          </tr>
+        </thead>
+        <tbody id="history-tbody">
+          <tr><td colspan="4" style="color:var(--text-muted);text-align:center">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  // ── State ──────────────────────────────────────────────────────────────────
+
+  const state = {
+    loops: [],
+    history: [],
+    resources: null,
+    daemonStatus: null,
+    selectedLoopId: null,
+    outputPaused: false,
+    outputSource: null,   // EventSource for /sse/output/:id
+    eventsSource: null,   // EventSource for /sse/events
+    startTime: null,
+    resourcesTimer: null,
+  };
+
+  // ── Utilities ──────────────────────────────────────────────────────────────
+
+  function fmtElapsed(ms) {
+    if (ms == null || ms < 0) return '—';
+    const s = Math.floor(ms / 1000);
+    if (s < 60) return s + 's';
+    const m = Math.floor(s / 60);
+    if (m < 60) return m + 'm ' + (s % 60) + 's';
+    const h = Math.floor(m / 60);
+    return h + 'h ' + (m % 60) + 'm';
+  }
+
+  function fmtDate(iso) {
+    if (!iso) return '—';
+    try {
+      return new Date(iso).toLocaleString(undefined, {
+        month: 'short', day: 'numeric',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+      });
+    } catch { return iso; }
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function statusDot(status) {
+    const cls = {
+      running: 'dot-running',
+      queued: 'dot-queued',
+      failed: 'dot-failed',
+      completed: 'dot-completed',
+      'permanently-failed': 'dot-permanently-failed',
+    }[status] || 'dot-completed';
+    return `<span class="dot ${cls}"></span>${escapeHtml(status)}`;
+  }
+
+  async function apiFetch(path, opts = {}) {
+    const res = await fetch(path, opts);
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({ error: res.statusText }));
+      throw new Error(body.error || `HTTP ${res.status}`);
+    }
+    return res.json();
+  }
+
+  // ── Tab navigation ─────────────────────────────────────────────────────────
+
+  const tabButtons = document.querySelectorAll('nav#tabs button');
+  const tabPanels  = document.querySelectorAll('.tab-panel');
+
+  tabButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      tabButtons.forEach((b) => b.classList.remove('active'));
+      tabPanels.forEach((p)  => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+
+      if (btn.dataset.tab === 'history') loadHistory();
+      if (btn.dataset.tab === 'resources') loadResources();
+    });
+  });
+
+  // ── Status badge & uptime ─────────────────────────────────────────────────
+
+  async function loadStatus() {
+    try {
+      const s = await apiFetch('/api/status');
+      state.daemonStatus = s;
+      state.startTime = s.uptime != null ? Date.now() - s.uptime * 1000 : null;
+
+      const badge = document.getElementById('daemon-status-badge');
+      badge.textContent = s.status;
+      badge.className = '';
+      badge.classList.add(s.status === 'healthy' ? 'healthy' : s.status === 'starting' ? '' : 'error');
+
+      updateUptime();
+    } catch (err) {
+      const badge = document.getElementById('daemon-status-badge');
+      badge.textContent = 'unreachable';
+      badge.className = 'error';
+    }
+  }
+
+  function updateUptime() {
+    if (state.startTime == null) return;
+    const elapsed = Math.floor((Date.now() - state.startTime) / 1000);
+    document.getElementById('uptime').textContent = 'up ' + fmtElapsed(elapsed * 1000);
+  }
+
+  setInterval(updateUptime, 1000);
+
+  // ── Loops table ────────────────────────────────────────────────────────────
+
+  async function loadLoops() {
+    try {
+      const data = await apiFetch('/api/loops');
+      const running = Array.isArray(data.running) ? data.running : [];
+      const queued  = Array.isArray(data.queued)  ? data.queued  : [];
+      state.loops = [
+        ...running.map((r) => ({ ...r, status: 'running' })),
+        ...queued.map((q)  => ({ ...q, status: 'queued'  })),
+      ];
+      renderLoops();
+    } catch (err) {
+      document.getElementById('loops-tbody').innerHTML =
+        `<tr><td colspan="7" style="color:var(--status-fail)">Error: ${escapeHtml(err.message)}</td></tr>`;
+    }
+  }
+
+  function renderLoops() {
+    const tbody = document.getElementById('loops-tbody');
+    if (state.loops.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="color:var(--text-muted);text-align:center">No active loops.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = state.loops.map((loop) => {
+      const elapsed = loop.startedAt
+        ? fmtElapsed(Date.now() - new Date(loop.startedAt).getTime())
+        : '—';
+      const selected = loop.loopId === state.selectedLoopId ? ' selected' : '';
+      return `<tr data-loop-id="${escapeHtml(loop.loopId)}" class="${selected}">
+        <td>${escapeHtml(loop.loopId)}</td>
+        <td>${statusDot(loop.status)}</td>
+        <td>${escapeHtml(elapsed)}</td>
+        <td>${loop.pid != null ? escapeHtml(String(loop.pid)) : '—'}</td>
+        <td>${loop.taskId ? escapeHtml(loop.taskId) : '—'}</td>
+        <td>${loop.priority != null ? escapeHtml(String(loop.priority)) : '—'}</td>
+        <td><button class="btn btn-sm btn-danger cancel-btn" data-loop-id="${escapeHtml(loop.loopId)}">Cancel</button></td>
+      </tr>`;
+    }).join('');
+
+    // Row click → select loop and switch to output tab
+    tbody.querySelectorAll('tr[data-loop-id]').forEach((row) => {
+      row.addEventListener('click', (e) => {
+        if (e.target.classList.contains('cancel-btn')) return;
+        const id = row.dataset.loopId;
+        selectLoop(id);
+        // Switch to output tab
+        tabButtons.forEach((b) => b.classList.remove('active'));
+        tabPanels.forEach((p)  => p.classList.remove('active'));
+        document.querySelector('[data-tab="output"]').classList.add('active');
+        document.getElementById('tab-output').classList.add('active');
+      });
+    });
+
+    // Cancel buttons
+    tbody.querySelectorAll('.cancel-btn').forEach((btn) => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.loopId;
+        try {
+          await apiFetch('/api/cancel/' + encodeURIComponent(id), { method: 'POST' });
+          await loadLoops();
+        } catch (err) {
+          alert('Cancel failed: ' + err.message);
+        }
+      });
+    });
+  }
+
+  // ── Output pane ────────────────────────────────────────────────────────────
+
+  const outputStream = document.getElementById('output-stream');
+  const outputLoopId = document.getElementById('output-loop-id');
+  const btnPause     = document.getElementById('btn-pause-scroll');
+  const btnClear     = document.getElementById('btn-clear-output');
+
+  btnPause.addEventListener('click', () => {
+    state.outputPaused = !state.outputPaused;
+    btnPause.textContent = state.outputPaused ? 'Resume scroll' : 'Pause scroll';
+    btnPause.classList.toggle('btn-accent', state.outputPaused);
+  });
+
+  btnClear.addEventListener('click', () => {
+    outputStream.textContent = '';
+  });
+
+  function selectLoop(loopId) {
+    state.selectedLoopId = loopId;
+    outputLoopId.textContent = loopId;
+    outputStream.textContent = '';
+    state.outputPaused = false;
+    btnPause.textContent = 'Pause scroll';
+    btnPause.classList.remove('btn-accent');
+
+    // Mark selected row
+    document.querySelectorAll('#loops-tbody tr').forEach((row) => {
+      row.classList.toggle('selected', row.dataset.loopId === loopId);
+    });
+
+    // Close previous output stream
+    if (state.outputSource) {
+      state.outputSource.close();
+      state.outputSource = null;
+    }
+
+    const es = new EventSource('/sse/output/' + encodeURIComponent(loopId));
+    state.outputSource = es;
+
+    es.onmessage = (ev) => {
+      try {
+        const msg = JSON.parse(ev.data);
+        const chunk = msg.chunk || '';
+        if (!chunk) return;
+        appendOutput(chunk);
+      } catch { /* ignore parse errors */ }
+    };
+
+    es.onerror = () => {
+      appendOutput('\n[stream closed]\n');
+    };
+  }
+
+  function appendOutput(text) {
+    const span = document.createElement('span');
+    span.className = 'line';
+    span.textContent = text;
+    outputStream.appendChild(span);
+
+    // Trim to avoid unbounded growth (keep last 5000 lines)
+    const lines = outputStream.querySelectorAll('.line');
+    if (lines.length > 5000) {
+      for (let i = 0; i < lines.length - 5000; i++) {
+        lines[i].remove();
+      }
+    }
+
+    if (!state.outputPaused) {
+      outputStream.scrollTop = outputStream.scrollHeight;
+    }
+  }
+
+  // ── Submit form ────────────────────────────────────────────────────────────
+
+  document.getElementById('submit-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const objective  = document.getElementById('f-objective').value.trim();
+    const completion = document.getElementById('f-completion').value.trim();
+    const provider   = document.getElementById('f-provider').value;
+    const maxIter    = parseInt(document.getElementById('f-max-iter').value, 10) || 10;
+    const priority   = parseInt(document.getElementById('f-priority').value, 10) || 0;
+
+    if (!objective) return;
+
+    // Build prompt incorporating completion criteria
+    let prompt = objective;
+    if (completion) {
+      prompt += '\n\nCompletion criteria: ' + completion;
+    }
+    if (provider !== 'claude') {
+      prompt += '\n\nProvider hint: ' + provider;
+    }
+
+    const resultEl = document.getElementById('submit-result');
+    resultEl.style.display = 'none';
+
+    try {
+      const result = await apiFetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt, priority, maxIterations: maxIter }),
+      });
+
+      resultEl.textContent = 'Submitted: ' + (result.loopId || JSON.stringify(result));
+      resultEl.className = 'ok';
+      resultEl.style.display = 'block';
+      e.target.reset();
+      document.getElementById('f-max-iter').value = '10';
+      await loadLoops();
+    } catch (err) {
+      resultEl.textContent = 'Error: ' + err.message;
+      resultEl.className = 'err';
+      resultEl.style.display = 'block';
+    }
+  });
+
+  // ── Resources ─────────────────────────────────────────────────────────────
+
+  async function loadResources() {
+    try {
+      const r = await apiFetch('/api/resources');
+      state.resources = r;
+      renderResources(r);
+    } catch (err) {
+      document.getElementById('res-mem-pct').textContent = 'err';
+    }
+  }
+
+  function renderResources(r) {
+    const memPct  = r.memory?.percentUsed ?? 0;
+    const memFree = r.memory?.freeMb ?? 0;
+    const memTotal = r.memory?.totalMb ?? 0;
+    const loadAvg = r.cpu?.loadAvg?.[0] ?? 0;
+    const cores   = r.cpu?.cores ?? 1;
+
+    document.getElementById('res-mem-pct').textContent = memPct.toFixed(1) + '%';
+    document.getElementById('res-mem-sub').textContent =
+      memFree + ' MB free / ' + memTotal + ' MB total';
+
+    const bar = document.getElementById('res-mem-bar');
+    bar.style.width = Math.min(memPct, 100) + '%';
+    bar.className = 'progress-fill' + (memPct > 90 ? ' crit' : memPct > 75 ? ' warn' : '');
+
+    document.getElementById('res-load').textContent = loadAvg.toFixed(2);
+    document.getElementById('res-load-sub').textContent = cores + ' CPU core' + (cores !== 1 ? 's' : '');
+
+    document.getElementById('res-queue').textContent = r.queueDepth ?? 0;
+
+    const budget = r.budgetRemaining;
+    document.getElementById('res-budget').textContent =
+      typeof budget === 'number' ? '$' + budget.toFixed(2) : String(budget);
+  }
+
+  function startResourcesAutoRefresh() {
+    if (state.resourcesTimer) clearInterval(state.resourcesTimer);
+    state.resourcesTimer = setInterval(() => {
+      const resourcesTab = document.getElementById('tab-resources');
+      if (resourcesTab.classList.contains('active')) {
+        loadResources();
+      }
+    }, 5000);
+  }
+
+  // ── History ────────────────────────────────────────────────────────────────
+
+  async function loadHistory() {
+    try {
+      const data = await apiFetch('/api/history?limit=50');
+      state.history = Array.isArray(data) ? data : [];
+      renderHistory();
+    } catch (err) {
+      document.getElementById('history-tbody').innerHTML =
+        `<tr><td colspan="4" style="color:var(--status-fail)">Error: ${escapeHtml(err.message)}</td></tr>`;
+    }
+  }
+
+  function renderHistory() {
+    const tbody = document.getElementById('history-tbody');
+    if (state.history.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" style="color:var(--text-muted);text-align:center">No completed loops.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = state.history.map((entry) => {
+      return `<tr>
+        <td>${escapeHtml(entry.loopId || '—')}</td>
+        <td>${statusDot(entry.outcome || 'completed')}</td>
+        <td>${escapeHtml(fmtDate(entry.completedAt))}</td>
+        <td class="wrap" style="color:var(--text-muted)">${entry.error ? escapeHtml(entry.error) : '—'}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // ── SSE event stream ───────────────────────────────────────────────────────
+
+  function connectEventStream() {
+    if (state.eventsSource) {
+      state.eventsSource.close();
+    }
+
+    const es = new EventSource('/sse/events');
+    state.eventsSource = es;
+
+    es.addEventListener('loop:started', () => loadLoops());
+    es.addEventListener('loop:completed', () => { loadLoops(); loadHistory(); });
+    es.addEventListener('loop:failed', () => { loadLoops(); loadHistory(); });
+    es.addEventListener('loop:queued', () => loadLoops());
+    es.addEventListener('loop:cancelled', () => loadLoops());
+    es.addEventListener('status', (ev) => {
+      try {
+        const data = JSON.parse(ev.data);
+        if (data.status) {
+          const badge = document.getElementById('daemon-status-badge');
+          badge.textContent = data.status;
+        }
+      } catch { /* ignore */ }
+    });
+
+    es.onerror = () => {
+      // Reconnect after 5s on failure
+      setTimeout(connectEventStream, 5000);
+    };
+  }
+
+  // ── Init ───────────────────────────────────────────────────────────────────
+
+  async function init() {
+    await loadStatus();
+    await loadLoops();
+    startResourcesAutoRefresh();
+    connectEventStream();
+
+    // Refresh loops table every 10s as fallback
+    setInterval(loadLoops, 10000);
+    // Refresh status every 30s
+    setInterval(loadStatus, 30000);
+  }
+
+  init();
+
+})();
+</script>
+
+</body>
+</html>

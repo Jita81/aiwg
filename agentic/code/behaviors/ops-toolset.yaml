@@ -1,0 +1,135 @@
+name: ops-toolset
+version: "1.0.0"
+description: >
+  Operational toolset for daemons and long-running agent loops.
+  Provides process governance directives and resource monitoring tools.
+
+agentTypes:
+  - daemon
+  - ralph-loop
+  - long-running-agent
+
+directives:
+  - id: process-group-kill
+    rule: >
+      Always use process.kill(-pid, signal) to terminate spawned sessions.
+      This sends the signal to the entire process group, killing child shells
+      and subprocesses that would otherwise become orphans.
+    defaults:
+      signal: SIGTERM
+      escalation_signal: SIGKILL
+      escalation_delay_ms: 5000
+
+  - id: restart-intensity
+    rule: >
+      Track the number of restarts per task within a sliding time window.
+      If restarts exceed the threshold within the window, mark the task as
+      permanently failed. Follows Erlang/OTP max_restarts supervisor pattern.
+    defaults:
+      max_restarts: 3
+      window_ms: 300000
+
+  - id: concurrency-cap
+    rule: >
+      Never exceed max_concurrent simultaneous agent sessions.
+      Additional submissions are queued in priority order.
+      When the queue is full, reject with a structured error.
+    defaults:
+      max_concurrent: 4
+      max_queue_depth: 20
+
+  - id: budget-gate
+    rule: >
+      Check aggregate spend across all loops before spawning a new session.
+      Emit a warning at 90% of daily_budget_usd. Block spawning at 100%.
+      Budget resets at midnight local time.
+    defaults:
+      daily_budget_usd: 0
+      warning_threshold_pct: 90
+
+  - id: zombie-reap
+    rule: >
+      On child process exit, verify the process is fully reaped.
+      Remove stale PID files and heartbeat entries for dead processes.
+      Check for zombie children on a periodic interval.
+    defaults:
+      check_interval_ms: 30000
+
+tools:
+  - tool: process-list
+    description: >
+      List all running agent loops with their PID, status, start time,
+      and resource usage. Wraps ProcessMonitor.getRunningLoops().
+    schema:
+      type: object
+      properties:
+        filter:
+          type: string
+          enum: [all, running, queued, failed]
+          default: all
+      required: []
+
+  - tool: process-kill
+    description: >
+      Kill a running agent loop by loop ID. Uses process group kill (-pid)
+      to ensure all child processes are terminated.
+    schema:
+      type: object
+      properties:
+        loopId:
+          type: string
+          description: The loop identifier to kill
+        signal:
+          type: string
+          enum: [SIGTERM, SIGKILL, SIGINT]
+          default: SIGTERM
+      required: [loopId]
+
+  - tool: resource-snapshot
+    description: >
+      Capture current system resource usage: CPU percentage, memory MB,
+      disk usage, and daemon uptime. Wraps MetricsCollector.getSystemMetrics().
+    schema:
+      type: object
+      properties: {}
+      required: []
+
+  - tool: circuit-status
+    description: >
+      Query the circuit breaker state: closed (normal), open (blocking),
+      or half-open (probing). Includes failure count and cooldown remaining.
+    schema:
+      type: object
+      properties: {}
+      required: []
+
+  - tool: queue-inspect
+    description: >
+      Inspect the submission queue: depth, oldest entry timestamp,
+      priority distribution, and estimated wait time.
+    schema:
+      type: object
+      properties: {}
+      required: []
+
+  - tool: loop-history
+    description: >
+      Retrieve completed loop summaries: loop ID, duration, exit status,
+      iteration count, and cost. Wraps ExternalMultiLoopStateManager.
+    schema:
+      type: object
+      properties:
+        limit:
+          type: integer
+          default: 20
+          description: Maximum number of history entries to return
+      required: []
+
+  - tool: budget-remaining
+    description: >
+      Check remaining daily budget: spent amount, configured limit,
+      remaining amount, and percentage used. Currency in USD.
+    schema:
+      type: object
+      properties: {}
+      required: []

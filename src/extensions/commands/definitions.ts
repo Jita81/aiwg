@@ -1351,12 +1351,37 @@ export const reproducibilityValidateCommand: Extension = {
   } satisfies CommandMetadata,
 };
 
+export const behaviorCommand: Extension = {
+  id: 'behavior',
+  type: 'command',
+  name: 'Behavior',
+  description: 'Manage behavior YAML bundles that bind directives and toolsets to agent types',
+  version: '1.0.0',
+  capabilities: ['cli', 'behavior', 'daemon', 'configuration'],
+  keywords: ['behavior', 'directive', 'toolset', 'daemon', 'ops', 'agent-type'],
+  category: 'daemon',
+  platforms: {
+    claude: 'full',
+    generic: 'full',
+  },
+  deployment: {
+    pathTemplate: '.{platform}/commands/{id}.md',
+    core: false,
+  },
+  metadata: {
+    type: 'command',
+    template: 'utility',
+    argumentHint: '<list|info|apply|remove> [name] [--to <agent>] [--from <agent>]',
+    allowedTools: ['Read', 'Bash', 'Write'],
+  } satisfies CommandMetadata,
+};
+
 // ============================================
 // Aggregated Exports
 // ============================================
 
 /**
- * All command definitions (50 total)
+ * All command definitions (51 total)
  *
  * Organized by category:
  * - Maintenance (5): help, version, doctor, update, sync
@@ -1377,6 +1402,7 @@ export const reproducibilityValidateCommand: Extension = {
  * - SDLC Orchestration (1): sdlc-accelerate
  * - Index (1): index
  * - Reproducibility (4): execution-mode, snapshot, checkpoint, reproducibility-validate
+ * - Daemon (1): behavior
  */
 export const commandDefinitions: Extension[] = [
   // Maintenance (5)
@@ -1464,6 +1490,9 @@ export const commandDefinitions: Extension[] = [
   snapshotCommand,
   checkpointCommand,
   reproducibilityValidateCommand,
+
+  // Daemon (1)
+  behaviorCommand,
 ];
 
 // ============================================

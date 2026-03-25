@@ -11,6 +11,11 @@ import { IPCServer } from './ipc-server.mjs';
 import { AgentSupervisor } from './agent-supervisor.mjs';
 import { TaskStore } from './task-store.mjs';
 import { AutomationEngine } from './automation-engine.mjs';
+import { registerOpsHandlers } from './ipc-ops-handlers.mjs';
+import { DaemonSupervisor } from '../ralph-external/daemon-supervisor.mjs';
+import { BehaviorRegistry } from '../ralph-external/lib/behavior-registry.mjs';
+import { WebServer } from './web-server.mjs';
+import { MessageRouter } from './message-router.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -25,6 +30,11 @@ class DaemonMain {
     this.supervisor = null;
     this.taskStore = null;
     this.automationEngine = null;
+    this.daemonSupervisor = null;
+    this.behaviorRegistry = null;
+    this.webServer = null;
+    this.messageRouter = null;
+    this.opsHandlersApi = null;
     this.shutdownInProgress = false;
     this.isRotating = false;
     this.startTime = Date.now();
@@ -185,6 +195,43 @@ class DaemonMain {
     this.supervisor.on('task:timeout', (e) => this.log(`Agent task timed out: ${e.taskId}`));
     this.log(`Agent supervisor started (max ${maxConcurrency} concurrent)`);
 
+    // Wrap AgentSupervisor with DaemonSupervisor for production governance
+    const supConfig = this.config.get('supervisor') || {};
+    this.daemonSupervisor = new DaemonSupervisor({
+      agentSupervisor: this.supervisor,
+      maxConcurrent: supConfig.max_concurrent ?? maxConcurrency,
+      maxQueueDepth: supConfig.max_queue_depth ?? 20,
+      dailyBudgetUsd: supConfig.daily_budget_usd ?? 0,
+      restartIntensity: {
+        maxRestarts: supConfig.restart_intensity?.max_restarts ?? 3,
+        windowMs: (supConfig.restart_intensity?.window_seconds ?? 300) * 1000,
+      },
+      circuitBreaker: supConfig.circuit_breaker,
+    });
+    this.daemonSupervisor.on('loop:started', (e) => this.log(`Loop started: ${e.loopId}`));
+    this.daemonSupervisor.on('loop:completed', (e) => this.log(`Loop completed: ${e.loopId}`));
+    this.daemonSupervisor.on('loop:failed', (e) => this.log(`Loop failed: ${e.loopId} (permanent: ${e.permanent})`));
+    this.daemonSupervisor.on('circuit:trip', (e) => this.log(`Circuit breaker tripped: ${e.consecutiveFailures} failures`));
+    this.daemonSupervisor.on('budget:warning', (e) => this.log(`Budget warning: ${e.percentUsed}% used`));
+    this.log('DaemonSupervisor initialized');
+
+    // Load behavior registry
+    try {
+      const projectRoot = process.cwd();
+      this.behaviorRegistry = new BehaviorRegistry({
+        projectRoot,
+        frameworkRoot: projectRoot,
+      });
+      const behaviors = await this.behaviorRegistry.loadAll();
+      this.log(`Behavior registry loaded ${behaviors.size} behavior(s)`);
+    } catch (err) {
+      this.log(`Behavior registry init failed (non-fatal): ${err.message}`);
+    }
+
+    // Initialize MessageRouter
+    this.messageRouter = new MessageRouter({ supervisor: this.supervisor });
+    this.log('MessageRouter initialized');
+
     // Initialize automation engine (trigger-action rules)
     this.automationEngine = new AutomationEngine({
       supervisor: this.supervisor,
@@ -228,11 +275,39 @@ class DaemonMain {
       this.log(`Messaging subsystem not available: ${error.message}`);
     }
 
-    // Route events through automation engine
+    // Start web server if configured
+    const webConfig = this.config.get('interface.web');
+    if (webConfig?.enabled) {
+      this.webServer = new WebServer({
+        port: webConfig.port ?? 7474,
+        host: webConfig.host ?? '127.0.0.1',
+        token: webConfig.token || process.env.AIWG_WEB_TOKEN || null,
+        daemonSupervisor: this.daemonSupervisor,
+        opsHandlers: this.opsHandlersApi,
+      });
+      await this.webServer.start();
+      this.log(`Web server listening on ${this.webServer.url}`);
+    }
+
+    // Route events through automation engine and adapters
     this.eventRouter.on('event', (event) => {
       this.handleEvent(event);
       this.automationEngine.processEvent(event);
     });
+
+    // Forward DaemonSupervisor events to MessageRouter and WebServer
+    if (this.daemonSupervisor) {
+      for (const eventName of ['loop:started', 'loop:completed', 'loop:failed', 'loop:queued', 'circuit:trip', 'circuit:recover', 'budget:warning']) {
+        this.daemonSupervisor.on(eventName, (data) => {
+          if (this.messageRouter) {
+            this.messageRouter.broadcast({ type: eventName, data });
+          }
+          if (this.webServer) {
+            this.webServer.broadcastEvent(eventName, data);
+          }
+        });
+      }
+    }
   }
 
   /**
@@ -345,6 +420,12 @@ class DaemonMain {
       // Ping for health checks
       'ping': () => ({ pong: true, timestamp: new Date().toISOString() }),
     });
+
+    // Register ops-toolset IPC methods
+    if (this.daemonSupervisor) {
+      this.opsHandlersApi = registerOpsHandlers(this.ipcServer, this.daemonSupervisor);
+      this.log('Ops-toolset IPC methods registered (7 methods)');
+    }
   }
 
   handleEvent(event) {
@@ -390,6 +471,7 @@ class DaemonMain {
 
   writeState() {
     const supervisorStatus = this.supervisor ? this.supervisor.getStatus() : { running: 0, queued: 0, tasks: { running: [], queued: [] } };
+    const daemonStatus = this.daemonSupervisor ? this.daemonSupervisor.status() : null;
     const taskStats = this.taskStore ? this.taskStore.getStats() : {};
 
     const state = {
@@ -418,6 +500,15 @@ class DaemonMain {
         enabled: this.automationEngine.enabled,
         rule_count: this.automationEngine.ruleCount,
       } : { enabled: false },
+      daemon_supervisor: daemonStatus ? {
+        concurrency: `${daemonStatus.concurrencyUsed}/${daemonStatus.concurrencyMax}`,
+        queue: `${daemonStatus.queueDepth}/${daemonStatus.queueMax}`,
+        circuit: daemonStatus.circuitState?.state || 'unknown',
+        budget: daemonStatus.budgetLimit > 0
+          ? `$${daemonStatus.budgetUsed.toFixed(2)}/$${daemonStatus.budgetLimit.toFixed(2)}`
+          : 'unlimited',
+      } : null,
+      web_server: this.webServer ? { url: this.webServer.url } : null,
       health: {
         status: 'healthy',
         last_check: new Date().toISOString(),
@@ -460,8 +551,25 @@ class DaemonMain {
       }
     }
 
-    // Drain agent supervisor (wait for running tasks, cancel queued)
-    if (this.supervisor) {
+    // Stop web server
+    if (this.webServer) {
+      try {
+        await this.webServer.stop();
+        this.log('Web server stopped');
+      } catch (error) {
+        this.log(`Error stopping web server: ${error.message}`);
+      }
+    }
+
+    // Drain DaemonSupervisor (which delegates to AgentSupervisor)
+    if (this.daemonSupervisor) {
+      try {
+        await this.daemonSupervisor.shutdown(15000);
+        this.log('DaemonSupervisor drained');
+      } catch (error) {
+        this.log(`Error draining DaemonSupervisor: ${error.message}`);
+      }
+    } else if (this.supervisor) {
       try {
         this.log(`Draining supervisor (${this.supervisor.runningCount} running, ${this.supervisor.queuedCount} queued)`);
         await this.supervisor.shutdown(15000);

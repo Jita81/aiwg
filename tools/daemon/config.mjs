@@ -61,6 +61,21 @@ const DEFAULT_CONFIG = {
       }
     ]
   },
+  supervisor: {
+    max_concurrent: 4,
+    max_queue_depth: 20,
+    restart_intensity: { max_restarts: 3, window_seconds: 300 },
+    circuit_breaker: { failure_threshold: 5, cooldown_ms: 120000 },
+    daily_budget_usd: 0,
+    behaviors: ['ops-toolset'],
+  },
+  interface: {
+    web: {
+      enabled: false,
+      port: 7474,
+      host: '127.0.0.1',
+    },
+  },
   rules: []
 };
 
