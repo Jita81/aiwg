@@ -36,14 +36,14 @@
   },
   "seo": {
     "enabled": true,
-    "siteUrl": "https://docs.aiwg.dev",
+    "siteUrl": "https://docs.aiwg.io",
     "generateSitemap": true,
     "generateStaticPages": true,
     "generateRobotsTxt": true,
     "defaultChangeFreq": "weekly",
     "structuredData": {
       "organizationName": "AIWG Project",
-      "logoUrl": "https://docs.aiwg.dev/assets/favicon.svg"
+      "logoUrl": "https://docs.aiwg.io/assets/favicon.svg"
     }
   },
   "export": {

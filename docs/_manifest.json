@@ -1,11 +1,38 @@
 {
   "default": "welcome",
   "bottomNav": "mobile",
+  "exclude": [
+    "agent-intelligence",
+    "architecture",
+    "cli-ui-modernization",
+    "context-management-patterns",
+    "disk-output-patterns",
+    "gap-analysis-guide",
+    "hook-file-architecture",
+    "hybrid-addressing",
+    "mcp-auto-mode-guide",
+    "model-evaluation",
+    "overrides",
+    "quality-metrics",
+    "reference",
+    "reliability",
+    "research",
+    "research-pdf-optimization",
+    "session-pr-linking",
+    "skills-commands-unification",
+    "soul-md-guide",
+    "sponsors",
+    "task-management-integration",
+    "usage-notes",
+    "yaml-metalanguage",
+    "how-it-works"
+  ],
   "order": [
     "welcome",
     "getting-started",
     "overview/what-is-aiwg",
     "overview/executive-brief",
+    "getting-started/prerequisites",
     "quickstart",
     "intake-guide",
     "regenerate-guide",
@@ -22,21 +49,6 @@
     "integrations/cross-platform-config",
     "quickstart-sdlc",
     "quickstart-mmk",
-    "reference",
-    "CLI_USAGE",
-    "mention-utilities",
-    "deploy-generators",
-    "configuration/model-configuration",
-    "hook-patterns",
-    "mcp/README",
-    "plugin-marketplace-guide",
-    "daemon-guide",
-    "messaging-guide",
-    "troubleshooting",
-    "troubleshooting/setup-issues",
-    "troubleshooting/deployment-issues",
-    "troubleshooting/path-issues",
-    "troubleshooting/platform-issues",
     "guides",
     "models",
     "models/claude-optimization",
@@ -48,6 +60,19 @@
     "prompting/context-optimization",
     "prompting/few-shot-learning",
     "prompting/role-based-prompting",
+    "reference",
+    "CLI_USAGE",
+    "cli-reference",
+    "ralph-guide",
+    "simple-language-translations",
+    "mention-utilities",
+    "deploy-generators",
+    "configuration/model-configuration",
+    "hook-patterns",
+    "mcp/README",
+    "plugin-marketplace-guide",
+    "daemon-guide",
+    "messaging-guide",
     "customizing",
     "extensions",
     "extensions/overview",
@@ -74,12 +99,21 @@
     "contributing/contributor-quickstart",
     "contributing/maintainer-review-guide",
     "contributing/testing-requirements",
+    "troubleshooting",
+    "troubleshooting/setup-issues",
+    "troubleshooting/deployment-issues",
+    "troubleshooting/path-issues",
+    "troubleshooting/platform-issues",
     "references",
     "references/REF-001-production-grade-agentic-workflows",
     "references/REF-002-llm-failure-modes-agentic",
     "references/REF-003-agentic-development-antipatterns",
     "references/REF-066-mcp-specification-2025",
     "releases",
+    "releases/v2026.3.3-announcement",
+    "releases/v2026.3.2-announcement",
+    "releases/v2026.3.1-announcement",
+    "releases/v2026.2.15-announcement",
     "releases/v2026.2.14-announcement",
     "releases/v2026.2.12-announcement",
     "releases/v2026.2.9-announcement",
@@ -119,28 +153,35 @@
     {
       "id": "overview/what-is-aiwg",
       "title": "What is AIWG?",
-      "summary": "Framework overview",
+      "summary": "Framework overview and key concepts",
       "file": "overview/what-is-aiwg.md",
       "parent": "getting-started"
     },
     {
       "id": "overview/executive-brief",
       "title": "Executive Brief",
-      "summary": "High-level summary",
+      "summary": "High-level summary for decision makers",
       "file": "overview/executive-brief.md",
+      "parent": "getting-started"
+    },
+    {
+      "id": "getting-started/prerequisites",
+      "title": "Prerequisites",
+      "summary": "System requirements and setup",
+      "file": "getting-started/prerequisites.md",
       "parent": "getting-started"
     },
     {
       "id": "quickstart",
       "title": "Quick Start",
-      "summary": "Install and deploy",
+      "summary": "Install and deploy in 5 minutes",
       "file": "quickstart.md",
       "parent": "getting-started"
     },
     {
       "id": "intake-guide",
       "title": "Intake Guide",
-      "summary": "Start projects easily",
+      "summary": "Start projects with structured intake",
       "file": "intake-guide.md",
       "parent": "getting-started"
     },
@@ -154,7 +195,7 @@
     {
       "id": "integrations",
       "title": "Platform Setup",
-      "summary": "Configure your AI platform",
+      "summary": "Configure your AI coding platform",
       "collapsed": true,
       "parent": "getting-started"
     },
@@ -224,7 +265,7 @@
     {
       "id": "integrations/cross-platform-config",
       "title": "Configuration",
-      "summary": "Shared configuration",
+      "summary": "Shared configuration across platforms",
       "file": "integrations/cross-platform-config.md",
       "parent": "integrations"
     },
@@ -243,21 +284,117 @@
       "parent": "getting-started"
     },
     {
+      "id": "guides",
+      "title": "Guides",
+      "summary": "Learn AI model optimization and prompting techniques"
+    },
+    {
+      "id": "models",
+      "title": "Model Optimization",
+      "summary": "Get the best results from AI models",
+      "collapsed": true,
+      "parent": "guides"
+    },
+    {
+      "id": "models/claude-optimization",
+      "title": "Claude",
+      "summary": "Claude context and tool patterns",
+      "file": "models/claude-optimization.md",
+      "parent": "models"
+    },
+    {
+      "id": "models/gpt-optimization",
+      "title": "GPT",
+      "summary": "GPT function calling and outputs",
+      "file": "models/gpt-optimization.md",
+      "parent": "models"
+    },
+    {
+      "id": "models/local-models",
+      "title": "Local Models",
+      "summary": "Quantization and local deployment",
+      "file": "models/local-models.md",
+      "parent": "models"
+    },
+    {
+      "id": "models/hybrid-architectures",
+      "title": "Hybrid Architectures",
+      "summary": "Multi-model routing strategies",
+      "file": "models/hybrid-architectures.md",
+      "parent": "models"
+    },
+    {
+      "id": "prompting",
+      "title": "Prompting Techniques",
+      "summary": "Advanced prompting strategies",
+      "collapsed": true,
+      "parent": "guides"
+    },
+    {
+      "id": "prompting/chain-of-thought",
+      "title": "Chain-of-Thought",
+      "summary": "Structured reasoning patterns",
+      "file": "prompting/chain-of-thought.md",
+      "parent": "prompting"
+    },
+    {
+      "id": "prompting/context-optimization",
+      "title": "Context Optimization",
+      "summary": "Managing context windows effectively",
+      "file": "prompting/context-optimization.md",
+      "parent": "prompting"
+    },
+    {
+      "id": "prompting/few-shot-learning",
+      "title": "Few-Shot Learning",
+      "summary": "Example selection and formatting",
+      "file": "prompting/few-shot-learning.md",
+      "parent": "prompting"
+    },
+    {
+      "id": "prompting/role-based-prompting",
+      "title": "Role-Based Prompting",
+      "summary": "Persona design and voice",
+      "file": "prompting/role-based-prompting.md",
+      "parent": "prompting"
+    },
+    {
       "id": "reference",
       "title": "Reference",
-      "summary": "CLI and configuration docs"
+      "summary": "CLI commands, configuration, and API docs"
     },
     {
       "id": "CLI_USAGE",
       "title": "CLI Reference",
-      "summary": "Command line usage",
+      "summary": "Complete command line usage",
       "file": "CLI_USAGE.md",
+      "parent": "reference"
+    },
+    {
+      "id": "cli-reference",
+      "title": "All Commands",
+      "summary": "Every aiwg command with examples",
+      "file": "cli-reference.md",
+      "parent": "reference"
+    },
+    {
+      "id": "ralph-guide",
+      "title": "Ralph Loop Guide",
+      "summary": "Iterative AI task execution with automatic recovery",
+      "file": "ralph-guide.md",
+      "parent": "reference"
+    },
+    {
+      "id": "simple-language-translations",
+      "title": "Natural Language Reference",
+      "summary": "Maps everyday phrases to AIWG commands",
+      "file": "simple-language-translations.md",
       "parent": "reference"
     },
     {
       "id": "mention-utilities",
       "title": "@-Mention Utilities",
-      "summary": "Traceability references",
+      "summary": "Traceability references and linking",
       "file": "mention-utilities.md",
       "parent": "reference"
     },
@@ -271,7 +408,7 @@
     {
       "id": "configuration/model-configuration",
       "title": "Model Configuration",
-      "summary": "Configure AI models",
+      "summary": "Configure AI model settings",
       "file": "configuration/model-configuration.md",
       "parent": "reference"
     },
@@ -285,7 +422,7 @@
     {
       "id": "mcp/README",
       "title": "MCP Server",
-      "summary": "Model Context Protocol",
+      "summary": "Model Context Protocol integration",
       "file": "mcp/README.md",
       "parent": "reference"
     },
@@ -309,6 +446,186 @@
       "summary": "Chat platform integration",
       "file": "messaging-guide.md",
       "parent": "reference"
+    },
+    {
+      "id": "customizing",
+      "title": "Customizing AIWG",
+      "summary": "Extend, build, and contribute components"
+    },
+    {
+      "id": "extensions",
+      "title": "Extension System",
+      "summary": "Architecture and types",
+      "collapsed": true,
+      "parent": "customizing"
+    },
+    {
+      "id": "extensions/overview",
+      "title": "Overview",
+      "summary": "Extension architecture",
+      "file": "extensions/overview.md",
+      "parent": "extensions"
+    },
+    {
+      "id": "extensions/creating-extensions",
+      "title": "Creating Extensions",
+      "summary": "Build custom extensions",
+      "file": "extensions/creating-extensions.md",
+      "parent": "extensions"
+    },
+    {
+      "id": "extensions/extension-types",
+      "title": "Extension Types",
+      "summary": "Complete type reference",
+      "file": "extensions/extension-types.md",
+      "parent": "extensions"
+    },
+    {
+      "id": "development",
+      "title": "Addons & Frameworks",
+      "summary": "Package reusable components",
+      "collapsed": true,
+      "parent": "customizing"
+    },
+    {
+      "id": "development/devkit-overview",
+      "title": "Devkit Overview",
+      "summary": "Development toolkit",
+      "file": "development/devkit-overview.md",
+      "parent": "development"
+    },
+    {
+      "id": "development/addon-creation-guide",
+      "title": "Creating Addons",
+      "summary": "Build addon packages",
+      "file": "development/addon-creation-guide.md",
+      "parent": "development"
+    },
+    {
+      "id": "development/extension-creation-guide",
+      "title": "Creating Extensions",
+      "summary": "Build standalone extensions",
+      "file": "development/extension-creation-guide.md",
+      "parent": "development"
+    },
+    {
+      "id": "development/framework-creation-guide",
+      "title": "Creating Frameworks",
+      "summary": "Build complete frameworks",
+      "file": "development/framework-creation-guide.md",
+      "parent": "development"
+    },
+    {
+      "id": "development/skill-creation-guide",
+      "title": "Creating Skills",
+      "summary": "Build reusable skills",
+      "file": "development/skill-creation-guide.md",
+      "parent": "development"
+    },
+    {
+      "id": "development/walkthrough-create-addon",
+      "title": "Addon Walkthrough",
+      "summary": "Step-by-step addon tutorial",
+      "file": "development/walkthrough-create-addon.md",
+      "parent": "development"
+    },
+    {
+      "id": "development/file-placement-guide",
+      "title": "File Placement",
+      "summary": "Where files belong in the project",
+      "file": "development/file-placement-guide.md",
+      "parent": "development"
+    },
+    {
+      "id": "commands",
+      "title": "Commands",
+      "summary": "Build slash commands",
+      "collapsed": true,
+      "parent": "customizing"
+    },
+    {
+      "id": "commands/DEVELOPMENT_GUIDE",
+      "title": "Development Guide",
+      "summary": "Creating commands",
+      "file": "commands/DEVELOPMENT_GUIDE.md",
+      "parent": "commands"
+    },
+    {
+      "id": "commands/development-commands-examples",
+      "title": "Examples",
+      "summary": "Command usage examples",
+      "file": "commands/development-commands-examples.md",
+      "parent": "commands"
+    },
+    {
+      "id": "commands/subagents-and-commands-guide",
+      "title": "Subagents",
+      "summary": "Work with subagents",
+      "file": "commands/subagents-and-commands-guide.md",
+      "parent": "commands"
+    },
+    {
+      "id": "smithing",
+      "title": "Smithing",
+      "summary": "Generate tools and MCP servers dynamically",
+      "collapsed": true,
+      "parent": "customizing"
+    },
+    {
+      "id": "smithing/agentic-smiths",
+      "title": "Agentic Smiths",
+      "summary": "Generate agents and skills on demand",
+      "file": "smithing/agentic-smiths.md",
+      "parent": "smithing"
+    },
+    {
+      "id": "smithing/toolsmith",
+      "title": "Toolsmith",
+      "summary": "Create automation tools",
+      "file": "smithing/toolsmith.md",
+      "parent": "smithing"
+    },
+    {
+      "id": "smithing/mcpsmith",
+      "title": "MCP Smith",
+      "summary": "Generate MCP servers",
+      "file": "smithing/mcpsmith.md",
+      "parent": "smithing"
+    },
+    {
+      "id": "smithing/graduating-creations",
+      "title": "Graduating Creations",
+      "summary": "Promote to production",
+      "file": "smithing/graduating-creations.md",
+      "parent": "smithing"
+    },
+    {
+      "id": "contributing",
+      "title": "Contributing",
+      "summary": "Contribute to the AIWG project",
+      "collapsed": true,
+      "parent": "customizing"
+    },
+    {
+      "id": "contributing/contributor-quickstart",
+      "title": "Contributor Guide",
+      "summary": "Getting started as a contributor",
+      "file": "contributing/contributor-quickstart.md",
+      "parent": "contributing"
+    },
+    {
+      "id": "contributing/maintainer-review-guide",
+      "title": "Maintainer Guide",
+      "summary": "Review and merge process",
+      "file": "contributing/maintainer-review-guide.md",
+      "parent": "contributing"
+    },
+    {
+      "id": "contributing/testing-requirements",
+      "title": "Testing Requirements",
+      "summary": "Test standards for contributions",
+      "file": "contributing/testing-requirements.md",
+      "parent": "contributing"
     },
     {
       "id": "troubleshooting",
@@ -345,266 +662,10 @@
       "parent": "troubleshooting"
     },
     {
-      "id": "guides",
-      "title": "Guides",
-      "summary": "Model optimization and prompting"
-    },
-    {
-      "id": "models",
-      "title": "Model Optimization",
-      "summary": "Optimize AI model usage",
-      "collapsed": true,
-      "parent": "guides"
-    },
-    {
-      "id": "models/claude-optimization",
-      "title": "Claude",
-      "summary": "Claude context and tool patterns",
-      "file": "models/claude-optimization.md",
-      "parent": "models"
-    },
-    {
-      "id": "models/gpt-optimization",
-      "title": "GPT",
-      "summary": "GPT function calling and outputs",
-      "file": "models/gpt-optimization.md",
-      "parent": "models"
-    },
-    {
-      "id": "models/local-models",
-      "title": "Local Models",
-      "summary": "Quantization and deployment",
-      "file": "models/local-models.md",
-      "parent": "models"
-    },
-    {
-      "id": "models/hybrid-architectures",
-      "title": "Hybrid Architectures",
-      "summary": "Multi-model routing",
-      "file": "models/hybrid-architectures.md",
-      "parent": "models"
-    },
-    {
-      "id": "prompting",
-      "title": "Prompting Techniques",
-      "summary": "Advanced prompting strategies",
-      "collapsed": true,
-      "parent": "guides"
-    },
-    {
-      "id": "prompting/chain-of-thought",
-      "title": "Chain-of-Thought",
-      "summary": "Structured reasoning",
-      "file": "prompting/chain-of-thought.md",
-      "parent": "prompting"
-    },
-    {
-      "id": "prompting/context-optimization",
-      "title": "Context Optimization",
-      "summary": "Managing context windows",
-      "file": "prompting/context-optimization.md",
-      "parent": "prompting"
-    },
-    {
-      "id": "prompting/few-shot-learning",
-      "title": "Few-Shot Learning",
-      "summary": "Example selection and formatting",
-      "file": "prompting/few-shot-learning.md",
-      "parent": "prompting"
-    },
-    {
-      "id": "prompting/role-based-prompting",
-      "title": "Role-Based Prompting",
-      "summary": "Persona design and voice",
-      "file": "prompting/role-based-prompting.md",
-      "parent": "prompting"
-    },
-    {
-      "id": "customizing",
-      "title": "Customizing AIWG",
-      "summary": "Extend and build components"
-    },
-    {
-      "id": "extensions",
-      "title": "Extension System",
-      "summary": "Architecture and types",
-      "collapsed": true,
-      "parent": "customizing"
-    },
-    {
-      "id": "extensions/overview",
-      "title": "Overview",
-      "summary": "Extension architecture",
-      "file": "extensions/overview.md",
-      "parent": "extensions"
-    },
-    {
-      "id": "extensions/creating-extensions",
-      "title": "Creating Extensions",
-      "summary": "Build custom extensions",
-      "file": "extensions/creating-extensions.md",
-      "parent": "extensions"
-    },
-    {
-      "id": "extensions/extension-types",
-      "title": "Extension Types",
-      "summary": "Type reference",
-      "file": "extensions/extension-types.md",
-      "parent": "extensions"
-    },
-    {
-      "id": "development",
-      "title": "Addons & Frameworks",
-      "summary": "Package reusable components",
-      "collapsed": true,
-      "parent": "customizing"
-    },
-    {
-      "id": "development/devkit-overview",
-      "title": "Devkit Overview",
-      "summary": "Development toolkit",
-      "file": "development/devkit-overview.md",
-      "parent": "development"
-    },
-    {
-      "id": "development/addon-creation-guide",
-      "title": "Creating Addons",
-      "summary": "Build addons",
-      "file": "development/addon-creation-guide.md",
-      "parent": "development"
-    },
-    {
-      "id": "development/extension-creation-guide",
-      "title": "Creating Extensions",
-      "summary": "Build extensions",
-      "file": "development/extension-creation-guide.md",
-      "parent": "development"
-    },
-    {
-      "id": "development/framework-creation-guide",
-      "title": "Creating Frameworks",
-      "summary": "Build frameworks",
-      "file": "development/framework-creation-guide.md",
-      "parent": "development"
-    },
-    {
-      "id": "development/skill-creation-guide",
-      "title": "Creating Skills",
-      "summary": "Build skills",
-      "file": "development/skill-creation-guide.md",
-      "parent": "development"
-    },
-    {
-      "id": "development/walkthrough-create-addon",
-      "title": "Addon Walkthrough",
-      "summary": "Step-by-step tutorial",
-      "file": "development/walkthrough-create-addon.md",
-      "parent": "development"
-    },
-    {
-      "id": "development/file-placement-guide",
-      "title": "File Placement",
-      "summary": "Where files go",
-      "file": "development/file-placement-guide.md",
-      "parent": "development"
-    },
-    {
-      "id": "commands",
-      "title": "Commands",
-      "summary": "Build slash commands",
-      "collapsed": true,
-      "parent": "development"
-    },
-    {
-      "id": "commands/DEVELOPMENT_GUIDE",
-      "title": "Development Guide",
-      "summary": "Creating commands",
-      "file": "commands/DEVELOPMENT_GUIDE.md",
-      "parent": "commands"
-    },
-    {
-      "id": "commands/development-commands-examples",
-      "title": "Examples",
-      "summary": "Command usage examples",
-      "file": "commands/development-commands-examples.md",
-      "parent": "commands"
-    },
-    {
-      "id": "commands/subagents-and-commands-guide",
-      "title": "Subagents",
-      "summary": "Work with subagents",
-      "file": "commands/subagents-and-commands-guide.md",
-      "parent": "development"
-    },
-    {
-      "id": "smithing",
-      "title": "Smithing",
-      "summary": "Generate tools and MCP servers",
-      "collapsed": true,
-      "parent": "development"
-    },
-    {
-      "id": "smithing/agentic-smiths",
-      "title": "Agentic Smiths",
-      "summary": "Generate agents and skills",
-      "file": "smithing/agentic-smiths.md",
-      "parent": "smithing"
-    },
-    {
-      "id": "smithing/toolsmith",
-      "title": "Toolsmith",
-      "summary": "Create automation tools",
-      "file": "smithing/toolsmith.md",
-      "parent": "smithing"
-    },
-    {
-      "id": "smithing/mcpsmith",
-      "title": "MCP Smith",
-      "summary": "Generate MCP servers",
-      "file": "smithing/mcpsmith.md",
-      "parent": "smithing"
-    },
-    {
-      "id": "smithing/graduating-creations",
-      "title": "Graduating Creations",
-      "summary": "Promote to production",
-      "file": "smithing/graduating-creations.md",
-      "parent": "smithing"
-    },
-    {
-      "id": "contributing",
-      "title": "Contributing",
-      "summary": "Contribute to AIWG",
-      "collapsed": true,
-      "parent": "customizing"
-    },
-    {
-      "id": "contributing/contributor-quickstart",
-      "title": "Contributor Guide",
-      "summary": "Getting started",
-      "file": "contributing/contributor-quickstart.md",
-      "parent": "contributing"
-    },
-    {
-      "id": "contributing/maintainer-review-guide",
-      "title": "Maintainer Guide",
-      "summary": "Review process",
-      "file": "contributing/maintainer-review-guide.md",
-      "parent": "contributing"
-    },
-    {
-      "id": "contributing/testing-requirements",
-      "title": "Testing Requirements",
-      "summary": "Test standards",
-      "file": "contributing/testing-requirements.md",
-      "parent": "contributing"
-    },
-    {
       "id": "references",
       "title": "Research",
-      "summary": "Papers and specifications",
-      "collapsed": true,
-      "parent": "customizing"
+      "summary": "Academic papers and specifications",
+      "collapsed": true
     },
     {
       "id": "references/REF-001-production-grade-agentic-workflows",
@@ -616,7 +677,7 @@
     {
       "id": "references/REF-002-llm-failure-modes-agentic",
       "title": "REF-002: LLM Failure Modes",
-      "summary": "Failure analysis",
+      "summary": "Failure analysis and mitigation",
       "file": "references/REF-002-llm-failure-modes-agentic.md",
       "parent": "references"
     },
@@ -637,13 +698,41 @@
     {
       "id": "releases",
       "title": "Releases",
-      "summary": "Release notes",
+      "summary": "Release notes and changelog",
       "collapsed": true
+    },
+    {
+      "id": "releases/v2026.3.3-announcement",
+      "title": "v2026.3.3",
+      "summary": "Latest release",
+      "file": "releases/v2026.3.3-announcement.md",
+      "parent": "releases"
+    },
+    {
+      "id": "releases/v2026.3.2-announcement",
+      "title": "v2026.3.2",
+      "summary": "Previous release",
+      "file": "releases/v2026.3.2-announcement.md",
+      "parent": "releases"
+    },
+    {
+      "id": "releases/v2026.3.1-announcement",
+      "title": "v2026.3.1",
+      "summary": "Previous release",
+      "file": "releases/v2026.3.1-announcement.md",
+      "parent": "releases"
+    },
+    {
+      "id": "releases/v2026.2.15-announcement",
+      "title": "v2026.2.15",
+      "summary": "Previous release",
+      "file": "releases/v2026.2.15-announcement.md",
+      "parent": "releases"
     },
     {
       "id": "releases/v2026.2.14-announcement",
       "title": "v2026.2.14",
-      "summary": "Latest release",
+      "summary": "Previous release",
       "file": "releases/v2026.2.14-announcement.md",
       "parent": "releases"
     },

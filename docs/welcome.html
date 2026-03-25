@@ -2,7 +2,7 @@
   <header>
     <p class="eyebrow">AIWG</p>
     <h1>Deploy a Virtual Organization</h1>
-    <p class="lead">Architects, engineers, testers, forensics analysts, researchers, marketers — 85+ specialized agents that collaborate like a real team. Five frameworks, five addons, one CLI.</p>
+    <p class="lead">Architects, engineers, testers, forensics analysts, researchers, marketers — 90+ specialized agents that collaborate like a real team. Six frameworks, eight addons, one CLI.</p>
   </header>
 
   <div class="doc-grid">
@@ -11,7 +11,7 @@
       <div class="layer-stack">
         <div class="layer">
           <div class="layer-title">SDLC Complete</div>
-          <div class="layer-desc">Full software lifecycle — 85+ agents, stage-gate workflows, multi-agent orchestration from intake to production</div>
+          <div class="layer-desc">Full software lifecycle — 90+ agents, stage-gate workflows, multi-agent orchestration from intake to production</div>
         </div>
         <div class="layer">
           <div class="layer-title">Forensics Complete</div>
@@ -29,6 +29,10 @@
           <div class="layer-title">Media Curator</div>
           <div class="layer-desc">Intelligent media archive management — discography analysis, quality filtering, metadata curation, multi-platform export</div>
         </div>
+        <div class="layer">
+          <div class="layer-title">Ops Complete</div>
+          <div class="layer-desc">Operational infrastructure — fleet management, CMDB, CI/CD, and streaming pipelines. YAML-native artifact design with four extensions: sys, it, dev, stream</div>
+        </div>
       </div>
     </article>
 
@@ -38,6 +42,10 @@
         <div class="layer">
           <div class="layer-title">RLM</div>
           <div class="layer-desc">Recursive context decomposition — process 10M+ tokens via sub-agent delegation</div>
+        </div>
+        <div class="layer">
+          <div class="layer-title">Ring Methodology</div>
+          <div class="layer-desc">Four-layer verification framework — Developer, Integration, User Surface, and Generative Reflection. Circuit breaker halts before problems compound</div>
         </div>
         <div class="layer">
           <div class="layer-title">Voice Framework</div>
@@ -50,6 +58,14 @@
         <div class="layer">
           <div class="layer-title">Writing Quality</div>
           <div class="layer-desc">AI pattern detection, content validation, authenticity scoring</div>
+        </div>
+        <div class="layer">
+          <div class="layer-title">Verbalized Sampling</div>
+          <div class="layer-desc">Diversity addon for generating varied, non-repetitive output — content-diversifier agent and three prompt strategies</div>
+        </div>
+        <div class="layer">
+          <div class="layer-title">Color Palette</div>
+          <div class="layer-desc">Generate accessible color palettes with WCAG contrast checking and trend analysis</div>
         </div>
         <div class="layer">
           <div class="layer-title">UAT-MCP Toolkit</div>
@@ -75,6 +91,8 @@
           <tr><td>Cursor</td><td>Rules-based integration</td></tr>
           <tr><td>OpenAI/Codex</td><td>Skills-based deployment</td></tr>
           <tr><td>Windsurf</td><td>Rules-based integration</td></tr>
+          <tr><td>Hermes</td><td>First-class deployment target — 96 skills, token-optimized templates</td></tr>
+          <tr><td>Local/Ollama</td><td>First-class provider — model evaluation suite, 6-dimension compatibility scoring</td></tr>
         </tbody>
       </table>
     </article>
@@ -85,6 +103,14 @@
         <div class="layer">
           <div class="layer-title">Ralph Loop</div>
           <div class="layer-desc">Iterative task execution with automatic error recovery and crash resilience</div>
+        </div>
+        <div class="layer">
+          <div class="layer-title">Mission Control</div>
+          <div class="layer-desc">Multi-loop background orchestration — dispatch missions, monitor all from a status dashboard, react to completions without blocking the primary context</div>
+        </div>
+        <div class="layer">
+          <div class="layer-title">Ring Methodology</div>
+          <div class="layer-desc">Four-layer completion verification with spectral gap health measurement and circuit breaker</div>
         </div>
         <div class="layer">
           <div class="layer-title">Ensemble Validation</div>
@@ -106,11 +132,16 @@ npm install -g aiwg
 # Deploy a framework
 aiwg use sdlc              # Software lifecycle
 aiwg use forensics         # Digital forensics
-aiwg use research          # Research workflows
+aiwg use ops --ext sys,dev # Operational infrastructure
 
 # Add capabilities
+aiwg use ring              # Four-layer verification
 aiwg use rlm               # Recursive context decomposition
 aiwg use voice             # Voice profiles
+
+# Deploy to a specific platform
+aiwg use sdlc --provider hermes   # Hermes
+aiwg use sdlc --provider copilot  # GitHub Copilot
 
 # Start working — just describe what you need
 "transition to elaboration"
@@ -129,7 +160,7 @@ aiwg use voice             # Voice profiles
     </a>
     <a href="#cli-reference" class="card">
       <h3>CLI Reference</h3>
-      <p>All 42 commands with examples</p>
+      <p>All 47 commands with examples</p>
     </a>
     <a href="https://github.com/jmagly/aiwg" class="external-cta">
       View on GitHub
