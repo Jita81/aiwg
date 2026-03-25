@@ -272,6 +272,12 @@ async function registerBuiltinProviders() {
   try {
     await import('./codex-adapter.mjs');
   } catch { /* ignore if not found */ }
+  try {
+    await import('./opencode-adapter.mjs');
+  } catch { /* ignore if not found */ }
+  try {
+    await import('./factory-adapter.mjs');
+  } catch { /* ignore if not found */ }
 }
 
 // Run registration — store promise so callers can await it

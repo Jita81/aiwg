@@ -52,7 +52,7 @@ function parseArgs(args) {
     enableAnalytics: true,        // Iteration analytics (#167)
     enableBestOutput: true,       // Best output tracking (#168)
     enableEarlyStopping: true,    // Early stopping (#149)
-    provider: 'claude',           // CLI provider (claude, codex)
+    provider: 'claude',           // CLI provider (claude, codex, opencode, factory)
     verbose: false,               // Verbose per-iteration detail
     logFile: null,                // Optional log file path
   };
@@ -182,7 +182,7 @@ OPTIONS:
   --timeout <min>         Timeout per iteration in minutes (default: 60)
   --mcp-config <json>     MCP server configuration JSON
   --gitea-issue           Create/link Gitea issue for tracking
-  --provider <name>       CLI provider: claude (default), codex
+  --provider <name>       CLI provider: claude (default), codex, opencode, factory
 
 RESEARCH-BACKED OPTIONS (REF-015, REF-021):
   -m, --memory <n|preset>  Memory capacity Ω: 1-10 or preset name
@@ -298,7 +298,7 @@ async function main() {
   await ensureProvidersRegistered();
   const providerName = options.provider || 'claude';
   if (!hasProvider(providerName)) {
-    console.error(`Error: Unknown provider '${providerName}'. Available: claude, codex`);
+    console.error(`Error: Unknown provider '${providerName}'. Available: claude, codex, opencode, factory`);
     process.exit(1);
   }
 

@@ -28,7 +28,9 @@
     "uat:watch": "vitest --config vitest.uat.config.js",
     "uat:live": "vitest run --config vitest.uat-live.config.js",
     "uat:claude": "vitest run --config vitest.uat-live.config.js --reporter=verbose ralph-live-claude",
-    "uat:codex": "vitest run --config vitest.uat-live.config.js --reporter=verbose ralph-live-codex"
+    "uat:codex": "vitest run --config vitest.uat-live.config.js --reporter=verbose ralph-live-codex",
+    "uat:opencode": "vitest run --config vitest.uat-live.config.js --reporter=verbose ralph-live-opencode",
+    "uat:factory": "vitest run --config vitest.uat-live.config.js --reporter=verbose ralph-live-factory"
   },
   "files": [
     "bin/",

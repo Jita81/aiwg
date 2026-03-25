@@ -1,12 +1,15 @@
 /**
  * Unit tests for Provider Adapter system
  *
- * Tests the base class, factory, Claude adapter, and Codex adapter
- * for the external Ralph loop multi-provider support.
+ * Tests the base class, factory, Claude adapter, Codex adapter,
+ * OpenCode adapter, and Factory adapter for the external Ralph loop
+ * multi-provider support.
  *
  * @source @tools/ralph-external/lib/provider-adapter.mjs
  * @source @tools/ralph-external/lib/claude-adapter.mjs
  * @source @tools/ralph-external/lib/codex-adapter.mjs
+ * @source @tools/ralph-external/lib/opencode-adapter.mjs
+ * @source @tools/ralph-external/lib/factory-adapter.mjs
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -20,6 +23,8 @@ let hasProvider: any;
 let ensureProvidersRegistered: any;
 let ClaudeAdapter: any;
 let CodexAdapter: any;
+let OpenCodeAdapter: any;
+let FactoryAdapter: any;
 
 beforeEach(async () => {
   const adapterMod = await import('../../../tools/ralph-external/lib/provider-adapter.mjs');
@@ -35,6 +40,12 @@ beforeEach(async () => {
 
   const codexMod = await import('../../../tools/ralph-external/lib/codex-adapter.mjs');
   CodexAdapter = codexMod.CodexAdapter;
+
+  const opencodeMod = await import('../../../tools/ralph-external/lib/opencode-adapter.mjs');
+  OpenCodeAdapter = opencodeMod.OpenCodeAdapter;
+
+  const factoryMod = await import('../../../tools/ralph-external/lib/factory-adapter.mjs');
+  FactoryAdapter = factoryMod.FactoryAdapter;
 });
 
 // ============================================================================
@@ -65,7 +76,7 @@ describe('ProviderAdapter (base class)', () => {
 
 describe('Provider Registry', () => {
   it('has all core providers registered', () => {
-    const providers = ['claude', 'codex'];
+    const providers = ['claude', 'codex', 'opencode', 'factory'];
     for (const provider of providers) {
       expect(hasProvider(provider)).toBe(true);
     }
@@ -80,6 +91,8 @@ describe('Provider Registry', () => {
     const tests = [
       { name: 'claude', Class: ClaudeAdapter, caseName: 'Claude' },
       { name: 'codex', Class: CodexAdapter, caseName: 'CODEX' },
+      { name: 'opencode', Class: OpenCodeAdapter, caseName: 'OpenCode' },
+      { name: 'factory', Class: FactoryAdapter, caseName: 'Factory' },
     ];
 
     for (const { name, Class, caseName } of tests) {
@@ -424,50 +437,332 @@ describe('CodexAdapter', () => {
 });
 
 // ============================================================================
+// OpenCode Adapter Tests
+// ============================================================================
+
+describe('OpenCodeAdapter', () => {
+  let adapter: any;
+
+  beforeEach(() => {
+    adapter = new OpenCodeAdapter();
+  });
+
+  describe('identity', () => {
+    it('returns correct binary and name', () => {
+      expect(adapter.getBinary()).toBe('opencode');
+      expect(adapter.getName()).toBe('opencode');
+    });
+  });
+
+  describe('capabilities', () => {
+    it('reports correct capabilities', () => {
+      const caps = adapter.getCapabilities();
+      expect(caps.streamJson).toBe(false);
+      expect(caps.sessionResume).toBe(true);
+      expect(caps.budgetControl).toBe(false);
+      expect(caps.systemPrompt).toBe(false);
+      expect(caps.agentMode).toBe(true);
+      expect(caps.mcpConfig).toBe(false);
+      expect(caps.maxTurns).toBe(false);
+    });
+  });
+
+  describe('model mapping', () => {
+    it('maps generic model names to OpenCode provider/model format', () => {
+      const mappings = [
+        { input: 'opus', expected: 'anthropic/claude-opus-4-5-20251101' },
+        { input: 'sonnet', expected: 'anthropic/claude-sonnet-4-5-20250929' },
+        { input: 'haiku', expected: 'anthropic/claude-haiku-4-5-20251001' },
+        { input: 'OPUS', expected: 'anthropic/claude-opus-4-5-20251101' },
+      ];
+
+      for (const { input, expected } of mappings) {
+        expect(adapter.mapModel(input)).toBe(expected);
+      }
+    });
+
+    it('passes through unknown model names', () => {
+      expect(adapter.mapModel('anthropic/custom-model')).toBe('anthropic/custom-model');
+    });
+  });
+
+  describe('buildSessionArgs', () => {
+    it('uses run subcommand with --format json', () => {
+      const args = adapter.buildSessionArgs({ prompt: 'task' });
+      expect(args[0]).toBe('run');
+      expect(args).toContain('--format');
+      expect(args).toContain('json');
+      expect(args).not.toContain('--dangerously-skip-permissions');
+    });
+
+    it('maps model names with -m flag', () => {
+      const args = adapter.buildSessionArgs({ prompt: 'task', model: 'sonnet' });
+      expect(args).toContain('-m');
+      expect(args).toContain('anthropic/claude-sonnet-4-5-20250929');
+    });
+
+    it('supports session resume via -s flag', () => {
+      const args = adapter.buildSessionArgs({ prompt: 'task', sessionId: 'abc-123' });
+      expect(args).toContain('-s');
+      expect(args).toContain('abc-123');
+    });
+
+    it('injects system prompt into main prompt', () => {
+      const args = adapter.buildSessionArgs({
+        prompt: 'my task',
+        systemPrompt: 'Be helpful',
+      });
+      const lastArg = args[args.length - 1];
+      expect(lastArg).toContain('Be helpful');
+      expect(lastArg).toContain('my task');
+      expect(lastArg).toContain('[System Context]');
+    });
+
+    it('puts prompt last', () => {
+      const args = adapter.buildSessionArgs({ prompt: 'do stuff' });
+      expect(args[args.length - 1]).toBe('do stuff');
+    });
+
+    it('warns on unsupported features', () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      adapter.buildSessionArgs({ prompt: 'task', budget: 5 });
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Budget control'));
+
+      warnSpy.mockClear();
+      adapter.buildSessionArgs({ prompt: 'task', mcpConfig: {} });
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('MCP configuration'));
+
+      warnSpy.mockRestore();
+    });
+  });
+
+  describe('buildAnalysisArgs', () => {
+    it('uses run subcommand with --format json', () => {
+      const args = adapter.buildAnalysisArgs({ prompt: 'analyze' });
+      expect(args[0]).toBe('run');
+      expect(args).toContain('--format');
+      expect(args).toContain('json');
+    });
+
+    it('supports agent flag', () => {
+      const args = adapter.buildAnalysisArgs({
+        prompt: 'analyze',
+        agent: 'ralph-output-analyzer',
+      });
+      expect(args).toContain('--agent');
+      expect(args).toContain('ralph-output-analyzer');
+    });
+
+    it('maps model names', () => {
+      const args = adapter.buildAnalysisArgs({ prompt: 'analyze', model: 'haiku' });
+      expect(args).toContain('-m');
+      expect(args).toContain('anthropic/claude-haiku-4-5-20251001');
+    });
+  });
+
+  describe('environment overrides', () => {
+    it('sets CI=true', () => {
+      expect(adapter.getEnvOverrides()).toEqual({ CI: 'true' });
+    });
+  });
+
+  describe('transcript path', () => {
+    it('returns null (not supported)', () => {
+      expect(adapter.getTranscriptPath('session-123', '/project')).toBeNull();
+    });
+  });
+});
+
+// ============================================================================
+// Factory (Droid) Adapter Tests
+// ============================================================================
+
+describe('FactoryAdapter', () => {
+  let adapter: any;
+
+  beforeEach(() => {
+    adapter = new FactoryAdapter();
+  });
+
+  describe('identity', () => {
+    it('returns correct binary and name', () => {
+      expect(adapter.getBinary()).toBe('droid');
+      expect(adapter.getName()).toBe('factory');
+    });
+  });
+
+  describe('capabilities', () => {
+    it('reports correct capabilities', () => {
+      const caps = adapter.getCapabilities();
+      expect(caps.streamJson).toBe(true);
+      expect(caps.sessionResume).toBe(true);
+      expect(caps.budgetControl).toBe(false);
+      expect(caps.systemPrompt).toBe(false);
+      expect(caps.agentMode).toBe(false);
+      expect(caps.mcpConfig).toBe(false);
+      expect(caps.maxTurns).toBe(false);
+    });
+  });
+
+  describe('model mapping', () => {
+    it('maps generic model names to Factory model IDs', () => {
+      const mappings = [
+        { input: 'opus', expected: 'claude-opus-4-5-20251101' },
+        { input: 'sonnet', expected: 'claude-sonnet-4-5-20250929' },
+        { input: 'haiku', expected: 'claude-haiku-4-5-20251001' },
+        { input: 'HAIKU', expected: 'claude-haiku-4-5-20251001' },
+      ];
+
+      for (const { input, expected } of mappings) {
+        expect(adapter.mapModel(input)).toBe(expected);
+      }
+    });
+
+    it('passes through unknown model names', () => {
+      expect(adapter.mapModel('gpt-5.1')).toBe('gpt-5.1');
+    });
+  });
+
+  describe('buildSessionArgs', () => {
+    it('uses exec subcommand with --skip-permissions-unsafe', () => {
+      const args = adapter.buildSessionArgs({ prompt: 'task' });
+      expect(args[0]).toBe('exec');
+      expect(args).toContain('--skip-permissions-unsafe');
+      expect(args).toContain('--output-format');
+      expect(args).toContain('stream-json');
+      expect(args).not.toContain('--dangerously-skip-permissions');
+    });
+
+    it('maps model names with -m flag', () => {
+      const args = adapter.buildSessionArgs({ prompt: 'task', model: 'opus' });
+      expect(args).toContain('-m');
+      expect(args).toContain('claude-opus-4-5-20251101');
+    });
+
+    it('supports session resume via -s flag', () => {
+      const args = adapter.buildSessionArgs({ prompt: 'task', sessionId: 'sess-456' });
+      expect(args).toContain('-s');
+      expect(args).toContain('sess-456');
+    });
+
+    it('injects system prompt into main prompt', () => {
+      const args = adapter.buildSessionArgs({
+        prompt: 'my task',
+        systemPrompt: 'Be careful',
+      });
+      const lastArg = args[args.length - 1];
+      expect(lastArg).toContain('Be careful');
+      expect(lastArg).toContain('my task');
+      expect(lastArg).toContain('[System Context]');
+    });
+
+    it('puts prompt last', () => {
+      const args = adapter.buildSessionArgs({ prompt: 'do stuff' });
+      expect(args[args.length - 1]).toBe('do stuff');
+    });
+
+    it('warns on unsupported features', () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      adapter.buildSessionArgs({ prompt: 'task', budget: 5 });
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Budget control'));
+
+      warnSpy.mockClear();
+      adapter.buildSessionArgs({ prompt: 'task', maxTurns: 50 });
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Max turns'));
+
+      warnSpy.mockRestore();
+    });
+  });
+
+  describe('buildAnalysisArgs', () => {
+    it('uses exec subcommand with text output (read-only)', () => {
+      const args = adapter.buildAnalysisArgs({ prompt: 'analyze' });
+      expect(args[0]).toBe('exec');
+      expect(args).toContain('--output-format');
+      expect(args).toContain('text');
+      expect(args).not.toContain('--skip-permissions-unsafe');
+    });
+
+    it('maps model names', () => {
+      const args = adapter.buildAnalysisArgs({ prompt: 'analyze', model: 'sonnet' });
+      expect(args).toContain('-m');
+      expect(args).toContain('claude-sonnet-4-5-20250929');
+    });
+
+    it('silently skips unsupported agent flag', () => {
+      const args = adapter.buildAnalysisArgs({
+        prompt: 'analyze',
+        agent: 'ralph-output-analyzer',
+      });
+      expect(args).not.toContain('--agent');
+    });
+  });
+
+  describe('environment overrides', () => {
+    it('sets CI=true', () => {
+      expect(adapter.getEnvOverrides()).toEqual({ CI: 'true' });
+    });
+  });
+
+  describe('transcript path', () => {
+    it('returns null (not supported)', () => {
+      expect(adapter.getTranscriptPath('session-123', '/project')).toBeNull();
+    });
+  });
+});
+
+// ============================================================================
 // Cross-Provider Consistency Tests
 // ============================================================================
 
 describe('Cross-Provider Consistency', () => {
-  let claude: any;
-  let codex: any;
+  let adapters: Record<string, any>;
 
   beforeEach(() => {
-    claude = new ClaudeAdapter();
-    codex = new CodexAdapter();
+    adapters = {
+      claude: new ClaudeAdapter(),
+      codex: new CodexAdapter(),
+      opencode: new OpenCodeAdapter(),
+      factory: new FactoryAdapter(),
+    };
   });
 
-  it('both implement all required methods', () => {
+  it('all implement required methods', () => {
     const methods = [
       'getBinary', 'getName', 'getCapabilities',
       'buildSessionArgs', 'buildAnalysisArgs', 'mapModel',
       'isAvailable', 'getVersion', 'parseOutput',
       'getEnvOverrides', 'getTranscriptPath',
     ];
-    for (const method of methods) {
-      expect(typeof claude[method]).toBe('function');
-      expect(typeof codex[method]).toBe('function');
+    for (const [name, adapter] of Object.entries(adapters)) {
+      for (const method of methods) {
+        expect(typeof adapter[method]).toBe('function');
+      }
     }
   });
 
-  it('both produce prompt as last argument', () => {
+  it('all produce prompt as last argument', () => {
     const promptTests = [
       { method: 'buildSessionArgs', prompt: 'test' },
       { method: 'buildAnalysisArgs', prompt: 'analyze' },
     ];
 
     for (const { method, prompt } of promptTests) {
-      const claudeArgs = claude[method]({ prompt });
-      const codexArgs = codex[method]({ prompt });
-      expect(claudeArgs[claudeArgs.length - 1]).toBe(prompt);
-      expect(codexArgs[codexArgs.length - 1]).toBe(prompt);
+      for (const [name, adapter] of Object.entries(adapters)) {
+        const args = adapter[method]({ prompt });
+        expect(args[args.length - 1]).toBe(prompt);
+      }
     }
   });
 
-  it('both handle the same generic model names', () => {
+  it('all handle the same generic model names', () => {
     const models = ['opus', 'sonnet', 'haiku'];
-    for (const model of models) {
-      expect(typeof claude.mapModel(model)).toBe('string');
-      expect(typeof codex.mapModel(model)).toBe('string');
+    for (const [name, adapter] of Object.entries(adapters)) {
+      for (const model of models) {
+        expect(typeof adapter.mapModel(model)).toBe('string');
+      }
     }
   });
 });
