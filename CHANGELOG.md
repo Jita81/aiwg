@@ -27,6 +27,7 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 | **Native UX tools rule** | Agents prefer platform-native interaction tools; platform capability matrix (#448) |
 | **Local/Ollama as first-class provider** | Ollama on equal footing with cloud providers; local model support documented (#434) |
 | **`sdlc-accelerate` handler fix** | Primary CTA after `aiwg use sdlc` was broken — "No handler found" error. Handler now spawns Claude Code with the sdlc-accelerate skill. |
+| **Composable RULES-INDEX hierarchy** | Rules indexes are now component-owned. Each addon ships its own `rules/RULES-INDEX.md`; the deployed index is assembled from all installed components at deploy time. Addon authors contribute rules without editing files they don't own. `#496–#500` |
 
 ### Added
 
@@ -57,6 +58,7 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 - **Claude Code memory-mapped @-link best practices** (`#427`) — guidance for @-link usage in agent memory contexts
 - **Skills in proper addon source directories** — `aiwg-sync` (aiwg-utils addon), `mission-control` (ralph addon), `ring-check` (ring-methodology addon) written to `agentic/code/addons/*/skills/` so they deploy correctly via `aiwg use`; previously only existed in gitignored `.claude/skills/` deployment output
 - **Agent personas in proper addon source directories** — `aiwg-steward` (aiwg-utils addon) and `mc-conductor` (ralph addon) written to `agentic/code/addons/*/agents/` so they deploy via `aiwg use`
+- **Composable RULES-INDEX hierarchy** (`#496–#500`) — two-level rules index architecture: each component owns `rules/RULES-INDEX.md`; global `agentic/code/RULES-INDEX.md` is an aggregator template; `assembleRulesIndex()` in `tools/agents/providers/base.mjs` discovers all installed component indexes and concatenates them at deploy time; component manifests declare `consolidation.rulesIndex` and `consolidation.deployIndexOnly` so the CLI knows which addons ship indexes instead of individual rule files; component indexes created for `ring-methodology` (7 rules) and `aiwg-utils` (7 rules); `sdlc-complete` RULES-INDEX scoped to its own 33 rules with cross-references to addon indexes; duplicates `instruction-comprehension.md` and `research-before-decision.md` removed from `sdlc-complete/rules/` (canonical home is `aiwg-utils/rules/`); ADR at `.aiwg/architecture/adr-rules-index-hierarchy.md`
 
 ### Changed
 
