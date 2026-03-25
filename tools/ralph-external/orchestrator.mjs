@@ -352,21 +352,15 @@ export class Orchestrator {
     if (state.config.enableSemanticMemory) {
       const memoryPath = join(this.projectRoot, '.aiwg', 'ralph', 'semantic-memory');
 
-      this.semanticMemory = new SemanticMemory({
-        storagePath: memoryPath,
-      });
+      this.semanticMemory = new SemanticMemory(memoryPath);
 
-      this.memoryPromotion = new MemoryPromotion({
-        storagePath: memoryPath,
-      });
+      this.memoryPromotion = new MemoryPromotion(memoryPath);
 
       this.learningExtractor = new LearningExtractor({
         projectRoot: this.projectRoot,
       });
 
-      this.memoryRetrieval = new MemoryRetrieval({
-        storagePath: memoryPath,
-      });
+      this.memoryRetrieval = new MemoryRetrieval(memoryPath);
 
       console.log('[External Ralph] Semantic memory layer: ENABLED (#24)');
     }

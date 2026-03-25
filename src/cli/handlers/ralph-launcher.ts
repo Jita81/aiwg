@@ -25,7 +25,10 @@
 
 import { spawn, ChildProcess } from 'child_process';
 import { join } from 'path';
-import { existsSync, mkdirSync, writeFileSync, readFileSync, rmSync, readdirSync, copyFileSync } from 'fs';
+import {
+  existsSync, mkdirSync, writeFileSync, readFileSync, rmSync, readdirSync, copyFileSync,
+  statSync, openSync, readSync, closeSync,
+} from 'fs';
 import { getProviderConfig } from '../agent-spawn.js';
 
 /**
@@ -662,4 +665,92 @@ export function cleanupRegistry(projectRoot: string, keepDays: number = 7): numb
   }
 
   return cleaned;
+}
+
+/**
+ * Attach to a running Ralph loop's output stream.
+ *
+ * Tails the loop's daemon-output.log to stdout in real-time.
+ * Ctrl+C detaches (the background loop keeps running).
+ * Returns a Promise that resolves when the user detaches or the loop exits.
+ */
+export function attachToLoopOutput(projectRoot: string, loopId?: string): Promise<void> {
+  const registry = loadLauncherRegistry(projectRoot);
+  const entries = Object.values(registry.loops);
+
+  let entry: LoopRegistryEntry | undefined;
+
+  if (loopId) {
+    entry = registry.loops[loopId];
+    if (!entry) {
+      return Promise.reject(new Error(`Loop not found: ${loopId}`));
+    }
+  } else {
+    // Use most recently started running loop
+    const running = entries
+      .filter((e) => e.status === 'running' && isProcessAlive(e.pid))
+      .sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime());
+
+    if (running.length === 0) {
+      return Promise.reject(new Error('No running loops to attach to. Use --loop-id to specify a loop.'));
+    }
+    entry = running[0];
+  }
+
+  const outputFile = entry.outputFile;
+  const attachedLoopId = entry.loopId;
+
+  return new Promise<void>((resolve) => {
+    let offset = 0;
+
+    // Print any existing content
+    try {
+      const stats = statSync(outputFile);
+      if (stats.size > 0) {
+        const fd = openSync(outputFile, 'r');
+        const buf = Buffer.alloc(stats.size);
+        readSync(fd, buf, 0, stats.size, 0);
+        closeSync(fd);
+        process.stdout.write(buf);
+        offset = stats.size;
+      }
+    } catch {
+      // Log file may not exist yet — will appear shortly
+    }
+
+    // Poll for new content every 250 ms
+    const interval = setInterval(() => {
+      try {
+        const stats = statSync(outputFile);
+        if (stats.size > offset) {
+          const newBytes = stats.size - offset;
+          const fd = openSync(outputFile, 'r');
+          const buf = Buffer.alloc(newBytes);
+          readSync(fd, buf, 0, newBytes, offset);
+          closeSync(fd);
+          process.stdout.write(buf);
+          offset = stats.size;
+        }
+
+        // Stop polling if the process has exited
+        if (!isProcessAlive(registry.loops[attachedLoopId]?.pid ?? 0)) {
+          clearInterval(interval);
+          process.stdout.write('\n[ralph-attach] Loop process has exited.\n');
+          resolve();
+        }
+      } catch {
+        // File may be temporarily unavailable during rotation — ignore
+      }
+    }, 250);
+
+    // Ctrl+C detaches without stopping the loop
+    process.on('SIGINT', () => {
+      clearInterval(interval);
+      process.stdout.write('\n\nDetached from loop output. Loop continues in background.\n');
+      process.stdout.write(`  Status:     aiwg ralph-status\n`);
+      process.stdout.write(`  Re-attach:  aiwg ralph-attach --loop-id ${attachedLoopId}\n`);
+      process.stdout.write(`  Abort:      aiwg ralph-abort --loop-id ${attachedLoopId}\n`);
+      resolve();
+    });
+  });
 }

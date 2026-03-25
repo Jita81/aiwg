@@ -18,6 +18,7 @@ import {
   getLoopStatuses,
   abortLoop,
   resumeLoop,
+  attachToLoopOutput,
   RalphLaunchOptions,
 } from './ralph-launcher.js';
 
@@ -44,6 +45,7 @@ function parseRalphArgs(args: string[]): {
   provider?: string;
   dangerous?: boolean;
   params?: string;
+  attach?: boolean;
 } {
   const result: ReturnType<typeof parseRalphArgs> = {};
   let i = 0;
@@ -90,6 +92,8 @@ function parseRalphArgs(args: string[]): {
       result.dangerous = true;
     } else if (arg === '--params') {
       result.params = args[++i];
+    } else if (arg === '--attach') {
+      result.attach = true;
     } else if (!arg.startsWith('-') && !result.objective) {
       result.objective = arg;
     }
@@ -170,6 +174,15 @@ export class RalphHandler implements CommandHandler {
 
       const result = await launchExternalRalph(ctx.frameworkRoot, process.cwd(), options);
 
+      if (parsed.attach) {
+        process.stdout.write(
+          `✓ ${result.message}\n  PID: ${result.pid}\n  Loop ID: ${result.loopId}\n\n` +
+          `Attaching to output... Press Ctrl+C to detach (loop keeps running).\n\n`
+        );
+        await attachToLoopOutput(process.cwd(), result.loopId);
+        return { exitCode: 0, message: '' };
+      }
+
       return {
         exitCode: 0,
         message: `✓ ${result.message}\n  PID: ${result.pid}\n  Loop ID: ${result.loopId}`,
@@ -213,6 +226,9 @@ OPTIONS:
                           provider doesn't have a dangerous mode flag.
   --params "<args>"       Pass arbitrary args verbatim to the agent binary.
                           Appended after all other flags. Quoted segments preserved.
+  --attach                Stay attached to the loop's output after launch.
+                          Press Ctrl+C to detach (loop keeps running in background).
+                          Use 'aiwg ralph-attach' to re-attach later.
 
 RESEARCH-BACKED OPTIONS (REF-015, REF-021):
   -m, --memory <n>        Memory capacity Ω (default: 3)
@@ -469,12 +485,50 @@ export const ralphConfigHandler: CommandHandler = {
 };
 
 /**
+ * Ralph Attach Handler
+ *
+ * Re-attaches to a running Ralph loop's live output stream.
+ * Press Ctrl+C to detach — loop continues running in background.
+ */
+export class RalphAttachHandler implements CommandHandler {
+  id = 'ralph-attach';
+  name = 'Ralph Attach';
+  description = 'Attach to a running Ralph loop\'s live output stream';
+  category = 'ralph' as const;
+  aliases = ['ralph-attach'];
+
+  async execute(ctx: HandlerContext): Promise<HandlerResult> {
+    let loopId: string | undefined;
+    const loopIdIndex = ctx.args.indexOf('--loop-id');
+    if (loopIdIndex !== -1 && ctx.args[loopIdIndex + 1]) {
+      loopId = ctx.args[loopIdIndex + 1];
+    }
+
+    try {
+      process.stdout.write(
+        `Attaching to loop output${loopId ? ` (${loopId})` : ''}...\n` +
+        `Press Ctrl+C to detach (loop keeps running in background).\n\n`
+      );
+      await attachToLoopOutput(process.cwd(), loopId);
+      return { exitCode: 0, message: '' };
+    } catch (error) {
+      return {
+        exitCode: 1,
+        message: `Failed to attach: ${error instanceof Error ? error.message : String(error)}`,
+        error: error instanceof Error ? error : new Error(String(error)),
+      };
+    }
+  }
+}
+
+/**
  * Export handler instances
  */
 export const ralphHandler = new RalphHandler();
 export const ralphStatusHandler = new RalphStatusHandler();
 export const ralphAbortHandler = new RalphAbortHandler();
 export const ralphResumeHandler = new RalphResumeHandler();
+export const ralphAttachHandler = new RalphAttachHandler();
 
 /**
  * Export all Ralph handlers as array for easy registration
@@ -484,6 +538,7 @@ export const ralphHandlers: CommandHandler[] = [
   ralphStatusHandler,
   ralphAbortHandler,
   ralphResumeHandler,
+  ralphAttachHandler,
   ralphExternalHandler,
   ralphMemoryHandler,
   ralphConfigHandler,

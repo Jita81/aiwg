@@ -927,6 +927,31 @@ export const ralphResumeCommand: Extension = {
   } satisfies CommandMetadata,
 };
 
+export const ralphAttachCommand: Extension = {
+  id: 'ralph-attach',
+  type: 'command',
+  name: 'Ralph Attach',
+  description: 'Attach to a running Ralph loop\'s live output stream. Press Ctrl+C to detach.',
+  version: '1.0.0',
+  capabilities: ['cli', 'ralph', 'control', 'monitoring'],
+  keywords: ['ralph', 'attach', 'follow', 'watch', 'tail', 'output', 'stream'],
+  category: 'ralph',
+  platforms: {
+    claude: 'full',
+    generic: 'full',
+  },
+  deployment: {
+    pathTemplate: '.{platform}/commands/{id}.md',
+    core: true,
+  },
+  metadata: {
+    type: 'command',
+    template: 'utility',
+    allowedTools: ['Read'],
+    argumentHint: '[--loop-id <id>]',
+  } satisfies CommandMetadata,
+};
+
 export const ralphExternalCommand: Extension = {
   id: 'ralph-external',
   type: 'command',
@@ -1344,7 +1369,7 @@ export const reproducibilityValidateCommand: Extension = {
  * - Utility (3): prefill-cards, contribute-start, validate-metadata
  * - Plugin (5): install-plugin, uninstall-plugin, plugin-status, package-plugin, package-all-plugins
  * - Scaffolding (7): add-agent, add-command, add-skill, add-template, scaffold-addon, scaffold-extension, scaffold-framework
- * - Ralph (4): ralph, ralph-status, ralph-abort, ralph-resume
+ * - Ralph (5): ralph, ralph-status, ralph-abort, ralph-resume, ralph-attach
  * - Metrics (3): cost-report, cost-history, metrics-tokens
  * - Documentation (1): doc-sync
  * - Code Analysis (1): cleanup-audit
@@ -1408,6 +1433,7 @@ export const commandDefinitions: Extension[] = [
   ralphStatusCommand,
   ralphAbortCommand,
   ralphResumeCommand,
+  ralphAttachCommand,
   ralphExternalCommand,
   ralphMemoryCommand,
   ralphConfigCommand,
