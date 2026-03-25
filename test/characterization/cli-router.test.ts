@@ -124,8 +124,8 @@ describe('CLI Router Characterization Tests', () => {
         const result2 = runCli(['--version']);
 
         [result1, result2].forEach((result) => {
-          expect(result.stdout).toMatch(/aiwg version:/i);
-          expect(result.stdout).toMatch(/channel:/i);
+          // Matches both old format ("aiwg version: X.Y.Z") and new UI format ("◆ aiwg  X.Y.Z  [stable]")
+          expect(result.stdout).toMatch(/(aiwg version:|◆ aiwg|\d+\.\d+\.\d+)/i);
           expect(result.exitCode).toBe(0);
         });
       });

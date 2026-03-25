@@ -255,7 +255,7 @@ export class Orchestrator {
 
     // Best Output Tracker (REF-015 Self-Refine)
     if (state.config.enableBestOutput) {
-      this.bestOutputTracker = new BestOutputTracker(stateDir);
+      this.bestOutputTracker = new BestOutputTracker(state.loopId, { storage_path: stateDir });
       console.log('[External Ralph] Best output tracking: ENABLED (REF-015)');
     }
 
@@ -547,10 +547,10 @@ export class Orchestrator {
         let relevantKnowledge = null;
         if (this.memoryRetrieval && state.currentIteration > 1) {
           console.log('[External Ralph] Retrieving relevant knowledge...');
-          relevantKnowledge = await this.memoryRetrieval.retrieve({
-            query: state.objective,
-            context: assessment?.summary || '',
-            maxResults: 5,
+          relevantKnowledge = await this.memoryRetrieval.getRelevantKnowledge({
+            objective: state.objective,
+            taskType: assessment?.taskType,
+            errorPatterns: assessment?.errorPatterns || [],
           });
         }
 
@@ -558,15 +558,15 @@ export class Orchestrator {
         let strategy = null;
         if (this.strategyPlanner) {
           console.log('[External Ralph] Planning iteration strategy...');
-          strategy = await this.strategyPlanner.plan({
-            objective: state.objective,
-            completionCriteria: state.completionCriteria,
+          // StrategyPlanner.plan(history, metrics): history = past iterations array,
+          // metrics = { trend, completionPercentage, ... } derived from assessment
+          const planMetrics = {
+            trend: assessment?.trend || 'unknown',
+            completionPercentage: assessment?.completionPercentage || 0,
             iteration: state.currentIteration,
             maxIterations: state.maxIterations,
-            assessment,
-            relevantKnowledge,
-            previousIterations: state.iterations,
-          });
+          };
+          strategy = this.strategyPlanner.plan(state.iterations || [], planMetrics);
         }
 
         // PID Controller: Compute control signals
@@ -1344,7 +1344,7 @@ ${state.filesModified.length > 0 ? state.filesModified.map(f => `- ${f}`).join('
         let reflections = [];
         if (this.memoryManager) {
           try {
-            reflections = this.memoryManager.getReflectionWindow() || [];
+            reflections = this.memoryManager.getActiveReflections() || [];
           } catch (error) {
             console.warn('[External Ralph] Failed to get reflections:', error.message);
           }
@@ -1390,7 +1390,7 @@ ${state.filesModified.length > 0 ? state.filesModified.map(f => `- ${f}`).join('
     // Export best output tracker data
     if (this.bestOutputTracker) {
       try {
-        this.bestOutputTracker.export();
+        this.bestOutputTracker.exportCSV();
       } catch (error) {
         console.warn('[External Ralph] BestOutputTracker export failed:', error.message);
       }
