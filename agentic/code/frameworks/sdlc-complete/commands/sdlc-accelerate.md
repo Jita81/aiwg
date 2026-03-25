@@ -117,108 +117,11 @@ Contents:
 
 ## Resume Support
 
-State tracked in `.aiwg/reports/accelerate-state.json`:
-
-```json
-{
-  "version": "1.0.0",
-  "started": "2026-02-26T10:00:00Z",
-  "description": "Customer portal with real-time chat",
-  "entryPoint": "intake-wizard",
-  "phases": {
-    "intake": { "status": "completed", "completedAt": "...", "artifacts": [...] },
-    "gate_lom": { "status": "completed", "result": "CONDITIONAL", "waivers": [...] },
-    "elaboration": { "status": "in_progress", "startedAt": "..." },
-    "gate_abm": { "status": "pending" },
-    "construction_prep": { "status": "pending" },
-    "brief": { "status": "pending" }
-  },
-  "guidance": "Focus on API-first design",
-  "decisions": [
-    { "phase": "gate_lom", "question": "Proceed with 8 risks?", "answer": "waiver", "timestamp": "..." }
-  ]
-}
-```
-
-`--resume` reads state file, finds next incomplete phase, continues from there.
+State tracked in `.aiwg/reports/accelerate-state.json` (schema: `@accelerate-state.yaml`). `--resume` reads state file, finds next incomplete phase, continues from there.
 
 ## Dry Run Behavior
 
-With `--dry-run`:
-1. Detect entry point
-2. Show planned pipeline phases
-3. List commands that would be invoked
-4. Estimate artifact count
-5. Exit without executing
-
-Output format:
-```
-SDLC Accelerate Pipeline Plan
-==============================
-Entry: intake-wizard
-Description: "Customer portal with real-time chat"
-
-Phase 1: Intake
-  → /intake-wizard "Customer portal with real-time chat"
-  → /flow-concept-to-inception
-  Artifacts: intake form, solution profile
-
-Phase 2: LOM Gate
-  → /flow-gate-check inception
-  Artifacts: gate report
-
-Phase 3: Elaboration
-  → /flow-inception-to-elaboration
-  → /flow-gate-check elaboration
-  Artifacts: SAD, ADRs, test strategy, requirements
-
-Phase 4: Construction Prep
-  → /flow-elaboration-to-construction
-  Artifacts: iteration plans, construction backlog
-
-Phase 5: Construction Ready Brief
-  Artifacts: construction-ready-brief.md
-
-Estimated: 15-25 artifacts, 5 phase transitions
-```
-
-## Examples
-
-### New project from idea
-```
-/sdlc-accelerate "Customer portal with real-time chat and payment integration"
-```
-
-### From existing codebase
-```
-/sdlc-accelerate --from-codebase ./src "E-commerce platform"
-```
-
-### Resume interrupted pipeline
-```
-/sdlc-accelerate --resume
-```
-
-### Preview pipeline
-```
-/sdlc-accelerate --dry-run "Mobile banking app"
-```
-
-### Skip to elaboration (prerequisites validated)
-```
-/sdlc-accelerate --skip-to elaboration
-```
-
-## Integration Points
-
-Delegates to existing commands:
-- `/intake-wizard` — Project intake from description
-- `/intake-from-codebase` — Intake from existing code
-- `/flow-concept-to-inception` — Concept to inception transition
-- `/flow-gate-check` — Phase gate evaluation
-- `/flow-inception-to-elaboration` — Inception to elaboration
-- `/flow-elaboration-to-construction` — Elaboration to construction
-- `/project-status` — Current phase detection for resume
+With `--dry-run`: detect entry point, show planned phases with commands to invoke, estimate artifact count, exit without executing.
 
 ## References
 
