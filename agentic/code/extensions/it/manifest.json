@@ -1,0 +1,20 @@
+{
+  "id": "it",
+  "type": "addon",
+  "name": "IT Operations Extension",
+  "version": "1.0.0",
+  "description": "IT operations extension for ops-complete — asset management, CMDB, service deployments, disaster recovery",
+  "core": false,
+  "autoInstall": false,
+  "requires": ["ops-complete"],
+  "entry": {
+    "rules": "rules/",
+    "templates": "templates/",
+    "skills": "skills/"
+  },
+  "provides": {
+    "rules": ["it-dr-validation", "it-service-health"],
+    "templates": ["application", "dr-runbook", "deployment-guide"],
+    "skills": ["it-provision", "it-dr-test", "it-network-state", "it-deployment-lifecycle"]
+  }
+}

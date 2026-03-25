@@ -1,0 +1,11 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsExtension
+metadata:
+  name: sys
+  labels:
+    domain: system-operations
+spec:
+  extends: ops-complete
+  description: "System operations — per-host hardware, OS, boot chains, fleet docs"
+  version: "1.0.0"
+  capabilities: auto-discover

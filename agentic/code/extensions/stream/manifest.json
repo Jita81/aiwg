@@ -1,0 +1,20 @@
+{
+  "id": "stream",
+  "type": "addon",
+  "name": "Streaming Operations Extension",
+  "version": "1.0.0",
+  "description": "Streaming operations extension for ops-complete — transcoders, restreaming, platform integrations",
+  "core": false,
+  "autoInstall": false,
+  "requires": ["ops-complete"],
+  "entry": {
+    "rules": "rules/",
+    "templates": "templates/",
+    "skills": "skills/"
+  },
+  "provides": {
+    "rules": ["stream-safety"],
+    "templates": ["stream-service"],
+    "skills": ["stream-health"]
+  }
+}

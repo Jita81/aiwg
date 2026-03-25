@@ -1,0 +1,20 @@
+{
+  "id": "dev",
+  "type": "addon",
+  "name": "DevOps Extension",
+  "version": "1.0.0",
+  "description": "DevOps extension for ops-complete — CI/CD pipelines, build automation, fleet-wide tooling",
+  "core": false,
+  "autoInstall": false,
+  "requires": ["ops-complete"],
+  "entry": {
+    "rules": "rules/",
+    "templates": "templates/",
+    "skills": "skills/"
+  },
+  "provides": {
+    "rules": ["dev-ci-self-contained", "dev-pipeline-safety"],
+    "templates": ["pipeline", "ci-builder-dockerfile", "ci-builder-workflow"],
+    "skills": ["dev-ci-builder", "dev-pipeline-audit"]
+  }
+}

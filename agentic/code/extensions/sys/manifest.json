@@ -1,0 +1,20 @@
+{
+  "id": "sys",
+  "type": "addon",
+  "name": "SysOps Extension",
+  "version": "1.0.0",
+  "description": "System operations extension for ops-complete — per-host hardware, OS, boot chains, fleet documentation",
+  "core": false,
+  "autoInstall": false,
+  "requires": ["ops-complete"],
+  "entry": {
+    "rules": "rules/",
+    "templates": "templates/",
+    "skills": "skills/"
+  },
+  "provides": {
+    "rules": ["sys-host-independence", "sys-hardware-safety", "sys-interactive-gate"],
+    "templates": ["system-spec", "canned-process", "host-standup"],
+    "skills": ["sys-fleet-inventory", "sys-host-audit"]
+  }
+}

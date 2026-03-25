@@ -1,0 +1,45 @@
+{
+  "name": "Ops Complete",
+  "path": "agentic/code/frameworks/ops-complete",
+  "files": [
+    "README.md"
+  ],
+  "ignore": [
+    "manifest.json",
+    "templates"
+  ],
+  "contextContributions": {
+    "hookFragment": "templates/project/AIWG-ops-fragment.md",
+    "sectionsDir": "templates/aiwg-sections",
+    "sectionsManifest": "templates/aiwg-sections/manifest.json",
+    "priority": 20,
+    "description": "Ops framework context: runbooks, inventory, fleet management, operational workflows"
+  },
+  "consolidation": {
+    "strategy": "index-with-links",
+    "rulesIndex": "rules/RULES-INDEX.md",
+    "deployIndexOnly": true
+  },
+  "extensions": {
+    "sys": {
+      "path": "agentic/code/extensions/sys",
+      "type": "extension",
+      "requires": ["ops-complete"]
+    },
+    "it": {
+      "path": "agentic/code/extensions/it",
+      "type": "extension",
+      "requires": ["ops-complete"]
+    },
+    "dev": {
+      "path": "agentic/code/extensions/dev",
+      "type": "extension",
+      "requires": ["ops-complete"]
+    },
+    "stream": {
+      "path": "agentic/code/extensions/stream",
+      "type": "extension",
+      "requires": ["ops-complete"]
+    }
+  }
+}

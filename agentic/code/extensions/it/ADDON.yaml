@@ -1,0 +1,11 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsExtension
+metadata:
+  name: it
+  labels:
+    domain: it-operations
+spec:
+  extends: ops-complete
+  description: "IT operations — asset management, CMDB, service deployments, disaster recovery"
+  version: "1.0.0"
+  capabilities: auto-discover

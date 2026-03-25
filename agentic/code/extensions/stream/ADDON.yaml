@@ -1,0 +1,11 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsExtension
+metadata:
+  name: stream
+  labels:
+    domain: stream-operations
+spec:
+  extends: ops-complete
+  description: "Streaming operations — transcoders, restreaming, platform integrations"
+  version: "1.0.0"
+  capabilities: auto-discover
