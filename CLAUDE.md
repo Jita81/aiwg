@@ -42,7 +42,7 @@ src/                         # CLI and MCP server implementation
 test/                        # Test suites and fixtures
 tools/                       # Build and deployment scripts
 docs/                        # Documentation
-├── cli-reference.md         # All 44 CLI commands
+├── cli-reference.md         # All 50 CLI commands
 ├── extensions/              # Extension system docs
 │   ├── overview.md
 │   ├── creating-extensions.md
@@ -131,7 +131,7 @@ aiwg new my-project    # Scaffold new project
 aiwg help              # Show all commands
 aiwg doctor            # Check installation health
 
-# See @docs/cli-reference.md for all 49 commands
+# See @docs/cli-reference.md for all 50 commands
 ```
 
 ## Project Artifacts (.aiwg/)
@@ -180,9 +180,9 @@ AIWG uses a unified extension system for all extension types:
 - `@docs/extensions/creating-extensions.md` - Build custom extensions
 - `@docs/extensions/extension-types.md` - Complete type reference
 - `@src/extensions/types.ts` - TypeScript type definitions
-- `@src/extensions/commands/definitions.ts` - All 47 command definitions
+- `@src/extensions/commands/definitions.ts` - All 50 command definitions
 
-## CLI Commands (47 Total)
+## CLI Commands (50 Total)
 
 **See `@docs/cli-reference.md` for complete documentation.**
 
@@ -201,7 +201,7 @@ AIWG uses a unified extension system for all extension types:
 | **Plugin** (5) | install-plugin, uninstall-plugin, plugin-status, package-plugin, package-all-plugins |
 | **Scaffolding** (7) | add-agent, add-command, add-skill, add-template, scaffold-addon, scaffold-extension, scaffold-framework |
 | **Orchestration** (1) | mc (start, dispatch, status, watch, abort, pause, resume, stop, list) |
-| **Ralph** (7) | ralph, ralph-status, ralph-abort, ralph-resume, ralph-external, ralph-memory, ralph-config |
+| **Ralph** (8) | ralph, ralph-status, ralph-abort, ralph-resume, ralph-attach, ralph-external, ralph-memory, ralph-config |
 | **Metrics** (3) | cost-report, cost-history, metrics-tokens |
 | **Documentation** (1) | doc-sync |
 | **SDLC Orchestration** (1) | sdlc-accelerate |
@@ -249,6 +249,7 @@ aiwg ralph "Fix all tests" --completion "npm test passes"
 aiwg ralph-status            # Show loop status
 aiwg ralph-abort             # Stop loop
 aiwg ralph-resume            # Resume paused loop
+aiwg ralph-attach            # Attach to running external loop
 aiwg ralph-external "task"   # Crash-resilient external loop
 aiwg ralph-memory list       # Show debug memory entries
 aiwg ralph-config show       # Show Ralph configuration

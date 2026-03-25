@@ -4,7 +4,7 @@
 
 **Multi-agent AI framework for Claude Code, Copilot, Cursor, Warp, and 4 more platforms**
 
-162 agents, 47 CLI commands, 86 skills, 5 frameworks, 20 addons. SDLC workflows, digital forensics, research management, marketing operations, and media curation — all deployable with one command.
+188 agents, 50 CLI commands, 128 skills, 6 frameworks, 21 addons. SDLC workflows, digital forensics, research management, marketing operations, media curation, and ops infrastructure — all deployable with one command.
 
 ```bash
 npm i -g aiwg        # install globally
@@ -244,11 +244,11 @@ User intent → AIWG CLI → Deploy agents + rules + templates → AI platform
                 │                                     Cursor / Warp / Factory /
                 ▼                                     OpenCode / Codex / Windsurf
          ┌──────────────┐
-         │ 162 Agents   │  Specialized AI personas with domain expertise
-         │ 47 Commands  │  CLI + slash commands for workflow automation
-         │ 86 Skills    │  Natural language workflow triggers
+         │ 188 Agents   │  Specialized AI personas with domain expertise
+         │ 50 Commands  │  CLI + slash commands for workflow automation
+         │ 128 Skills   │  Natural language workflow triggers
          │ 35 Rules     │  Enforcement patterns (security, quality, anti-laziness)
-         │ 366 Templates│  SDLC artifact templates with progressive disclosure
+         │ 334 Templates│  SDLC artifact templates with progressive disclosure
          └──────────────┘
                 │
                 ▼
@@ -278,14 +278,14 @@ The orchestration pattern: **Primary Author → Parallel Reviewers → Synthesiz
 
 ## Features
 
-- **162 specialized agents** — domain experts across testing, security, architecture, DevOps, cloud, frontend, backend, data engineering, documentation, and more
-- **47 CLI commands** — framework deployment, project scaffolding, iterative execution, metrics, reproducibility validation
-- **86 workflow skills** — natural language triggers for regression testing, forensics, voice profiles, quality gates, and CI/CD integration
+- **188 specialized agents** — domain experts across testing, security, architecture, DevOps, cloud, frontend, backend, data engineering, documentation, and more
+- **50 CLI commands** — framework deployment, project scaffolding, iterative execution, metrics, reproducibility validation
+- **128 workflow skills** — natural language triggers for regression testing, forensics, voice profiles, quality gates, and CI/CD integration
 - **35 enforcement rules** — anti-laziness detection, token security, citation integrity, executable feedback, failure mitigation across 6 LLM archetypes
-- **366 artifact templates** — progressive disclosure templates for requirements, architecture, testing, security, deployment, and more
+- **334 artifact templates** — progressive disclosure templates for requirements, architecture, testing, security, deployment, and more
 - **8 platform support** — deploy to Claude Code, Copilot, Cursor, Warp, Factory AI, OpenCode, Codex, and Windsurf
-- **5 complete frameworks** — SDLC, Digital Forensics, Marketing Operations, Research Management, Media Curation
-- **20 addons** — RLM recursive decomposition, voice profiles, testing quality, mutation testing, UAT automation, and more
+- **6 complete frameworks** — SDLC, Digital Forensics, Marketing Operations, Research Management, Media Curation, Ops Infrastructure
+- **21 addons** — RLM recursive decomposition, voice profiles, testing quality, mutation testing, UAT automation, ring methodology, and more
 - **Ralph Loop** — iterative task execution with automatic error recovery and crash resilience (6-8 hour sessions)
 - **RLM addon** — recursive context decomposition for processing 10M+ tokens via sub-agent delegation
 - **YAML metalanguage** — declarative schema-validated workflow definitions (JSON Schema 2020-12)
@@ -308,7 +308,7 @@ npm install -g aiwg
 
 # Deploy to your project
 cd your-project
-aiwg use sdlc              # Full SDLC framework (98 agents, 23 rules, 150+ templates)
+aiwg use sdlc              # Full SDLC framework (90 agents, 34 rules, 170+ templates)
 aiwg use forensics         # Digital forensics & incident response (13 agents, 10 skills)
 aiwg use marketing         # Marketing operations (37 agents, 87+ templates)
 aiwg use media-curator     # Media archive management (6 agents, 9 commands)
@@ -347,17 +347,18 @@ aiwg use sdlc --provider windsurf      # Windsurf
 
 ## What You Get
 
-### Frameworks (5)
+### Frameworks (6)
 
 | Framework | Agents | Templates | What It Does |
 |-----------|--------|-----------|--------------|
-| **[SDLC Complete](agentic/code/frameworks/sdlc-complete/)** | 98 | 150+ | Full software development lifecycle — Inception through Production with multi-agent orchestration, quality gates, and DORA metrics |
-| **[Forensics Complete](agentic/code/frameworks/forensics-complete/)** | 13 | 30+ | Digital forensics and incident response — evidence acquisition, timeline reconstruction, IOC extraction, Sigma rule hunting. NIST SP 800-86, MITRE ATT&CK, STIX 2.1 |
+| **[SDLC Complete](agentic/code/frameworks/sdlc-complete/)** | 90 | 170+ | Full software development lifecycle — Inception through Production with multi-agent orchestration, quality gates, and DORA metrics |
+| **[Forensics Complete](agentic/code/frameworks/forensics-complete/)** | 13 | 8 | Digital forensics and incident response — evidence acquisition, timeline reconstruction, IOC extraction, Sigma rule hunting. NIST SP 800-86, MITRE ATT&CK, STIX 2.1 |
 | **[Media/Marketing Kit](agentic/code/frameworks/media-marketing-kit/)** | 37 | 87+ | End-to-end marketing operations — strategy, content creation, campaign management, brand compliance, analytics, and reporting |
-| **[Media Curator](agentic/code/frameworks/media-curator/)** | 6 | 15+ | Intelligent media archive management — discography analysis, source discovery, quality filtering, metadata curation, multi-platform export (Plex, Jellyfin, MPD) |
-| **[Research Complete](agentic/code/frameworks/research-complete/)** | 8 | 25+ | Academic research automation — paper discovery, citation management, RAG-based summarization, GRADE quality scoring, FAIR compliance, W3C PROV provenance |
+| **[Media Curator](agentic/code/frameworks/media-curator/)** | 6 | — | Intelligent media archive management — discography analysis, source discovery, quality filtering, metadata curation, multi-platform export (Plex, Jellyfin, MPD) |
+| **[Research Complete](agentic/code/frameworks/research-complete/)** | 8 | 6 | Academic research automation — paper discovery, citation management, RAG-based summarization, GRADE quality scoring, FAIR compliance, W3C PROV provenance |
+| **[Ops Complete](agentic/code/frameworks/ops-complete/)** | 2 | 3 | Operational infrastructure — incident management, runbooks, troubleshooting workflows |
 
-### Addons (20)
+### Addons (21)
 
 | Addon | What It Does |
 |-------|--------------|
@@ -380,15 +381,16 @@ aiwg use sdlc --provider windsurf      # Windsurf
 | **[AIWG Hooks](agentic/code/addons/aiwg-hooks/)** | Lifecycle event handlers — pre-session, post-write, workflow tracing |
 | **[AIWG Utils](agentic/code/addons/aiwg-utils/)** | Core meta-utilities (auto-installed with any framework) |
 | **[Droid Bridge](agentic/code/addons/droid-bridge/)** | Factory Droid orchestration — multi-platform agent bridge |
+| **[Ring Methodology](agentic/code/addons/ring-methodology/)** | Bounded iteration control with circuit breakers and session management |
 | **[Star Prompt](agentic/code/addons/star-prompt/)** | Repository star prompt for success celebration |
 
 ---
 
-### Agents (162)
+### Agents (188)
 
 Specialized AI personas deployed to your platform with defined tools, responsibilities, and operating rhythms.
 
-#### SDLC Agents (98)
+#### SDLC Agents (90)
 
 | Domain | Agents | Examples |
 |--------|--------|---------|
@@ -462,7 +464,7 @@ Enforcement patterns that prevent common AI failure modes. Rules deploy automati
 | `instruction-comprehension` | HIGH | Fully parse all instructions before acting; track multi-part requests to completion |
 | `subagent-scoping` | HIGH | One focused task per subagent; <20% context budget; no delegation chains deeper than 2 levels |
 
-#### SDLC Rules (23) — Active with Framework
+#### SDLC Rules (34) — Active with Framework
 
 Actionable feedback, mention wiring, HITL gates, agent fallback, provenance tracking, TAO loop, reproducibility validation, SDLC orchestration, agent-friendly code, agent generation guardrails, artifact discovery, HITL patterns, human gate display, thought protocol, reasoning sections, few-shot examples, best output selection, reproducibility, progressive disclosure, conversable agent interface, auto-reply chains, criticality panel sizing, qualified references.
 
@@ -472,7 +474,7 @@ Research metadata (FAIR-compliant YAML frontmatter), index generation (auto-gene
 
 ---
 
-### Skills (86)
+### Skills (128)
 
 Natural language workflow triggers. Say "what's the project status?" and the `project-awareness` skill activates.
 
@@ -496,7 +498,7 @@ Natural language workflow triggers. Say "what's the project status?" and the `pr
 
 ### SDLC Complete — Full Software Development Lifecycle
 
-The SDLC framework implements a phase-gated development lifecycle with 98 specialized agents, 23 enforcement rules, and 150+ artifact templates. Natural language commands drive phase transitions with automated quality gates.
+The SDLC framework implements a phase-gated development lifecycle with 90 specialized agents, 34 enforcement rules, and 170+ artifact templates. Natural language commands drive phase transitions with automated quality gates.
 
 ```
  ┌──────────┐    ┌─────────────┐    ┌──────────────┐    ┌────────────┐    ┌────────────┐
@@ -1029,7 +1031,7 @@ All 8 platforms receive agents, commands, skills, and rules. Deployment adapts t
 
 ---
 
-## CLI Reference (47 Commands)
+## CLI Reference (50 Commands)
 
 | Category | Commands | Description |
 |----------|----------|-------------|
@@ -1100,13 +1102,13 @@ AIWG uses a unified extension system with 10 extension types, all deployable acr
 
 | Type | Count | Description |
 |------|-------|-------------|
-| **Agents** | 162 | Specialized AI personas with defined tools, responsibilities, and operating rhythms |
-| **Commands** | 47 | CLI commands and slash commands for workflow automation |
-| **Skills** | 86 | Natural language workflow triggers activated by conversation patterns |
+| **Agents** | 188 | Specialized AI personas with defined tools, responsibilities, and operating rhythms |
+| **Commands** | 50 | CLI commands and slash commands for workflow automation |
+| **Skills** | 128 | Natural language workflow triggers activated by conversation patterns |
 | **Rules** | 35 | Enforcement patterns deployed as consolidated index with on-demand full-rule loading |
-| **Templates** | 366 | Progressive disclosure document templates for all SDLC phases |
-| **Frameworks** | 5 | Complete workflow systems (SDLC, Forensics, Marketing, Research, Media Curator) |
-| **Addons** | 20 | Feature bundles extending frameworks (RLM, Voice, Testing Quality, UAT) |
+| **Templates** | 334 | Progressive disclosure document templates for all SDLC phases |
+| **Frameworks** | 6 | Complete workflow systems (SDLC, Forensics, Marketing, Research, Media Curator, Ops) |
+| **Addons** | 21 | Feature bundles extending frameworks (RLM, Voice, Testing Quality, UAT, Ring) |
 | **Hooks** | varies | Lifecycle event handlers (pre-session, post-write, workflow tracing) |
 | **Tools** | varies | External utility integrations (git, jq, npm) |
 | **MCP Servers** | varies | Model Context Protocol server integrations |
@@ -1555,7 +1557,7 @@ Full research background, citations, and methodology: [docs/research/](docs/rese
 
 ### Framework Documentation
 
-- **[SDLC Framework](agentic/code/frameworks/sdlc-complete/README.md)** — 98 agents, phase workflows, quality gates
+- **[SDLC Framework](agentic/code/frameworks/sdlc-complete/README.md)** — 90 agents, phase workflows, quality gates
 - **[Forensics Complete](agentic/code/frameworks/forensics-complete/README.md)** — DFIR investigation workflows
 - **[Marketing Kit](agentic/code/frameworks/media-marketing-kit/README.md)** — 37 agents, campaign lifecycle
 - **[Media Curator](agentic/code/frameworks/media-curator/README.md)** — Media archive management

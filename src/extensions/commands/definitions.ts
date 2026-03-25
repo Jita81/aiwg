@@ -181,7 +181,7 @@ export const useCommand: Extension = {
   metadata: {
     type: 'command',
     template: 'orchestration',
-    argumentHint: '<framework>',
+    argumentHint: '<framework|addon>',
     allowedTools: ['Read', 'Write', 'Bash', 'Glob'],
     executionSteps: [
       'Validate framework name',
@@ -1356,10 +1356,10 @@ export const reproducibilityValidateCommand: Extension = {
 // ============================================
 
 /**
- * All command definitions (44 total)
+ * All command definitions (50 total)
  *
  * Organized by category:
- * - Maintenance (4): help, version, doctor, update
+ * - Maintenance (5): help, version, doctor, update, sync
  * - Framework (3): use, list, remove
  * - Project (1): new
  * - Workspace (3): status, migrate-workspace, rollback-workspace
@@ -1369,7 +1369,8 @@ export const reproducibilityValidateCommand: Extension = {
  * - Utility (3): prefill-cards, contribute-start, validate-metadata
  * - Plugin (5): install-plugin, uninstall-plugin, plugin-status, package-plugin, package-all-plugins
  * - Scaffolding (7): add-agent, add-command, add-skill, add-template, scaffold-addon, scaffold-extension, scaffold-framework
- * - Ralph (5): ralph, ralph-status, ralph-abort, ralph-resume, ralph-attach
+ * - Ralph (8): ralph, ralph-status, ralph-abort, ralph-resume, ralph-attach, ralph-external, ralph-memory, ralph-config
+ * - Mission Control (1): mc
  * - Metrics (3): cost-report, cost-history, metrics-tokens
  * - Documentation (1): doc-sync
  * - Code Analysis (1): cleanup-audit
@@ -1428,7 +1429,7 @@ export const commandDefinitions: Extension[] = [
   scaffoldExtensionCommand,
   scaffoldFrameworkCommand,
 
-  // Ralph (7)
+  // Ralph (8)
   ralphCommand,
   ralphStatusCommand,
   ralphAbortCommand,

@@ -1370,6 +1370,26 @@ aiwg ralph-resume
 
 ---
 
+### ralph-attach
+
+Attach to a running Ralph loop's live output stream.
+
+```bash
+aiwg ralph-attach
+```
+
+**Capabilities:** cli, ralph, control, monitoring
+**Platforms:** All
+**Tools:** Read
+
+**Actions:**
+- Attaches to a running external Ralph loop
+- Streams live output (press Ctrl+C to detach)
+- Shows current iteration progress in real time
+- Does not affect the running loop
+
+---
+
 ### ralph-external
 
 Start external Ralph loop with full crash recovery.
@@ -2007,6 +2027,28 @@ aiwg index stats --graph framework
 
 ---
 
+## Code Analysis Commands
+
+### cleanup-audit
+
+Audit codebase for dead code, unused exports, orphaned files, and stale manifests.
+
+```bash
+aiwg cleanup-audit [--scope <path>] [--fix] [--verbose]
+```
+
+**Capabilities:** cli, analysis, code-quality, dead-code, cleanup
+**Platforms:** All
+**Tools:** Bash, Glob, Grep, Read, Write, Edit
+
+**Actions:**
+- Scans for unused exports, orphaned files, and dead code
+- Detects stale manifest entries and broken references
+- Reports findings with severity classification
+- Optionally applies auto-fixes with `--fix`
+
+---
+
 ## Addon Commands
 
 Commands contributed by installed addons. Available after running `aiwg use <addon>`.
@@ -2162,7 +2204,7 @@ All commands are registered as extensions in the unified schema. This enables:
 
 | Category | Count | Commands |
 |----------|-------|----------|
-| **Maintenance** | 4 | help, version, doctor, update |
+| **Maintenance** | 5 | help, version, doctor, update, sync |
 | **Framework** | 3 | use, list, remove |
 | **Project** | 1 | new |
 | **Workspace** | 3 | status, migrate-workspace, rollback-workspace |
@@ -2172,7 +2214,8 @@ All commands are registered as extensions in the unified schema. This enables:
 | **Utility** | 3 | prefill-cards, contribute-start, validate-metadata |
 | **Plugin** | 5 | install-plugin, uninstall-plugin, plugin-status, package-plugin, package-all-plugins |
 | **Scaffolding** | 7 | add-agent, add-command, add-skill, add-template, scaffold-addon, scaffold-extension, scaffold-framework |
-| **Ralph** | 7 | ralph, ralph-status, ralph-abort, ralph-resume, ralph-external, ralph-memory, ralph-config |
+| **Ralph** | 8 | ralph, ralph-status, ralph-abort, ralph-resume, ralph-attach, ralph-external, ralph-memory, ralph-config |
+| **Mission Control** | 1 | mc (9 subcommands) |
 | **Metrics** | 3 | cost-report, cost-history, metrics-tokens |
 | **Documentation** | 1 | doc-sync |
 | **SDLC Orchestration** | 1 | sdlc-accelerate |
@@ -2181,7 +2224,7 @@ All commands are registered as extensions in the unified schema. This enables:
 | **Reproducibility** | 4 | execution-mode, snapshot, checkpoint, reproducibility-validate |
 | **Addon: ring** | 5 | ring check, ring circuit-breaker, ring session-start, ring session-end, ring status |
 
-**Total:** 47 built-in + addon commands (addon commands require `aiwg use <addon>`)
+**Total:** 50 built-in + addon commands (addon commands require `aiwg use <addon>`)
 
 ---
 
