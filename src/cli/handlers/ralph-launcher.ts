@@ -26,6 +26,7 @@
 import { spawn, ChildProcess } from 'child_process';
 import { join } from 'path';
 import { existsSync, mkdirSync, writeFileSync, readFileSync, rmSync, readdirSync, copyFileSync } from 'fs';
+import { getProviderConfig } from '../agent-spawn.js';
 
 /**
  * Options for launching an external Ralph loop
@@ -47,6 +48,10 @@ export interface RalphLaunchOptions {
   loopId?: string;
   force?: boolean;
   provider?: string;
+  /** Enable dangerous/unrestricted mode — passed to the orchestrator via env + flag */
+  dangerous?: boolean;
+  /** Raw args to append verbatim to the agent invocation inside the loop */
+  params?: string;
 }
 
 /**
@@ -155,6 +160,12 @@ export function buildArgs(options: RalphLaunchOptions): string[] {
   if (options.provider && options.provider !== 'claude') {
     args.push('--provider', options.provider);
   }
+  if (options.dangerous) {
+    args.push('--dangerous');
+  }
+  if (options.params) {
+    args.push('--params', options.params);
+  }
 
   return args;
 }
@@ -200,6 +211,11 @@ export async function launchExternalRalph(
       RALPH_LOOP_ID: loopId,
       RALPH_DETACHED: 'true',
       ...(options.provider ? { RALPH_PROVIDER: options.provider } : {}),
+      ...(options.dangerous ? {
+        RALPH_DANGEROUS: 'true',
+        RALPH_DANGEROUS_FLAG: getProviderConfig(options.provider ?? 'claude').dangerousFlag ?? '',
+      } : {}),
+      ...(options.params ? { RALPH_EXTRA_PARAMS: options.params } : {}),
     },
   });
 

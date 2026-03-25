@@ -1,0 +1,214 @@
+/**
+ * Agent Spawn Utility
+ *
+ * Centralized utility for spawning agentic CLI tools across providers.
+ * Handles --dangerous, --provider, and --params passthrough flags uniformly
+ * across all commands that invoke an underlying agent system.
+ *
+ * Usage pattern:
+ *   const { opts, remaining } = parseAgentSpawnFlags(ctx.args);
+ *   const config = getProviderConfig(opts.provider);
+ *   const spawnArgs = buildAgentArgs(prompt, opts);
+ *   spawn(config.binary, spawnArgs, { stdio: 'inherit' });
+ */
+
+// ── Provider configuration ────────────────────────────────────
+
+/**
+ * Per-provider spawn configuration.
+ *
+ * binary: CLI binary name (null = IDE-integrated, cannot be spawned)
+ * dangerousFlag: Flag that enables unrestricted/bypass mode for this provider
+ *   (null = provider does not support a dangerous mode via CLI flag)
+ * name: Human-readable display name
+ * guidanceMessage: Shown instead of spawning when binary is null
+ */
+export interface ProviderConfig {
+  binary: string | null;
+  dangerousFlag: string | null;
+  name: string;
+  guidanceMessage?: string;
+}
+
+export const PROVIDER_CONFIGS: Record<string, ProviderConfig> = {
+  claude: {
+    binary: 'claude',
+    dangerousFlag: '--dangerously-skip-permissions',
+    name: 'Claude Code',
+  },
+  opencode: {
+    binary: 'opencode',
+    // OpenCode shares Claude Code's flag surface
+    dangerousFlag: '--dangerously-skip-permissions',
+    name: 'OpenCode',
+  },
+  codex: {
+    binary: 'codex',
+    dangerousFlag: '--full-auto',
+    name: 'OpenAI Codex',
+  },
+  hermes: {
+    binary: 'hermes',
+    dangerousFlag: null,
+    name: 'Hermes',
+  },
+  copilot: {
+    binary: null,
+    dangerousFlag: null,
+    name: 'GitHub Copilot',
+    guidanceMessage:
+      'GitHub Copilot is IDE-integrated and cannot be spawned from the CLI.\n' +
+      'Open your IDE, navigate to the Copilot chat panel, and run the skill manually.',
+  },
+  cursor: {
+    binary: null,
+    dangerousFlag: null,
+    name: 'Cursor',
+    guidanceMessage:
+      'Cursor is IDE-integrated and cannot be spawned from the CLI.\n' +
+      'Open Cursor and run the skill or command from the AI panel.',
+  },
+  factory: {
+    binary: null,
+    dangerousFlag: null,
+    name: 'Factory AI',
+    guidanceMessage:
+      'Factory AI is cloud-based and cannot be spawned from the CLI.\n' +
+      'Use the Factory AI dashboard to dispatch the workflow.',
+  },
+  warp: {
+    binary: null,
+    dangerousFlag: null,
+    name: 'Warp Terminal',
+    guidanceMessage:
+      'Warp Terminal is a terminal application and cannot be spawned programmatically.\n' +
+      'Open Warp and run the skill from the AI Command Palette.',
+  },
+  windsurf: {
+    binary: null,
+    dangerousFlag: null,
+    name: 'Windsurf',
+    guidanceMessage:
+      'Windsurf is IDE-integrated and cannot be spawned from the CLI.\n' +
+      'Open Windsurf and run the command from the Cascade panel.',
+  },
+};
+
+// ── Flag parsing ──────────────────────────────────────────────
+
+export interface AgentSpawnOptions {
+  /** Provider override (default: 'claude') */
+  provider?: string;
+  /** Enable dangerous/unrestricted mode via provider-specific flag */
+  dangerous?: boolean;
+  /**
+   * Raw args to append to the agent binary call verbatim.
+   * The user is responsible for correctness — no validation performed.
+   * Accepts a space-separated string; quoted segments are preserved.
+   *
+   * Example: --params "--output-format json --timeout 120"
+   */
+  params?: string;
+}
+
+/**
+ * Extract --provider, --dangerous, and --params from an args array.
+ * Returns the parsed options and the remaining args with those flags removed.
+ *
+ * This is non-destructive — the original array is not modified.
+ */
+export function parseAgentSpawnFlags(args: string[]): {
+  opts: AgentSpawnOptions;
+  remaining: string[];
+} {
+  const opts: AgentSpawnOptions = {};
+  const remaining: string[] = [];
+
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (arg === '--provider' && i + 1 < args.length) {
+      opts.provider = args[++i];
+    } else if (arg === '--dangerous') {
+      opts.dangerous = true;
+    } else if (arg === '--params' && i + 1 < args.length) {
+      opts.params = args[++i];
+    } else {
+      remaining.push(arg);
+    }
+  }
+
+  return { opts, remaining };
+}
+
+// ── Arg construction ──────────────────────────────────────────
+
+/**
+ * Build the final args array for spawning a provider binary.
+ *
+ * Order: [prompt, dangerous-flag?, ...raw-params]
+ */
+export function buildAgentArgs(prompt: string, opts: AgentSpawnOptions): string[] {
+  const config = getProviderConfig(opts.provider ?? 'claude');
+  const args: string[] = [prompt];
+
+  if (opts.dangerous) {
+    if (config.dangerousFlag) {
+      args.push(config.dangerousFlag);
+    }
+    // If provider has no dangerous flag, the flag is silently ignored —
+    // callers should warn the user via warnIfDangerousUnsupported().
+  }
+
+  if (opts.params) {
+    args.push(...splitParams(opts.params));
+  }
+
+  return args;
+}
+
+/**
+ * Split a params string into individual args, respecting double/single quotes.
+ * "hello world" → ['hello world']
+ * --flag value  → ['--flag', 'value']
+ */
+export function splitParams(params: string): string[] {
+  const result: string[] = [];
+  const re = /(?:[^\s"']+|"[^"]*"|'[^']*')+/g;
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(params)) !== null) {
+    // Strip surrounding quotes from individual tokens
+    result.push(match[0].replace(/^["']|["']$/g, ''));
+  }
+  return result;
+}
+
+// ── Provider helpers ──────────────────────────────────────────
+
+/** Get config for a provider, falling back to claude for unknown values. */
+export function getProviderConfig(provider: string): ProviderConfig {
+  return PROVIDER_CONFIGS[provider] ?? PROVIDER_CONFIGS['claude']!;
+}
+
+/** Returns true if the provider has a CLI binary that can be spawned. */
+export function isSpawnableProvider(provider: string): boolean {
+  return getProviderConfig(provider).binary !== null;
+}
+
+/**
+ * Warn string if --dangerous was requested but the provider has no
+ * corresponding flag. Returns null if the combination is valid.
+ */
+export function dangerousWarning(provider: string): string | null {
+  const config = getProviderConfig(provider);
+  if (!config.dangerousFlag) {
+    return `--dangerous is not supported for provider '${config.name}' and will be ignored.`;
+  }
+  return null;
+}
+
+/** List all spawnable provider names. */
+export function spawnableProviders(): string[] {
+  return Object.entries(PROVIDER_CONFIGS)
+    .filter(([, c]) => c.binary !== null)
+    .map(([k]) => k);
+}

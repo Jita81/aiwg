@@ -42,6 +42,8 @@ function parseRalphArgs(args: string[]): {
   help?: boolean;
   loopId?: string;
   provider?: string;
+  dangerous?: boolean;
+  params?: string;
 } {
   const result: ReturnType<typeof parseRalphArgs> = {};
   let i = 0;
@@ -84,6 +86,10 @@ function parseRalphArgs(args: string[]): {
       result.loopId = args[++i];
     } else if (arg === '--provider') {
       result.provider = args[++i];
+    } else if (arg === '--dangerous') {
+      result.dangerous = true;
+    } else if (arg === '--params') {
+      result.params = args[++i];
     } else if (!arg.startsWith('-') && !result.objective) {
       result.objective = arg;
     }
@@ -158,6 +164,8 @@ export class RalphHandler implements CommandHandler {
         enableEarlyStopping: parsed.enableEarlyStopping,
         loopId: parsed.loopId,
         provider: parsed.provider,
+        dangerous: parsed.dangerous,
+        params: parsed.params,
       };
 
       const result = await launchExternalRalph(ctx.frameworkRoot, process.cwd(), options);
@@ -197,7 +205,14 @@ OPTIONS:
   --mcp-config <json>     MCP server configuration JSON
   --gitea-issue           Create/link Gitea issue for tracking
   --loop-id <id>          Use specific loop ID
-  --provider <name>       CLI provider: claude (default), codex
+  --provider <name>       Agent system to use (default: claude)
+                          Spawnable: claude, opencode, codex, hermes
+  --dangerous             Enable unrestricted mode for the selected provider.
+                          Passes the provider's native flag (e.g. --dangerously-skip-permissions
+                          for claude/opencode, --full-auto for codex). No effect if the
+                          provider doesn't have a dangerous mode flag.
+  --params "<args>"       Pass arbitrary args verbatim to the agent binary.
+                          Appended after all other flags. Quoted segments preserved.
 
 RESEARCH-BACKED OPTIONS (REF-015, REF-021):
   -m, --memory <n>        Memory capacity Ω (default: 3)
