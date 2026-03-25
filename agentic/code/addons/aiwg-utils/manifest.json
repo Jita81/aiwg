@@ -34,6 +34,11 @@
     "templates": "templates/",
     "prompts": "prompts/"
   },
+  "consolidation": {
+    "strategy": "index-with-links",
+    "rulesIndex": "rules/RULES-INDEX.md",
+    "deployIndexOnly": true
+  },
   "commands": [
     "aiwg-refresh",
     "aiwg-regenerate",

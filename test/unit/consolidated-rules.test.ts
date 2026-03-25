@@ -112,9 +112,9 @@ describe('Consolidated Rules Functions', () => {
     it('groups real manifest rules correctly', () => {
       const manifest = base.loadRulesManifest(REPO_ROOT);
       const groups = base.groupRulesByTier(manifest.rules);
-      // Core has 9 rules per RULES-INDEX.md
-      expect(groups.core.length).toBeGreaterThanOrEqual(9);
-      // SDLC has 20 rules
+      // Core rules (aiwg-utils rules migrated to addon, sdlc-complete has 7)
+      expect(groups.core.length).toBeGreaterThanOrEqual(7);
+      // SDLC rules
       expect(groups.sdlc.length).toBeGreaterThanOrEqual(20);
       // Research has 2 rules
       expect(groups.research.length).toBeGreaterThanOrEqual(2);
@@ -233,19 +233,196 @@ describe('Consolidated Rules Functions', () => {
         path.join(REPO_ROOT, 'agentic', 'code', 'addons', 'testing', 'rules', 'test-rule.md'),
       ];
       const content = base.generateConsolidatedRulesContent(REPO_ROOT, 'claude', addonFiles);
-      expect(content).toContain('## Addon Rules');
+      expect(content).toContain('## Additional Addon Rules');
       expect(content).toContain('**voice-rule**');
       expect(content).toContain('**test-rule**');
     });
 
     it('does not include addon section when no addons provided', () => {
       const content = base.generateConsolidatedRulesContent(REPO_ROOT, 'claude');
-      expect(content).not.toContain('## Addon Rules');
+      expect(content).not.toContain('## Additional Addon Rules');
     });
 
     it('returns null when source root does not exist', () => {
       const content = base.generateConsolidatedRulesContent('/tmp/nonexistent-aiwg-test', 'claude');
       expect(content).toBeNull();
+    });
+  });
+
+  // ==========================================================================
+  // getComponentRulesIndexPath
+  // ==========================================================================
+
+  describe('getComponentRulesIndexPath', () => {
+    it('returns path when manifest has consolidation.rulesIndex', () => {
+      const ringPath = path.join(REPO_ROOT, 'agentic', 'code', 'addons', 'ring-methodology');
+      const result = base.getComponentRulesIndexPath(ringPath);
+      expect(result).not.toBeNull();
+      expect(result).toContain('RULES-INDEX.md');
+      expect(fs.existsSync(result)).toBe(true);
+    });
+
+    it('returns path for aiwg-utils addon', () => {
+      const utilsPath = path.join(REPO_ROOT, 'agentic', 'code', 'addons', 'aiwg-utils');
+      const result = base.getComponentRulesIndexPath(utilsPath);
+      expect(result).not.toBeNull();
+      expect(result).toContain('RULES-INDEX.md');
+      expect(fs.existsSync(result)).toBe(true);
+    });
+
+    it('returns path for sdlc-complete framework', () => {
+      const sdlcPath = path.join(REPO_ROOT, 'agentic', 'code', 'frameworks', 'sdlc-complete');
+      const result = base.getComponentRulesIndexPath(sdlcPath);
+      expect(result).not.toBeNull();
+      expect(result).toContain('RULES-INDEX.md');
+      expect(fs.existsSync(result)).toBe(true);
+    });
+
+    it('returns null when manifest does not exist', () => {
+      const tmpDir = path.join(TEST_BASE, 'no-manifest-component');
+      fs.mkdirSync(tmpDir, { recursive: true });
+      const result = base.getComponentRulesIndexPath(tmpDir);
+      expect(result).toBeNull();
+    });
+
+    it('returns null when manifest has no consolidation field', () => {
+      const tmpDir = path.join(TEST_BASE, 'no-consolidation-component');
+      fs.mkdirSync(tmpDir, { recursive: true });
+      fs.writeFileSync(path.join(tmpDir, 'manifest.json'), JSON.stringify({ name: 'test' }));
+      const result = base.getComponentRulesIndexPath(tmpDir);
+      expect(result).toBeNull();
+    });
+
+    it('returns null when manifest consolidation.rulesIndex points to missing file', () => {
+      const tmpDir = path.join(TEST_BASE, 'missing-index-component');
+      fs.mkdirSync(tmpDir, { recursive: true });
+      fs.writeFileSync(path.join(tmpDir, 'manifest.json'), JSON.stringify({
+        consolidation: { rulesIndex: 'rules/RULES-INDEX.md', deployIndexOnly: true }
+      }));
+      const result = base.getComponentRulesIndexPath(tmpDir);
+      expect(result).toBeNull();
+    });
+
+    it('returns path when index file exists', () => {
+      const tmpDir = path.join(TEST_BASE, 'valid-component');
+      const rulesDir = path.join(tmpDir, 'rules');
+      fs.mkdirSync(rulesDir, { recursive: true });
+      fs.writeFileSync(path.join(tmpDir, 'manifest.json'), JSON.stringify({
+        consolidation: { rulesIndex: 'rules/RULES-INDEX.md', deployIndexOnly: true }
+      }));
+      fs.writeFileSync(path.join(rulesDir, 'RULES-INDEX.md'), '# Test Index');
+      const result = base.getComponentRulesIndexPath(tmpDir);
+      expect(result).toBe(path.join(rulesDir, 'RULES-INDEX.md'));
+    });
+
+    it('returns null for invalid JSON in manifest', () => {
+      const tmpDir = path.join(TEST_BASE, 'bad-json-component');
+      fs.mkdirSync(tmpDir, { recursive: true });
+      fs.writeFileSync(path.join(tmpDir, 'manifest.json'), '{ invalid json }');
+      const result = base.getComponentRulesIndexPath(tmpDir);
+      expect(result).toBeNull();
+    });
+  });
+
+  // ==========================================================================
+  // assembleRulesIndex
+  // ==========================================================================
+
+  describe('assembleRulesIndex', () => {
+    it('returns content when global RULES-INDEX.md exists', () => {
+      const result = base.assembleRulesIndex(REPO_ROOT);
+      expect(result).not.toBeNull();
+      expect(typeof result).toBe('string');
+      expect(result.length).toBeGreaterThan(0);
+    });
+
+    it('returns null when global RULES-INDEX.md is missing', () => {
+      const result = base.assembleRulesIndex('/tmp/nonexistent-aiwg-test');
+      expect(result).toBeNull();
+    });
+
+    it('includes global header content', () => {
+      const result = base.assembleRulesIndex(REPO_ROOT);
+      // Global template header should appear before component sections
+      expect(result).toContain('AIWG Rules Index');
+      expect(result).toContain('Installed Components');
+    });
+
+    it('includes Quick Reference section from global template', () => {
+      const result = base.assembleRulesIndex(REPO_ROOT);
+      expect(result).toContain('## Quick Reference by Context');
+    });
+
+    it('includes sdlc-complete component rules', () => {
+      const result = base.assembleRulesIndex(REPO_ROOT);
+      // sdlc-complete RULES-INDEX.md should be embedded
+      expect(result).toContain('# AIWG SDLC Rules Index');
+      expect(result).toContain('## Core Rules');
+      expect(result).toContain('## SDLC Rules');
+    });
+
+    it('includes ring-methodology component rules', () => {
+      const result = base.assembleRulesIndex(REPO_ROOT);
+      expect(result).toContain('# Ring Methodology Rules Index');
+      expect(result).toContain('verification-ring');
+    });
+
+    it('includes aiwg-utils component rules', () => {
+      const result = base.assembleRulesIndex(REPO_ROOT);
+      expect(result).toContain('subagent-scoping');
+    });
+
+    it('component section headings appear in assembled output', () => {
+      const result = base.assembleRulesIndex(REPO_ROOT);
+      const sdlcPos = result.indexOf('# AIWG SDLC Rules Index');
+      const ringPos = result.indexOf('# Ring Methodology Rules Index');
+      // Both component headings should be present
+      expect(sdlcPos).toBeGreaterThan(0);
+      expect(ringPos).toBeGreaterThan(0);
+    });
+
+    it('global Quick Reference appears at the end of the assembled output', () => {
+      const result = base.assembleRulesIndex(REPO_ROOT);
+      // The global template's QR section (from agentic/code/RULES-INDEX.md)
+      // is appended after all component sections as the final summary
+      expect(result).toContain('## Quick Reference by Context');
+      // The global QR footer should be the last occurrence
+      const lastQrPos = result.lastIndexOf('## Quick Reference by Context');
+      const sdlcPos = result.indexOf('# AIWG SDLC Rules Index');
+      expect(lastQrPos).toBeGreaterThan(sdlcPos);
+    });
+  });
+
+  // ==========================================================================
+  // getAddonRuleFiles — consolidated addon skipping
+  // ==========================================================================
+
+  describe('getAddonRuleFiles (consolidated addon skipping)', () => {
+    it('skips addons with consolidation.deployIndexOnly=true', () => {
+      const files = base.getAddonRuleFiles(REPO_ROOT);
+      // ring-methodology and aiwg-utils have deployIndexOnly=true and should be excluded
+      const hasRingFiles = files.some((f: string) => f.includes('ring-methodology'));
+      const hasUtilsFiles = files.some((f: string) => f.includes('aiwg-utils'));
+      expect(hasRingFiles).toBe(false);
+      expect(hasUtilsFiles).toBe(false);
+    });
+
+    it('still returns files from addons without consolidation', () => {
+      // Addons without consolidation field should still have their rules returned
+      // (most addons don't have rules at all, so we just verify the function runs)
+      const files = base.getAddonRuleFiles(REPO_ROOT);
+      expect(Array.isArray(files)).toBe(true);
+    });
+
+    it('respects excludeAddons parameter for non-consolidated addons', () => {
+      // Create a temp addon without consolidation to test excludeAddons
+      // Since we can't easily add a real addon, just verify the excludeAddons
+      // contract still works in combination with the new skipping logic
+      const filesNoExclude = base.getAddonRuleFiles(REPO_ROOT);
+      const filesWithExclude = base.getAddonRuleFiles(REPO_ROOT, ['ring-methodology']);
+      // Both should not contain ring-methodology (it's consolidated)
+      // The sets should be equal since ring-methodology was already excluded by consolidation
+      expect(filesNoExclude).toEqual(filesWithExclude);
     });
   });
 

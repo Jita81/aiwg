@@ -18,5 +18,10 @@
     "sectionsManifest": "templates/aiwg-sections/manifest.json",
     "priority": 10,
     "description": "SDLC framework context: orchestration, NL translations, phase overview, commands"
+  },
+  "consolidation": {
+    "strategy": "index-with-links",
+    "rulesIndex": "rules/RULES-INDEX.md",
+    "deployIndexOnly": true
   }
 }

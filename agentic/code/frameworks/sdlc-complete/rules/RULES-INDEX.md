@@ -1,12 +1,12 @@
-# AIWG Rules Index
+# AIWG SDLC Rules Index
 
-Consolidated index of all AIWG enforcement rules. Each entry provides a summary sufficient to determine relevance — load the full rule via @-link only when needed.
+Rules owned by the sdlc-complete framework. Each entry provides a summary sufficient to determine relevance — load the full rule via @-link only when needed.
 
 **How to use**: Scan summaries below. When a rule is relevant to your current task, load the full rule file for detailed enforcement instructions. Rules are grouped by tier and ordered by enforcement level (CRITICAL > HIGH > MEDIUM).
 
 ---
 
-## Core Rules (10 rules — always active)
+## Core Rules (7 rules — always active)
 
 Core rules are non-negotiable defaults deployed to every AIWG installation.
 
@@ -49,24 +49,9 @@ Core rules are non-negotiable defaults deployed to every AIWG installation.
 **When to apply**: Pre-generation risk assessment, during-generation monitoring, post-generation validation
 **Full rule**: @agentic/code/frameworks/sdlc-complete/rules/failure-mitigation.md
 
-#### research-before-decision
-**Summary**: Research codebase, docs, and sources before making technical decisions. Prevents guessing APIs, blind retries, and missing context. Pattern: IDENTIFY > SEARCH > EXTRACT > REASON > ACT > VERIFY.
-**When to apply**: Technical decision-making, API usage, configuration changes, dependency selection, error diagnosis
-**Full rule**: @agentic/code/frameworks/sdlc-complete/rules/research-before-decision.md
-
-#### instruction-comprehension
-**Summary**: Fully parse and confirm understanding of all user instructions before acting. Extract constraints, requirements, and format preferences. Track multi-part requests to completion. Top user complaint: repeating instructions 5-6 times.
-**When to apply**: Every user request, multi-part tasks, specification compliance, instruction drift detection
-**Full rule**: @agentic/code/frameworks/sdlc-complete/rules/instruction-comprehension.md
-
-#### subagent-scoping
-**Summary**: Each subagent gets ONE focused task with minimal context. Decompose complex work into parallel subagents rather than overloading one. Prompt budget <20% of context window per subagent. No delegation chains deeper than 2 levels. Spawn many focused subagents over few overloaded ones.
-**When to apply**: Task delegation, subagent spawning, parallel dispatch, orchestrator fan-out, context budget planning
-**Full rule**: @agentic/code/addons/aiwg-utils/rules/subagent-scoping.md
-
 ---
 
-## SDLC Rules (23 rules — active with framework)
+## SDLC Rules (24 rules — active with framework)
 
 SDLC rules enforce workflow quality when the SDLC framework is deployed via `aiwg use sdlc`.
 
@@ -216,92 +201,39 @@ Research rules manage the research corpus. Deployed when research features are a
 
 ---
 
-## Utility Rules (2 rules — active with aiwg-utils addon)
+## Component Rule Indexes
 
-### HIGH
+Rules contributed by installed addons. Load the component index for full rule summaries.
 
-#### native-ux-tools
-**Summary**: Agents MUST prefer platform-native interaction tools (e.g., AskUserQuestion in Claude Code) over plain text output for interactive questions. Check tool availability before asking, fall back to formatted markdown if unavailable. One question per turn. Includes platform capability matrix.
-**When to apply**: Interactive commands (--interactive flag), decision gates, user confirmations, intake wizards, any agent question
-**Full rule**: @agentic/code/addons/aiwg-utils/rules/native-ux-tools.md
-
-### MEDIUM
-
-#### diagram-generation
-**Summary**: Diagram generation is a standard output alongside every major documentation artifact. Defines required diagram types per artifact (C4 for SAD, ER for data models, sequence for APIs, DFD for threat models). MermaidJS is default; PlantUML for C4/formal UML. Source must be committed alongside rendered output.
-**When to apply**: Architecture documentation, threat modeling, API design, deployment planning, any artifact with visual communication needs
-**Full rule**: @agentic/code/addons/aiwg-utils/rules/diagram-generation.md
-
----
-
-## Ring Methodology Rules (7 rules — active with ring-methodology addon)
-
-Ring methodology rules enforce a cyclical execution framework with four-layer verification, process health measurement, and structured failure learning. Deployed via `aiwg use ring`.
-
-### HIGH
-
-#### verification-ring
-**Summary**: Four-layer A→B→C→D verification ring. Layer A: developer tests. Layer B: integration tests. Layer C: user surface from `~`, login shell, installed command. Layer D: structured reflection artifact. One Feature, One Full Ring — never batch. C failure = feature incomplete. D always runs. Enforced by `ring-check` hook on FeatureComplete.
-**When to apply**: Every feature completion, any deliverable type (CLI, library, API, app), output verification
-**Full rule**: @agentic/code/addons/ring-methodology/rules/verification-ring.md
-
-#### morpholepsis-detection
-**Summary**: Wrong-frame detection with 3 mechanisms: (1) 7-signal reactive table (tool fixation, layer confusion, category lock, Ω-occlusion, pleromatic collapse, morpholeptic loop, success arrest); (2) protonoia pre-tool-use early warning — 4 checks (repetition, frame, layer, kernel library) fire before each tool call with `[PROTONOIA]` notice; (3) sovereignty stack (L1 Mind → L5 Thronokrator) — L3/L4 trigger LIMINAL, L5 triggers HALTED. 13 attribution signatures. Intervention = reframe, not retry. Does not consume retry slot.
-**When to apply**: Before each tool call (protonoia); repeated failures, same approach variations (reactive signals); classifying failure depth to select correct intervention (sovereignty stack)
-**Full rule**: @agentic/code/addons/ring-methodology/rules/morpholepsis-detection.md
-
-#### kenophoria-state
-**Summary**: Four-state execution model: EXECUTING ↔ LIMINAL (internal reorientation loop), EXECUTING → KENOPHORIA → HALTED. LIMINAL = agent's frame is wrong — stop, extract kernel, declare frame shift, re-enter EXECUTING. KENOPHORIA = blocked on external dependency (not failure). Circuit breakers: consecutive failures ≥2, red-flag rate >61.8% (=φ⁻¹), spectral gap <23.6% (=φ⁻³). Duration gate: 3× mean feature time escalates to soft halt.
-**When to apply**: External blocking (API down, credential missing, human decision needed), internal frame error detected, morpholeptic loop, Ω-occlusion, circuit breaker evaluation, session resume
-**Full rule**: @agentic/code/addons/ring-methodology/rules/kenophoria-state.md
-
-#### temporal-coupling
-**Summary**: Run-to-run state entanglement model. Coupling score: residual ∩ assumptions. Three zones: Independent (<38.2%), Correlated (38.2–61.8%), Entangled (>61.8%). Gate 15: idempotency — two consecutive runs without cleanup must both succeed. STEWARD THE GROUND protocol: Verify → Clean → Bind → Register → On Exit.
-**When to apply**: Resource-binding code (ports, locks, PIDs, temp files), second-run failures, iterative loop state
-**Full rule**: @agentic/code/addons/ring-methodology/rules/temporal-coupling.md
-
-#### kernel-extraction
-**Summary**: Mandatory failure insight preservation before any retry. Extract kernel (valid insight from failed approach) to append-only `kernels.jsonl`. Query library before retry and before decomposition. Monotonic growth — no deletion, contradictions preserved. Non-monotonic quality tracking: stop at peak, not final iteration.
-**When to apply**: Any failure before retry, task decomposition planning, morpholeptic loop detection
-**Full rule**: @agentic/code/addons/ring-methodology/rules/kernel-extraction.md
-
-#### spectral-gap
-**Summary**: Process health metric: Layer C first-attempt pass rate. Four discrete phases: PEAK (≥61.8% = φ⁻¹), STABLE (≥38.2% = φ⁻²), DEGRADED (≥23.6% = φ⁻³), CRITICAL (<23.6%). Perinoetic review every 3 features or on phase transition. 7-question review protocol. Rubber-stamp detection: 2 consecutive empty `actions_taken` → escalate.
-**When to apply**: Session health assessment, perinoetic review triggers, DEGRADED/CRITICAL halt conditions
-**Full rule**: @agentic/code/addons/ring-methodology/rules/spectral-gap.md
-
-#### phi-constants
-**Summary**: φ (golden ratio) axioms for all ring-methodology thresholds. Constants: φ⁻¹ ≈ 0.618 (signal inversion/entanglement), φ⁻² ≈ 0.382 (stable floor), φ⁻³ ≈ 0.236 (critical boundary), φ² ≈ 3 (retry ceiling). Usage table maps each constant to the rules that use it. Adjustment guidance: change φ-power, not raw number.
-**When to apply**: Understanding why ring thresholds have specific values; tuning thresholds for a project; implementing new ring metrics that should align with the φ-threshold family
-**Full rule**: @agentic/code/addons/ring-methodology/rules/phi-constants.md
+| Component | Index | Rules |
+|-----------|-------|-------|
+| aiwg-utils | @agentic/code/addons/aiwg-utils/rules/RULES-INDEX.md | 7 |
+| ring-methodology | @agentic/code/addons/ring-methodology/rules/RULES-INDEX.md | 7 |
 
 ---
 
 ## Quick Reference by Context
 
+> For ring-methodology contexts, see @agentic/code/addons/ring-methodology/rules/RULES-INDEX.md
+> For aiwg-utils contexts, see @agentic/code/addons/aiwg-utils/rules/RULES-INDEX.md
+
 | Task Type | Relevant Rules |
 |-----------|---------------|
-| **Writing code** | no-attribution, executable-feedback, research-before-decision, anti-laziness, token-security, agent-friendly-code, agent-generation-guardrails |
-| **Running tests** | executable-feedback, anti-laziness, reproducibility, reproducibility-validation, verification-ring, temporal-coupling |
-| **Creating artifacts** | mention-wiring, provenance-tracking, qualified-references, progressive-disclosure, artifact-discovery, diagram-generation |
+| **Writing code** | no-attribution, executable-feedback, anti-laziness, agent-friendly-code, agent-generation-guardrails |
+| **Running tests** | executable-feedback, anti-laziness, reproducibility, reproducibility-validation |
+| **Creating artifacts** | mention-wiring, provenance-tracking, qualified-references, progressive-disclosure, artifact-discovery |
 | **Phase transitions** | hitl-gates, sdlc-orchestration, human-gate-display |
-| **Ralph loops** | tao-loop, actionable-feedback, best-output-selection, anti-laziness, kernel-extraction, morpholepsis-detection |
-| **Agent design** | few-shot-examples, conversable-agent-interface, agent-fallback, thought-protocol, native-ux-tools |
-| **Documentation** | citation-policy, no-attribution, reasoning-sections, research-metadata, diagram-generation |
-| **Security review** | token-security, failure-mitigation, research-before-decision |
-| **Delegating to subagents** | subagent-scoping, instruction-comprehension, research-before-decision |
-| **Multi-agent work** | auto-reply-chains, criticality-panel-sizing, sdlc-orchestration, subagent-scoping |
-| **Interactive commands** | native-ux-tools, instruction-comprehension |
+| **Ralph loops** | tao-loop, actionable-feedback, best-output-selection, anti-laziness |
+| **Agent design** | few-shot-examples, conversable-agent-interface, agent-fallback, thought-protocol |
+| **Documentation** | citation-policy, no-attribution, reasoning-sections, research-metadata |
+| **Security review** | token-security, failure-mitigation |
+| **Multi-agent work** | auto-reply-chains, criticality-panel-sizing, sdlc-orchestration |
 | **Versioning/release** | versioning, no-attribution |
-| **Self-maintenance** | self-maintenance, research-before-decision |
+| **Self-maintenance** | self-maintenance |
 | **Background orchestration** | self-maintenance, sdlc-orchestration |
 | **Research** | research-metadata, index-generation, citation-policy |
-| **Ring methodology** | verification-ring, morpholepsis-detection, kenophoria-state, temporal-coupling, kernel-extraction, spectral-gap |
-| **Feature completion** | verification-ring, morpholepsis-detection (success arrest), spectral-gap |
-| **Failure recovery** | kernel-extraction, morpholepsis-detection, kenophoria-state, anti-laziness, failure-mitigation |
-| **Process health** | spectral-gap, kernel-extraction, temporal-coupling |
 
 ---
 
-*Generated from manifest.json v2.0.0 — 45 rules across 5 tiers*
+*Generated from manifest.json v2.0.0 — 33 rules across 3 tiers*
 *Full rule files: @agentic/code/frameworks/sdlc-complete/rules/*

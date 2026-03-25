@@ -353,11 +353,14 @@ Apply mitigations for known LLM failure archetypes: hallucination, context loss,
 
 ### Rules Reference
 
-Rules deploy as a single consolidated `RULES-INDEX.md` (~200 lines) instead of 31 individual files (~9,321 lines). The index contains summaries with @-links to full rule files for on-demand loading.
+Rules are organized in a two-level hierarchy: each component owns its own `RULES-INDEX.md`, and a global index aggregates pointers to all installed components.
 
-- Consolidated index: `agentic/code/frameworks/sdlc-complete/rules/RULES-INDEX.md`
-- Full rule files: `agentic/code/frameworks/sdlc-complete/rules/`
-- Manifest: `agentic/code/frameworks/sdlc-complete/rules/manifest.json`
+- Global index: `agentic/code/RULES-INDEX.md` (assembled during deployment)
+- Component indexes:
+  - sdlc-complete (33 rules): `agentic/code/frameworks/sdlc-complete/rules/RULES-INDEX.md`
+  - aiwg-utils (7 rules): `agentic/code/addons/aiwg-utils/rules/RULES-INDEX.md`
+  - ring-methodology (7 rules): `agentic/code/addons/ring-methodology/rules/RULES-INDEX.md`
+- Architecture decision: `.aiwg/architecture/adr-rules-index-hierarchy.md`
 
 ## Commit and Output Conventions
 

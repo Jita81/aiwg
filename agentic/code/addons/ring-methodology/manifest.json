@@ -30,6 +30,11 @@
     "templates": "templates/",
     "docs": "docs/"
   },
+  "consolidation": {
+    "strategy": "index-with-links",
+    "rulesIndex": "rules/RULES-INDEX.md",
+    "deployIndexOnly": true
+  },
   "rules": [
     "verification-ring",
     "morpholepsis-detection",

@@ -967,6 +967,10 @@ export function getAddonRuleFiles(srcRoot, excludeAddons = []) {
   for (const addon of addons) {
     if (excludeAddons.includes(addon.name)) continue;
 
+    // Skip addons with consolidated rule indexes — their rules are
+    // included via assembleRulesIndex() instead of individual files
+    if (addon.manifest?.consolidation?.deployIndexOnly) continue;
+
     const rulesDir = path.join(addon.path, 'rules');
     if (fs.existsSync(rulesDir)) {
       files.push(...listMdFiles(rulesDir));
@@ -1057,6 +1061,99 @@ export function groupByEnforcement(rules) {
 }
 
 /**
+ * Get the RULES-INDEX.md path for a component (framework or addon).
+ * Checks the component's manifest.json for consolidation.rulesIndex.
+ * @param {string} componentPath - Path to the component directory
+ * @returns {string|null} - Path to the component's RULES-INDEX.md or null
+ */
+export function getComponentRulesIndexPath(componentPath) {
+  const manifestPath = path.join(componentPath, 'manifest.json');
+  if (!fs.existsSync(manifestPath)) return null;
+
+  try {
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    const rulesIndex = manifest.consolidation?.rulesIndex;
+    if (!rulesIndex) return null;
+
+    const indexPath = path.join(componentPath, rulesIndex);
+    return fs.existsSync(indexPath) ? indexPath : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+/**
+ * Assemble the deployed RULES-INDEX.md from the global template and all
+ * installed component indexes.
+ *
+ * Flow:
+ * 1. Read global template from agentic/code/RULES-INDEX.md
+ * 2. For each component with consolidation support, read its RULES-INDEX.md
+ * 3. Concatenate: global header + component indexes + global quick reference
+ *
+ * @param {string} srcRoot - Source root directory
+ * @returns {string|null} - Assembled content or null if global template missing
+ */
+export function assembleRulesIndex(srcRoot) {
+  const globalPath = path.join(srcRoot, 'agentic', 'code', 'RULES-INDEX.md');
+  if (!fs.existsSync(globalPath)) return null;
+
+  const globalContent = fs.readFileSync(globalPath, 'utf8');
+
+  // Find the Quick Reference section in the global template
+  const qrMarker = '## Quick Reference by Context';
+  const qrIndex = globalContent.indexOf(qrMarker);
+
+  // Split global into header (before Quick Reference) and footer (Quick Reference + rest)
+  let header, footer;
+  if (qrIndex >= 0) {
+    header = globalContent.substring(0, qrIndex).trimEnd();
+    footer = globalContent.substring(qrIndex);
+  } else {
+    header = globalContent;
+    footer = '';
+  }
+
+  // Collect component indexes
+  const componentSections = [];
+
+  // 1. Framework indexes (sdlc-complete, etc.)
+  const frameworksDir = path.join(srcRoot, 'agentic', 'code', 'frameworks');
+  if (fs.existsSync(frameworksDir)) {
+    for (const entry of fs.readdirSync(frameworksDir, { withFileTypes: true })) {
+      if (!entry.isDirectory()) continue;
+      const fwPath = path.join(frameworksDir, entry.name);
+      const indexPath = getComponentRulesIndexPath(fwPath);
+      if (indexPath) {
+        componentSections.push(fs.readFileSync(indexPath, 'utf8').trim());
+      }
+    }
+  }
+
+  // 2. Addon indexes
+  const addons = discoverAddons(srcRoot);
+  for (const addon of addons) {
+    const indexPath = getComponentRulesIndexPath(addon.path);
+    if (indexPath) {
+      componentSections.push(fs.readFileSync(indexPath, 'utf8').trim());
+    }
+  }
+
+  // Assemble: header + component indexes + footer
+  const parts = [header];
+  if (componentSections.length > 0) {
+    parts.push('');
+    parts.push(componentSections.join('\n\n'));
+  }
+  if (footer) {
+    parts.push('');
+    parts.push(footer);
+  }
+
+  return parts.join('\n');
+}
+
+/**
  * Get the RULES-INDEX.md file path from source
  * @param {string} srcRoot - Source root directory
  * @returns {string|null} - Path to RULES-INDEX.md or null
@@ -1077,12 +1174,27 @@ export function getRulesIndexPath(srcRoot) {
  * @returns {string|null} - Generated content or null if manifest/index missing
  */
 export function generateConsolidatedRulesContent(srcRoot, provider, addonRuleFiles = []) {
+  // Try assembled index first (new multi-component assembly)
+  const assembled = assembleRulesIndex(srcRoot);
+  if (assembled) {
+    let content = assembled;
+    // Append any remaining non-consolidated addon rules
+    if (addonRuleFiles.length > 0) {
+      content += '\n\n---\n\n## Additional Addon Rules\n\n';
+      for (const ruleFile of addonRuleFiles) {
+        const ruleName = path.basename(ruleFile, '.md');
+        content += `- **${ruleName}**: @${path.relative(srcRoot, ruleFile)}\n`;
+      }
+    }
+    return content;
+  }
+
+  // Fallback: legacy single-index behavior
   const indexPath = getRulesIndexPath(srcRoot);
   if (!indexPath) return null;
 
   let content = fs.readFileSync(indexPath, 'utf8');
 
-  // Append addon rules section if any addon rules exist
   if (addonRuleFiles.length > 0) {
     content += '\n\n---\n\n## Addon Rules\n\n';
     for (const ruleFile of addonRuleFiles) {

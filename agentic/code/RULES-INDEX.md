@@ -1,0 +1,49 @@
+# AIWG Rules Index
+
+Global rule index assembled from all installed AIWG components.
+Scan component indexes to find relevant rules; load the full rule file via @-link when needed.
+
+---
+
+## Installed Components
+
+| Component | Type | Rules | Index |
+|-----------|------|-------|-------|
+| sdlc-complete | framework | 33 | @agentic/code/frameworks/sdlc-complete/rules/RULES-INDEX.md |
+| aiwg-utils | addon (core) | 7 | @agentic/code/addons/aiwg-utils/rules/RULES-INDEX.md |
+| ring-methodology | addon | 7 | @agentic/code/addons/ring-methodology/rules/RULES-INDEX.md |
+
+**Total**: 47 rules across 3 components
+
+---
+
+## Quick Reference by Context
+
+Combined context table across all components. Use to identify which component index to consult.
+
+| Task Type | Component | Key Rules |
+|-----------|-----------|-----------|
+| **Writing code** | sdlc-complete | no-attribution, executable-feedback, anti-laziness, agent-friendly-code |
+| **Running tests** | sdlc-complete | executable-feedback, anti-laziness, reproducibility |
+| **Creating artifacts** | sdlc-complete | mention-wiring, provenance-tracking, qualified-references, artifact-discovery |
+| **Phase transitions** | sdlc-complete | hitl-gates, sdlc-orchestration, human-gate-display |
+| **Ralph loops** | sdlc-complete | tao-loop, actionable-feedback, best-output-selection |
+| **Agent design** | sdlc-complete | few-shot-examples, conversable-agent-interface, agent-fallback |
+| **Documentation** | sdlc-complete | citation-policy, reasoning-sections, research-metadata |
+| **Security review** | sdlc-complete | token-security, failure-mitigation |
+| **Versioning/release** | sdlc-complete | versioning, no-attribution |
+| **Research** | sdlc-complete | research-metadata, index-generation, citation-policy |
+| **Delegating to subagents** | aiwg-utils | subagent-scoping, context-budget, instruction-comprehension |
+| **Interactive commands** | aiwg-utils | native-ux-tools, instruction-comprehension |
+| **Agent deployment** | aiwg-utils | agent-deployment |
+| **Diagrams** | aiwg-utils | diagram-generation |
+| **Research/decisions** | aiwg-utils | research-before-decision |
+| **Feature completion** | ring-methodology | verification-ring, morpholepsis-detection, spectral-gap |
+| **Failure recovery** | ring-methodology | kernel-extraction, morpholepsis-detection, kenophoria-state |
+| **Process health** | ring-methodology | spectral-gap, kernel-extraction, temporal-coupling |
+| **Threshold understanding** | ring-methodology | phi-constants |
+
+---
+
+*Assembled from 3 component indexes — 47 rules total*
+*Each component index contains full rule summaries with @-links to complete rule files*

@@ -13,6 +13,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import { tmpdir } from 'os';
 import {
   ensureDir,
   listMdFiles,
@@ -28,6 +29,7 @@ import {
   getAddonCommandFiles,
   getAddonSkillDirs,
   getAddonRuleFiles,
+  assembleRulesIndex,
   normalizeDeploymentMode,
   collectFrameworkArtifacts,
   cleanupOldRuleFiles,
@@ -445,9 +447,34 @@ export async function deploy(opts) {
   }
 
   if (shouldDeployRules || rulesOnly) {
-    if (verbose) console.log(`\nDeploying ${ruleFiles.length} rules...`);
-    deployRules(ruleFiles, target, opts);
-    counts.rules = ruleFiles.length;
+    // Try assembled rules index (combines all component indexes)
+    const assembled = assembleRulesIndex(srcRoot);
+    if (assembled) {
+      // Write assembled index to temp file for deployment
+      const tmpDir = path.join(tmpdir(), 'aiwg-rules-assembly');
+      fs.mkdirSync(tmpDir, { recursive: true });
+      const assembledPath = path.join(tmpDir, 'RULES-INDEX.md');
+      fs.writeFileSync(assembledPath, assembled);
+
+      // Replace the sdlc RULES-INDEX.md with the assembled one;
+      // keep any non-RULES-INDEX files (non-consolidated addon rules)
+      const finalRuleFiles = [
+        assembledPath,
+        ...ruleFiles.filter(f => path.basename(f) !== 'RULES-INDEX.md')
+      ];
+
+      if (verbose) console.log(`\nDeploying assembled RULES-INDEX.md + ${finalRuleFiles.length - 1} additional rule files...`);
+      deployRules(finalRuleFiles, target, opts);
+      counts.rules = finalRuleFiles.length;
+
+      // Cleanup temp directory
+      try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch (e) { /* ignore */ }
+    } else {
+      // Fallback: deploy individual files
+      if (verbose) console.log(`\nDeploying ${ruleFiles.length} rules...`);
+      deployRules(ruleFiles, target, opts);
+      counts.rules = ruleFiles.length;
+    }
   }
 
   // Post-deployment
