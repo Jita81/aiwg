@@ -1302,22 +1302,22 @@ Research foundation: Recursive Language Models (Zhang, Kraska, Khattab — MIT C
 
 AIWG's architecture is grounded in peer-reviewed research. Citations are maintained in a [dedicated research corpus](https://git.integrolabs.net/roctinam/research-papers) with 138+ papers.
 
-| Capability | Research Foundation |
-|-----------|-------------------|
-| Cognitive load optimization | Miller's 7±2 (1956), Sweller's CLT (1988) |
-| Multi-agent ensemble validation | Jacobs et al. mixture-of-experts (1991), MetaGPT (Hong et al., ICLR 2024) |
-| Closed-loop self-correction | Self-Refine (Madaan et al., NeurIPS 2023), METR 2025 |
-| Structured reasoning | ReAct (Yao et al., ICLR 2023), Chain-of-Thought (Wei et al., NeurIPS 2022) |
-| Iterative execution | Self-Refine (Madaan et al., 2023), Reflexion (Shinn et al., 2023) |
-| Recursive context decomposition | RLM (Zhang, Kraska, Khattab — MIT CSAIL, 2026) |
-| Provenance tracking | W3C PROV (2013), FAIR Principles (Wilkinson et al., 2016) |
-| Quality assessment | GRADE methodology (adopted by WHO, Cochrane, NICE — 100+ organizations) |
-| Stage-gate process | Cooper's Stage-Gate (1990), RUP (Jacobson, Booch, Rumbaugh, 1999) |
-| Agent-computer interface | SWE-Agent (Yang et al., 2024), Focus Agent |
-| Context engineering | Anthropic Context Engineering (2025), Codified Context Infrastructure |
-| Failure archetypes | METR 2025 (sophisticated reward hacking), Anthropic 2024 (13% misalignment rate) |
-| Declarative agent workflows | DSPy (Khattab et al., ICLR 2024), AFlow (ICLR 2025 Oral) |
-| Constrained generation | Outlines (Willard & Louf, NeurIPS 2023), LMQL (Beurer-Kellner et al., PLDI 2023) |
+| Capability | Papers |
+|-----------|--------|
+| **Cognitive load optimization** | Miller, G.A. (1956). [The Magical Number Seven, Plus or Minus Two](https://doi.org/10.1037/h0043158). *Psychological Review*, 63(2), 81–97. · Sweller, J. (1988). [Cognitive Load During Problem Solving](https://doi.org/10.1207/s15516709cog1202_4). *Cognitive Science*, 12(2), 257–285. |
+| **Multi-agent ensemble validation** | Jacobs, R.A. et al. (1991). [Adaptive Mixtures of Local Experts](https://doi.org/10.1162/neco.1991.3.1.79). *Neural Computation*, 3(1), 79–87. · Hong, S. et al. (2024). [MetaGPT: Meta Programming for a Multi-Agent Collaborative Framework](https://arxiv.org/abs/2308.00352). *ICLR 2024*. |
+| **Closed-loop self-correction** | Madaan, A. et al. (2023). [Self-Refine: Iterative Refinement with Self-Feedback](https://arxiv.org/abs/2303.17651). *NeurIPS 2023*. · Shinn, N. et al. (2023). [Reflexion: Language Agents with Verbal Reinforcement Learning](https://arxiv.org/abs/2303.11366). *NeurIPS 2023*. |
+| **Structured reasoning** | Yao, S. et al. (2023). [ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629). *ICLR 2023*. · Wei, J. et al. (2022). [Chain-of-Thought Prompting Elicits Reasoning in Large Language Models](https://arxiv.org/abs/2201.11903). *NeurIPS 2022*. |
+| **Recursive context decomposition** | Zhang, A.L., Kraska, T. & Khattab, O. (2026). [Recursive Language Models](https://arxiv.org/abs/2512.24601). *arXiv:2512.24601*. MIT CSAIL. |
+| **Provenance & data stewardship** | W3C (2013). [PROV-DM: The PROV Data Model](https://www.w3.org/TR/prov-dm/). W3C Recommendation. · Wilkinson, M.D. et al. (2016). [The FAIR Guiding Principles for scientific data management](https://doi.org/10.1038/sdata.2016.18). *Scientific Data*, 3, 160018. |
+| **Quality assessment** | GRADE Working Group (2004–present). [GRADE Handbook](https://www.gradeworkinggroup.org/). Adopted by WHO, Cochrane, NICE, and 100+ organizations. |
+| **Stage-gate & lifecycle** | Cooper, R.G. (1990). Stage-Gate Systems: A New Tool for Managing New Products. *Business Horizons*, 33(3), 44–54. · Jacobson, I., Booch, G. & Rumbaugh, J. (1999). *The Unified Software Development Process*. Addison-Wesley. ISBN 978-0-201-57169-1. |
+| **Agent-computer interface** | Yang, J. et al. (2024). [SWE-agent: Agent-Computer Interfaces Enable Automated Software Engineering](https://arxiv.org/abs/2405.15793). *NeurIPS 2024*. |
+| **Context engineering** | Anthropic Applied AI Team (2026). [Effective Context Engineering for AI Agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents). Anthropic Engineering Blog. · Vasilopoulos, A. (2026). [Codified Context: Infrastructure for AI Agents in a Complex Codebase](https://arxiv.org/abs/2602.20478). *arXiv:2602.20478*. |
+| **Failure archetypes** | Von Arx, S., Chan, L. & Barnes, E. (2025). [Recent Frontier Models Are Reward Hacking](https://metr.org/blog/2025-06-05-recent-reward-hacking/). METR Research. · Anthropic Alignment Team (2025). [From shortcuts to sabotage: Natural emergent misalignment from reward hacking](https://www.anthropic.com/research/emergent-misalignment-reward-hacking). Anthropic Research. |
+| **Reproducibility** | Sureshkumar, V. et al. (2026). [R-LAM: Towards Reproducibility in Large Action Model Workflows](https://arxiv.org/abs/2601.09749). *arXiv:2601.09749*. |
+| **Declarative agent workflows** | Khattab, O. et al. (2023). [DSPy: Compiling Declarative Language Model Calls into Self-Improving Pipelines](https://arxiv.org/abs/2310.03714). *ICLR 2024*. · Zhang, J. et al. (2025). [AFlow: Automating Agentic Workflow Generation](https://arxiv.org/abs/2410.10762). *ICLR 2025 Oral*. |
+| **Constrained generation** | Willard, B.T. & Louf, R. (2023). [Efficient Guided Generation for Large Language Models](https://arxiv.org/abs/2307.09702). *arXiv:2307.09702*. · Beurer-Kellner, L., Fischer, M. & Vechev, M. (2023). [Prompting Is Programming: A Query Language for Large Language Models](https://arxiv.org/abs/2212.06094). *PLDI 2023*. [doi:10.1145/3591300](https://doi.org/10.1145/3591300). |
 
 Full research background, citations, and methodology: [docs/research/](docs/research/)
 
