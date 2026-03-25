@@ -73,6 +73,10 @@
     "plugin-marketplace-guide",
     "daemon-guide",
     "messaging-guide",
+    "behaviors-guide",
+    "frameworks",
+    "addons",
+    "tools",
     "customizing",
     "extensions",
     "extensions/overview",
@@ -136,7 +140,48 @@
     "releases/v0.9.1-announcement",
     "legal",
     "privacy",
-    "terms"
+    "terms",
+    "frameworks/forensics-complete",
+    "frameworks/forensics-complete/ai-assisted-forensics",
+    "frameworks/forensics-complete/attack-mapping",
+    "frameworks/forensics-complete/methodology",
+    "frameworks/forensics-complete/research-guide",
+    "frameworks/forensics-complete/tool-reference",
+    "frameworks/media-curator",
+    "frameworks/media-curator/overview",
+    "frameworks/media-curator/standards-reference",
+    "frameworks/media-curator/user-guide",
+    "frameworks/sdlc-complete",
+    "frameworks/sdlc-complete/agent-design",
+    "frameworks/sdlc-complete/agent-permission-rationale",
+    "frameworks/sdlc-complete/agent-permission-tiers",
+    "frameworks/sdlc-complete/flow-cleanup-checklist",
+    "frameworks/sdlc-complete/multi-agent-documentation-pattern",
+    "frameworks/sdlc-complete/orchestrator-architecture",
+    "frameworks/sdlc-complete/production-grade-guide",
+    "frameworks/sdlc-complete/simple-language-translations",
+    "frameworks/sdlc-complete/token-security",
+    "frameworks/sdlc-complete/vendor-detection",
+    "frameworks/sdlc-complete/workspace-cleanup-pattern",
+    "addons/agent-persistence",
+    "addons/agent-persistence/hitl-integration",
+    "addons/ralph",
+    "addons/ralph/agent-persistence-integration",
+    "addons/ralph/best-practices",
+    "addons/ralph/cross-loop-learning",
+    "addons/ralph/quickstart",
+    "addons/ralph/troubleshooting",
+    "addons/ralph/when-to-use-ralph",
+    "addons/rlm",
+    "addons/rlm/deployment-guide",
+    "addons/rlm/messaging-events",
+    "addons/rlm/multi-provider-guide",
+    "addons/rlm/ralph-integration",
+    "addons/rlm/supervisor-integration",
+    "addons/rlm/taskstore-persistence",
+    "tools/ralph-external",
+    "tools/ralph-external/snapshot-manager-api",
+    "tools/ralph-external/snapshot-manager-usage"
   ],
   "sections": [
     {
@@ -445,6 +490,34 @@
       "title": "Messaging",
       "summary": "Chat platform integration",
       "file": "messaging-guide.md",
+      "parent": "reference"
+    },
+    {
+      "id": "behaviors-guide",
+      "title": "Behaviors",
+      "summary": "Behavior bundles — directives and toolsets for daemon-governed agents",
+      "file": "behaviors-guide.md",
+      "parent": "reference"
+    },
+    {
+      "id": "frameworks",
+      "title": "Framework Docs",
+      "summary": "Deep guides for each installed framework",
+      "collapsed": true,
+      "parent": "reference"
+    },
+    {
+      "id": "addons",
+      "title": "Addon Docs",
+      "summary": "Guides and references for each installed addon",
+      "collapsed": true,
+      "parent": "reference"
+    },
+    {
+      "id": "tools",
+      "title": "Tool Internals",
+      "summary": "API references and implementation guides for built-in tools",
+      "collapsed": true,
       "parent": "reference"
     },
     {
@@ -899,6 +972,293 @@
     {
       "title": "npm",
       "url": "https://www.npmjs.com/package/aiwg"
+    },
+    {
+      "id": "frameworks/forensics-complete",
+      "title": "Forensics Complete",
+      "summary": "Digital forensics methodology and tool reference",
+      "collapsed": true,
+      "parent": "frameworks"
+    },
+    {
+      "id": "frameworks/forensics-complete/ai-assisted-forensics",
+      "title": "AI-Assisted Forensics",
+      "summary": "This guide describes how AI assistants integrate into the forensics-complete framework, what tasks t",
+      "file": "frameworks/forensics-complete/ai-assisted-forensics.md",
+      "parent": "frameworks/forensics-complete"
+    },
+    {
+      "id": "frameworks/forensics-complete/attack-mapping",
+      "title": "Attack Mapping",
+      "summary": "This guide maps MITRE ATT&CK techniques to the forensic artifacts that reveal them and the commands ",
+      "file": "frameworks/forensics-complete/attack-mapping.md",
+      "parent": "frameworks/forensics-complete"
+    },
+    {
+      "id": "frameworks/forensics-complete/methodology",
+      "title": "Methodology",
+      "summary": "This framework aligns with two complementary standards: NIST SP 800-86 for the technical forensic pr",
+      "file": "frameworks/forensics-complete/methodology.md",
+      "parent": "frameworks/forensics-complete"
+    },
+    {
+      "id": "frameworks/forensics-complete/research-guide",
+      "title": "Research Guide",
+      "summary": "The research phase occurs before any active investigation or intrusive action against a target syste",
+      "file": "frameworks/forensics-complete/research-guide.md",
+      "parent": "frameworks/forensics-complete"
+    },
+    {
+      "id": "frameworks/forensics-complete/tool-reference",
+      "title": "Tool Reference",
+      "summary": "Reference inventory for tools used across the forensics-complete framework. Each entry includes purp",
+      "file": "frameworks/forensics-complete/tool-reference.md",
+      "parent": "frameworks/forensics-complete"
+    },
+    {
+      "id": "frameworks/media-curator",
+      "title": "Media Curator",
+      "summary": "Media archive management guides",
+      "collapsed": true,
+      "parent": "frameworks"
+    },
+    {
+      "id": "frameworks/media-curator/overview",
+      "title": "Overview",
+      "summary": "The Media Curator framework enables AI agents to build, curate, and maintain comprehensive media col",
+      "file": "frameworks/media-curator/overview.md",
+      "parent": "frameworks/media-curator"
+    },
+    {
+      "id": "frameworks/media-curator/standards-reference",
+      "title": "Standards Reference",
+      "summary": "Standards used by the Media Curator framework for metadata, integrity, provenance, and interoperabil",
+      "file": "frameworks/media-curator/standards-reference.md",
+      "parent": "frameworks/media-curator"
+    },
+    {
+      "id": "frameworks/media-curator/user-guide",
+      "title": "User Guide",
+      "summary": "Install required tools:",
+      "file": "frameworks/media-curator/user-guide.md",
+      "parent": "frameworks/media-curator"
+    },
+    {
+      "id": "frameworks/sdlc-complete",
+      "title": "SDLC Complete",
+      "summary": "Full lifecycle framework — internal docs and deep guides",
+      "collapsed": true,
+      "parent": "frameworks"
+    },
+    {
+      "id": "frameworks/sdlc-complete/agent-design",
+      "title": "Agent Design",
+      "summary": "The definitive guide for designing reliable, production-grade AI agents in the AIWG framework.",
+      "file": "frameworks/sdlc-complete/agent-design.md",
+      "parent": "frameworks/sdlc-complete"
+    },
+    {
+      "id": "frameworks/sdlc-complete/agent-permission-rationale",
+      "title": "Agent Permission Rationale",
+      "summary": "Version: 1.0.0",
+      "file": "frameworks/sdlc-complete/agent-permission-rationale.md",
+      "parent": "frameworks/sdlc-complete"
+    },
+    {
+      "id": "frameworks/sdlc-complete/agent-permission-tiers",
+      "title": "Agent Permission Tiers",
+      "summary": "Version: 1.0.0",
+      "file": "frameworks/sdlc-complete/agent-permission-tiers.md",
+      "parent": "frameworks/sdlc-complete"
+    },
+    {
+      "id": "frameworks/sdlc-complete/flow-cleanup-checklist",
+      "title": "Flow Cleanup Checklist",
+      "summary": "Purpose: Track which flow commands have been updated with workspace cleanup pattern.",
+      "file": "frameworks/sdlc-complete/flow-cleanup-checklist.md",
+      "parent": "frameworks/sdlc-complete"
+    },
+    {
+      "id": "frameworks/sdlc-complete/multi-agent-documentation-pattern",
+      "title": "Multi-Agent Documentation Pattern",
+      "summary": "The Multi-Agent Documentation Pattern ensures SDLC artifacts receive comprehensive, multi-perspectiv",
+      "file": "frameworks/sdlc-complete/multi-agent-documentation-pattern.md",
+      "parent": "frameworks/sdlc-complete"
+    },
+    {
+      "id": "frameworks/sdlc-complete/orchestrator-architecture",
+      "title": "Orchestrator Architecture",
+      "summary": "Purpose: Define how the core Claude Code platform orchestrates multi-agent workflows using flow comm",
+      "file": "frameworks/sdlc-complete/orchestrator-architecture.md",
+      "parent": "frameworks/sdlc-complete"
+    },
+    {
+      "id": "frameworks/sdlc-complete/production-grade-guide",
+      "title": "Production Grade Guide",
+      "summary": "This guide documents the production-grade improvements to AIWG based on academic research analysis.",
+      "file": "frameworks/sdlc-complete/production-grade-guide.md",
+      "parent": "frameworks/sdlc-complete"
+    },
+    {
+      "id": "frameworks/sdlc-complete/simple-language-translations",
+      "title": "Natural Language Reference",
+      "summary": "Purpose: Map natural language user requests to SDLC flow orchestration templates.",
+      "file": "frameworks/sdlc-complete/simple-language-translations.md",
+      "parent": "frameworks/sdlc-complete"
+    },
+    {
+      "id": "frameworks/sdlc-complete/token-security",
+      "title": "Token Security",
+      "summary": "Version: 1.0.0",
+      "file": "frameworks/sdlc-complete/token-security.md",
+      "parent": "frameworks/sdlc-complete"
+    },
+    {
+      "id": "frameworks/sdlc-complete/vendor-detection",
+      "title": "Vendor Detection",
+      "summary": "This document describes how AIWG regenerate commands detect which AI coding assistant is active, ena",
+      "file": "frameworks/sdlc-complete/vendor-detection.md",
+      "parent": "frameworks/sdlc-complete"
+    },
+    {
+      "id": "frameworks/sdlc-complete/workspace-cleanup-pattern",
+      "title": "Workspace Cleanup Pattern",
+      "summary": "Purpose: Standard pattern for cleaning up .aiwg/working/ directory after flow orchestration complete",
+      "file": "frameworks/sdlc-complete/workspace-cleanup-pattern.md",
+      "parent": "frameworks/sdlc-complete"
+    },
+    {
+      "id": "addons/agent-persistence",
+      "title": "Agent Persistence",
+      "summary": "Cross-session agent state and HITL integration",
+      "collapsed": true,
+      "parent": "addons"
+    },
+    {
+      "id": "addons/agent-persistence/hitl-integration",
+      "title": "HITL Integration",
+      "summary": "This document explains how Human-in-the-Loop (HITL) gates integrate with the Agent Persistence frame",
+      "file": "addons/agent-persistence/hitl-integration.md",
+      "parent": "addons/agent-persistence"
+    },
+    {
+      "id": "addons/ralph",
+      "title": "Ralph Addon",
+      "summary": "Iterative loop execution — quickstart, best practices, troubleshooting",
+      "collapsed": true,
+      "parent": "addons"
+    },
+    {
+      "id": "addons/ralph/agent-persistence-integration",
+      "title": "Agent Persistence Integration",
+      "summary": "Version: 1.0.0",
+      "file": "addons/ralph/agent-persistence-integration.md",
+      "parent": "addons/ralph"
+    },
+    {
+      "id": "addons/ralph/best-practices",
+      "title": "Best Practices",
+      "summary": "Master iterative AI task execution with these guidelines.",
+      "file": "addons/ralph/best-practices.md",
+      "parent": "addons/ralph"
+    },
+    {
+      "id": "addons/ralph/cross-loop-learning",
+      "title": "Cross-Loop Learning",
+      "summary": "Pattern sharing and knowledge transfer across multiple Ralph loops.",
+      "file": "addons/ralph/cross-loop-learning.md",
+      "parent": "addons/ralph"
+    },
+    {
+      "id": "addons/ralph/quickstart",
+      "title": "Quick Start",
+      "summary": "Get started with iterative AI task execution in 5 minutes.",
+      "file": "addons/ralph/quickstart.md",
+      "parent": "addons/ralph"
+    },
+    {
+      "id": "addons/ralph/troubleshooting",
+      "title": "Troubleshooting",
+      "summary": "Solutions for common Ralph issues.",
+      "file": "addons/ralph/troubleshooting.md",
+      "parent": "addons/ralph"
+    },
+    {
+      "id": "addons/ralph/when-to-use-ralph",
+      "title": "When to Use Ralph",
+      "summary": "Understanding Ralph's sweet spot and avoiding the token-burning trap.",
+      "file": "addons/ralph/when-to-use-ralph.md",
+      "parent": "addons/ralph"
+    },
+    {
+      "id": "addons/rlm",
+      "title": "RLM Addon",
+      "summary": "Recursive Language Model — deployment, multi-provider, integration guides",
+      "collapsed": true,
+      "parent": "addons"
+    },
+    {
+      "id": "addons/rlm/deployment-guide",
+      "title": "Deployment Guide",
+      "summary": "Version: 1.0.0",
+      "file": "addons/rlm/deployment-guide.md",
+      "parent": "addons/rlm"
+    },
+    {
+      "id": "addons/rlm/messaging-events",
+      "title": "Messaging Events",
+      "summary": "Documentation for how the RLM (Recursive Language Models) addon reports progress via AIWG's messagin",
+      "file": "addons/rlm/messaging-events.md",
+      "parent": "addons/rlm"
+    },
+    {
+      "id": "addons/rlm/multi-provider-guide",
+      "title": "Multi-Provider Guide",
+      "summary": "Version: 1.0.0",
+      "file": "addons/rlm/multi-provider-guide.md",
+      "parent": "addons/rlm"
+    },
+    {
+      "id": "addons/rlm/ralph-integration",
+      "title": "Ralph Integration",
+      "summary": "Version: 1.0.0",
+      "file": "addons/rlm/ralph-integration.md",
+      "parent": "addons/rlm"
+    },
+    {
+      "id": "addons/rlm/supervisor-integration",
+      "title": "Supervisor Integration",
+      "summary": "The RLM (Recursive Language Models) addon integrates with AIWG's Agent Supervisor to enable recursiv",
+      "file": "addons/rlm/supervisor-integration.md",
+      "parent": "addons/rlm"
+    },
+    {
+      "id": "addons/rlm/taskstore-persistence",
+      "title": "TaskStore Persistence",
+      "summary": "Version: 1.0.0",
+      "file": "addons/rlm/taskstore-persistence.md",
+      "parent": "addons/rlm"
+    },
+    {
+      "id": "tools/ralph-external",
+      "title": "External Ralph",
+      "summary": "Crash-resilient external loop — snapshot manager and provider API",
+      "collapsed": true,
+      "parent": "tools"
+    },
+    {
+      "id": "tools/ralph-external/snapshot-manager-api",
+      "title": "Snapshot Manager Api",
+      "summary": "Complete API documentation for the Snapshot Manager module.",
+      "file": "tools/ralph-external/snapshot-manager-api.md",
+      "parent": "tools/ralph-external"
+    },
+    {
+      "id": "tools/ralph-external/snapshot-manager-usage",
+      "title": "Snapshot Manager Usage",
+      "summary": "The Snapshot Manager captures comprehensive state before and after long-running Claude sessions, ena",
+      "file": "tools/ralph-external/snapshot-manager-usage.md",
+      "parent": "tools/ralph-external"
     }
   ]
 }

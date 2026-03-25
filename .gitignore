@@ -73,3 +73,6 @@ TODO.local.md
 # Agent temporary files
 _agent-temp/
 docs/references/pdfs/*.pdf
+
+# Test temp directories (created by file watcher tests)
+test-temp-watch-*/

@@ -1,0 +1,92 @@
+[
+  {
+    "kind": "frameworks",
+    "name": "forensics-complete",
+    "source": "agentic/code/frameworks/forensics-complete/docs",
+    "dest": "docs/frameworks/forensics-complete",
+    "files": [
+      "ai-assisted-forensics.md",
+      "attack-mapping.md",
+      "methodology.md",
+      "research-guide.md",
+      "tool-reference.md"
+    ]
+  },
+  {
+    "kind": "frameworks",
+    "name": "media-curator",
+    "source": "agentic/code/frameworks/media-curator/docs",
+    "dest": "docs/frameworks/media-curator",
+    "files": [
+      "overview.md",
+      "standards-reference.md",
+      "user-guide.md"
+    ]
+  },
+  {
+    "kind": "frameworks",
+    "name": "sdlc-complete",
+    "source": "agentic/code/frameworks/sdlc-complete/docs",
+    "dest": "docs/frameworks/sdlc-complete",
+    "files": [
+      "agent-design.md",
+      "agent-permission-rationale.md",
+      "agent-permission-tiers.md",
+      "flow-cleanup-checklist.md",
+      "multi-agent-documentation-pattern.md",
+      "orchestrator-architecture.md",
+      "production-grade-guide.md",
+      "simple-language-translations.md",
+      "token-security.md",
+      "vendor-detection.md",
+      "workspace-cleanup-pattern.md"
+    ]
+  },
+  {
+    "kind": "addons",
+    "name": "agent-persistence",
+    "source": "agentic/code/addons/agent-persistence/docs",
+    "dest": "docs/addons/agent-persistence",
+    "files": [
+      "hitl-integration.md"
+    ]
+  },
+  {
+    "kind": "addons",
+    "name": "ralph",
+    "source": "agentic/code/addons/ralph/docs",
+    "dest": "docs/addons/ralph",
+    "files": [
+      "agent-persistence-integration.md",
+      "best-practices.md",
+      "cross-loop-learning.md",
+      "quickstart.md",
+      "troubleshooting.md",
+      "when-to-use-ralph.md"
+    ]
+  },
+  {
+    "kind": "addons",
+    "name": "rlm",
+    "source": "agentic/code/addons/rlm/docs",
+    "dest": "docs/addons/rlm",
+    "files": [
+      "deployment-guide.md",
+      "messaging-events.md",
+      "multi-provider-guide.md",
+      "ralph-integration.md",
+      "supervisor-integration.md",
+      "taskstore-persistence.md"
+    ]
+  },
+  {
+    "kind": "tools",
+    "name": "ralph-external",
+    "source": "tools/ralph-external/docs",
+    "dest": "docs/tools/ralph-external",
+    "files": [
+      "snapshot-manager-api.md",
+      "snapshot-manager-usage.md"
+    ]
+  }
+]

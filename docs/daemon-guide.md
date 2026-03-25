@@ -122,6 +122,106 @@ Configuration is stored in `.aiwg/daemon.json`. Create this file in your project
 | `schedule.jobs` | object[] | — | Cron job definitions |
 | `rules` | object[] | — | Automation rules |
 
+## Headend Architecture
+
+The daemon acts as the headend supervisor for all External Ralph Loop lifecycles. A `DaemonSupervisor` component wraps the existing `AgentSupervisor`, adding process governance without breaking backward compatibility.
+
+### What DaemonSupervisor adds
+
+| Capability | Description |
+|------------|-------------|
+| **Concurrency cap** | Hard limit on simultaneous agent sessions (`max_concurrent`, default 4). Additional submissions queue in priority order; queue overflow is rejected with a structured error. |
+| **Bounded priority queue** | Queue depth cap (`max_queue_depth`, default 20) prevents unbounded memory growth under load. |
+| **Process group kill** | Uses `process.kill(-pid, signal)` to terminate entire process trees. Plain PID kill leaves child shells and subprocesses as orphans. |
+| **Restart intensity** | Tracks restart count per loop within a sliding time window (Erlang/OTP `max_restarts` pattern). Exceeded threshold marks the task permanently failed rather than entering an infinite restart loop. |
+| **Circuit breaker** | Consecutive failures increment a global counter. At `failure_threshold`, the breaker opens and blocks new spawns for `cooldown_ms`. After cooldown, one probe attempt (half-open state) determines whether to close. |
+| **Budget aggregation** | Rolls up token cost across all supervised loops. Emits a warning at 90% of the daily limit; blocks new spawns at 100%. Resets at midnight local time. |
+| **Zombie reap** | Periodic sweep reconciles PID files against running processes. Stale entries are cleaned up automatically. |
+
+### Relationship to AgentSupervisor
+
+`DaemonSupervisor` is a wrapper, not a replacement. The existing `AgentSupervisor` in `tools/daemon/agent-supervisor.mjs` continues to handle subprocess spawning and the basic task queue. `DaemonSupervisor` sits above it and enforces governance policy. Consumers of `AgentSupervisor` directly are unaffected.
+
+See `.aiwg/architecture/adr-daemon-as-headend.md` for the full architecture decision.
+
+## Headend Configuration Reference
+
+The supervisor configuration lives under the `supervisor` key in `.aiwg/daemon.json`:
+
+```json
+{
+  "supervisor": {
+    "max_concurrent": 4,
+    "max_queue_depth": 20,
+    "restart_intensity": {
+      "max_restarts": 3,
+      "window_seconds": 300
+    },
+    "circuit_breaker": {
+      "failure_threshold": 5,
+      "cooldown_ms": 120000
+    },
+    "daily_budget_usd": 50,
+    "behaviors": ["ops-toolset"]
+  },
+  "interface": {
+    "web": {
+      "enabled": true,
+      "port": 7474,
+      "host": "127.0.0.1"
+    }
+  }
+}
+```
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| `supervisor.max_concurrent` | number | 4 | Maximum simultaneous agent sessions |
+| `supervisor.max_queue_depth` | number | 20 | Maximum queued submissions before rejection |
+| `supervisor.restart_intensity.max_restarts` | number | 3 | Restarts allowed within the window before permanent failure |
+| `supervisor.restart_intensity.window_seconds` | number | 300 | Sliding window for restart counting (seconds) |
+| `supervisor.circuit_breaker.failure_threshold` | number | 5 | Consecutive failures that open the circuit |
+| `supervisor.circuit_breaker.cooldown_ms` | number | 120000 | Time the circuit stays open before half-open probe (ms) |
+| `supervisor.daily_budget_usd` | number | 0 | Daily spend cap across all loops. 0 = no cap. |
+| `supervisor.behaviors` | string[] | `[]` | Behavior names to attach at initialization |
+| `interface.web.enabled` | boolean | false | Enable the operator web UI |
+| `interface.web.port` | number | 7474 | Web UI port |
+| `interface.web.host` | string | `"127.0.0.1"` | Bind address (localhost by default) |
+
+## Operator Web UI
+
+When `interface.web.enabled` is `true`, the daemon serves an operator interface at `http://localhost:7474`.
+
+### Access
+
+```bash
+# Start daemon with web UI enabled (configure in daemon.json first)
+aiwg daemon start
+
+# Open in browser
+open http://localhost:7474
+```
+
+Authentication uses a Bearer token. On first start, a token is generated and written to `~/.config/aiwg/daemon-token`. Alternatively, set the `AIWG_WEB_TOKEN` environment variable to supply a token at startup.
+
+The web UI is localhost-only by default. Remote access requires a TLS-terminating reverse proxy; the daemon does not enforce TLS itself.
+
+### Tab reference
+
+| Tab | Purpose |
+|-----|---------|
+| **Loops** | All active loops — status, elapsed time, iteration count, controls (pause, resume, abort) |
+| **Output** | Live SSE stream for a selected loop with ANSI rendering |
+| **Submit** | Submit new task prompts with priority and budget override |
+| **Resources** | System snapshot: CPU, memory, load average, queue depth, uptime |
+| **History** | Completed loop summaries with duration, exit status, and cost rollup |
+
+### Live streaming
+
+Output is delivered via Server-Sent Events (SSE). Each loop has its own SSE endpoint. The browser reconnects automatically on disconnect. No WebSocket or polling required.
+
+See `.aiwg/architecture/adr-native-web-operator-interface.md` for the architecture decision.
+
 ## IPC Commands
 
 The daemon communicates via a Unix domain socket at `.aiwg/daemon/daemon.sock` using JSON-RPC 2.0.
@@ -182,6 +282,26 @@ aiwg automation disable --rule auto-test-on-change
 # Send a chat message through the daemon (submitted as a task)
 aiwg chat send "What is our current test coverage?"
 ```
+
+### Daemon Supervisor IPC Methods
+
+The following `daemon.*` JSON-RPC methods are available on the IPC socket when the `DaemonSupervisor` is active:
+
+| Method | Params | Returns |
+|--------|--------|---------|
+| `daemon.process.list` | `{ filter }` | Array of loop entries (id, status, pid, elapsed, iterations, cost) |
+| `daemon.process.kill` | `{ loopId, signal }` | `{ killed, loopId, signal }` |
+| `daemon.resource.snapshot` | `{}` | `{ cpu, memory, loadAvg, queueDepth, uptime }` |
+| `daemon.circuit.status` | `{}` | `{ state, consecutiveFailures, cooldownRemainingMs }` |
+| `daemon.queue.inspect` | `{}` | `{ depth, maxDepth, oldest, priorityDistribution }` |
+| `daemon.loop.history` | `{ limit }` | Array of completed loop summaries |
+| `daemon.budget.remaining` | `{}` | `{ dailyLimit, spent, remaining, percentUsed }` |
+
+`filter` values for `daemon.process.list`: `all` (default), `running`, `queued`, `failed`.
+
+`signal` values for `daemon.process.kill`: `SIGTERM` (default), `SIGKILL`, `SIGINT`. The kill is sent to the entire process group (`-pid`), not just the top-level PID.
+
+Circuit breaker `state` values: `closed` (normal operation), `open` (blocking new spawns), `half-open` (one probe in progress).
 
 ## Agent Tasks
 
@@ -473,6 +593,71 @@ aiwg task list --state running
 aiwg task cancel <task-id>
 ```
 
+### Circuit breaker is open
+
+The circuit breaker opens when consecutive loop failures reach `circuit_breaker.failure_threshold`. New submissions are rejected while it is open.
+
+```bash
+# Check circuit breaker state via IPC
+aiwg daemon status
+
+# Wait for the cooldown period to elapse (default: 120 seconds)
+# The breaker enters half-open state and allows one probe attempt.
+# If the probe succeeds, the breaker closes automatically.
+# If the probe fails, the cooldown timer resets.
+
+# To override cooldown and force-close the circuit (use with caution):
+aiwg daemon circuit-reset
+```
+
+To reduce sensitivity, increase `failure_threshold` or `cooldown_ms` in `supervisor.circuit_breaker`.
+
+### Restart intensity threshold exceeded
+
+A loop is marked permanently failed when it restarts more than `max_restarts` times within `window_seconds`. This prevents infinite crash-restart cycles.
+
+```bash
+# Check a loop's restart count
+aiwg task get <task-id>
+
+# Review the loop's error output for root cause before resubmitting
+aiwg task get <task-id> --output
+
+# Resubmit after fixing the underlying issue
+aiwg task submit "..." --priority 5
+```
+
+To allow more restarts before permanent failure, increase `supervisor.restart_intensity.max_restarts`.
+
+### Queue overflow (submission rejected)
+
+Submissions are rejected when the queue reaches `max_queue_depth`. This is a backpressure signal, not an error condition.
+
+```bash
+# Check current queue depth
+aiwg task list --state queued
+
+# Cancel lower-priority items to free capacity
+aiwg task cancel <task-id>
+
+# Or increase max_queue_depth in daemon.json (with caution — unbounded queues
+# can exhaust memory under sustained load)
+```
+
+### Budget gate blocking submissions
+
+New loops are blocked when cumulative spend reaches `daily_budget_usd`. A warning is emitted at 90%.
+
+```bash
+# Check remaining budget
+aiwg daemon status  # includes budget line
+
+# Budget resets at midnight local time automatically.
+# To raise the limit mid-day, update daemon.json and restart the daemon.
+```
+
+Set `daily_budget_usd: 0` to disable the budget gate entirely.
+
 ### High memory usage
 
 The daemon accumulates conversation history for AI chat sessions. Clear old conversations by restarting the daemon:
@@ -671,8 +856,13 @@ aiwg daemon status
 
 - [Messaging Guide](messaging-guide.md) — Platform integration
 - [Ralph Guide](ralph-guide.md) — Iterative task loops via daemon
-- `.aiwg/architecture/adrs/ADR-daemon-mode.md` — Architecture decision
+- [Behaviors Guide](behaviors-guide.md) — Attaching capabilities to daemon and long-running agents
+- `.aiwg/architecture/adrs/ADR-daemon-mode.md` — Original daemon architecture decision
 - `.aiwg/architecture/adrs/ADR-ipc-protocol.md` — IPC protocol specification
+- `.aiwg/architecture/adr-daemon-as-headend.md` — DaemonSupervisor headend architecture
+- `.aiwg/architecture/adr-native-web-operator-interface.md` — Web UI architecture decision
+- `.aiwg/architecture/adr-behaviors-sticky-capabilities.md` — Behaviors primitive design
+- `.aiwg/architecture/adr-in-memory-queue-defer-redis.md` — Queue implementation decision
 - `tools/daemon/README.md` — Developer documentation
 - `tools/daemon/daemon-main.mjs` — Daemon entry point source
 - `tools/daemon/agent-supervisor.mjs` — Agent task execution
