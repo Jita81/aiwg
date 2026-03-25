@@ -2,7 +2,7 @@
 name: doc-splitter
 description: Split large documentation (10K+ pages) into focused sub-skills with intelligent routing. Use for massive doc sites like Godot, AWS, or MSDN.
 tools: Read, Write, Bash, Glob
-platforms: [claude-code, hermes]
+platforms: [claude-code, hermes, openclaw]
 ---
 
 # Documentation Splitter Skill

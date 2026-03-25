@@ -2,7 +2,7 @@
 name: eslint-checker
 description: Run ESLint for JavaScript/TypeScript code quality and style enforcement. Use for static analysis and auto-fixing.
 tools: Read, Write, Bash
-platforms: [claude-code, hermes]
+platforms: [claude-code, hermes, openclaw]
 ---
 
 # ESLint Checker Skill

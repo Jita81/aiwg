@@ -12,7 +12,7 @@ triggers:
   - "less diverse"
   - "maximize diversity"
   - "diversity A/B"
-platforms: [claude-code, opencode, hermes]
+platforms: [claude-code, opencode, hermes, openclaw]
 ---
 
 # Diversity Tuning Skill

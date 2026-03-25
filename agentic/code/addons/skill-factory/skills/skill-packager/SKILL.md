@@ -2,7 +2,7 @@
 name: skill-packager
 description: Package skills into uploadable ZIP files for Claude. Use after skill-builder/skill-enhancer to create final upload package.
 tools: Read, Write, Bash
-platforms: [claude-code, hermes]
+platforms: [claude-code, hermes, openclaw]
 ---
 
 # Skill Packager Skill

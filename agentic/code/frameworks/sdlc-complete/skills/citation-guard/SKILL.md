@@ -1,5 +1,5 @@
 ---
-platforms: [claude-code]
+platforms: [claude-code, openclaw]
 ---
 
 # citation-guard

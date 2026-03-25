@@ -1,5 +1,5 @@
 ---
-platforms: [claude-code, hermes]
+platforms: [claude-code, hermes, openclaw]
 ---
 
 # test-coverage

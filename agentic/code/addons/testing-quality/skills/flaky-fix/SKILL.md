@@ -2,7 +2,7 @@
 name: flaky-fix
 description: Suggest and apply fixes for flaky tests based on detected patterns. Use after flaky-detect identifies unreliable tests that need repair.
 version: 1.0.0
-platforms: [claude-code, hermes]
+platforms: [claude-code, hermes, openclaw]
 ---
 
 # Flaky Fix Skill

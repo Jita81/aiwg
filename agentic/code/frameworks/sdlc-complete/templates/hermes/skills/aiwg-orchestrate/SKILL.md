@@ -2,7 +2,7 @@
 name: aiwg-orchestrate
 description: Route structured artifact work to AIWG workflows via MCP with zero parent context cost
 version: 1.0.0
-platforms: [hermes]
+platforms: [hermes, openclaw]
 metadata:
   tags: [aiwg, sdlc, artifacts, delegation, mcp]
 ---

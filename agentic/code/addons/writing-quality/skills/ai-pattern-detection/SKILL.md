@@ -2,7 +2,7 @@
 name: ai-pattern-detection
 description: Detects AI-generated writing patterns and suggests authentic alternatives. Auto-applies when reviewing content, editing documents, generating text, or when user mentions writing quality, AI detection, authenticity, or natural voice.
 version: 1.0.0
-platforms: [claude-code, hermes]
+platforms: [claude-code, hermes, openclaw]
 ---
 
 # AI Pattern Detection Skill

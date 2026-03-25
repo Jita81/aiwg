@@ -2,7 +2,7 @@
 name: voice-apply
 description: Applies a voice profile to transform content. Use when user asks to write in a specific voice, match a tone, apply a style, or transform content to sound like a particular voice profile.
 version: 1.0.0
-platforms: [claude-code, hermes]
+platforms: [claude-code, hermes, openclaw]
 ---
 
 # Voice Apply Skill

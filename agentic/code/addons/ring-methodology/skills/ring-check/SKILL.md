@@ -2,6 +2,7 @@
 platforms:
   - claude-code
   - hermes
+  - openclaw
 ---
 
 # Ring Check

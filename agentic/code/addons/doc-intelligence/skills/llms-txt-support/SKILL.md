@@ -2,7 +2,7 @@
 name: llms-txt-support
 description: Detect and use llms.txt files for LLM-optimized documentation. Use when checking if a site has LLM-ready docs before scraping.
 tools: Read, Write, WebFetch
-platforms: [claude-code, hermes]
+platforms: [claude-code, hermes, openclaw]
 ---
 
 # llms.txt Support Skill

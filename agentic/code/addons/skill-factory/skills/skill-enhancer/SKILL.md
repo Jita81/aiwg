@@ -2,7 +2,7 @@
 name: skill-enhancer
 description: AI-powered enhancement of skill SKILL.md files. Use to transform basic templates into comprehensive, high-quality skill documentation.
 tools: Read, Write, Bash
-platforms: [claude-code, hermes]
+platforms: [claude-code, hermes, openclaw]
 ---
 
 # Skill Enhancer Skill

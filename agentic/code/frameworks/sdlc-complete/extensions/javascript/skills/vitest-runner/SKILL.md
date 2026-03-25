@@ -2,7 +2,7 @@
 name: vitest-runner
 description: Execute JavaScript/TypeScript tests with Vitest, supporting coverage, watch mode, and parallel execution. Use for JS/TS test automation.
 tools: Read, Write, Bash
-platforms: [claude-code, hermes]
+platforms: [claude-code, hermes, openclaw]
 ---
 
 # Vitest Runner Skill
