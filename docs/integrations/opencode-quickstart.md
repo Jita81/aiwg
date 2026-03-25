@@ -81,12 +81,46 @@ Invoke via @-mention:
 
 ---
 
+## Models
+
+OpenCode ships with built-in models (no credentials required) and supports Anthropic models when you connect an account.
+
+**Free tier (default):**
+
+| Generic alias | Resolves to |
+|---|---|
+| `haiku`, `sonnet`, `opus` | `opencode/big-pickle` |
+
+Any `opencode/*` model ID from `opencode models` can be passed directly.
+
+**Anthropic tier** (after `opencode auth add`):
+
+```bash
+# Connect Anthropic account
+opencode auth add   # follow prompts, enter ANTHROPIC_API_KEY
+
+# Verify models appear
+opencode models | grep anthropic
+```
+
+Once connected, pass `anthropic/*` model IDs directly:
+
+```bash
+aiwg ralph-external "Fix tests" --provider opencode --model anthropic/claude-haiku-4-6
+```
+
+---
+
 ## Ralph Iterative Loops
 
 Ralph loops support multi-provider execution. While OpenCode agents are deployed via AIWG, Ralph task loops run through the CLI:
 
 ```bash
-aiwg ralph "Fix all tests" --completion "npm test passes"
+# Free tier (uses opencode/big-pickle)
+aiwg ralph "Fix all tests" --completion "npm test passes" --provider opencode
+
+# Anthropic tier
+aiwg ralph "Fix all tests" --completion "npm test passes" --provider opencode --model anthropic/claude-sonnet-4-6
 ```
 
 See [Ralph Guide](../ralph-guide.md) for full documentation including `--provider` options.

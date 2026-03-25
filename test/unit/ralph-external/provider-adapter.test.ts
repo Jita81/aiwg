@@ -468,12 +468,12 @@ describe('OpenCodeAdapter', () => {
   });
 
   describe('model mapping', () => {
-    it('maps generic model names to OpenCode provider/model format', () => {
+    it('maps generic model names to opencode/big-pickle (free tier default)', () => {
       const mappings = [
-        { input: 'opus', expected: 'anthropic/claude-opus-4-5-20251101' },
-        { input: 'sonnet', expected: 'anthropic/claude-sonnet-4-5-20250929' },
-        { input: 'haiku', expected: 'anthropic/claude-haiku-4-5-20251001' },
-        { input: 'OPUS', expected: 'anthropic/claude-opus-4-5-20251101' },
+        { input: 'opus',   expected: 'opencode/big-pickle' },
+        { input: 'sonnet', expected: 'opencode/big-pickle' },
+        { input: 'haiku',  expected: 'opencode/big-pickle' },
+        { input: 'OPUS',   expected: 'opencode/big-pickle' },
       ];
 
       for (const { input, expected } of mappings) {
@@ -498,7 +498,7 @@ describe('OpenCodeAdapter', () => {
     it('maps model names with -m flag', () => {
       const args = adapter.buildSessionArgs({ prompt: 'task', model: 'sonnet' });
       expect(args).toContain('-m');
-      expect(args).toContain('anthropic/claude-sonnet-4-5-20250929');
+      expect(args).toContain('opencode/big-pickle');
     });
 
     it('supports session resume via -s flag', () => {
@@ -557,7 +557,7 @@ describe('OpenCodeAdapter', () => {
     it('maps model names', () => {
       const args = adapter.buildAnalysisArgs({ prompt: 'analyze', model: 'haiku' });
       expect(args).toContain('-m');
-      expect(args).toContain('anthropic/claude-haiku-4-5-20251001');
+      expect(args).toContain('opencode/big-pickle');
     });
   });
 
@@ -570,6 +570,30 @@ describe('OpenCodeAdapter', () => {
   describe('transcript path', () => {
     it('returns null (not supported)', () => {
       expect(adapter.getTranscriptPath('session-123', '/project')).toBeNull();
+    });
+  });
+
+  describe('parseOutput', () => {
+    it('extracts text from newline-delimited JSON event stream', () => {
+      const stdout = [
+        JSON.stringify({ type: 'step_start', timestamp: 1234, sessionID: 's1', part: {} }),
+        JSON.stringify({ type: 'text', timestamp: 1235, sessionID: 's1', part: { type: 'text', text: 'Hello ' } }),
+        JSON.stringify({ type: 'text', timestamp: 1236, sessionID: 's1', part: { type: 'text', text: 'world' } }),
+        JSON.stringify({ type: 'step_finish', timestamp: 1237, sessionID: 's1', part: { reason: 'stop' } }),
+      ].join('\n');
+
+      const result = adapter.parseOutput(stdout);
+      expect(result).not.toBeNull();
+      expect(result.text).toBe('Hello world');
+    });
+
+    it('returns null when no text events present', () => {
+      const stdout = JSON.stringify({ type: 'step_start', part: {} });
+      expect(adapter.parseOutput(stdout)).toBeNull();
+    });
+
+    it('passes through anthropic/* model IDs unchanged', () => {
+      expect(adapter.mapModel('anthropic/claude-sonnet-4-6')).toBe('anthropic/claude-sonnet-4-6');
     });
   });
 });

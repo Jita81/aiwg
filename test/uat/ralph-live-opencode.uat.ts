@@ -10,7 +10,9 @@
  *
  * Requirements:
  *   - opencode CLI installed (opencode run --format json)
- *   - Anthropic API key configured via `opencode auth`
+ *   - Free tier: no credentials needed (uses opencode/* models)
+ *   - Anthropic tier: run `opencode auth add` with ANTHROPIC_API_KEY to
+ *     unlock anthropic/* models; pass --model anthropic/claude-haiku-4-6
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
@@ -37,7 +39,7 @@ function makeTmpDir(): string {
 const LIVE_BASE_CONFIG = {
   provider: 'opencode',
   maxIterations: 3,
-  model: 'haiku',           // Maps to anthropic/claude-haiku-4-5-20251001
+  model: 'haiku',           // Maps to opencode/big-pickle (free tier default)
   timeoutMinutes: 3,
   enablePIDControl: false,
   enableOverseer: false,

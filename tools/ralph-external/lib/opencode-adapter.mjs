@@ -15,19 +15,31 @@
  * - No --max-turns flag
  * - No --mcp-config flag
  * - Session resume via -s/--session instead of --session-id
- * - Model format: provider/model (e.g., anthropic/claude-sonnet-4-5-20250514)
+ * - Model format: provider/model (e.g., opencode/big-pickle, anthropic/claude-sonnet-4-6)
  * - Agent flag: --agent
+ * - JSON output: newline-delimited events, text in type="text" events
+ *
+ * Model tiers:
+ * - Free tier (default): opencode/* models (opencode/big-pickle, etc.)
+ * - Anthropic account: anthropic/claude-* models available after `opencode auth add`
  *
  * @implements Plan: Multi-Provider Support for External Ralph Loop
  */
 
 import { ProviderAdapter, registerProvider } from './provider-adapter.mjs';
 
-/** Model mapping from generic names to OpenCode-specific models */
+/**
+ * Model mapping from generic names to OpenCode provider/model format.
+ *
+ * Free tier uses opencode/* models. Users who have connected an Anthropic
+ * account via `opencode auth add` can pass anthropic/* IDs directly
+ * (e.g., --model anthropic/claude-sonnet-4-6) and they pass through unchanged
+ * because mapModel() only substitutes known generic aliases.
+ */
 const MODEL_MAP = {
-  'opus': 'anthropic/claude-opus-4-5-20251101',
-  'sonnet': 'anthropic/claude-sonnet-4-5-20250929',
-  'haiku': 'anthropic/claude-haiku-4-5-20251001',
+  'opus':   'opencode/big-pickle',
+  'sonnet': 'opencode/big-pickle',
+  'haiku':  'opencode/big-pickle',
 };
 
 export class OpenCodeAdapter extends ProviderAdapter {
@@ -170,16 +182,31 @@ export class OpenCodeAdapter extends ProviderAdapter {
   }
 
   /**
-   * Parse OpenCode output — JSON format returns structured data.
+   * Parse OpenCode output — extracts text from newline-delimited JSON events.
+   *
+   * OpenCode --format json produces one JSON object per line. Text content
+   * lives in events with type="text" at part.text. This method collects all
+   * text parts and returns the concatenated result as a synthetic object so
+   * callers get a consistent { text } shape.
    *
    * @param {string} stdout
-   * @returns {Object|null}
+   * @returns {{ text: string }|null}
    */
   parseOutput(stdout) {
     try {
-      const jsonMatch = stdout.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) return null;
-      return JSON.parse(jsonMatch[0]);
+      const lines = stdout.split('\n').filter(l => l.trim());
+      let text = '';
+      for (const line of lines) {
+        try {
+          const event = JSON.parse(line);
+          if (event.type === 'text' && event.part?.text) {
+            text += event.part.text;
+          }
+        } catch {
+          // skip malformed lines
+        }
+      }
+      return text ? { text } : null;
     } catch {
       return null;
     }
