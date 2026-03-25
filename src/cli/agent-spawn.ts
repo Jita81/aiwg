@@ -27,6 +27,12 @@ export interface ProviderConfig {
   binary: string | null;
   dangerousFlag: string | null;
   name: string;
+  /**
+   * Args to prepend before the prompt when spawning.
+   * e.g. opencode requires ['run'] → `opencode run "<prompt>"`
+   * Defaults to [] (prompt is the first arg).
+   */
+  promptPrefix?: string[];
   guidanceMessage?: string;
 }
 
@@ -38,19 +44,27 @@ export const PROVIDER_CONFIGS: Record<string, ProviderConfig> = {
   },
   opencode: {
     binary: 'opencode',
-    // OpenCode shares Claude Code's flag surface
-    dangerousFlag: '--dangerously-skip-permissions',
+    // OpenCode uses `opencode run "<prompt>"` for non-interactive execution.
+    // Dangerous mode flag not yet confirmed; omit rather than guess.
+    promptPrefix: ['run'],
+    dangerousFlag: null,
     name: 'OpenCode',
   },
   codex: {
     binary: 'codex',
+    // Codex supports --full-auto (no approval prompts) and --approval-mode full-auto
     dangerousFlag: '--full-auto',
     name: 'OpenAI Codex',
   },
   hermes: {
-    binary: 'hermes',
+    // Hermes is a model series (NousResearch), not a confirmed standalone CLI.
+    // Treat as IDE/runtime-integrated until a CLI is confirmed.
+    binary: null,
     dangerousFlag: null,
     name: 'Hermes',
+    guidanceMessage:
+      'Hermes does not have a confirmed standalone CLI.\n' +
+      'Run via Ollama (`ollama run hermes3`) or through your configured MCP sidecar.',
   },
   copilot: {
     binary: null,
@@ -149,7 +163,8 @@ export function parseAgentSpawnFlags(args: string[]): {
  */
 export function buildAgentArgs(prompt: string, opts: AgentSpawnOptions): string[] {
   const config = getProviderConfig(opts.provider ?? 'claude');
-  const args: string[] = [prompt];
+  // Some providers use a subcommand before the prompt (e.g. `opencode run "<prompt>"`)
+  const args: string[] = [...(config.promptPrefix ?? []), prompt];
 
   if (opts.dangerous) {
     if (config.dangerousFlag) {
