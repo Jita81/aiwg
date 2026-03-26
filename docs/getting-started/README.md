@@ -18,6 +18,27 @@ Find the scenario that matches where you are right now.
 
 ---
 
+## Frameworks
+
+| I'm working on... | Guide |
+|---|---|
+| Software development (the full lifecycle) | [SDLC Framework](sdlc-framework.md) |
+| Marketing campaigns and content | [Marketing Framework](marketing-framework.md) |
+| Digital forensics and incident response | [Forensics Framework](forensics-framework.md) |
+| Academic or technical research | [Research Framework](research-framework.md) |
+| Building and managing a media archive | [Media Curator Framework](media-curator-framework.md) |
+
+---
+
+## Going deeper
+
+| Topic | Guide |
+|---|---|
+| How intake, flows, gates, and sdlc-accelerate work together | [Flow and Gate Process](flow-and-gate-process.md) |
+| Ralph, Ring, RLM, Voice, and other power features | [Key Addons](key-addons.md) |
+
+---
+
 ## Not sure which one?
 
 Read the one-paragraph version of each below, then click the one that sounds right.
@@ -35,3 +56,21 @@ Read the one-paragraph version of each below, then click the one that sounds rig
 **Team Setup** — Multiple developers all using different AI tools. You want everyone to have the same agents, rules, and commands regardless of their platform — Claude Code, Cursor, Copilot, or others.
 
 **Daemon and Automation** — You want AIWG running in the background: scheduled tasks, event-driven scripts, a Telegram bot that reports what the AI is doing. Set it up once, let it run.
+
+---
+
+**SDLC Framework** — Software development from idea to production: intake, architecture, requirements, tests, security, deployment. 90 specialized agents coordinated through phase flows and gate validation.
+
+**Marketing Framework** — Full campaign lifecycle: strategy, content creation across channels, brand and legal review, publication, and performance analysis.
+
+**Forensics Framework** — Digital forensics and incident response following NIST SP 800-86 and MITRE ATT&CK: target profiling, volatile data capture, evidence acquisition, timeline reconstruction, IOC extraction, forensic reporting.
+
+**Research Framework** — Academic and technical research automation: paper discovery, PDF acquisition, RAG-based summarization with hallucination prevention, citation management, GRADE quality assessment.
+
+**Media Curator Framework** — Media archive management: discography research, source discovery, parallel acquisition, quality scoring, metadata tagging, completeness tracking, platform export.
+
+---
+
+**Flow and Gate Process** — The mechanics behind SDLC: how the intake commands, flow commands, gate commands, and the `sdlc-accelerate` meta-command connect and why that structure exists.
+
+**Key Addons** — Ralph (iterative loops), Ring (four-layer verification), RLM (large codebase handling), Voice Framework (consistent writing style), and other capabilities that extend any framework.
