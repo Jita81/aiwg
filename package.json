@@ -1,7 +1,7 @@
 {
   "name": "aiwg",
   "version": "2026.3.3",
-  "description": "Multi-agent AI framework for Claude Code, Copilot, Cursor, Warp, and 4 more platforms. 188 agents, 50 CLI commands, 128 skills across SDLC, digital forensics, research, marketing, and media curation. Ralph loop for iterative execution with crash recovery. YAML metalanguage for declarative multi-agent workflows.",
+  "description": "Multi-agent AI framework for Claude Code, Copilot, Cursor, Warp, OpenClaw, and 5 more platforms. Agents, commands, skills, rules, and behaviors across SDLC, forensics, research, marketing, and media curation. Ralph loop, autonomous daemon, reactive behaviors, and YAML metalanguage for declarative multi-agent workflows.",
   "type": "module",
   "bin": {
     "aiwg": "bin/aiwg.mjs"
@@ -177,7 +177,16 @@
     "task-automation",
     "cron-agents",
     "scheduled-agents",
-    "remote-agents"
+    "remote-agents",
+    "openclaw",
+    "clawhub",
+    "behaviors",
+    "reactive-automation",
+    "event-driven-agents",
+    "behavior-hooks",
+    "file-watch-agents",
+    "autonomous-daemon",
+    "daemon-mode"
   ],
   "author": "jmagly",
   "license": "MIT",
