@@ -1,0 +1,37 @@
+# Getting Started with AIWG
+
+Find the scenario that matches where you are right now.
+
+---
+
+## Pick your situation
+
+| I want to... | Guide |
+|---|---|
+| Start a brand new project from scratch | [New Project](new-project.md) |
+| Bring AI up to speed on code I already have | [Existing Project](existing-project.md) |
+| Just try it and see what happens | [Quick Start — No Setup](just-try-it.md) |
+| Write better, more consistent documentation | [Content and Writing](writing-and-content.md) |
+| Run a security or code quality audit | [Audit Existing Code](audit-existing-code.md) |
+| Set up my whole team, not just myself | [Team Setup](team-setup.md) |
+| Work in the background while I do other things | [Daemon and Automation](daemon-and-automation.md) |
+
+---
+
+## Not sure which one?
+
+Read the one-paragraph version of each below, then click the one that sounds right.
+
+**New Project** — You have an idea and want to kick off a real project with proper requirements, architecture, and a development plan. AIWG runs an intake conversation, generates the foundation docs, and assigns AI agents to each phase of the work.
+
+**Existing Project** — You already have a codebase. Maybe you wrote it yourself, maybe you inherited it. You want an AI assistant that actually understands what the code does, follows your conventions, and picks up where things left off.
+
+**Just Try It** — You want to skip setup and see something happen. Run one command, ask the AI a question about your code, get a useful answer. No intake forms, no configuration. Figure out the rest later.
+
+**Content and Writing** — You're writing docs, blog posts, proposals, or any other text. You want consistent voice and quality. AIWG's voice framework profiles train the AI to write the way you write.
+
+**Audit Existing Code** — You have code you want reviewed: security issues, test coverage gaps, dead code, dependency risks. AIWG runs structured audits and produces a report with prioritized findings.
+
+**Team Setup** — Multiple developers all using different AI tools. You want everyone to have the same agents, rules, and commands regardless of their platform — Claude Code, Cursor, Copilot, or others.
+
+**Daemon and Automation** — You want AIWG running in the background: scheduled tasks, event-driven scripts, a Telegram bot that reports what the AI is doing. Set it up once, let it run.

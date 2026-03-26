@@ -1,5 +1,13 @@
 # Quick Start
 
+## Not sure where to start?
+
+**[→ Find your scenario in the Getting Started guides](getting-started/README.md)**
+
+These cover the common situations in plain terms: new project, existing code, just trying it out, team setup, writing, auditing, automation.
+
+---
+
 ## Claude Code
 
 Get started in seconds with the Claude Code plugin:
