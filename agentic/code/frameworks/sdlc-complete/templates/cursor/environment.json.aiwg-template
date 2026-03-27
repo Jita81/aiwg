@@ -1,0 +1,9 @@
+{
+  "install": "npm install -g aiwg && aiwg use sdlc --provider cursor",
+  "terminal": {
+    "env": {
+      "AIWG_PROVIDER": "cursor",
+      "AIWG_CONTEXT_WINDOW": "200000"
+    }
+  }
+}
