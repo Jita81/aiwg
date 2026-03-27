@@ -254,14 +254,6 @@ describe('Consolidated Rules Functions', () => {
   // ==========================================================================
 
   describe('getComponentRulesIndexPath', () => {
-    it('returns path when manifest has consolidation.rulesIndex', () => {
-      const ringPath = path.join(REPO_ROOT, 'agentic', 'code', 'addons', 'ring-methodology');
-      const result = base.getComponentRulesIndexPath(ringPath);
-      expect(result).not.toBeNull();
-      expect(result).toContain('RULES-INDEX.md');
-      expect(fs.existsSync(result)).toBe(true);
-    });
-
     it('returns path for aiwg-utils addon', () => {
       const utilsPath = path.join(REPO_ROOT, 'agentic', 'code', 'addons', 'aiwg-utils');
       const result = base.getComponentRulesIndexPath(utilsPath);
@@ -361,12 +353,6 @@ describe('Consolidated Rules Functions', () => {
       expect(result).toContain('## SDLC Rules');
     });
 
-    it('includes ring-methodology component rules', () => {
-      const result = base.assembleRulesIndex(REPO_ROOT);
-      expect(result).toContain('# Ring Methodology Rules Index');
-      expect(result).toContain('verification-ring');
-    });
-
     it('includes aiwg-utils component rules', () => {
       const result = base.assembleRulesIndex(REPO_ROOT);
       expect(result).toContain('subagent-scoping');
@@ -375,10 +361,7 @@ describe('Consolidated Rules Functions', () => {
     it('component section headings appear in assembled output', () => {
       const result = base.assembleRulesIndex(REPO_ROOT);
       const sdlcPos = result.indexOf('# AIWG SDLC Rules Index');
-      const ringPos = result.indexOf('# Ring Methodology Rules Index');
-      // Both component headings should be present
       expect(sdlcPos).toBeGreaterThan(0);
-      expect(ringPos).toBeGreaterThan(0);
     });
 
     it('global Quick Reference appears at the end of the assembled output', () => {
@@ -400,10 +383,8 @@ describe('Consolidated Rules Functions', () => {
   describe('getAddonRuleFiles (consolidated addon skipping)', () => {
     it('skips addons with consolidation.deployIndexOnly=true', () => {
       const files = base.getAddonRuleFiles(REPO_ROOT);
-      // ring-methodology and aiwg-utils have deployIndexOnly=true and should be excluded
-      const hasRingFiles = files.some((f: string) => f.includes('ring-methodology'));
+      // aiwg-utils has deployIndexOnly=true and should be excluded
       const hasUtilsFiles = files.some((f: string) => f.includes('aiwg-utils'));
-      expect(hasRingFiles).toBe(false);
       expect(hasUtilsFiles).toBe(false);
     });
 
@@ -419,9 +400,9 @@ describe('Consolidated Rules Functions', () => {
       // Since we can't easily add a real addon, just verify the excludeAddons
       // contract still works in combination with the new skipping logic
       const filesNoExclude = base.getAddonRuleFiles(REPO_ROOT);
-      const filesWithExclude = base.getAddonRuleFiles(REPO_ROOT, ['ring-methodology']);
-      // Both should not contain ring-methodology (it's consolidated)
-      // The sets should be equal since ring-methodology was already excluded by consolidation
+      const filesWithExclude = base.getAddonRuleFiles(REPO_ROOT, ['aiwg-utils']);
+      // aiwg-utils is already excluded by consolidation
+      // The sets should be equal since aiwg-utils was already excluded by consolidation
       expect(filesNoExclude).toEqual(filesWithExclude);
     });
   });

@@ -725,8 +725,8 @@ ralph:
 - `@agentic/code/addons/ralph/schemas/cross-task-memory.yaml` - Cross-task memory
 - `@agentic/code/addons/ralph/docs/cross-loop-learning.md` - Full documentation
 - `.aiwg/research/paper-analysis/REF-013-aiwg-analysis.md` - MetaGPT research
-- `/ralph` - Ralph loop command
-- `ralph-loop` skill - Detects Ralph requests
+- `ralph` skill - Iterative loop executor
+- `agent-loop` skill - Detects iterative loop requests
 
 ---
 

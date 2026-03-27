@@ -312,7 +312,6 @@ aiwg reproducibility-validate  # Validate workflow reproducibility
 | **Media Curator** | `@agentic/code/frameworks/media-curator/README.md` |
 | **Research Complete** | `@agentic/code/frameworks/research-complete/README.md` |
 | **RLM Addon** | `@agentic/code/addons/rlm/README.md` |
-| **Ring Methodology Addon** | `@agentic/code/addons/ring-methodology/README.md` |
 | **Daemon Mode** | `@docs/daemon-guide.md` |
 | **Messaging Integration** | `@docs/messaging-guide.md` |
 | **Voice Profiles** | `@agentic/code/addons/voice-framework/voices/templates/` |
@@ -321,6 +320,10 @@ aiwg reproducibility-validate  # Validate workflow reproducibility
 | **Templates** | `@agentic/code/frameworks/sdlc-complete/templates/` |
 | **Command Definitions** | `@src/extensions/commands/definitions.ts` |
 | **Extension Types** | `@src/extensions/types.ts` |
+
+## Deprecation: Commands → Skills
+
+**Commands are deprecated.** All new functionality MUST be implemented as skills, not commands. Existing commands should be migrated to skill equivalents when touched. Agents encountering command-based patterns (`.claude/commands/`, `/command-name`) should prefer the equivalent skill if one exists. Skills provide natural language triggers, platform portability, and better integration with the agent-loop detection layer.
 
 ## Core Enforcement Rules
 
@@ -366,7 +369,6 @@ Rules are organized in a two-level hierarchy: each component owns its own `RULES
 - Component indexes:
   - sdlc-complete (33 rules): `agentic/code/frameworks/sdlc-complete/rules/RULES-INDEX.md`
   - aiwg-utils (7 rules): `agentic/code/addons/aiwg-utils/rules/RULES-INDEX.md`
-  - ring-methodology (7 rules): `agentic/code/addons/ring-methodology/rules/RULES-INDEX.md`
 - Architecture decision: `.aiwg/architecture/adr-rules-index-hierarchy.md`
 
 ## Commit and Output Conventions

@@ -441,7 +441,7 @@ Which scope did you have in mind?
 
 ## Integration Notes
 
-- **Priority**: Medium (yields to ralph-loop for explicit iteration requests)
+- **Priority**: Medium (yields to agent-loop for explicit iteration requests)
 - **Exclusivity**: Partial (suggest RLM, but user can override)
 - **Confirmation**: Always confirm strategy before invoking RLM commands
 - **Fallback**: If user rejects RLM, warn about context limits but proceed if insisted

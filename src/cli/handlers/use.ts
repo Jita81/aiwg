@@ -43,7 +43,7 @@ const MODE_MAP: Record<Framework, string> = {
 /**
  * Valid addon identifiers (deployed independently via `aiwg use <addon>`)
  */
-const VALID_ADDONS = ['rlm', 'ring'] as const;
+const VALID_ADDONS = ['rlm'] as const;
 type Addon = typeof VALID_ADDONS[number];
 
 /**
@@ -51,7 +51,6 @@ type Addon = typeof VALID_ADDONS[number];
  */
 const ADDON_PATHS: Record<Addon, string> = {
   rlm: 'agentic/code/addons/rlm',
-  ring: 'agentic/code/addons/ring-methodology',
 };
 
 /**

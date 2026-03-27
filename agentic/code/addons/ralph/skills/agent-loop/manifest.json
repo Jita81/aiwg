@@ -1,7 +1,7 @@
 {
-  "name": "ralph-loop",
-  "version": "1.0.0",
-  "description": "Detect iterative task requests and route to Ralph loop command",
+  "name": "agent-loop",
+  "version": "3.0.0",
+  "description": "Detect iterative autonomous agent loop requests and route to the appropriate loop executor",
   "triggers": [
     "ralph this",
     "ralph:",
@@ -13,7 +13,8 @@
     "fix until green",
     "keep fixing until",
     "keep going until",
-    "iterate on"
+    "iterate on",
+    "al:"
   ],
   "priority": "high",
   "exclusive": true,

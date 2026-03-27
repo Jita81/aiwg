@@ -11,9 +11,8 @@ Scan component indexes to find relevant rules; load the full rule file via @-lin
 |-----------|------|-------|-------|
 | sdlc-complete | framework | 33 | @agentic/code/frameworks/sdlc-complete/rules/RULES-INDEX.md |
 | aiwg-utils | addon (core) | 7 | @agentic/code/addons/aiwg-utils/rules/RULES-INDEX.md |
-| ring-methodology | addon | 7 | @agentic/code/addons/ring-methodology/rules/RULES-INDEX.md |
 
-**Total**: 47 rules across 3 components
+**Total**: 40 rules across 2 components
 
 ---
 
@@ -38,12 +37,8 @@ Combined context table across all components. Use to identify which component in
 | **Agent deployment** | aiwg-utils | agent-deployment |
 | **Diagrams** | aiwg-utils | diagram-generation |
 | **Research/decisions** | aiwg-utils | research-before-decision |
-| **Feature completion** | ring-methodology | verification-ring, morpholepsis-detection, spectral-gap |
-| **Failure recovery** | ring-methodology | kernel-extraction, morpholepsis-detection, kenophoria-state |
-| **Process health** | ring-methodology | spectral-gap, kernel-extraction, temporal-coupling |
-| **Threshold understanding** | ring-methodology | phi-constants |
 
 ---
 
-*Assembled from 3 component indexes — 47 rules total*
+*Assembled from 2 component indexes — 40 rules total*
 *Each component index contains full rule summaries with @-links to complete rule files*

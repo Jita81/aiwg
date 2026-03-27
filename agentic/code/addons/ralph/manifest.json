@@ -42,7 +42,7 @@
     "execute-feedback"
   ],
   "skills": [
-    "ralph-loop",
+    "agent-loop",
     "reflection-injection",
     "auto-test-execution",
     "mission-control"

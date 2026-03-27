@@ -1,13 +1,24 @@
 ---
-name: ralph-loop
-description: Detect requests for iterative AI task loops and invoke the Ralph command
-version: 2.0.0
+name: agent-loop
+description: Detect requests for iterative autonomous agent loops and route to the appropriate loop executor
+version: 3.0.0
 platforms: [claude-code, hermes, openclaw]
 ---
 
-# Ralph Loop Skill
+# Agent Loop Skill
 
-You detect when users want iterative task execution and route to the `/ralph` command.
+You detect when users want iterative autonomous task execution and route to the appropriate loop command.
+
+## Loop Taxonomy
+
+This skill is the **detection and routing layer** for autonomous agent loops — iterative patterns where a single agent retries a task against completion criteria until success or limits.
+
+| Loop Type | Implementation | Description |
+|-----------|---------------|-------------|
+| **Ralph** | `/ralph` command | Basic iterate-until-complete with learning extraction |
+| *(future)* | — | Reflection loops, critic-actor loops, branching loops |
+
+Currently routes all detected requests to the iterative loop executor. As new loop types are added, this skill will route based on task characteristics.
 
 ## Triggers
 
@@ -18,6 +29,7 @@ Alternate expressions and non-obvious activations (primary phrases are matched a
 - "keep trying until [condition]" → loop with completion condition
 - "fix until green" → test-fixing loop shorthand
 - "loop until [condition]" → condition-based iteration
+- "al: [task]" → shortcut for agent-loop invocation
 
 ## Trigger Patterns Reference
 
@@ -32,6 +44,7 @@ Alternate expressions and non-obvious activations (primary phrases are matched a
 | `run until passes` | "run until passes" | Infer test command |
 | `fix until green` | "fix until green" | Task = fix tests, completion = tests pass |
 | `keep fixing until X` | "keep fixing until lint is clean" | Task = fix lint, completion = X |
+| `al: X` | "al: fix all lint errors" | Shortcut for agent-loop, extract task |
 
 ## Extraction Logic
 
@@ -99,7 +112,7 @@ When user doesn't specify explicit verification:
 If extraction is ambiguous, ask the user:
 
 ```
-I'll start a Ralph loop for: {extracted task}
+I'll start an iterative loop for: {extracted task}
 
 What command verifies completion?
 1. npm test (Recommended for test fixes)
@@ -112,7 +125,7 @@ What command verifies completion?
 Or if task is unclear:
 
 ```
-I detected a Ralph loop request. To start iterating:
+I detected an iterative loop request. To start iterating:
 
 What task should I repeat until success?
 What command tells me when it's done?
@@ -231,17 +244,13 @@ Multi-loop structure per loop:
 
 ## Invocation
 
-Once task and completion are extracted/confirmed:
+Once task and completion are extracted/confirmed, invoke the loop executor skill with:
 
-```
-/ralph "{task}" --completion "{completion}"
-```
-
-With optional parameters if the user specified them:
-- `--max-iterations N` if user mentioned iteration limit
-- `--timeout M` if user mentioned time limit
-- `--interactive` if task needs clarification
-- `--loop-id {id}` if user wants custom loop ID
+- **Task**: The extracted task description
+- **Completion criteria**: The verification command or condition
+- **Max iterations**: If user mentioned iteration limit
+- **Timeout**: If user mentioned time limit
+- **Loop ID**: If user wants a custom loop identifier
 
 ### Multi-Loop Examples
 
@@ -268,7 +277,7 @@ User: "actually, abort that and just fix the login bug"
 
 ## Integration Notes
 
-- This skill has **high priority** - ralph-related phrases should route here
+- This skill has **high priority** - iterative loop phrases should route here
 - The skill is **exclusive** - once triggered, handle the entire request
 - Always confirm extraction before invoking if there's ambiguity
 - Prefer inferring completion criteria over asking (ask only if truly unclear)
@@ -277,15 +286,16 @@ User: "actually, abort that and just fix the login bug"
 
 ## Related
 
-- `/ralph` command - the actual loop executor
-- `/ralph-status` - check loop progress
-- `/ralph-resume` - continue interrupted loops
-- `/ralph-abort` - abort active loops
+- `ralph` skill - the iterative loop executor implementation
+- `ralph-status` skill - check loop progress
+- `ralph-resume` skill - continue interrupted loops
+- `ralph-abort` skill - abort active loops
 - `@agentic/code/addons/ralph/schemas/loop-registry.yaml` - Registry schema
 - `@agentic/code/addons/ralph/schemas/loop-state.yaml` - Loop state schema
 - `@.aiwg/research/findings/REF-086-cognitive-load-limits.md` - Concurrency research
 
 ## Version History
 
+- **3.0.0**: Renamed from `ralph-loop` to `agent-loop`; added loop taxonomy (Issue #558)
 - **2.0.0**: Added multi-loop support with registry tracking (Issue #268)
 - **1.0.0**: Initial single-loop implementation

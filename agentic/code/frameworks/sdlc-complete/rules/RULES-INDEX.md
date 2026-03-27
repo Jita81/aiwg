@@ -208,13 +208,11 @@ Rules contributed by installed addons. Load the component index for full rule su
 | Component | Index | Rules |
 |-----------|-------|-------|
 | aiwg-utils | @agentic/code/addons/aiwg-utils/rules/RULES-INDEX.md | 7 |
-| ring-methodology | @agentic/code/addons/ring-methodology/rules/RULES-INDEX.md | 7 |
 
 ---
 
 ## Quick Reference by Context
 
-> For ring-methodology contexts, see @agentic/code/addons/ring-methodology/rules/RULES-INDEX.md
 > For aiwg-utils contexts, see @agentic/code/addons/aiwg-utils/rules/RULES-INDEX.md
 
 | Task Type | Relevant Rules |

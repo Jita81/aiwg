@@ -31,7 +31,7 @@
       "@agentic/code/addons/ralph/schemas/debug-memory.yaml"
     ],
     "skills": [
-      "ralph-loop"
+      "agent-loop"
     ]
   },
   "configuration": {

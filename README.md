@@ -381,7 +381,6 @@ aiwg use sdlc --provider windsurf      # Windsurf
 | **[AIWG Hooks](agentic/code/addons/aiwg-hooks/)** | Lifecycle event handlers — pre-session, post-write, workflow tracing |
 | **[AIWG Utils](agentic/code/addons/aiwg-utils/)** | Core meta-utilities (auto-installed with any framework) |
 | **[Droid Bridge](agentic/code/addons/droid-bridge/)** | Factory Droid orchestration — multi-platform agent bridge |
-| **[Ring Methodology](agentic/code/addons/ring-methodology/)** | Bounded iteration control with circuit breakers and session management |
 | **[Star Prompt](agentic/code/addons/star-prompt/)** | Repository star prompt for success celebration |
 
 ---
@@ -489,7 +488,7 @@ Natural language workflow triggers. Say "what's the project status?" and the `pr
 | **Artifacts & Traceability** | 6 | artifact-orchestration, artifact-metadata, artifact-lookup, traceability-check, claims-validator, citation-guard |
 | **Research** | 2 | grade-on-ingest, auto-provenance |
 | **Infrastructure** | 5 | config-validator, template-engine, code-chunker, decompose-file, workspace-health |
-| **Iteration** | 4 | ralph-loop, issue-driven-ralph, cross-task-learner, reflection-injection |
+| **Iteration** | 4 | agent-loop, issue-driven-ralph, cross-task-learner, reflection-injection |
 | **Other** | 19 | performance-digest, competitive-intel, audience-synthesis, skill-builder, skill-enhancer, skill-packager, quality-checker, nl-router, tot-exploration, and more |
 
 ---
