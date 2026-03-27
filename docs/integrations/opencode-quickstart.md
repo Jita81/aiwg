@@ -1,5 +1,7 @@
 # OpenCode Quick Start
 
+> **Archived Project Notice:** `opencode-ai/opencode` was archived in September 2025. The successor project is [`charmbracelet/crush`](https://github.com/charmbracelet/crush). AIWG currently targets OpenCode v0.0.55. See the [platform reference](.aiwg/references/platforms/opencode.md) for full status notes.
+
 ---
 
 ## Install & Deploy
@@ -7,7 +9,11 @@
 **1. Install OpenCode**
 
 ```bash
-curl -fsSL https://opencode.ai/install | sh
+# macOS / Linux
+brew install opencode-ai/tap/opencode
+
+# Or from source
+go install github.com/opencode-ai/opencode@latest
 ```
 
 **2. Install AIWG**
@@ -21,23 +27,34 @@ npm install -g aiwg
 ```bash
 cd /path/to/your/project
 
-# Deploy all 4 artifact types for OpenCode
+# Deploy all artifact types for OpenCode
 aiwg use sdlc --provider opencode
 ```
 
-**4. Configure MCP (optional)**
+**4. Configure context loading**
+
+AIWG rules and agents are deployed to `.opencode/rule/` and `.opencode/agent/`. To have OpenCode load them as context, add these paths to `contextPaths` in your `.opencode.json`:
+
+```json
+{
+  "contextPaths": [
+    "OpenCode.md",
+    "CLAUDE.md",
+    ".opencode/rule/",
+    ".opencode/agent/"
+  ]
+}
+```
+
+Without this step, OpenCode only loads `OpenCode.md` and `CLAUDE.md` by default.
+
+**5. Configure MCP (optional)**
 
 ```bash
 aiwg mcp install opencode
 ```
 
-**5. Regenerate for intelligent integration**
-
-```text
-/aiwg-regenerate-agents
-```
-
-This step is critical - it enables natural language command mapping ("run security review" → workflow). Without it, advanced features won't work correctly. See the [Regenerate Guide](#regenerate-guide) for details.
+See the [OpenCode MCP Sidecar Guide](opencode-mcp-sidecar.md) for the recommended full-access setup.
 
 **6. You're ready.** See the [Intake Guide](#intake-guide) for starting projects.
 
@@ -47,94 +64,114 @@ This step is critical - it enables natural language command mapping ("run securi
 
 ```text
 .opencode/
-├── agent/       # SDLC agents (Requirements Analyst, Architecture Designer, etc.)
-├── command/     # Workflow commands (/project-status, /security-gate, etc.)
-├── skill/       # Skill directories (voice profiles, project awareness, etc.)
-└── rule/        # Context rules (token security, citation policy, etc.)
+├── agent/       # SDLC agent personas (loaded via contextPaths — see step 4)
+├── commands/    # Workflow commands (invoked via Ctrl+K palette)
+├── skill/       # Skill definitions (AIWG-internal; not natively discovered)
+└── rule/        # Context rules (loaded via contextPaths — see step 4)
 
-AGENTS.md        # Project context
+OpenCode.md      # Project context (auto-loaded by OpenCode)
 .aiwg/           # SDLC artifacts
 ```
 
-> **Note:** OpenCode uses singular directory names (`agent/`, `command/`, `skill/`, `rule/`).
-
----
-
-## Using Agents
-
-Invoke via @-mention:
-
-```text
-@security-architect Review the authentication implementation
-@test-engineer Generate unit tests for the user service
-```
+> **How OpenCode discovers files:** OpenCode does not auto-discover agents, rules, or skills from `.opencode/` sub-directories. It loads files listed explicitly in `contextPaths` and discovers commands from `.opencode/commands/`. See [Capability Details](#capability-details) below.
 
 ---
 
 ## Using Commands
 
-```text
-/project-status
-/flow-gate-check elaboration
-/security-gate
+AIWG commands are deployed to `.opencode/commands/` and appear in OpenCode's command palette.
+
+**Invoke commands:**
+
+Press `Ctrl+K` inside OpenCode to open the command picker, then search for the command:
+
 ```
+project:project-status
+project:flow-gate-check
+project:security-gate
+```
+
+> **Note:** OpenCode uses `Ctrl+K` for command invocation, not slash-command syntax. Commands are prefixed with `project:` for project-scoped commands.
+
+---
+
+## Using Agents
+
+OpenCode does not have a first-class agent invocation system equivalent to Claude Code's `@-mention`. AIWG agent definitions in `.opencode/agent/` are loaded as context injections (when configured in `contextPaths`) rather than discrete AI personas.
+
+**Recommended approach:** Use MCP to access AIWG's full agent orchestration capabilities from within OpenCode. See the [MCP Sidecar Guide](opencode-mcp-sidecar.md).
+
+---
+
+## Capability Details
+
+| AIWG Artifact | Path | How OpenCode Uses It |
+|---------------|------|---------------------|
+| Agent personas | `.opencode/agent/` | Context injection via `contextPaths` |
+| Commands | `.opencode/commands/` | Ctrl+K palette (native discovery) |
+| Skills | `.opencode/skill/` | AIWG-internal only; not read by OpenCode |
+| Rules | `.opencode/rule/` | Context injection via `contextPaths` |
+| Project context | `OpenCode.md` | Auto-loaded by OpenCode (default) |
 
 ---
 
 ## Models
 
-OpenCode ships with built-in models (no credentials required) and supports Anthropic models when you connect an account.
+OpenCode supports multiple provider families. Configure via `.opencode.json`:
 
-**Free tier (default):**
+**Anthropic (recommended for AIWG):**
 
-| Generic alias | Resolves to |
-|---|---|
-| `haiku`, `sonnet`, `opus` | `opencode/big-pickle` |
-
-Any `opencode/*` model ID from `opencode models` can be passed directly.
-
-**Anthropic tier** (after `opencode auth add`):
-
-```bash
-# Connect Anthropic account
-opencode auth add   # follow prompts, enter ANTHROPIC_API_KEY
-
-# Verify models appear
-opencode models | grep anthropic
+```json
+{
+  "agents": {
+    "coder": {
+      "model": "claude-sonnet-4-5-20250929",
+      "maxTokens": 8000
+    },
+    "task": {
+      "model": "claude-haiku-4-5-20251001",
+      "maxTokens": 4000
+    }
+  }
+}
 ```
 
-Once connected, pass `anthropic/*` model IDs directly:
+**Other supported providers:** OpenAI, Gemini, Groq, OpenRouter, Bedrock, Azure, VertexAI, GitHub Copilot.
 
-```bash
-aiwg ralph-external "Fix tests" --provider opencode --model anthropic/claude-haiku-4-6
-```
+Run `opencode models` to list available models for your configured providers.
 
 ---
 
 ## Ralph Iterative Loops
 
-Ralph loops support multi-provider execution. While OpenCode agents are deployed via AIWG, Ralph task loops run through the CLI:
+Ralph loops support multi-provider execution through the AIWG CLI:
 
 ```bash
-# Free tier (uses opencode/big-pickle)
-aiwg ralph "Fix all tests" --completion "npm test passes" --provider opencode
-
 # Anthropic tier
-aiwg ralph "Fix all tests" --completion "npm test passes" --provider opencode --model anthropic/claude-sonnet-4-6
+aiwg ralph "Fix all tests" --completion "npm test passes" --provider opencode --model anthropic/claude-sonnet-4-5-20250929
 ```
 
-See [Ralph Guide](../ralph-guide.md) for full documentation including `--provider` options.
+OpenCode's headless mode (`opencode run --format json`) is used for Ralph loop execution.
+
+See [Ralph Guide](../ralph-guide.md) for full documentation.
 
 ---
 
 ## Troubleshooting
 
-**Natural language not working?** Run regenerate:
-```text
-/aiwg-regenerate-agents
+**Rules/agents not being applied?** Add paths to `contextPaths` in `.opencode.json`:
+```json
+{
+  "contextPaths": ["OpenCode.md", "CLAUDE.md", ".opencode/rule/", ".opencode/agent/"]
+}
 ```
 
-**Agents not appearing?** Redeploy:
+**Commands not appearing in Ctrl+K?** Confirm AIWG deployed to `.opencode/commands/` (plural):
+```bash
+ls .opencode/commands/
+```
+
+**Redeploy if needed:**
 ```bash
 aiwg use sdlc --provider opencode --force
 ```
@@ -146,9 +183,9 @@ aiwg mcp serve
 
 ---
 
-## MCP Sidecar (Unrestricted AIWG Access)
+## MCP Sidecar (Recommended for Full Access)
 
-OpenCode has no confirmed dangerous mode flag. The MCP sidecar is the recommended path for unrestricted AIWG tool access:
+The MCP sidecar is the recommended path for unrestricted AIWG tool access:
 
 ```bash
 aiwg mcp install opencode

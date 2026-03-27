@@ -10,7 +10,6 @@
   ],
   "entry": {
     "agents": "agents",
-    "commands": "commands",
     "skills": "skills",
     "templates": "templates",
     "rules": "rules"
@@ -39,8 +38,8 @@
     "created": "2026-02-27",
     "last_updated": "2026-02-27",
     "total_agents": 13,
-    "total_commands": 9,
-    "total_skills": 10,
+    "total_commands": 0,
+    "total_skills": 19,
     "total_rules": 4,
     "status": "active"
   }

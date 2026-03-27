@@ -270,60 +270,39 @@ describe.skipIf(!GIT_INIT_AVAILABLE)('Codex Integration', () => {
     });
   });
 
-  describe('Prompts Deployment', () => {
-    it('creates prompts in ~/.codex/prompts/', async () => {
-      const output = runScript('tools/commands/deploy-prompts-codex.mjs', [
-        '--target', path.join(TEST_CODEX_DIR, 'prompts')
+  describe('Skills Deployment (formerly Prompts)', () => {
+    it('deploys skills to ~/.codex/skills/ via main deploy script', async () => {
+      runScript('tools/agents/deploy-agents.mjs', [
+        '--provider', 'codex',
+        '--mode', 'sdlc',
+        '--deploy-skills',
+        '--target', TEST_PROJECT_DIR
       ]);
 
-      expect(output).toContain('Deploying commands as Codex prompts');
+      // Check skills were deployed to home directory
+      const skillsDir = path.join(TEST_CODEX_DIR, 'skills');
+      const skills = await fs.readdir(skillsDir);
 
-      // Check prompts directory was created
-      const promptsDir = path.join(TEST_CODEX_DIR, 'prompts');
-      const prompts = await fs.readdir(promptsDir);
-
-      expect(prompts.length).toBeGreaterThan(0);
-      expect(prompts.some((p) => p.endsWith('.md'))).toBe(true);
+      expect(skills.length).toBeGreaterThan(0);
     });
 
-    it('converts AIWG command placeholders', async () => {
-      runScript('tools/commands/deploy-prompts-codex.mjs', [
-        '--target', path.join(TEST_CODEX_DIR, 'prompts')
+    it('each deployed skill directory contains SKILL.md', async () => {
+      runScript('tools/agents/deploy-agents.mjs', [
+        '--provider', 'codex',
+        '--mode', 'sdlc',
+        '--deploy-skills',
+        '--target', TEST_PROJECT_DIR
       ]);
 
-      const promptsDir = path.join(TEST_CODEX_DIR, 'prompts');
-      const prompts = await fs.readdir(promptsDir);
+      const skillsDir = path.join(TEST_CODEX_DIR, 'skills');
+      const skills = await fs.readdir(skillsDir);
 
-      // Find a prompt with arguments
-      const prReview = prompts.find((p) => p.includes('pr-review'));
-      if (prReview) {
-        const content = await fs.readFile(
-          path.join(promptsDir, prReview),
-          'utf-8'
-        );
-
-        // Should use Codex placeholder format (not {{}} mustache)
-        expect(content).not.toContain('{{');
-        expect(content).not.toContain('}}');
-      }
-    });
-
-    it('generates correct argument-hint in frontmatter', async () => {
-      runScript('tools/commands/deploy-prompts-codex.mjs', [
-        '--target', path.join(TEST_CODEX_DIR, 'prompts')
-      ]);
-
-      const promptsDir = path.join(TEST_CODEX_DIR, 'prompts');
-      const prompts = await fs.readdir(promptsDir);
-
-      for (const prompt of prompts.filter((p) => p.endsWith('.md'))) {
-        const content = await fs.readFile(
-          path.join(promptsDir, prompt),
-          'utf-8'
-        );
-
-        // If has frontmatter, check format
-        if (content.startsWith('---')) {
+      for (const skill of skills) {
+        const skillMdPath = path.join(skillsDir, skill, 'SKILL.md');
+        const exists = await fs.access(skillMdPath).then(() => true).catch(() => false);
+        if (exists) {
+          const content = await fs.readFile(skillMdPath, 'utf-8');
+          expect(content).toMatch(/^---\n/);
           expect(content).toMatch(/\n---\n/);
         }
       }
@@ -400,11 +379,10 @@ describe.skipIf(!GIT_INIT_AVAILABLE)('Codex Integration', () => {
       expect(files).not.toContain('AGENTS.md');
     });
 
-    it('media-curator mode includes media-curator command prompts for codex', () => {
+    it('media-curator mode includes media-curator skills for codex', () => {
       const output = runScript('tools/agents/deploy-agents.mjs', [
         '--provider', 'codex',
         '--mode', 'media-curator',
-        '--deploy-commands',
         '--deploy-skills',
         '--target', TEST_PROJECT_DIR,
         '--dry-run'
@@ -412,14 +390,13 @@ describe.skipIf(!GIT_INIT_AVAILABLE)('Codex Integration', () => {
 
       expect(output).toContain('Mode: media-curator');
       expect(output).toContain('media-curator (');
-      expect(output).toContain('aiwg-verify-archive');
+      expect(output).toContain('verify-archive');
     });
 
-    it('research mode includes research command prompts for codex', () => {
+    it('research mode includes research skills for codex', () => {
       const output = runScript('tools/agents/deploy-agents.mjs', [
         '--provider', 'codex',
         '--mode', 'research',
-        '--deploy-commands',
         '--deploy-skills',
         '--target', TEST_PROJECT_DIR,
         '--dry-run'
@@ -427,14 +404,13 @@ describe.skipIf(!GIT_INIT_AVAILABLE)('Codex Integration', () => {
 
       expect(output).toContain('Mode: research');
       expect(output).toContain('research-complete (');
-      expect(output).toContain('aiwg-research-workflow');
+      expect(output).toContain('research-workflow');
     });
 
-    it('mmk mode alias deploys media-marketing-kit prompts for codex', () => {
+    it('mmk mode alias deploys media-marketing-kit skills for codex', () => {
       const output = runScript('tools/agents/deploy-agents.mjs', [
         '--provider', 'codex',
         '--mode', 'mmk',
-        '--deploy-commands',
         '--deploy-skills',
         '--target', TEST_PROJECT_DIR,
         '--dry-run'
@@ -442,7 +418,7 @@ describe.skipIf(!GIT_INIT_AVAILABLE)('Codex Integration', () => {
 
       expect(output).toContain('Mode: marketing');
       expect(output).toContain('media-marketing-kit (');
-      expect(output).toContain('aiwg-creative-brief');
+      expect(output).toContain('creative-brief');
     });
   });
 

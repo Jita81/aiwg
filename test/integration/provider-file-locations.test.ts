@@ -120,7 +120,7 @@ const PROVIDERS: Record<string, ProviderConfig> = {
   },
   windsurf: {
     name: 'windsurf',
-    projectPaths: ['.windsurf/workflows', '.windsurf/skills', '.windsurf/rules'],  // Agents → aggregated AGENTS.md (root file)
+    projectPaths: ['.windsurf/skills', '.windsurf/rules'],  // Agents → aggregated AGENTS.md (root file); commands migrated to skills (#551)
     rootFiles: ['AGENTS.md', '.windsurfrules'],
     forbiddenPaths: ['.claude/agents', '.codex'],
     fileExtension: '.md',
@@ -451,22 +451,22 @@ describe.skipIf(!GIT_INIT_AVAILABLE)('Edge Cases', () => {
   });
 
   it('--force overwrites existing files', async () => {
-    // Create a file that will be overwritten
-    await fs.mkdir(path.join(projectDir, '.cursor/rules'), { recursive: true });
+    // Create a file that will be overwritten (RULES-INDEX.md is always deployed)
+    await fs.mkdir(path.join(projectDir, '.claude/rules'), { recursive: true });
     await fs.writeFile(
-      path.join(projectDir, '.cursor/rules/aiwg-pr-review.mdc'),
+      path.join(projectDir, '.claude/rules/RULES-INDEX.md'),
       'OLD CONTENT'
     );
 
-    runDeploy('cursor', projectDir, homeDir, ['--force']);
+    runDeploy('claude', projectDir, homeDir, ['--force']);
 
     const content = await fs.readFile(
-      path.join(projectDir, '.cursor/rules/aiwg-pr-review.mdc'),
+      path.join(projectDir, '.claude/rules/RULES-INDEX.md'),
       'utf-8'
     );
 
     expect(content).not.toBe('OLD CONTENT');
-    expect(content).toContain('---');  // Should have proper MDC format
+    expect(content).toContain('# AIWG');  // Should have proper content
   });
 });
 

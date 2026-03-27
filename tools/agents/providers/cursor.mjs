@@ -390,13 +390,8 @@ export async function deploy(opts) {
 
   if (shouldDeployRules || rulesOnly) {
     console.log(`\nDeploying ${ruleFiles.length} rules...`);
-    // Try external script first for rules (native MDC support)
-    try {
-      await deployRulesViaScript(target, srcRoot, opts);
-    } catch (err) {
-      console.warn('External rules script failed, using inline deployment');
-      deployRulesInline(ruleFiles, target, opts);
-    }
+    // Use inline deployment (external script relied on commands/ dirs which are now skills)
+    deployRulesInline(ruleFiles, target, opts);
   }
 
   // Post-deployment

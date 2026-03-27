@@ -1,99 +1,131 @@
 ---
-platforms: [claude-code, hermes, openclaw]
+description: End-to-end SDLC ramp-up from idea to construction-ready with automated phase transitions and focused gate questions
+commandHint:
+  argumentHint: <description> [--from-codebase <path> --interactive --guidance "text" --auto --dry-run --skip-to <phase> --resume]
+  allowedTools: Task, Read, Write, Glob, TodoWrite
+  model: opus
+  category: sdlc-orchestration
 ---
 
-# sdlc-accelerate
+# SDLC Accelerate
 
-End-to-end SDLC ramp-up from idea to construction-ready in a single orchestrated pipeline.
+You are an SDLC Pipeline Orchestrator that takes a user from idea (or existing codebase) to construction-ready, orchestrating the full pipeline: intake → inception → gate → elaboration → gate → construction prep. You ask focused questions at each gate rather than requiring manual invocation of 7+ commands.
 
-## Triggers
+## Your Task
 
+When invoked with `/sdlc-accelerate <description> [options]`:
 
-Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+1. **Detect entry point** from arguments and workspace state
+2. **Execute pipeline** as a state machine through all phases
+3. **Handle gates** with focused questions instead of manual workflows
+4. **Track state** for resume capability
+5. **Produce** a Construction Ready Brief at completion
 
-- "zero to construction" → full Inception + Elaboration pipeline
-- "bootstrap SDLC" → SDLC ramp-up shorthand
-- "from idea to code" → end-to-end SDLC setup
+## Switches
 
-## Purpose
+| Switch | Default | Purpose |
+|--------|---------|---------|
+| `<description>` | positional | Project description (idea entry) |
+| `--from-codebase <path>` | none | Scan existing code instead of starting from idea |
+| `--interactive` | false | Full interactive mode at every step |
+| `--guidance "text"` | none | Project-level guidance for all phases |
+| `--auto` | false | Auto-proceed on CONDITIONAL gates |
+| `--dry-run` | false | Show pipeline plan without executing |
+| `--skip-to <phase>` | none | Jump to specific phase (validates prereqs) |
+| `--resume` | false | Resume from detected current phase |
 
-This skill eliminates the 7+ command ramp-up that new users face when going from idea to construction-ready. It orchestrates the full SDLC pipeline (intake → inception → elaboration → construction prep) with focused gate questions at each transition, producing a Construction Ready Brief at completion.
+## Entry Point Detection
 
-## Behavior
+1. No `.aiwg/` + description provided → `intake-wizard` path
+2. No `.aiwg/` + `--from-codebase` → `intake-from-codebase` path
+3. `.aiwg/` exists + `--resume` → detect phase via `project-status` logic, resume from next incomplete phase
+4. `--skip-to` → validate prerequisites exist, jump to specified phase
 
-When triggered, this skill:
+## State Machine
 
-1. **Detects entry mode**:
-   - New idea description → `sdlc-accelerate "<description>"`
-   - Existing codebase mentioned → `sdlc-accelerate --from-codebase <path>`
-   - Project already started → `sdlc-accelerate --resume`
-   - Preview request → `sdlc-accelerate --dry-run "<description>"`
-
-2. **Extracts project description**:
-   - Pull key phrases from user message
-   - Identify technology mentions, domain context
-   - Detect if user wants interactive or automated flow
-
-3. **Invokes sdlc-accelerate command**:
-   - Maps natural language to appropriate switches
-   - Defaults to interactive for new users (asks at gates)
-   - Uses `--auto` if user says "just do it" or "auto"
-
-4. **Guides through gates**:
-   - Presents focused questions (not full gate reports)
-   - Captures decisions for state tracking
-   - Allows skip with waiver for non-critical items
-
-## Natural Language Routing Examples
-
-### New project from idea
 ```
-User: "I have an idea for a customer portal with real-time chat"
-→ /sdlc-accelerate "Customer portal with real-time chat"
+INTAKE → GATE_LOM → INCEPTION_TO_ELABORATION → GATE_ABM →
+ELABORATION_TO_CONSTRUCTION → CONSTRUCTION_READY_BRIEF
 ```
 
-### From existing code
-```
-User: "Set up SDLC for this codebase"
-→ /sdlc-accelerate --from-codebase . "Existing project SDLC setup"
-```
+### Phase 1 — Intake
 
-### Resume
-```
-User: "Continue setting up the project"
-→ /sdlc-accelerate --resume
-```
+**Entry**: New project or existing codebase scan
 
-### Preview
-```
-User: "What would it take to get this project construction-ready?"
-→ /sdlc-accelerate --dry-run "Current project assessment"
-```
+1. If description provided (no `--from-codebase`):
+   - Delegate to `/intake-wizard "<description>"`
+   - Then invoke `/flow-concept-to-inception`
+2. If `--from-codebase`:
+   - Delegate to `/intake-from-codebase --path <path>`
+   - Then invoke `/flow-concept-to-inception`
+3. **Mini-gate**: Present project summary for confirmation:
+   - Project name and type
+   - Detected complexity
+   - Key requirements identified
+   - Confirm or adjust before proceeding
 
-### Automated flow
-```
-User: "Bootstrap SDLC for this project, just auto-approve everything"
-→ /sdlc-accelerate --auto "Project from context"
-```
+Record phase completion in state file.
 
-## Integration
+### Phase 2 — LOM Gate (Lifecycle Objective Milestone)
 
-This skill delegates to:
-- `intake-wizard` / `intake-from-codebase`: Initial project intake
-- `flow-concept-to-inception`: Phase transition
-- `flow-gate-check`: Gate evaluation
-- `flow-inception-to-elaboration`: Phase transition
-- `flow-elaboration-to-construction`: Phase transition
-- `project-status`: Phase detection for resume
+Invoke `/flow-gate-check inception`:
 
-## Output Location
+- **PASS**: Auto-proceed to elaboration
+- **CONDITIONAL**: Ask 2-3 focused questions:
+  1. "The gate found [specific gap]. Do you want to: (a) address it now, (b) proceed with waiver, (c) abort?"
+  2. If metrics misaligned: "Expected [X], found [Y]. Adjust target or document exception?"
+  3. If risks insufficient: "Only [N] risks identified. Add more or proceed?"
+- **FAIL**: Offer three options:
+  1. Auto-remediate (re-run relevant intake steps)
+  2. Skip with documented waiver
+  3. Abort pipeline
 
-- State file: `.aiwg/reports/accelerate-state.json`
-- Construction brief: `.aiwg/reports/construction-ready-brief.md`
-- Gate reports: `.aiwg/gates/`
+Record gate decision and any waivers in state file.
+
+### Phase 3 — Elaboration
+
+Delegate to `/flow-inception-to-elaboration`.
+
+**ABM Gate** (Architecture Baseline Milestone):
+- Invoke `/flow-gate-check elaboration`
+- On CONDITIONAL, ask focused questions:
+  1. "ADR [name] needs review — approve, revise, or skip?"
+  2. "Test coverage target is [X%]. Confirm or adjust?"
+  3. "Risk retirement at [N%] vs [target%]. Address or waive?"
+
+Record phase completion and gate decisions.
+
+### Phase 4 — Construction Prep
+
+Delegate to `/flow-elaboration-to-construction`.
+
+**Final mini-gate**:
+1. Present iteration 1 scope summary
+2. Confirm ready to build
+3. Flag any open items that need resolution
+
+### Phase 5 — Construction Ready Brief
+
+Generate consolidated `.aiwg/reports/construction-ready-brief.md` using template:
+
+Contents:
+- **Gate Decision Log**: All gate results, waivers, and decisions
+- **Artifacts Produced**: Complete list with status (draft/approved/baselined)
+- **Architecture Summary**: Key ADRs and architecture decisions
+- **Iteration Plans**: First 2-3 iterations scoped
+- **Open Items**: Anything deferred or waived
+- **Next Steps**: Immediate actions to begin construction
+
+## Resume Support
+
+State tracked in `.aiwg/reports/accelerate-state.json` (schema: `@accelerate-state.yaml`). `--resume` reads state file, finds next incomplete phase, continues from there.
+
+## Dry Run Behavior
+
+With `--dry-run`: detect entry point, show planned phases with commands to invoke, estimate artifact count, exit without executing.
 
 ## References
 
-- Command: @agentic/code/frameworks/sdlc-complete/commands/sdlc-accelerate.md
-- State schema: @agentic/code/frameworks/sdlc-complete/schemas/flows/accelerate-state.yaml
-- Brief template: @agentic/code/frameworks/sdlc-complete/templates/management/construction-ready-brief-template.md
+- @agentic/code/frameworks/sdlc-complete/schemas/flows/accelerate-state.yaml
+- @agentic/code/frameworks/sdlc-complete/templates/management/construction-ready-brief-template.md
+- @agentic/code/frameworks/sdlc-complete/skills/sdlc-accelerate/SKILL.md

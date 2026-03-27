@@ -150,36 +150,33 @@ describe('OpenCode Deployment', () => {
     });
   });
 
-  describe('Command Deployment', () => {
-    it('should deploy commands to .opencode/command/ directory', () => {
-      execSync(`node ${deployScript} --target ${testDir} --provider opencode --mode sdlc --deploy-commands`, {
+  describe('Skill Deployment', () => {
+    it('should deploy skills to .opencode/skill/ directory', () => {
+      execSync(`node ${deployScript} --target ${testDir} --provider opencode --mode sdlc --deploy-skills`, {
         encoding: 'utf-8'
       });
 
-      const commandDir = path.join(testDir, '.opencode', 'command');
-      expect(fs.existsSync(commandDir)).toBe(true);
+      const skillDir = path.join(testDir, '.opencode', 'skill');
+      expect(fs.existsSync(skillDir)).toBe(true);
 
-      const commands = fs.readdirSync(commandDir);
-      expect(commands.length).toBeGreaterThan(0);
-      expect(commands.some(c => c.endsWith('.md'))).toBe(true);
+      const skills = fs.readdirSync(skillDir);
+      expect(skills.length).toBeGreaterThan(0);
     });
 
-    it('should transform command frontmatter to OpenCode format', () => {
-      execSync(`node ${deployScript} --target ${testDir} --provider opencode --mode sdlc --deploy-commands`, {
+    it('should deploy skills with SKILL.md files', () => {
+      execSync(`node ${deployScript} --target ${testDir} --provider opencode --mode sdlc --deploy-skills`, {
         encoding: 'utf-8'
       });
 
-      const commandDir = path.join(testDir, '.opencode', 'command');
-      const commands = fs.readdirSync(commandDir).filter(f => f.endsWith('.md'));
+      const skillDir = path.join(testDir, '.opencode', 'skill');
+      const skills = fs.readdirSync(skillDir);
 
-      if (commands.length > 0) {
-        const commandContent = fs.readFileSync(path.join(commandDir, commands[0]), 'utf-8');
-
-        // Verify OpenCode command frontmatter
-        expect(commandContent).toMatch(/^---/);
-        expect(commandContent).toMatch(/description:/);
-        expect(commandContent).toMatch(/subtask:\s*true/);
-      }
+      // Check at least one skill has SKILL.md
+      const hasSkillMd = skills.some(s => {
+        const skillMdPath = path.join(skillDir, s, 'SKILL.md');
+        return fs.existsSync(skillMdPath);
+      });
+      expect(hasSkillMd).toBe(true);
     });
   });
 

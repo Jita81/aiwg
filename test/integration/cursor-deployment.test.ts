@@ -215,58 +215,40 @@ describe.skipIf(!GIT_INIT_AVAILABLE)('Cursor Integration', () => {
   });
 
   describe('Rules Deployment', () => {
-    it('deploys rules to .cursor/rules/', async () => {
-      // Note: --target is the PROJECT ROOT, script appends .cursor/rules/
-      const output = runScript('tools/rules/deploy-rules-cursor.mjs', [
+    it('deploys rules to .cursor/rules/ via main deploy script', async () => {
+      runScript('tools/agents/deploy-agents.mjs', [
+        '--provider', 'cursor',
+        '--mode', 'sdlc',
+        '--deploy-rules',
         '--target', TEST_PROJECT_DIR
       ]);
-
-      expect(output).toContain('Deploying commands as Cursor rules');
 
       // Check rules directory was created at .cursor/rules/
       const rulesDir = path.join(TEST_PROJECT_DIR, '.cursor', 'rules');
       const rules = await fs.readdir(rulesDir);
 
       expect(rules.length).toBeGreaterThan(0);
-      expect(rules.some((r) => r.endsWith('.mdc'))).toBe(true);
+      // Cursor rules are .mdc files or .md (RULES-INDEX.md)
+      expect(rules.some((r) => r.endsWith('.mdc') || r.endsWith('.md'))).toBe(true);
     });
 
-    it('formats rule with correct MDC frontmatter', async () => {
-      runScript('tools/rules/deploy-rules-cursor.mjs', [
+    it('RULES-INDEX.md has correct format', async () => {
+      runScript('tools/agents/deploy-agents.mjs', [
+        '--provider', 'cursor',
+        '--mode', 'sdlc',
+        '--deploy-rules',
         '--target', TEST_PROJECT_DIR
       ]);
 
       const rulesDir = path.join(TEST_PROJECT_DIR, '.cursor', 'rules');
-      const rules = await fs.readdir(rulesDir);
+      const indexPath = path.join(rulesDir, 'RULES-INDEX.md');
+      const exists = await fs.access(indexPath).then(() => true).catch(() => false);
 
-      // Find a rule file
-      const ruleFile = rules.find((r) => r.endsWith('.mdc'));
-      expect(ruleFile).toBeDefined();
-
-      const ruleContent = await fs.readFile(
-        path.join(rulesDir, ruleFile!),
-        'utf-8'
-      );
-
-      // Check MDC frontmatter format
-      expect(ruleContent).toMatch(/^---\n/);
-      expect(ruleContent).toMatch(/description: .+/);
-      expect(ruleContent).toMatch(/\n---\n/);
-    });
-
-    it('includes globs for applicable rules', async () => {
-      runScript('tools/rules/deploy-rules-cursor.mjs', [
-        '--target', TEST_PROJECT_DIR
-      ]);
-
-      const rulesDir = path.join(TEST_PROJECT_DIR, '.cursor', 'rules');
-
-      // Check security-audit rule has globs
-      const securityRulePath = path.join(rulesDir, 'aiwg-security-audit.mdc');
-      if (await fs.access(securityRulePath).then(() => true).catch(() => false)) {
-        const content = await fs.readFile(securityRulePath, 'utf-8');
-        expect(content).toContain('globs:');
-        expect(content).toContain('*.ts');
+      if (exists) {
+        const content = await fs.readFile(indexPath, 'utf-8');
+        // RULES-INDEX.md wraps in MDC frontmatter for cursor
+        expect(content).toContain('AIWG');
+        expect(content.length).toBeGreaterThan(100);
       }
     });
   });

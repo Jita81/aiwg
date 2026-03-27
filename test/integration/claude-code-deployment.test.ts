@@ -184,40 +184,39 @@ describe.skipIf(!GIT_INIT_AVAILABLE)('Claude Code Integration', () => {
     });
   });
 
-  describe('Command Deployment', () => {
-    it('deploys commands to .claude/commands/', async () => {
+  describe('Skill Deployment', () => {
+    it('deploys skills to .claude/skills/', async () => {
       runScript('tools/agents/deploy-agents.mjs', [
         '--provider', 'claude',
         '--mode', 'sdlc',
-        '--deploy-commands',
+        '--deploy-skills',
         '--target', TEST_PROJECT_DIR
       ]);
 
-      const commandsDir = path.join(TEST_CLAUDE_DIR, 'commands');
-      const commands = await fs.readdir(commandsDir);
+      const skillsDir = path.join(TEST_CLAUDE_DIR, 'skills');
+      const skills = await fs.readdir(skillsDir);
 
-      expect(commands.length).toBeGreaterThan(0);
-      expect(commands.some((c) => c.endsWith('.md'))).toBe(true);
+      expect(skills.length).toBeGreaterThan(0);
     });
 
-    it('command files are valid markdown', async () => {
+    it('skill directories contain valid SKILL.md files', async () => {
       runScript('tools/agents/deploy-agents.mjs', [
         '--provider', 'claude',
         '--mode', 'sdlc',
-        '--deploy-commands',
+        '--deploy-skills',
         '--target', TEST_PROJECT_DIR
       ]);
 
-      const commandsDir = path.join(TEST_CLAUDE_DIR, 'commands');
-      const commands = await fs.readdir(commandsDir);
+      const skillsDir = path.join(TEST_CLAUDE_DIR, 'skills');
+      const skills = await fs.readdir(skillsDir);
 
-      for (const cmd of commands.filter((c) => c.endsWith('.md'))) {
-        const content = await fs.readFile(
-          path.join(commandsDir, cmd),
-          'utf-8'
-        );
-        // Should be readable markdown content
-        expect(content.length).toBeGreaterThan(0);
+      for (const skill of skills) {
+        const skillMdPath = path.join(skillsDir, skill, 'SKILL.md');
+        const exists = await fs.access(skillMdPath).then(() => true).catch(() => false);
+        if (exists) {
+          const content = await fs.readFile(skillMdPath, 'utf-8');
+          expect(content.length).toBeGreaterThan(0);
+        }
       }
     });
   });

@@ -25,7 +25,6 @@
     "REF-003": "Predictable failure with automatic recovery beats unpredictable success"
   },
   "entry": {
-    "commands": "commands/",
     "skills": "skills/",
     "agents": "agents/",
     "hooks": "hooks/",
@@ -66,7 +65,10 @@
   ],
   "dependencies": {
     "required": [],
-    "optional": ["aiwg-hooks", "aiwg-utils"]
+    "optional": [
+      "aiwg-hooks",
+      "aiwg-utils"
+    ]
   },
   "configuration": {
     "defaults": {

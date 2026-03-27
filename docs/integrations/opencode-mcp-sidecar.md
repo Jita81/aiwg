@@ -36,24 +36,25 @@ OpenCode CLI (host)
 ## Part 1: Install MCP Configuration
 
 ```bash
-# Generate opencode.json with AIWG server config
+# Generate .opencode.json with AIWG server config
 aiwg mcp install opencode
 ```
 
-This creates or merges into `opencode.json` (or `.opencode/opencode.jsonc`):
+This creates or merges into `.opencode.json` in your project root:
 
 ```json
 {
-  "mcp": {
+  "mcpServers": {
     "aiwg": {
-      "type": "local",
-      "command": ["aiwg", "mcp", "serve"]
+      "type": "stdio",
+      "command": "aiwg",
+      "args": ["mcp", "serve"]
     }
   }
 }
 ```
 
-Note that OpenCode uses a `"mcp"` key (not `"mcpServers"`) and specifies `"type": "local"` for process-based servers.
+OpenCode uses the `"mcpServers"` key (matching the MCP spec) and `"type": "stdio"` for process-based servers. The `command` and `args` fields follow standard `stdio` transport format.
 
 ---
 
@@ -61,17 +62,16 @@ Note that OpenCode uses a `"mcp"` key (not `"mcpServers"`) and specifies `"type"
 
 For optimal context usage, limit the exposed tools. The minimal config template at `agentic/code/frameworks/sdlc-complete/templates/opencode/opencode-mcp-minimal.json` uses the recommended 5-tool whitelist.
 
-OpenCode's MCP whitelist is configured via the AIWG server arguments. Edit your `opencode.json`:
+OpenCode's MCP whitelist is configured via the AIWG server environment. Edit your `.opencode.json`:
 
 ```json
 {
-  "mcp": {
+  "mcpServers": {
     "aiwg": {
-      "type": "local",
-      "command": ["aiwg", "mcp", "serve"],
-      "env": {
-        "AIWG_MCP_TOOLS": "workflow-run,artifact-read,artifact-write,template-render,agent-list"
-      }
+      "type": "stdio",
+      "command": "aiwg",
+      "args": ["mcp", "serve"],
+      "env": ["AIWG_MCP_TOOLS=workflow-run,artifact-read,artifact-write,template-render,agent-list"]
     }
   }
 }
@@ -159,10 +159,11 @@ After the basic integration is stable, the full configuration template at `agent
 {
   // OpenCode + AIWG MCP — Full Configuration
   // Includes all tools with prompts and resources enabled
-  "mcp": {
+  "mcpServers": {
     "aiwg": {
-      "type": "local",
-      "command": ["aiwg", "mcp", "serve"]
+      "type": "stdio",
+      "command": "aiwg",
+      "args": ["mcp", "serve"]
     }
   }
 }

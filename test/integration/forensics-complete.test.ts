@@ -70,7 +70,7 @@ describe('Framework Manifest (#381)', () => {
   });
 
   it('has entry points for all artifact types', () => {
-    for (const key of ['agents', 'commands', 'skills', 'templates', 'rules']) {
+    for (const key of ['agents', 'skills', 'templates', 'rules']) {
       expect(manifest.entry).toHaveProperty(key);
       expect(fs.existsSync(path.join(FRAMEWORK_ROOT, manifest.entry[key]))).toBe(true);
     }
@@ -94,14 +94,12 @@ describe('Framework Manifest (#381)', () => {
 
   it('metadata counts match actual files', () => {
     const agentFiles = listFiles('agents', '.md');
-    const commandFiles = listFiles('commands', '.md');
     const skillDirs = listFiles('skills').filter(f =>
       fs.statSync(path.join(FRAMEWORK_ROOT, 'skills', f)).isDirectory()
     );
     const ruleFiles = listFiles('rules', '.md');
 
     expect(agentFiles.length).toBe(manifest.metadata.total_agents);
-    expect(commandFiles.length).toBe(manifest.metadata.total_commands);
     expect(skillDirs.length).toBe(manifest.metadata.total_skills);
     expect(ruleFiles.length).toBe(manifest.metadata.total_rules);
   });
@@ -254,8 +252,8 @@ describe('Sigma Rule Hunting (#395)', () => {
     expect(fileExists('skills/sigma-hunting/SKILL.md')).toBe(true);
   });
 
-  it('forensics-hunt command exists', () => {
-    expect(fileExists('commands/forensics-hunt.md')).toBe(true);
+  it('forensics-hunt skill exists', () => {
+    expect(fileExists('skills/forensics-hunt/SKILL.md')).toBe(true);
   });
 });
 
@@ -266,8 +264,8 @@ describe('Timeline Reconstruction (#396)', () => {
     expect(content).toContain('timeline');
   });
 
-  it('forensics-timeline command exists', () => {
-    expect(fileExists('commands/forensics-timeline.md')).toBe(true);
+  it('forensics-timeline skill exists', () => {
+    expect(fileExists('skills/forensics-timeline/SKILL.md')).toBe(true);
   });
 
   it('incident-timeline template exists', () => {
@@ -298,12 +296,12 @@ describe('Investigation Orchestrator (#398)', () => {
     expect(fm!.tools).toContain('Task');
   });
 
-  it('forensics-investigate command exists', () => {
-    expect(fileExists('commands/forensics-investigate.md')).toBe(true);
+  it('forensics-investigate skill exists', () => {
+    expect(fileExists('skills/forensics-investigate/SKILL.md')).toBe(true);
   });
 
-  it('forensics-status command exists', () => {
-    expect(fileExists('commands/forensics-status.md')).toBe(true);
+  it('forensics-status skill exists', () => {
+    expect(fileExists('skills/forensics-status/SKILL.md')).toBe(true);
   });
 });
 
@@ -398,11 +396,11 @@ describe('Skills Structure', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Commands Structure (#398, #401)
+// Migrated Commands as Skills (#398, #401, #551)
 // ---------------------------------------------------------------------------
 
-describe('Commands Structure', () => {
-  const expectedCommands = [
+describe('Migrated Commands as Skills', () => {
+  const expectedCommandSkills = [
     'forensics-profile',
     'forensics-triage',
     'forensics-investigate',
@@ -414,24 +412,28 @@ describe('Commands Structure', () => {
     'forensics-status',
   ];
 
-  it('all 9 expected commands exist', () => {
-    for (const cmd of expectedCommands) {
-      expect(fileExists(`commands/${cmd}.md`)).toBe(true);
+  it('all 9 former commands exist as skills', () => {
+    for (const cmd of expectedCommandSkills) {
+      expect(fileExists(`skills/${cmd}/SKILL.md`)).toBe(true);
     }
   });
 
-  it('each command has YAML frontmatter with description and category', () => {
-    for (const cmd of expectedCommands) {
-      const content = readFile(`commands/${cmd}.md`);
+  it('each migrated skill has YAML frontmatter with description', () => {
+    for (const cmd of expectedCommandSkills) {
+      const content = readFile(`skills/${cmd}/SKILL.md`);
       const fm = extractFrontmatter(content);
       expect(fm).not.toBeNull();
       expect(fm!.description).toBeTruthy();
     }
   });
 
-  it('commands manifest lists all 9 commands', () => {
-    const cmdManifest = readJson('commands/manifest.json');
-    expect(cmdManifest.commands).toHaveLength(9);
+  it('migrated skills preserve commandHint metadata', () => {
+    for (const cmd of expectedCommandSkills) {
+      const content = readFile(`skills/${cmd}/SKILL.md`);
+      const fm = extractFrontmatter(content);
+      expect(fm).not.toBeNull();
+      expect(fm!.commandHint).toBeTruthy();
+    }
   });
 });
 
@@ -619,7 +621,7 @@ describe('Configuration (#401)', () => {
 
 describe('Deployment Readiness (#401)', () => {
   it('framework directory has all required subdirectories', () => {
-    const requiredDirs = ['agents', 'commands', 'skills', 'schemas', 'templates', 'rules', 'sigma', 'docs', 'config'];
+    const requiredDirs = ['agents', 'skills', 'schemas', 'templates', 'rules', 'sigma', 'docs', 'config'];
     for (const dir of requiredDirs) {
       const fullPath = path.join(FRAMEWORK_ROOT, dir);
       expect(fs.existsSync(fullPath)).toBe(true);
@@ -631,10 +633,6 @@ describe('Deployment Readiness (#401)', () => {
     const agentManifest = readJson('agents/manifest.json');
     for (const agent of agentManifest.agents) {
       expect(fileExists(`agents/${agent.file}`)).toBe(true);
-    }
-    const cmdManifest = readJson('commands/manifest.json');
-    for (const cmd of cmdManifest.commands) {
-      expect(fileExists(`commands/${cmd.file}`)).toBe(true);
     }
   });
 

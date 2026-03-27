@@ -13,7 +13,7 @@ AIWG works across multiple AI platforms. **One command deploys everything.**
 | GitHub Copilot | `aiwg use sdlc --provider copilot` | copilot-instructions.md |
 | Factory AI | `aiwg use sdlc --provider factory` | AGENTS.md |
 | Cursor | `aiwg use sdlc --provider cursor` | .cursorrules |
-| OpenCode | `aiwg use sdlc --provider opencode` | AGENTS.md |
+| OpenCode | `aiwg use sdlc --provider opencode` | OpenCode.md |
 | Warp Terminal | `aiwg use sdlc --provider warp` | WARP.md |
 | Windsurf | `aiwg use sdlc --provider windsurf` | .windsurfrules |
 
@@ -39,7 +39,7 @@ All four artifact types deploy automatically in each platform's native format:
 | GitHub Copilot | native | conventional | conventional | conventional |
 | Factory AI | native | native | conventional | conventional |
 | Cursor | conventional | conventional | conventional | native |
-| OpenCode | native | native | conventional | conventional |
+| OpenCode | contextPaths | conventional | none | contextPaths |
 | Warp Terminal | aggregated | aggregated | conventional | conventional |
 | Windsurf | aggregated | native | conventional | conventional |
 
@@ -47,6 +47,8 @@ All four artifact types deploy automatically in each platform's native format:
 - **native** - Platform auto-discovers artifacts in standard directories
 - **conventional** - AIWG directory convention (platform reads on request)
 - **aggregated** - Single-file compilation + discrete files for compatibility
+- **contextPaths** - Injected via explicit `contextPaths` config (user must configure)
+- **none** - Artifact type has no equivalent on this platform
 
 ---
 
@@ -79,6 +81,7 @@ Most providers follow `.<provider>/<type>/`:
 | **Warp Terminal** | Discrete files + aggregated `WARP.md` |
 | **Windsurf** | Agents aggregated to `AGENTS.md`<br>Commands → `.windsurf/workflows/` |
 | **Cursor** | Rules use `.mdc` extension (MDC format) |
+| **OpenCode** | Commands → `.opencode/commands/` (Ctrl+K palette)<br>Agents/Rules → `.opencode/agent/` and `.opencode/rule/` (require `contextPaths` config)<br>Context file → `OpenCode.md` (auto-loaded) |
 
 ---
 

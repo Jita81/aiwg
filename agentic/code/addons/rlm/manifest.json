@@ -28,7 +28,6 @@
   },
   "entry": {
     "agents": "agents/",
-    "commands": "commands/",
     "skills": "skills/",
     "rules": "rules/",
     "schemas": "schemas/",
@@ -60,7 +59,10 @@
   ],
   "dependencies": {
     "required": [],
-    "optional": ["ralph", "aiwg-utils"]
+    "optional": [
+      "ralph",
+      "aiwg-utils"
+    ]
   },
   "configuration": {
     "defaults": {
