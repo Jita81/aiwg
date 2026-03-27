@@ -66,9 +66,9 @@ export const DEFAULT_SHORTHAND = {
 // ---------------------------------------------------------------------------
 
 export const OPENCODE_DEPLOY_MODELS = {
-  reasoning: 'anthropic/claude-opus-4-20250514',
-  coding: 'anthropic/claude-sonnet-4-20250514',
-  efficiency: 'anthropic/claude-haiku-4-6',
+  reasoning: 'anthropic/claude-opus-4-6',
+  coding: 'anthropic/claude-sonnet-4-6',
+  efficiency: 'anthropic/claude-haiku-4-5-20251001',
 } as const;
 
 // ---------------------------------------------------------------------------

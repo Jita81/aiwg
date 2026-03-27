@@ -111,7 +111,7 @@ describe('OpenCode Deployment', () => {
       expect(agentContent).toMatch(/mode:\s*(primary|subagent)/);
       expect(agentContent).toMatch(/model:\s*anthropic\//);
       expect(agentContent).toMatch(/temperature:/);
-      expect(agentContent).toMatch(/maxSteps:/);
+      expect(agentContent).toMatch(/steps:/);
     });
 
     it('should include tools configuration for agents', () => {
@@ -126,7 +126,7 @@ describe('OpenCode Deployment', () => {
       let hasToolsConfig = false;
       for (const agent of agents) {
         const content = fs.readFileSync(path.join(agentDir, agent), 'utf-8');
-        if (content.includes('tools:') && (content.includes('write:') || content.includes('bash:'))) {
+        if (content.includes('permission:') && content.includes('bash:')) {
           hasToolsConfig = true;
           break;
         }
