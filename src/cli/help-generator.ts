@@ -31,6 +31,9 @@ const CATEGORY_ORDER: { category: CommandCategory; title: string }[] = [
   { category: 'channel', title: 'Channel Management' },
   { category: 'maintenance', title: 'Maintenance' },
   { category: 'ralph', title: 'Ralph Loop (Iterative Execution)' },
+  { category: 'orchestration', title: 'Orchestration (Mission Control)' },
+  { category: 'index', title: 'Artifact Index' },
+  { category: 'daemon', title: 'Daemon & Behaviors' },
 ];
 
 /**

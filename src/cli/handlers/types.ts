@@ -84,7 +84,8 @@ export type CommandCategory =
   | 'maintenance'   // Maintenance (doctor, version, update, help)
   | 'ralph'         // Ralph loop
   | 'index'         // Artifact index
-  | 'orchestration'; // Mission Control
+  | 'orchestration' // Mission Control
+  | 'daemon';       // Daemon and behavior management
 
 /**
  * Handler factory function type
