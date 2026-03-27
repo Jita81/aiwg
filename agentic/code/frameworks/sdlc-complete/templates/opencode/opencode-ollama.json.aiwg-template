@@ -35,5 +35,9 @@
     "AGENTS.md",
     ".aiwg/instructions.md",
     ".opencode/rule/*.md"
-  ]
+  ],
+
+  "skills": {
+    "paths": [".opencode/skill"]
+  }
 }

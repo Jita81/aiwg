@@ -13,7 +13,7 @@
  * Special features:
  *   - Category-based configuration (analysis, documentation, planning, implementation)
  *   - Permission system with bash command whitelist
- *   - Temperature and maxSteps per category
+ *   - Temperature and steps per category
  */
 
 import fs from 'fs';
@@ -56,8 +56,8 @@ export const paths = {
 export const support = {
   agents: 'native',
   commands: 'native',
-  skills: 'conventional',
-  rules: 'conventional'
+  skills: 'native',      // Discovered via {skill,skills}/**/SKILL.md
+  rules: 'conventional'  // Requires instructions[] entry in opencode.json
 };
 
 export const capabilities = {
@@ -76,9 +76,9 @@ export const capabilities = {
  */
 export function mapModel(originalModel, modelCfg, modelsConfig) {
   const opencodeModels = {
-    'opus': 'anthropic/claude-opus-4-20250514',
-    'sonnet': 'anthropic/claude-sonnet-4-20250514',
-    'haiku': 'anthropic/claude-haiku-4-20250514'
+    'opus': 'anthropic/claude-opus-4-6',
+    'sonnet': 'anthropic/claude-sonnet-4-6',
+    'haiku': 'anthropic/claude-haiku-4-5-20251001'
   };
 
   // Handle override models first
@@ -108,32 +108,32 @@ export function mapModel(originalModel, modelCfg, modelsConfig) {
 export function getAgentConfig(category, name) {
   const configs = {
     analysis: {
-      tools: { write: false, edit: false, patch: false, bash: true, webfetch: true },
       permission: {
         bash: {
           'git *': 'allow',
           'npm audit': 'allow',
           'npm test': 'allow',
           '*': 'ask'
-        }
+        },
+        edit: 'ask'
       },
       temperature: 0.2,
-      maxSteps: 30
+      steps: 30
     },
     documentation: {
-      tools: { bash: false, patch: false },
       permission: {},
       temperature: 0.4,
-      maxSteps: 50
+      steps: 50
     },
     planning: {
-      tools: { write: false, edit: false, bash: false, patch: false, webfetch: true },
-      permission: {},
+      permission: {
+        bash: 'ask',
+        edit: 'ask'
+      },
       temperature: 0.3,
-      maxSteps: 40
+      steps: 40
     },
     implementation: {
-      tools: {},  // All tools enabled by default
       permission: {
         bash: {
           'aiwg *': 'allow',
@@ -148,7 +148,7 @@ export function getAgentConfig(category, name) {
         }
       },
       temperature: 0.3,
-      maxSteps: 100
+      steps: 100
     }
   };
 
@@ -185,28 +185,21 @@ export function transformAgent(srcPath, content, opts) {
   const category = categoryMatch || inferAgentCategory(name, body);
 
   // Get configuration based on category
-  const { tools, permission, temperature, maxSteps } = getAgentConfig(category, name);
+  const { permission, temperature, steps } = getAgentConfig(category, name);
 
   // Mode: primary for orchestration agents, subagent for others
   const mode = orchestrationMatch === 'true' ? 'primary' : 'subagent';
 
   // Generate OpenCode agent frontmatter
+  // Valid fields: description, mode, model, temperature, topP, steps, color, hidden, permission, options
   let opencodeFrontmatter = `---
 description: ${description || 'AIWG SDLC agent'}
 mode: ${mode}
 model: ${opencodeModel}
 temperature: ${temperature}
-maxSteps: ${maxSteps}`;
+steps: ${steps}`;
 
-  // Add tools configuration
-  if (Object.keys(tools).length > 0) {
-    opencodeFrontmatter += `\ntools:`;
-    for (const [tool, enabled] of Object.entries(tools)) {
-      opencodeFrontmatter += `\n  ${tool}: ${enabled}`;
-    }
-  }
-
-  // Add permission configuration
+  // Add permission configuration (controls tool access — opencode has no separate tools block)
   if (Object.keys(permission).length > 0) {
     opencodeFrontmatter += `\npermission:`;
     for (const [perm, value] of Object.entries(permission)) {
