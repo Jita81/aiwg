@@ -87,6 +87,22 @@ $defs:
       execution_config:
         $ref: "#/$defs/ExecutionConfig"
 
+      preferred_model:
+        type: string
+        enum: [haiku, sonnet, opus]
+        description: |
+          Preferred model tier for this node based on task role.
+          Haiku: screening, filtering, simple extraction.
+          Sonnet: orchestration, synthesis, moderate reasoning.
+          Opus: hard reasoning, final judgment, complex analysis.
+        examples:
+          - "haiku: screener, classifier, simple extractor"
+          - "sonnet: orchestrator, synthesizer, code analyzer"
+          - "opus: final reasoner, quality judge, complex reviewer"
+
+      quality_gate:
+        $ref: "#/$defs/QualityGate"
+
       decomposition_strategy:
         type: string
         enum: [parallel, sequential, conditional, map-reduce]
@@ -97,6 +113,26 @@ $defs:
           - "conditional: next child depends on previous result"
           - "map-reduce: scatter-gather pattern"
 
+      chunking_strategy:
+        type: string
+        enum: [semantic-boundary, fixed-count, adaptive]
+        description: |
+          How to partition input when decomposing into child tasks.
+          semantic-boundary: split at headers, sections, paragraph breaks, or function boundaries.
+          fixed-count: split into N roughly equal pieces.
+          adaptive: let the model determine optimal boundaries (default when unspecified).
+        default: adaptive
+
+      batch_size:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 25
+        description: |
+          Number of items to process per batch when using map-reduce
+          or pairwise comparison patterns. Default 25 balances parallelism
+          with context budget. Reduce on constrained systems.
+
       merge_strategy:
         type: string
         enum: [concatenate, summarize, vote, best-of-n]
@@ -106,6 +142,66 @@ $defs:
           - "summarize: LLM synthesis of all results"
           - "vote: majority or consensus"
           - "best-of-n: select highest quality"
+
+  QualityGate:
+    type: object
+    description: |
+      Quality threshold that must be met before a node's result is accepted.
+      Inspired by OpenProse's "ensures: result scoring 85+ against criteria"
+      obligation pattern. When a quality gate is present, the node's output
+      is evaluated by a scorer agent against the specified criteria. If the
+      score falls below min_score, the node re-executes with feedback from
+      the scorer, up to max_iterations times.
+    properties:
+      min_score:
+        type: integer
+        minimum: 0
+        maximum: 100
+        default: 85
+        description: "Minimum acceptable quality score (0-100)"
+      scoring_criteria:
+        type: string
+        description: |
+          Natural language description of what constitutes quality for this node.
+          The scorer agent evaluates output against these criteria.
+        examples:
+          - "Accuracy of extracted data, completeness of coverage, clarity of analysis"
+          - "All security vulnerabilities identified with severity ratings and remediation steps"
+      scorer_model:
+        type: string
+        enum: [haiku, sonnet, opus]
+        default: sonnet
+        description: "Model tier for the scoring evaluator"
+      max_iterations:
+        type: integer
+        minimum: 1
+        maximum: 10
+        default: 5
+        description: "Maximum refinement iterations before accepting best result"
+      fallback:
+        type: string
+        enum: [return_best, fail, escalate]
+        default: return_best
+        description: |
+          What to do if max_iterations reached without meeting min_score.
+          return_best: accept the highest-scoring attempt.
+          fail: mark node as failed.
+          escalate: flag for human review.
+      iteration_history:
+        type: array
+        items:
+          type: object
+          properties:
+            iteration:
+              type: integer
+            score:
+              type: integer
+            feedback:
+              type: string
+            timestamp:
+              type: string
+              format: date-time
+        description: "Record of scoring iterations for analysis"
 
   ContextReference:
     type: object

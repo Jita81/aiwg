@@ -32,7 +32,8 @@
     "rules": "rules/",
     "schemas": "schemas/",
     "templates": "templates/",
-    "docs": "docs/"
+    "docs": "docs/",
+    "examples": "examples/"
   },
   "agents": [
     "rlm-agent"

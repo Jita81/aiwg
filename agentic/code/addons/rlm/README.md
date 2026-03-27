@@ -125,6 +125,157 @@ Final env variable     → Task completion criteria
 4. Independent sub-agents process chunks in parallel
 5. Results aggregated incrementally through intermediate artifacts
 
+## Model Tiering
+
+Different nodes in a task tree should use different model tiers based on their role. Using Opus for everything wastes budget; using Haiku for complex reasoning produces poor results.
+
+### Recommended Model Assignments
+
+| Role | Model | Rationale |
+|------|-------|-----------|
+| **Screener / Filter** | Haiku | Simple classification, yes/no decisions, low cost |
+| **Extractor / Mapper** | Haiku | Structured data extraction from well-defined inputs |
+| **Orchestrator / Synthesizer** | Sonnet | Coordination, result merging, moderate reasoning |
+| **Analyzer / Reviewer** | Sonnet | Code analysis, pattern detection, quality review |
+| **Reasoner / Judge** | Opus | Complex reasoning, final quality judgment, nuanced decisions |
+| **Evaluator (quality gate)** | Sonnet | Scoring against rubric, feedback generation |
+
+### Example: Filter-Recurse Pipeline
+
+```yaml
+nodes:
+  - node_id: screener
+    preferred_model: haiku       # Quick relevance filtering
+    prompt: "Screen documents for relevance to the query"
+
+  - node_id: investigator
+    preferred_model: sonnet      # Moderate analysis
+    prompt: "Extract detailed findings from relevant documents"
+
+  - node_id: reasoner
+    preferred_model: opus        # Complex synthesis and judgment
+    prompt: "Synthesize findings into a comprehensive answer"
+    quality_gate:
+      min_score: 85
+      scorer_model: sonnet
+      max_iterations: 3
+```
+
+### Cost Impact
+
+Model tiering typically yields 40-60% cost reduction over uniform Opus usage while maintaining equivalent output quality, because most nodes in a tree perform simple tasks.
+
+## Chunking Strategies
+
+When decomposing large inputs into child tasks, the chunking strategy determines how to split the content.
+
+| Strategy | When to Use | Example |
+|----------|-------------|---------|
+| `semantic-boundary` | Documents, markdown, code with clear structure | Split at headers, function boundaries, class definitions |
+| `fixed-count` | Uniform content without clear boundaries | Split into 4-8 equal pieces |
+| `adaptive` | Unknown structure, let the model decide | Default — model examines content and determines optimal splits |
+
+### Semantic Boundary Chunking
+
+Preferred for structured content. Respects logical units:
+- **Markdown**: Split at `##` headers
+- **Code**: Split at function/class/module boundaries
+- **Data**: Split at record boundaries
+- **Mixed**: Split at section breaks or paragraph clusters
+
+### Batch Sizing
+
+For `map-reduce` and pairwise comparison patterns, the `batch_size` field controls how many items are processed per parallel group. Default is 25, which balances:
+- Parallelism (more batches = more parallel work)
+- Context efficiency (each batch fits comfortably in a sub-agent window)
+- Cost (fewer batches = fewer sub-agent invocations)
+
+Reduce to 10-15 on constrained systems or when items are individually large.
+
+## Quality Gates
+
+Quality gates enforce minimum output standards before accepting a node's result. When a gate is present, the output is scored against criteria and refined iteratively until the threshold is met.
+
+### How It Works
+
+```
+Node executes → Scorer evaluates output → Score ≥ threshold? → Accept
+                                          Score < threshold? → Refine with feedback → Re-execute
+                                          Max iterations? → Fallback (return_best | fail | escalate)
+```
+
+### Schema
+
+```yaml
+quality_gate:
+  min_score: 85              # 0-100, default 85
+  scoring_criteria: "Completeness, accuracy, clarity"
+  scorer_model: sonnet       # Model for the evaluator
+  max_iterations: 5          # Max refinement cycles
+  fallback: return_best      # return_best | fail | escalate
+```
+
+### When to Use Quality Gates
+
+- **Final synthesis nodes** — the output that users see
+- **Security analysis** — must be thorough, not just fast
+- **Data extraction** — accuracy matters more than speed
+- **Research synthesis** — completeness against a rubric
+
+Avoid gates on screening/filtering nodes — the overhead isn't worth it for simple classification tasks.
+
+## Antipatterns
+
+Common mistakes when building RLM task trees, adapted from OpenProse's antipattern guidance with AIWG-specific context.
+
+### parallel-then-synthesize
+
+**Problem**: Fan out work to parallel sub-agents that produce conflicting partial results, then try to merge.
+
+**AIWG risk**: RLM `decomposition_strategy: parallel` with `merge_strategy: summarize` may produce contradictions when sub-agents analyze overlapping context.
+
+**Mitigation**: Use `sequential` or `conditional` when sub-tasks have dependencies. Use `parallel` only for truly independent work (different files, different concerns).
+
+### fixed-observation-window
+
+**Problem**: Always using the same recursion depth regardless of task complexity.
+
+**AIWG risk**: Default `maxDepth: 3` may be too shallow for complex multi-file analysis, or unnecessarily deep for simple extraction.
+
+**Mitigation**: Set depth per task tree based on actual complexity. Simple extraction: depth 1. Multi-file analysis: depth 2-3. Cross-cutting research: depth 3-5.
+
+### excessive-user-checkpoints
+
+**Problem**: Pausing for human validation too often in automated pipelines.
+
+**AIWG risk**: Ralph completion criteria or quality gates may trigger unnecessary human review in batch processing.
+
+**Mitigation**: Use `fallback: return_best` instead of `fallback: escalate` for non-critical nodes. Reserve human escalation for final deliverables.
+
+### opus-for-everything
+
+**Problem**: Using the most expensive model for all nodes regardless of task complexity.
+
+**AIWG risk**: Default `defaultSubModel: sonnet` is reasonable, but not differentiating between screener (Haiku) and reasoner (Opus) nodes wastes budget.
+
+**Mitigation**: Use `preferred_model` per node. See the Model Tiering section above.
+
+### context-bloat
+
+**Problem**: Passing full conversation history or unnecessary context to sub-agents.
+
+**AIWG risk**: Sub-agents receiving entire parent context when they only need a slice.
+
+**Mitigation**: Use `context.type: filtered` or `context.type: slice` instead of `context.type: full`. Follow the subagent-scoping rule: each sub-agent gets <20% of the context window.
+
+### unbounded-loop
+
+**Problem**: Refinement loops without termination conditions.
+
+**AIWG risk**: Quality gates with high `min_score` and high `max_iterations` may loop excessively on tasks that can't meet the threshold.
+
+**Mitigation**: Set realistic `min_score` (85 is a good default). Keep `max_iterations` at 3-5. Use `fallback: return_best` to guarantee termination.
+
 ## Configuration
 
 Default settings from `manifest.json`:
@@ -300,6 +451,18 @@ RLM defines four core schemas:
 /rlm-query "@summaries/*.txt" "identify 5 most common themes"
 # → synthesized analysis
 ```
+
+## Examples
+
+Complete task tree examples in `examples/`:
+
+| Example | Pattern | Model Tiering | Quality Gate |
+|---------|---------|---------------|--------------|
+| `rlm-self-refine.yaml` | Evaluator + refiner loop | Sonnet (drafter + scorer) | Yes (85+, 5 iterations) |
+| `rlm-divide-conquer.yaml` | Chunker → analyzer → synthesizer | Haiku (chunker), Sonnet (analyzer + synth) | Yes (on synthesizer) |
+| `rlm-filter-recurse.yaml` | Screener → investigator → reasoner | Haiku → Sonnet → Opus | Yes (90+, escalate fallback) |
+
+These examples demonstrate the full feature set: `preferred_model`, `quality_gate`, `chunking_strategy`, and `batch_size`.
 
 ## Advanced Topics
 
