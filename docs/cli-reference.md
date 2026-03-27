@@ -719,7 +719,75 @@ System Utilities:
   ✓ npm v10.2.3
   ✗ gh (GitHub CLI not installed)
 
+Scheduler:
+  Backend:  native-cron (CronCreate) / aiwg-cli fallback
+  Chrony:   ✓ installed (precise NTP)
+
 Environment: Linux 6.14.0-37-generic
+```
+
+---
+
+## Schedule Skill
+
+Cross-provider scheduler that detects native cron capability (Claude Code `CronCreate`) and falls back to the AIWG daemon CLI on all other providers. Checks `chrony` installation for precise timing.
+
+### schedule create
+
+```bash
+/schedule create --name <name> --cron "<expr>" --task "<prompt>"
+```
+
+**Options:**
+- `--name` — Unique task name (required)
+- `--cron` — 5-field cron expression (required)
+- `--task` — Prompt or command to run (required)
+- `--provider native|aiwg-cli` — Override backend detection
+
+**Examples:**
+```bash
+/schedule create --name daily-sync --cron "0 9 * * *" --task "aiwg sync"
+/schedule create --name health-check --cron "0 */6 * * *" --task "aiwg doctor"
+```
+
+### schedule list
+
+```bash
+/schedule list
+```
+
+Lists all scheduled tasks, showing name, cron expression, next run time, and backend in use.
+
+### schedule delete
+
+```bash
+/schedule delete --name <name>
+```
+
+Deletes a scheduled task by name.
+
+### Backend Detection
+
+| Provider | Backend |
+|----------|---------|
+| Claude Code | `native-cron` (CronCreate/CronList/CronDelete) |
+| All others | `aiwg-cli` (AIWG daemon) |
+
+The active backend is reported in `aiwg runtime-info`. Override with `--provider` flag.
+
+### Chrony Recommendation
+
+When scheduling tasks, the skill checks whether `chrony` is installed and recommends it if missing. Chrony provides accurate NTP time synchronization, preventing clock drift that causes tasks to run at unexpected times — especially on servers that sleep or in virtual environments.
+
+```bash
+# Ubuntu/Debian
+sudo apt install chrony
+
+# RHEL/Fedora
+sudo dnf install chrony
+
+# macOS
+brew install chrony
 ```
 
 ---

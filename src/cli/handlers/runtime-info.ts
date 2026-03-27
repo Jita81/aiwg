@@ -137,6 +137,40 @@ async function handleRuntimeInfo(args: string[]): Promise<void> {
       console.log(`\nLast Discovery: ${summary.lastDiscovery}`);
       console.log(`Catalog: ${summary.catalogPath}`);
 
+      // Scheduler backend detection
+      const { execSync } = await import('child_process');
+      let schedulerBackend = 'aiwg-cli (daemon)';
+      let chronyInstalled = false;
+
+      try {
+        execSync('which chronyc 2>/dev/null || which chronyd 2>/dev/null', { stdio: 'pipe' });
+        chronyInstalled = true;
+      } catch {
+        // chrony not found
+      }
+
+      // Native CronCreate is only available when running inside a Claude Code agent context.
+      // The CLI itself cannot call agent tools, so we report based on platform heuristics.
+      // When invoked from within an agent, the schedule skill performs live detection.
+      const isClaudeCodeContext =
+        process.env.CLAUDE_CODE_VERSION !== undefined ||
+        process.env.ANTHROPIC_API_KEY !== undefined;
+
+      if (isClaudeCodeContext) {
+        schedulerBackend = 'native-cron (CronCreate) / aiwg-cli fallback';
+      }
+
+      console.log(`\nScheduler:`);
+      console.log(`  Backend:  ${schedulerBackend}`);
+      console.log(`  Chrony:   ${chronyInstalled ? '✓ installed (precise NTP)' : '✗ not installed (install for precise timing)'}`);
+
+      if (!chronyInstalled) {
+        console.log(`\n  To install chrony for more precise cron scheduling:`);
+        console.log(`    Ubuntu/Debian: sudo apt install chrony`);
+        console.log(`    RHEL/Fedora:   sudo dnf install chrony`);
+        console.log(`    macOS:         brew install chrony`);
+      }
+
       console.log(`\nRun 'aiwg runtime-info --discover' to refresh catalog`);
       console.log(`\nRun 'aiwg runtime-info --check <tool>' to check a specific tool`);
     }
