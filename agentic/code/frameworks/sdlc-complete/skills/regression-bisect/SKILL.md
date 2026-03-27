@@ -8,12 +8,11 @@ Automatically identify the commit that introduced a regression using git bisect.
 
 ## Triggers
 
-- "find regression commit"
-- "bisect the regression"
-- "when did this break"
-- "which commit broke [feature]"
-- "git bisect [test/issue]"
-- "identify breaking commit"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "git bisect" → binary search for regression commit
+- "when did this break" → regression commit discovery
 
 ## Purpose
 

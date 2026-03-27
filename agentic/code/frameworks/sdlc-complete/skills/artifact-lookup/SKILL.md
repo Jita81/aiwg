@@ -8,14 +8,11 @@ Search and navigate SDLC artifacts using the artifact index.
 
 ## Triggers
 
-- "find artifacts about [topic]"
-- "what depends on [artifact]?"
-- "show me the [phase] requirements"
-- "what test plans exist for [module]?"
-- "what references UC-001?"
-- "show artifact stats"
-- "rebuild the artifact index"
-- "what security artifacts exist?"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "where is [artifact]" → artifact location query
+- "find my [SAD/test plan/ADR]" → artifact search shorthand
 
 ## Purpose
 

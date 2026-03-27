@@ -8,12 +8,15 @@ Execute threat modeling, vulnerability scanning, and security control validation
 
 ## Triggers
 
-- "run security review"
-- "security assessment"
-- "threat model [component]"
-- "validate security controls"
-- "security scan"
-- "check vulnerabilities"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "STRIDE [component]" → threat model using STRIDE framework
+- "OWASP check" → OWASP Top 10 validation
+- "SAST" / "DAST" → static/dynamic application security testing
+- "CVE scan" → known vulnerability enumeration
+- "is the code safe" → colloquial security check
+- "pentest prep" → pre-penetration-test readiness
 
 ## Purpose
 

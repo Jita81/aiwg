@@ -8,13 +8,11 @@ Cross-task learning skill for improving regression detection over time through p
 
 ## Triggers
 
-- "learn from regressions"
-- "improve regression detection"
-- "analyze regression patterns"
-- "prioritize regression tests"
-- "what tests should I run"
-- "predict regression risk"
-- "similar past failures"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "learn from regressions" → adaptive pattern recognition
+- "improve detection accuracy" → regression ML tuning
 
 ## Purpose
 

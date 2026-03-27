@@ -6,21 +6,25 @@ platforms: [claude-code, hermes, openclaw]
 
 Assesses workspace alignment and suggests cleanup or realignment actions at key transition points.
 
-## Trigger Conditions
+## Triggers
 
-This skill should be invoked:
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "do I need to realign" → workspace realignment check
+- "is my workspace aligned" → alignment status check
+- "cleanup recommendations" → workspace prune suggestions
+
+Auto-triggers:
+- After phase transition flow commands complete
+- After completing major features or intensive processes
+
+## Trigger Conditions Reference
+
+This skill is commonly invoked:
 - At the end of phase transitions (flow commands)
 - After completing major features or intensive processes
 - When documentation appears out of sync
-- Manually via "check workspace health" or similar
-
-## Natural Language Triggers
-
-- "check workspace health"
-- "is my workspace aligned"
-- "workspace status"
-- "do I need to realign"
-- "cleanup recommendations"
+- Manually via natural language phrases above
 
 ## Assessment Checklist
 

@@ -2,20 +2,18 @@
 name: diversity-tuning
 description: Interactive tuning of Verbalized Sampling diversity parameters with preset management and A/B comparison
 version: 1.0.0
-triggers:
-  - "tune diversity"
-  - "adjust diversity"
-  - "set diversity threshold"
-  - "compare diversity"
-  - "diversity settings"
-  - "more diverse"
-  - "less diverse"
-  - "maximize diversity"
-  - "diversity A/B"
 platforms: [claude-code, opencode, hermes, openclaw]
 ---
 
 # Diversity Tuning Skill
+
+## Triggers
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "mode collapse" → RLHF pattern mitigation via diversity tuning
+- "RLHF collapse" → same
+- "VS parameters" → Verbalized Sampling parameter adjustment shorthand
 
 ## Purpose
 

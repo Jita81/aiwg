@@ -8,13 +8,12 @@ Continuous risk identification, assessment, tracking, and retirement throughout 
 
 ## Triggers
 
-- "risk review"
-- "update risks"
-- "new risk"
-- "risk status"
-- "mitigate risk"
-- "retire risk"
-- "risk cycle"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "RAG status" / "RED/AMBER/GREEN" → risk dashboard summary
+- "risk register" → update or view risk register
+- "RAID log" → Risks/Assumptions/Issues/Dependencies log
 
 ## Purpose
 

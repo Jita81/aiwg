@@ -8,12 +8,11 @@ Automatically manage regression test baseline lifecycle with triggers for releas
 
 ## Triggers
 
-- "auto-update baselines"
-- "automatic baseline management"
-- "baseline on release"
-- "update baseline after merge"
-- "schedule baseline updates"
-- "baseline lifecycle"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "auto-update baselines" → automatic baseline management
+- "baseline on release" → release-triggered baseline update
 
 ## Purpose
 

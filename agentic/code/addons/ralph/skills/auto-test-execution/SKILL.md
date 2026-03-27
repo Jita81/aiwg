@@ -8,14 +8,8 @@ Automatically execute tests when code-generating agents write to source files, e
 
 ## Triggers
 
-- Agent writes to `src/**/*.ts`
-- Agent writes to `src/**/*.js`
-- Agent writes to `src/**/*.py`
-- Agent writes to `**/*.go`
-- Agent writes to `**/*.rs`
-- "run tests"
-- "execute feedback"
-- "verify my changes"
+
+Primary phrases matched automatically from skill description. No additional alternate expressions defined.
 
 ## Purpose
 

@@ -8,12 +8,11 @@ Generate comprehensive regression analysis reports combining bisect, baseline, a
 
 ## Triggers
 
-- "regression report"
-- "generate regression analysis"
-- "full regression report"
-- "regression summary"
-- "compile regression data"
-- "regression postmortem"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "full regression report" → comprehensive regression analysis
+- "test health" → regression summary report
 
 ## Purpose
 

@@ -8,12 +8,11 @@ Analyze a large source file and produce a concrete decomposition plan, optionall
 
 ## Triggers
 
-- "decompose this file"
-- "split this file into smaller modules"
-- "this file is too large, break it up"
-- "decompose src/path/to/large-file.ts"
-- "refactor this file into smaller pieces"
-- "/decompose-file src/path/to/file.ts"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "this file is too large" → file decomposition trigger
+- "split into modules" → modular decomposition
 
 ## Purpose
 

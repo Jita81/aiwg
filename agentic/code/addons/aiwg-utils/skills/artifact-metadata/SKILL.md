@@ -8,12 +8,11 @@ Manage artifact metadata, versioning, ownership, and history tracking.
 
 ## Triggers
 
-- "update artifact metadata"
-- "track artifact version"
-- "artifact history"
-- "who owns [artifact]"
-- "artifact status"
-- "version [artifact]"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "tag this artifact" → metadata tagging
+- "classify [artifact]" → artifact metadata assignment
 
 ## Purpose
 

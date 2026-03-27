@@ -8,16 +8,12 @@ Synchronize documentation and code to eliminate drift through parallel audit and
 
 ## Triggers
 
-- "align docs to code"
-- "align code to docs"
-- "sync documentation"
-- "doc audit"
-- "check doc drift"
-- "are docs up to date"
-- "find stale documentation"
-- "reconcile docs and code"
-- "documentation out of date"
-- "docs don't match code"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "docs are stale" → documentation drift detected
+- "sync docs" → doc-to-code reconciliation
+- "doc drift" → documentation drift check
 
 ## Purpose
 

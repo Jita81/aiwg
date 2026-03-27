@@ -11,11 +11,12 @@ Correlates log data from multiple sources to identify attacker activity patterns
 
 ## Triggers
 
-- "analyze logs"
-- "log forensics"
-- "auth log analysis"
-- "log correlation"
-- "investigate authentication events"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "auth.log" / "syslog" → specific log file analysis
+- "lateral movement" → log-based lateral movement detection
+- "brute force" → authentication attack detection in logs
 
 ## Purpose
 

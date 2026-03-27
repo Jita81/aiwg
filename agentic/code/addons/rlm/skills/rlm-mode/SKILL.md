@@ -2,28 +2,21 @@
 name: rlm-mode
 description: Detect requests for recursive decomposition and large-scale operations that benefit from RLM processing
 version: 1.0.0
-triggers:
-  - "analyze all files"
-  - "search the entire codebase"
-  - "review every module"
-  - "find all instances"
-  - "summarize the whole repository"
-  - "check every file"
-  - "scan all directories"
-  - "across the entire project"
-  - "in the whole codebase"
-  - "throughout the repository"
-  - "recursively process"
-  - "batch process"
-  - "apply to all"
-  - "update every"
-  - "generate for each"
 platforms: [claude-code, hermes, openclaw]
 ---
 
 # RLM Mode Skill
 
 You detect when users need large-scale operations that would benefit from recursive decomposition and route to RLM commands instead of attempting to load everything into context.
+
+## Triggers
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "RLM" / "recursive language model" → explicit RLM mode activation
+- "process in chunks" → chunk-based decomposition request
+- "decompose and process" → explicit decomposition shorthand
+- "fan out" → parallel fan-out processing across files or modules
 
 ## Core Problem
 
@@ -35,7 +28,7 @@ Loading entire codebases or directory trees into context causes:
 
 **RLM solution**: Decompose → Process in chunks → Aggregate results
 
-## Trigger Patterns
+## Trigger Patterns Reference
 
 | Pattern | Example | Why RLM? |
 |---------|---------|----------|

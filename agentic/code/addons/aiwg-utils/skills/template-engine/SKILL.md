@@ -8,11 +8,11 @@ Load, validate, and populate templates consistently across frameworks.
 
 ## Triggers
 
-- "create from template [name]"
-- "instantiate [template]"
-- "new [artifact-type] from template"
-- "use template [name]"
-- "scaffold [artifact]"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "fill template" → template instantiation
+- "scaffold from template" → template-driven generation
 
 ## Purpose
 

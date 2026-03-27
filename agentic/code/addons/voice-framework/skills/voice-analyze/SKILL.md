@@ -8,11 +8,11 @@ Reverse-engineer voice profiles from sample content by analyzing writing pattern
 
 ## Triggers
 
-- "analyze this writing style"
-- "extract voice from..."
-- "what voice is this?"
-- "create profile from this sample"
-- "match this writing style"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "voice fingerprint" → voice profile extraction
+- "what's my writing style" → voice analysis
 
 ## Behavior
 

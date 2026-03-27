@@ -8,14 +8,12 @@ Automatically generates W3C PROV-compliant provenance records when agents create
 
 ## Triggers
 
-- "create provenance"
-- "track artifact"
-- "record provenance"
-- "who created this"
-- "what derived from"
-- "provenance chain"
-- "trace artifact"
-- "audit trail"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "W3C PROV" → provenance standard reference
+- "lineage" → data/artifact lineage tracking
+- "provenance for [artifact]" → specific artifact provenance
 
 ## Purpose
 

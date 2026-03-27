@@ -8,18 +8,12 @@ platforms: [claude-code, openclaw]
 
 ## Triggers
 
-Activate this skill when the user says:
-- "address the open issues"
-- "work through the bugs"
-- "fix open issues"
-- "tackle issue {N}"
-- "address issues {N}, {M}, {P}"
-- "work on the bug backlog"
-- "fix the reported bugs"
-- "go through the open tickets"
-- "handle the issue queue"
-- "process the open issues"
-- "work on issue {N}"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "work through the bugs" → issue-driven loop shorthand
+- "address the backlog" → iterative issue queue processing
+- "tackle issue [N]" → single-issue loop
 
 ## Purpose
 

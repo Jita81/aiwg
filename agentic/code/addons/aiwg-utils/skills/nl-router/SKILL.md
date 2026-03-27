@@ -8,7 +8,11 @@ Route natural language requests to appropriate skills and workflows.
 
 ## Triggers
 
-This skill is the meta-router - it processes natural language and routes to other skills. It should be consulted when no explicit skill trigger is matched.
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "route this" → explicit NL routing request
+- "what skill handles [X]" → skill discovery
 
 ## Purpose
 

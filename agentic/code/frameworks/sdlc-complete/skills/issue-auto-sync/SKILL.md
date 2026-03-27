@@ -8,13 +8,11 @@ Automatically detect and update linked issues after commits or artifact changes.
 
 ## Triggers
 
-- "sync issues"
-- "update linked issues"
-- "check issue references in commits"
-- "auto-update issues"
-- "post-commit issue sync"
-- After git commit (if configured)
-- After artifact creation/update
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "link commits to issues" → commit-to-issue tracing
+- "auto-close issues" → issue auto-closure on commit
 
 ## Purpose
 

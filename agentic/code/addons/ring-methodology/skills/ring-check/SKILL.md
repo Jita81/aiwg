@@ -9,7 +9,17 @@ platforms:
 
 You enforce the four-layer Ring Methodology verification standard when features are completed.
 
-## Trigger Patterns
+## Triggers
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "four-layer check" / "four layers" → Ring Methodology verification shorthand
+- "circuit breaker" → ring circuit-breaker health check
+- "spectral gap" → ring health metric query
+- "perinoetic" → session reflection record (ring session-end)
+- "layer C" / "layer D" → specific ring layer verification
+
+## Trigger Patterns Reference
 
 | Pattern | Example | Action |
 |---------|---------|--------|

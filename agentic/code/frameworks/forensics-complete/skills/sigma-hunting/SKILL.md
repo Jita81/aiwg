@@ -11,11 +11,12 @@ Applies Sigma detection rules against collected log sources to identify threat a
 
 ## Triggers
 
-- "sigma hunt"
-- "threat hunt"
-- "sigma rules"
-- "apply sigma rules"
-- "hunt for <technique>"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "ATT&CK [technique]" / "MITRE [TID]" → technique-specific threat hunt
+- "T1059" / "T1053" (etc.) → ATT&CK technique ID lookups
+- "Sigma rules" → rule-based threat hunting
 
 ## Purpose
 

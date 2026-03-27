@@ -1,147 +1,153 @@
 # Simple Language Translations
 
-Maps natural language requests to AIWG rules, skills, and workflows. Used by the NL router and by agents interpreting user intent.
+Maps **non-obvious** natural language requests to AIWG skills, commands, rules, and workflows. Used by the NL router and by agents interpreting user intent.
 
-## Phase Transitions
+**Design principle**: Claude Code natively matches primary phrases against skill `description:` fields. This document focuses on alternate expressions, domain jargon, abbreviations, and compound intents that Claude would not automatically resolve.
 
-| User Says | Maps To | Skill/Command |
-|-----------|---------|---------------|
-| "move to elaboration" | Inception → Elaboration gate | `flow-inception-to-elaboration` |
-| "start construction" | Elaboration → Construction gate | `flow-elaboration-to-construction` |
-| "ready for production" | Construction → Transition gate | `flow-construction-to-transition` |
-| "transition to {phase}" | Phase transition flow | `flow-{from}-to-{to}` |
-| "check the gate" | Gate validation | `flow-gate-check` |
-| "can we move forward" | Gate readiness check | `flow-gate-check` |
+---
 
-## Workflow Requests
+## SDLC Domain Terminology
 
-| User Says | Maps To | Skill/Command |
-|-----------|---------|---------------|
-| "where are we" | Project status | `project-status` |
-| "what's next" | Phase recommendation | `project-awareness` |
-| "run security review" | Security assessment | `security-audit` |
-| "update risks" | Risk management cycle | `flow-risk-management-cycle` |
-| "create a {artifact}" | Artifact generation | `orchestrate-project` |
-| "generate tests" | Test generation | `generate-tests` |
+| User Says | Meaning | Maps To |
+|-----------|---------|---------|
+| "LO" / "LOM" | Lifecycle Objective — Inception exit gate | `flow-gate-check inception` |
+| "LA" / "ABM" | Lifecycle Architecture / Architecture Baseline Milestone | `flow-gate-check elaboration` |
+| "IOC" | Initial Operational Capability — Construction exit gate | `flow-gate-check construction` |
+| "PRM" | Product Release Milestone — Transition exit gate | `flow-gate-check transition` |
+| "SAD" | Software Architecture Document | `orchestrate-project` / Architecture Designer agent |
+| "ADR" | Architecture Decision Record | `tot-decide` |
+| "RTM" | Requirements Traceability Matrix | `traceability-check` |
+| "DOD" | Definition of Done — gate criteria | `gate-evaluation` |
+| "NFR" | Non-Functional Requirement | Requirements Analyst agent |
+| "RAG status" / "RED/AMBER/GREEN" | Risk dashboard summary | `risk-cycle` |
+| "V&V matrix" | Verification & Validation coverage | `traceability-check` |
+| "RACI for [X]" | Responsibility assignment | `approval-workflow` |
 
-## Review Cycles
+## Operations & Incident Shorthand
 
-| User Says | Maps To | Skill/Command |
-|-----------|---------|---------------|
-| "review this PR" | PR review | `pr-review` |
-| "code review" | Code review agent | Code Reviewer agent |
-| "security scan" | Security assessment | `security-audit` |
-| "check brand compliance" | Brand audit | `brand-audit` |
-| "validate config" | Configuration validator | `config-validator` |
+| User Says | Meaning | Maps To |
+|-----------|---------|---------|
+| "P0" / "P1" / "SEV1" / "SEV2" | Severity-based incident triage | `flow-incident-response` |
+| "we got paged" | Production incident response | `incident-triage` |
+| "war room" | Incident coordination setup | `flow-incident-response` |
+| "postmortem [incident]" | Post-incident review | `flow-retrospective-cycle` |
+| "ship it" | Deploy to production | `flow-deploy-to-production` |
+| "burn it down" | Rollback workspace to clean state | `workspace-reset` |
+| "clean the bench" | Purge working directory | `workspace-prune-working` |
+| "mc start" / "mc dispatch" / "mc status" | Mission Control operations | `mission-control` |
+| "background this" | Dispatch as background mission | `mission-control` |
 
-## Artifact Generation
+## Security & Forensics Jargon
 
-| User Says | Maps To | Skill/Command |
-|-----------|---------|---------------|
-| "write the SAD" | Software Architecture Document | `orchestrate-project` |
-| "create an ADR" | Architecture Decision Record | `tot-decide` |
-| "draft requirements" | Requirements document | Requirements Analyst agent |
-| "create test plan" | Test strategy | Test Architect agent |
-| "threat model" | Threat model | Security Architect agent |
+| User Says | Meaning | Maps To |
+|-----------|---------|---------|
+| "STRIDE [component]" | Threat model using STRIDE framework | `security-assessment` |
+| "OWASP check" | OWASP Top 10 validation | `security-assessment` |
+| "SAST" / "DAST" | Static/dynamic application security testing | `security-assessment` |
+| "CVE scan" | Known vulnerability enumeration | `security-assessment` |
+| "IOCs" / "indicators" | Indicator of compromise extraction | `ioc-extraction` |
+| "STIX" / "STIX 2.1" | Structured threat intelligence output | `ioc-extraction` |
+| "ATT&CK [technique]" / "MITRE [TID]" | Technique-specific threat hunt | `sigma-hunting` |
+| "T1059" / "T1053" (etc.) | ATT&CK technique ID lookups | `sigma-hunting` |
+| "vol3" / "volatility" | Volatility 3 memory analysis | `memory-forensics` |
+| "LSASS" | Credential extraction analysis | `memory-forensics` |
+| "chain of custody" | Forensic evidence handling | `evidence-preservation` |
+| "bag and tag" | Evidence collection shorthand | `evidence-preservation` |
+| "SBOM" | Software bill of materials analysis | `supply-chain-forensics` |
+| "Falco" / "Tetragon" / "Tracee" | eBPF runtime monitoring tools | `container-forensics` |
+| "CloudTrail" / "Activity Log" | Cloud provider audit log analysis | `cloud-forensics` |
 
-## Research & Investigation
+## Testing & Quality Jargon
 
-| User Says | Maps To | Rule Activated |
+| User Says | Meaning | Maps To |
+|-----------|---------|---------|
+| "stryker" / "pitest" / "mutmut" | Tool-specific mutation testing | `mutation-test` |
+| "are my tests catching bugs" | Test effectiveness check | `mutation-test` |
+| "intermittent failures" / "CI keeps failing randomly" | Flaky test identification | `flaky-detect` |
+| "red-green-refactor" | TDD cycle enforcement | `tdd-enforce` |
+| "test first" | TDD mode activation | `tdd-enforce` |
+| "orphan tests" | Tests without matching source | `test-sync` |
+| "coverage holes" / "what's not tested" | Coverage gap analysis | `test-coverage` |
+| "lcov" / "istanbul" / "c8" | Coverage tool-specific queries | `test-coverage` |
+| "MCP tool testing" | Tool-level acceptance tests | `uat-mode` |
+| "fixtures for [model]" / "faker data" | Test data factory generation | `generate-factory` |
+
+## Writing & Voice Domain
+
+| User Says | Meaning | Maps To |
+|-----------|---------|---------|
+| "sounds robotic" / "too AI-ish" / "sounds like ChatGPT" | AI pattern detection | `ai-pattern-detection` |
+| "humanize this" | AI pattern remediation | `ai-pattern-detection` |
+| "AI smell test" | Quick authenticity check | `ai-pattern-detection` |
+| "make me sound like [reference]" | Reference-based voice creation | `voice-create` |
+| "voice fingerprint" | Voice profile extraction from text | `voice-analyze` |
+| "rewrite in [voice name]" | Voice transformation | `voice-apply` |
+| "70/30 [voice A]/[voice B]" | Ratio-based voice blending | `voice-blend` |
+| "SOUL.md" / "project identity" | Project soul/identity definition | `soul-create` |
+| "soul score" | Soul quality metrics | `soul-validate` |
+| "mode collapse" | RLHF pattern mitigation | `diversity-tuning` |
+
+## Marketing Domain
+
+| User Says | Meaning | Maps To |
+|-----------|---------|---------|
+| "brand police" | Brand guideline enforcement | `brand-compliance` |
+| "on-brand check" | Brand consistency validation | `brand-compliance` |
+| "launch checklist" / "pre-flight check" | Pre-launch validation | `qa-protocol` |
+| "battle card" | Competitive comparison document | `competitive-intel` |
+| "ICP" | Ideal Customer Profile | `audience-synthesis` |
+| "buyer persona" | Audience persona creation | `audience-synthesis` |
+| "KPIs" / "MQL" / "SQL" / "CAC" / "LTV" | Marketing metrics shorthand | `performance-digest` |
+| "ETL [source] to [dest]" | Data pipeline creation | `data-pipeline` |
+
+## Compound Intent (Multi-Skill Routing)
+
+These phrases map to a sequence of skills or a compound workflow:
+
+| User Says | Meaning | Skill Sequence |
 |-----------|---------|----------------|
-| "look this up first" | Research action required | `research-before-decision` |
-| "check the docs" | Read documentation before acting | `research-before-decision` |
-| "how does this work" | Codebase exploration | `research-before-decision` |
-| "find documentation for X" | Documentation search | `research-before-decision` |
-| "what pattern does this use" | Pattern investigation | `research-before-decision` |
-| "why is this failing" | Error investigation | `research-before-decision` |
-| "search for X in the codebase" | Code search | `research-before-decision` |
-| "read about X before changing it" | Pre-change research | `research-before-decision` |
-| "investigate before you fix" | Root cause analysis | `research-before-decision` |
-| "don't guess, look it up" | Explicit research demand | `research-before-decision` |
+| "zero to construction" | Full Inception + Elaboration pipeline | `sdlc-accelerate` |
+| "audit everything" | Security + brand + compliance sweep | `security-assessment` → `brand-compliance` → `flow-compliance-validation` |
+| "is this release-ready" | Gate check + test coverage + security | `gate-evaluation` → `test-coverage` → `security-assessment` |
+| "full retro" | Retrospective + risk update + learnings | `flow-retrospective-cycle` → `risk-cycle` → `cross-task-learner` |
+| "harden the codebase" | Security audit + dependency scan + dead code | `security-audit` → `supply-chain-forensics` → `cleanup-audit` |
+| "bootstrap and go" | Project scaffold + SDLC ramp-up | `aiwg use sdlc` → `sdlc-accelerate` |
 
-## Planning & Strategy
+## Disambiguation (Same Phrase, Different Skill)
 
-| User Says | Maps To | Skill/Command |
-|-----------|---------|---------------|
-| "plan how to do this" | Approach planning | Plan mode / `orchestrate-project` |
-| "think through this first" | Pre-implementation planning | Plan mode |
-| "break this down" | Task decomposition | `orchestrate-project` |
-| "what's the best approach" | Decision support | `tot-decide` |
-| "compare these options" | Trade-off analysis | `tot-decide` |
-| "design the approach" | Architecture/design work | Architecture Designer agent |
-| "outline the steps" | Implementation plan | Plan mode |
-| "strategize this" | Strategic planning | Product Strategist agent |
+These phrases route to different skills depending on context:
 
-## Clarification & Recovery
+| User Says | Context | Maps To |
+|-----------|---------|---------|
+| "check coverage" | Testing context | `test-coverage` |
+| "check coverage" | Requirements/traceability context | `traceability-check` |
+| "what's blocking" | Project status context | `project-awareness` |
+| "what's blocking" | Risk management context | `risk-cycle` |
+| "validate this" | Configuration files | `config-validator` |
+| "validate this" | Marketing asset | `qa-protocol` |
+| "validate this" | SOUL.md file | `soul-validate` |
+| "review" | Pull request context | `pr-review` |
+| "review" | Multi-agent document review | `review-synthesis` |
+| "review" | Security context | `security-assessment` |
+| "scan" | Security context | `security-assessment` |
+| "scan" | Log/forensics context | `log-analysis` |
+| "scan" | Codebase health context | `codebase-health` |
+| "sync" | Documentation context | `doc-sync` |
+| "sync" | AIWG framework context | `aiwg-sync` |
+| "sync" | Issue tracker context | `issue-auto-sync` |
 
-| User Says | Maps To | Rule Activated |
+## Clarification & Recovery Patterns
+
+These activate rules rather than skills:
+
+| User Says | Meaning | Rule Activated |
 |-----------|---------|----------------|
 | "re-read my instructions" | Instruction reparse | `instruction-comprehension` |
-| "that's not what I asked" | Instruction reparse + correction | `instruction-comprehension` |
-| "I said X, not Y" | Explicit correction | `instruction-comprehension` |
-| "you missed {thing}" | Incomplete execution | `instruction-comprehension` |
-| "go back and read what I wrote" | Full reparse of original request | `instruction-comprehension` |
-| "I already told you" | Repeated instruction (drift detected) | `instruction-comprehension` |
-| "stop and listen" | Halt + reparse | `instruction-comprehension` |
-| "no, use X instead" | Technology/approach correction | `instruction-comprehension` |
-| "don't change that file" | Constraint violation correction | `instruction-comprehension` |
+| "that's not what I asked" | Correction + reparse | `instruction-comprehension` |
+| "I already told you" | Drift detection | `instruction-comprehension` |
+| "don't guess, look it up" | Explicit research demand | `research-before-decision` |
+| "investigate before you fix" | Root cause analysis | `research-before-decision` |
 | "follow my instructions exactly" | Strict compliance demand | `instruction-comprehension` |
-
-## Issue Management
-
-| User Says | Maps To | Skill/Command |
-|-----------|---------|---------------|
-| "address the open issues" | Issue-driven ralph loop | `address-issues --all-open` |
-| "work through the bugs" | Bug-filtered issue loop | `address-issues --filter "label:bug"` |
-| "fix open issues" | All open issue loop | `address-issues --all-open` |
-| "tackle issue 17" | Single issue loop | `address-issues 17` |
-| "address issues 17, 18, 19" | Multi-issue loop | `address-issues 17 18 19` |
-| "work on the bug backlog" | Bug backlog loop | `address-issues --filter "status:open label:bug"` |
-| "fix the reported bugs" | Bug-filtered issue loop | `address-issues --filter "label:bug"` |
-| "go through the open tickets" | All open issue loop | `address-issues --all-open` |
-| "handle the issue queue" | All open issue loop | `address-issues --all-open` |
-| "process the open issues" | All open issue loop | `address-issues --all-open` |
-| "work on issue 17 interactively" | Interactive single issue | `address-issues 17 --interactive` |
-| "address all bugs with branches" | Branch-per-issue bug loop | `address-issues --filter "label:bug" --branch-per-issue` |
-
-## Self-Maintenance & Orchestration
-
-| User Says | Maps To | Skill/Command |
-|-----------|---------|---------------|
-| "make sure AIWG is up to date" | Sync to latest version + re-deploy | `aiwg sync` |
-| "is AIWG current?" | Check version without changes | `aiwg sync --dry-run` |
-| "check AIWG version" | Version check | `aiwg sync --dry-run` |
-| "deploy the latest to copilot" | Provider-targeted sync | `aiwg sync --provider copilot` |
-| "health check" | Installation health | `aiwg doctor` |
-| "is everything working?" | Installation health | `aiwg doctor` |
-| "install the SDLC framework" | Framework deployment | `aiwg use sdlc` |
-| "remove the marketing framework" | Framework removal | `aiwg remove media-marketing-kit` |
-| "what frameworks do I have?" | List installed frameworks | `aiwg list` |
-| "what's installed?" | List installed frameworks | `aiwg list` |
-| "run these tasks in the background" | Background orchestration | `aiwg mc start` + `aiwg mc dispatch` |
-| "orchestrate X and Y in parallel" | Multi-mission dispatch | `aiwg mc start` + `aiwg mc dispatch` |
-| "monitor background tasks" | Mission status | `aiwg mc status` / `aiwg mc watch` |
-| "stop background work" | Stop missions | `aiwg mc stop` |
-| "deploy SDLC to all providers" | Multi-provider deployment | AIWG Steward agent |
-| "repair the AIWG installation" | Full health + fix cycle | AIWG Steward agent |
-
-## Incident & Urgency
-
-| User Says | Maps To | Skill/Command |
-|-----------|---------|---------------|
-| "production is down" | Incident response | `flow-incident-response` |
-| "P0" / "SEV1" | High-priority incident | `flow-incident-response` |
-| "system down" | Incident triage | `flow-incident-response` |
-| "security breach" | Security incident | `flow-incident-response` + `security-audit` |
-
-## Meta & Help
-
-| User Says | Maps To | Skill/Command |
-|-----------|---------|---------------|
-| "help" | Available actions | NL router options display |
-| "what can you do" | Capability listing | `aiwg-kb` |
-| "show me the framework" | Framework status | `project-status` |
-| "doctor" / "health check" | Installation health | `aiwg doctor` |
 
 ## Rule Activation Mapping
 

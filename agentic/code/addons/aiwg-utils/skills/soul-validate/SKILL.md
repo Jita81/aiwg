@@ -8,12 +8,11 @@ Validate a SOUL.md file against community best practices and quality criteria.
 
 ## Triggers
 
-- "validate my soul file"
-- "check SOUL.md quality"
-- "is my SOUL.md good enough"
-- "soul quality check"
-- "validate soul"
-- "review my SOUL.md"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "soul score" → soul quality metrics
+- "check the soul" → soul validation
 
 ## Behavior
 

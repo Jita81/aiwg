@@ -11,16 +11,13 @@ Investigates containerized environments for signs of compromise, misconfiguratio
 
 ## Triggers
 
-- "container forensics"
-- "docker investigation"
-- "kubernetes forensics"
-- "investigate containers"
-- "k8s forensics"
-- "ebpf forensics"
-- "falco alerts"
-- "crictl investigation"
-- "etcd audit"
-- "api server audit"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "Falco" / "Tetragon" / "Tracee" → eBPF runtime monitoring tools
+- "dive" → Docker image layer analysis
+- "crictl" → containerd/CRI-O environment forensics
+- "escape" → container escape investigation
 
 ## Purpose
 

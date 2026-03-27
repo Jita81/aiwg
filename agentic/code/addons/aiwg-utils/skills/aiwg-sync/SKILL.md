@@ -9,7 +9,15 @@ platforms:
 
 You ensure the current session's AIWG installation is up-to-date and correctly deployed to the active provider.
 
-## Trigger Patterns
+## Triggers
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "is the framework current" → sync dry-run check
+- "re-deploy" → force redeploy to active provider
+- "aiwg drift" → deploy drift detected, sync needed
+
+## Trigger Patterns Reference
 
 | Pattern | Example | Action |
 |---------|---------|--------|

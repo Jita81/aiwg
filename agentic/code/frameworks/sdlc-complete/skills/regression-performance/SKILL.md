@@ -8,14 +8,12 @@ Detect performance regressions by comparing benchmarks across versions, analyzin
 
 ## Triggers
 
-- "performance regression"
-- "check latency"
-- "benchmark comparison"
-- "detect slowdown"
-- "throughput degradation"
-- "memory leak"
-- "performance analysis"
-- "compare performance"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "latency regression" → performance benchmark comparison
+- "p99" / "p95" → percentile-based performance metrics
+- "benchmark diff" → performance baseline comparison
 
 ## Purpose
 

@@ -8,14 +8,12 @@ Detect visual and UI regressions through screenshot comparison and pixel-diff an
 
 ## Triggers
 
-- "visual regression"
-- "UI diff"
-- "screenshot comparison"
-- "visual testing"
-- "check for UI changes"
-- "visual baseline"
-- "pixel diff"
-- "layout regression"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "visual diff" → screenshot/UI comparison
+- "UI diff" → visual regression shorthand
+- "Playwright screenshots" / "Storybook snapshots" → tool-specific visual regression
 
 ## Purpose
 

@@ -11,11 +11,12 @@ Guides memory acquisition and analysis for both Linux and Windows targets. Acqui
 
 ## Triggers
 
-- "memory forensics"
-- "volatility analysis"
-- "memory dump analysis"
-- "analyze memory image"
-- "acquire memory from <host>"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "vol3" / "volatility" → Volatility 3 memory analysis
+- "LSASS" → credential extraction analysis
+- "memory dump" → volatile memory analysis
 
 ## Purpose
 

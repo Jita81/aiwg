@@ -8,13 +8,11 @@ Generate a SOUL.md identity file from source material or interactive prompts.
 
 ## Triggers
 
-- "create a soul for..."
-- "build a soul file"
-- "generate SOUL.md"
-- "define agent identity"
-- "create an agent persona"
-- "make a SOUL.md for this project"
-- "soul from my writing samples"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "SOUL.md" / "project identity" → project soul/identity definition
+- "write the soul file" → soul document creation
 
 ## Behavior
 

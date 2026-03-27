@@ -8,12 +8,11 @@ Multi-stage quality assurance protocol for marketing assets with channel-specifi
 
 ## Triggers
 
-- "quality check"
-- "QA this asset"
-- "validate for [channel]"
-- "ready for approval"
-- "pre-flight check"
-- "final review"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "launch checklist" / "pre-flight check" → pre-launch validation
+- "content QA" → quality assurance shorthand
 
 ## Purpose
 

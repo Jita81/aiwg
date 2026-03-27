@@ -11,11 +11,12 @@ Investigates software supply chain compromise across three vectors: dependency i
 
 ## Triggers
 
-- "supply chain forensics"
-- "sbom analysis"
-- "dependency audit"
-- "build pipeline investigation"
-- "package integrity check"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "SBOM" → Software Bill of Materials analysis
+- "build pipeline audit" → supply chain security review
+- "dependency confusion" → supply chain attack vector
 
 ## Purpose
 

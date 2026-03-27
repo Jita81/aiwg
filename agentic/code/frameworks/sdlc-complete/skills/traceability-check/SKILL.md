@@ -8,12 +8,13 @@ Verify bidirectional traceability from requirements to code to tests.
 
 ## Triggers
 
-- "check traceability"
-- "validate requirements coverage"
-- "trace requirements to code"
-- "find orphan requirements"
-- "coverage analysis"
-- "what requirements are tested"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "RTM" → Requirements Traceability Matrix check
+- "V&V matrix" → Verification & Validation coverage
+- "coverage holes" in requirements context → traceability gap analysis
+- "are requirements covered" → traceability validation
 
 ## Purpose
 

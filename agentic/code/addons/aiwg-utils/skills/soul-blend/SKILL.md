@@ -8,12 +8,11 @@ Merge multiple SOUL.md files into a composite persona — for team-level agents 
 
 ## Triggers
 
-- "blend these souls"
-- "merge soul files"
-- "combine personas"
-- "create a composite soul"
-- "soul blend"
-- "mix these identities"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "blend souls" → multi-SOUL.md synthesis
+- "merge voice profiles" → soul blending
 
 ## Behavior
 

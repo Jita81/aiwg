@@ -8,12 +8,11 @@ Create and maintain regression test baselines for comparison and drift detection
 
 ## Triggers
 
-- "create regression baseline"
-- "update baseline"
-- "baseline the tests"
-- "capture current state"
-- "set new baseline"
-- "baseline snapshot"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "snapshot tests" → baseline creation shorthand
+- "capture current behavior" → baseline establishment
 
 ## Purpose
 

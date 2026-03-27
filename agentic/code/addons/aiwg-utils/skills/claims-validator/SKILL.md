@@ -8,12 +8,11 @@ Validate documentation for unsupported claims, made-up metrics, and unverifiable
 
 ## Triggers
 
-- "check for unsupported claims"
-- "validate claims"
-- "review for BS"
-- "check metrics"
-- "verify claims in this document"
-- "find made-up stats"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "fact-check this" → claim validation
+- "verify [claim]" → specific claim check
 
 ## Purpose
 

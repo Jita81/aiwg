@@ -2,18 +2,6 @@
 name: ralph-loop
 description: Detect requests for iterative AI task loops and invoke the Ralph command
 version: 2.0.0
-triggers:
-  - "ralph this"
-  - "ralph:"
-  - "ralph it"
-  - "keep trying until"
-  - "loop until"
-  - "iterate until"
-  - "run until passes"
-  - "fix until green"
-  - "keep fixing until"
-  - "keep going until"
-  - "iterate on"
 platforms: [claude-code, hermes, openclaw]
 ---
 
@@ -21,7 +9,17 @@ platforms: [claude-code, hermes, openclaw]
 
 You detect when users want iterative task execution and route to the `/ralph` command.
 
-## Trigger Patterns
+## Triggers
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "ralph this: [task]" → iterative loop with extracted task
+- "ralph it" (after describing work in conversation) → loop using conversation context
+- "keep trying until [condition]" → loop with completion condition
+- "fix until green" → test-fixing loop shorthand
+- "loop until [condition]" → condition-based iteration
+
+## Trigger Patterns Reference
 
 | Pattern | Example | Action |
 |---------|---------|--------|

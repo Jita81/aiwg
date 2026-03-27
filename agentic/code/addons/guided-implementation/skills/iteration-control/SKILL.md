@@ -8,10 +8,11 @@ Manages bounded iteration loops for autonomous implementation with escalation.
 
 ## Triggers
 
-- "retry with feedback"
-- "check iteration limit"
-- "should I retry or escalate"
-- "iteration [N] of [max]"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "pause the loop" → loop control signal
+- "stop after N cycles" → explicit iteration limit
 
 ## Purpose
 

@@ -8,13 +8,11 @@ Apply a SOUL.md identity to content generation — deeper than voice-apply, inco
 
 ## Triggers
 
-- "apply soul to..."
-- "write this as the soul"
-- "generate with soul"
-- "use the soul for..."
-- "apply persona to..."
-- "in character, write..."
-- "soul apply"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "apply soul" → voice enforcement via SOUL.md
+- "write in our voice" → soul-based writing
 
 ## Behavior
 

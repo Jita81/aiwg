@@ -11,11 +11,12 @@ Implements evidence preservation procedures aligned with RFC 3227 (Guidelines fo
 
 ## Triggers
 
-- "preserve evidence"
-- "chain of custody"
-- "evidence collection"
-- "document custody"
-- "package evidence"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "chain of custody" → forensic evidence handling
+- "bag and tag" → evidence collection shorthand
+- "SHA-256 verify" → evidence hash verification
 
 ## Purpose
 

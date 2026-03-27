@@ -8,14 +8,12 @@ Identify dead code, unused exports, orphaned files, stale manifest entries, and 
 
 ## Triggers
 
-- "find dead code"
-- "what files are not imported anywhere?"
-- "show me unused exports"
-- "audit dependencies"
-- "find orphaned files"
-- "cleanup audit"
-- "/cleanup-audit"
-- "/cleanup-audit --scope src/"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "dead code" → unused code detection
+- "orphaned files" → files with no importers
+- "stale exports" → unused export detection
 
 ## Purpose
 

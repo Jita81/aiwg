@@ -11,11 +11,12 @@ Performs structured forensic analysis on Linux systems, adapting collection and 
 
 ## Triggers
 
-- "linux forensics"
-- "investigate linux server"
-- "linux incident response"
-- "forensic analysis <host>"
-- "investigate <user@host>"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "ir" / "incident response" for Linux → generalized Linux forensics
+- "DFIR" → Digital Forensics and Incident Response
+- "triage [host]" → host-level forensic triage
 
 ## Purpose
 

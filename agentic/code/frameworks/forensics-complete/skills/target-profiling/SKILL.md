@@ -11,11 +11,12 @@ Connects to a target system over SSH and constructs a structured baseline profil
 
 ## Triggers
 
-- "profile target"
-- "system reconnaissance"
-- "build baseline"
-- "profile <user@host>"
-- "baseline this system"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "OSINT [target]" → open-source intelligence gathering
+- "footprint [domain]" → attack surface mapping
+- "recon [system]" → system reconnaissance
 
 ## Purpose
 

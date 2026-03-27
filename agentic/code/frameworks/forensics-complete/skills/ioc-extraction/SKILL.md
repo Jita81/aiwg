@@ -11,11 +11,12 @@ Scans investigation artifacts — log files, memory analysis output, findings do
 
 ## Triggers
 
-- "extract iocs"
-- "indicator extraction"
-- "ioc analysis"
-- "build ioc list"
-- "extract indicators from <path>"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "IOCs" / "indicators" → Indicator of Compromise extraction
+- "STIX" / "STIX 2.1" → structured threat intelligence output
+- "pull indicators" → IOC extraction shorthand
 
 ## Purpose
 

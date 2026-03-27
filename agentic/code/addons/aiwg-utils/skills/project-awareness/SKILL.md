@@ -8,18 +8,12 @@ Comprehensive project context detection and state awareness.
 
 ## Triggers
 
-- "what project is this"
-- "project context"
-- "what phase are we in"
-- "where are we?"
-- "what's next?"
-- "project status"
-- "current phase"
-- "who is on the team"
-- "what framework is active"
-- "ready to transition?"
-- "what's blocking us?"
-- (Auto-triggered at session start for context building)
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "where are we" / "what's next" → project state summary
+- "what's blocking" in project context → status + blockers
+- "sprint status" → iteration awareness
 
 ## Purpose
 

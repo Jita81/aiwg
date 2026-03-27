@@ -8,12 +8,11 @@ Track and analyze regression statistics, trends, and health indicators.
 
 ## Triggers
 
-- "regression metrics"
-- "show regression stats"
-- "regression trends"
-- "regression health"
-- "how many regressions"
-- "regression dashboard"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "regression KPIs" → regression metric dashboard
+- "flakiness score" → test stability metrics
 
 ## Purpose
 

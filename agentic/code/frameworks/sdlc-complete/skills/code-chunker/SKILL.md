@@ -8,12 +8,11 @@ Analyze a source file's structure and produce a navigable map with logical secti
 
 ## Triggers
 
-- "map this file"
-- "chunk this file for navigation"
-- "show me the structure of this file"
-- "what's in this file?"
-- "/code-chunker src/path/to/file.ts"
-- "I need to work on a large file"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "map this file" → structural chunking for navigation
+- "chunk for navigation" → file structure mapping
 
 ## Purpose
 

@@ -8,12 +8,12 @@ Synthesize audience insights from multiple data sources into unified personas an
 
 ## Triggers
 
-- "analyze audience"
-- "build personas"
-- "segment audience"
-- "who is our target"
-- "audience insights"
-- "customer profile"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "ICP" → Ideal Customer Profile
+- "buyer persona" → audience persona creation
+- "target segments" → audience segmentation
 
 ## Purpose
 

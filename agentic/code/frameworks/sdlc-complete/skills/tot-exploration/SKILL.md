@@ -8,14 +8,11 @@ Automatically trigger Tree of Thoughts exploration when agents face architectura
 
 ## Triggers
 
-- "evaluate architecture options"
-- "compare approaches"
-- "which pattern should we use"
-- "explore alternatives"
-- "architecture decision"
-- "ADR for"
-- "trade-off between"
-- "should we use X or Y"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "ToT" → Tree of Thought exploration
+- "evaluate N options" → multi-option architectural analysis
 
 ## Purpose
 

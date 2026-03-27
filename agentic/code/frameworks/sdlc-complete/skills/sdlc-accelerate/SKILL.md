@@ -8,17 +8,12 @@ End-to-end SDLC ramp-up from idea to construction-ready in a single orchestrated
 
 ## Triggers
 
-- "set up project"
-- "take me to construction"
-- "bootstrap SDLC"
-- "ramp up project"
-- "accelerate project"
-- "full SDLC setup"
-- "prepare project for development"
-- "get this project construction-ready"
-- "I have an idea for"
-- "new project setup"
-- "start from scratch"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "zero to construction" → full Inception + Elaboration pipeline
+- "bootstrap SDLC" → SDLC ramp-up shorthand
+- "from idea to code" → end-to-end SDLC setup
 
 ## Purpose
 

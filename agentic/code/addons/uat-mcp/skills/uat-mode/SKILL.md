@@ -2,20 +2,6 @@
 name: uat-mode
 description: Detect requests for UAT generation, execution, or reporting and invoke the appropriate UAT command
 version: 1.0.0
-triggers:
-  - "run UAT"
-  - "generate UAT plan"
-  - "test the MCP tools"
-  - "acceptance test this server"
-  - "UAT the MCP connections"
-  - "run acceptance tests"
-  - "generate test plan for MCP"
-  - "test MCP coverage"
-  - "MCP acceptance testing"
-  - "validate MCP tools"
-  - "run UAT report"
-  - "show UAT results"
-  - "UAT coverage"
 platforms: [claude-code, hermes, openclaw]
 ---
 
@@ -25,16 +11,8 @@ Detects requests related to User Acceptance Testing of MCP tool surfaces and rou
 
 ## Triggers
 
-| Pattern | Confidence | Routes To |
-|---------|-----------|-----------|
-| "run UAT", "execute UAT", "run acceptance tests" | High | `/uat-execute` |
-| "generate UAT plan", "create test plan for MCP" | High | `/uat-generate` |
-| "test the MCP tools", "validate MCP tools" | High | `/uat-generate` (if no plan exists) or `/uat-execute` |
-| "acceptance test this server" | High | `/uat-generate` then `/uat-execute` |
-| "UAT report", "show UAT results", "UAT coverage" | High | `/uat-report` |
-| "test coverage for tools" | Medium | `/uat-report` (if results exist) or `/uat-generate` |
-| "how are the MCP tools doing" | Medium | `/uat-report` (if results exist) |
-| "run tests" (generic) | Low | Don't suggest — too ambiguous |
+
+Primary phrases matched automatically from skill description. No additional alternate expressions defined.
 
 ## Detection Logic
 

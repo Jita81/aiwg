@@ -8,12 +8,11 @@ Aggregate multi-reviewer feedback into consolidated, actionable recommendations.
 
 ## Triggers
 
-- "synthesize reviews"
-- "merge feedback"
-- "consolidate comments"
-- "combine reviewer input"
-- "summarize all feedback"
-- "what do reviewers say"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "merge reviews" → multi-reviewer feedback synthesis
+- "synthesize feedback" → review consolidation
 
 ## Purpose
 

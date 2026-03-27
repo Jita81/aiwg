@@ -11,12 +11,13 @@ Investigates cloud environments for signs of compromise, data exfiltration, priv
 
 ## Triggers
 
-- "cloud forensics"
-- "aws investigation"
-- "azure forensics"
-- "gcp forensics"
-- "cloud incident response"
-- "investigate cloud environment"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "CloudTrail" → AWS audit log analysis
+- "Activity Log" → Azure audit log analysis
+- "Cloud Audit Logs" → GCP audit log analysis
+- "IAM review" → cloud identity forensics
 
 ## Purpose
 

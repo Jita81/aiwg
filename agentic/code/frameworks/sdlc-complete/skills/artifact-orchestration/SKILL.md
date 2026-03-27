@@ -8,10 +8,12 @@ Orchestrate multi-agent artifact generation with the Primary Author → Parallel
 
 ## Triggers
 
-- "generate [artifact-type]"
-- "create [SAD/test plan/deployment plan/requirements]"
-- "draft [artifact]"
-- "new [architecture/security/deployment] document"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "SAD" → Software Architecture Document
+- "ADR" → Architecture Decision Record
+- "generate [artifact]" for named SDLC artifacts (test plan, deployment plan, requirements)
 
 ## Purpose
 

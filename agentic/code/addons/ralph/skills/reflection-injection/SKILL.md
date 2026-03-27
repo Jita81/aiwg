@@ -8,11 +8,11 @@ Automatically inject relevant past reflections into agent context when starting 
 
 ## Triggers
 
-- Ralph loop starting new iteration
-- Agent retry after failure
-- "what did we learn"
-- "apply past lessons"
-- "avoid previous mistakes"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "inject reflection" → explicit reflection injection shorthand
+- "add metacognition" → metacognitive step insertion
 
 ## Purpose
 

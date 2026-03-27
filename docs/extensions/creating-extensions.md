@@ -350,14 +350,44 @@ interface CommandOption {
 
 ## Creating Skills
 
-Skills are natural language workflows triggered by phrases.
+Skills are natural language workflows. Claude Code uses the `description:` field for native NL matching — it reads each skill's description at session start and autonomously decides when a skill is relevant.
+
+### NL Trigger Strategy
+
+**The `description:` field is the primary NL signal.** Write it well — Claude matches user intent against it automatically. Anything a user says that resembles the description will match without explicit trigger lists.
+
+**The `## Triggers` body section is for alternate expressions only** — phrases Claude would *not* naturally associate with the skill description:
+
+| Include in `## Triggers` | Omit from `## Triggers` |
+|--------------------------|------------------------|
+| Domain abbreviations ("SAST", "RTM", "IOC") | Primary phrases matching the description |
+| Colloquial shorthand ("ship it", "we got paged") | Rewordings of the skill name |
+| Tool-specific names ("stryker", "volatility") | Obvious synonyms ("scan" for a scanning skill) |
+| Auto-trigger file patterns | Questions Claude can infer from description |
+| Negation patterns ("what are we NOT doing") | Generic phrases ("run this", "do that") |
+
+**Do NOT add a `triggers:` key to frontmatter.** Triggers are expressed through:
+- `description:` — primary NL signal (frontmatter)
+- `## Triggers` section in body — supplementary alt expressions only
+
+#### Description Quality Checklist
+
+A strong description enables Claude to match user intent without explicit trigger phrases.
+
+| Criterion | Strong | Weak |
+|-----------|--------|------|
+| **Specific** | "Validate phase gate criteria with multi-agent review and generate pass/fail reports" | "Check project gates" |
+| **Action-oriented** | "Extract IOCs from investigation artifacts and produce STIX 2.1 output" | "Handle IOCs" |
+| **Domain-scoped** | "Continuous risk identification, assessment, tracking, and retirement throughout SDLC" | "Manage risks" |
+| **Includes key terms** | "STRIDE threat modeling, vulnerability scanning, and security control validation" | "Security stuff" |
+| **Differentiating** | "Detects AI-generated writing patterns and suggests authentic alternatives" | "Check writing quality" |
 
 ### Skill Structure
 
 ```markdown
 ---
 name: Security Awareness
-description: Detects security-sensitive context and suggests review
+description: Detects security-sensitive context and suggests review when editing authentication, authorization, or data-handling code
 version: 1.0.0
 capabilities:
   - security
@@ -367,11 +397,6 @@ keywords:
   - security
   - awareness
   - context
-triggerPhrases:
-  - "security review needed"
-  - "is this secure"
-  - "check security"
-  - "security implications"
 autoTrigger: true
 autoTriggerConditions:
   - "modifying-auth-code"
@@ -385,18 +410,14 @@ tools:
 
 Automatically detects security-sensitive context and provides guidance.
 
-## When It Triggers
+## Triggers
 
-### Manual:
-- "Is this code secure?"
-- "Security review needed"
-- "What are the security implications?"
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
 
-### Automatic:
-- Editing authentication code
-- Handling sensitive data (passwords, tokens, PII)
-- Making external API calls
-- Database query modifications
+- "OWASP check" → OWASP Top 10 validation
+- "is the code safe" → colloquial security check
+- "pentest prep" → pre-penetration-test readiness
+- Auto-triggered when editing `src/auth/**`, `src/security/**`, or files containing password/token handling
 
 ## What It Does
 
@@ -435,14 +456,14 @@ Automatically detects security-sensitive context and provides guidance.
 
 **Skill activates:**
 ```
-🛡️ Security-sensitive code detected
+Security-sensitive code detected
 
 You're modifying authentication logic. Consider:
-  ✓ Input validation on username/password
-  ✓ Rate limiting to prevent brute force
-  ✓ Secure password hashing (bcrypt, scrypt)
-  ✓ Session token security (httpOnly, secure flags)
-  ✓ Audit logging for failed attempts
+  - Input validation on username/password
+  - Rate limiting to prevent brute force
+  - Secure password hashing (bcrypt, scrypt)
+  - Session token security (httpOnly, secure flags)
+  - Audit logging for failed attempts
 
 Recommend security review before merging.
 Run: /security-auditor "Review auth changes"
@@ -454,7 +475,6 @@ Run: /security-auditor "Review auth changes"
 ```typescript
 interface SkillMetadata {
   type: 'skill';
-  triggerPhrases: string[];         // Natural language triggers
   autoTrigger?: boolean;            // Auto-activate
   autoTriggerConditions?: string[]; // When to auto-activate
   tools?: string[];

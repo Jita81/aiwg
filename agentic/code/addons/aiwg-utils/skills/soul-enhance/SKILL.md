@@ -8,13 +8,11 @@ Improve an existing SOUL.md by identifying vague sections, suggesting missing co
 
 ## Triggers
 
-- "enhance my soul file"
-- "improve SOUL.md"
-- "soul needs work"
-- "make my soul file better"
-- "soul enhance"
-- "sharpen my SOUL.md"
-- "fix vague sections in SOUL.md"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "improve the soul" → soul quality enhancement
+- "soul needs work" → soul refinement trigger
 
 ## Behavior
 

@@ -8,13 +8,12 @@ Automatically triggers GRADE quality assessment when new research sources or fin
 
 ## Triggers
 
-- "add research source"
-- "new finding"
-- "ingest paper"
-- "add reference"
-- "import study"
-- "register source"
-- "cite new paper"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "GRADE" → evidence quality rating framework
+- "quality of evidence" → GRADE assessment
+- "evidence level" → source quality grading
 
 ## Purpose
 

@@ -8,14 +8,12 @@ Detect breaking changes in API contracts across REST, GraphQL, and gRPC interfac
 
 ## Triggers
 
-- "API breaking change"
-- "contract regression"
-- "schema compatibility"
-- "API compatibility check"
-- "breaking API change"
-- "API contract drift"
-- "backward compatibility"
-- "API version check"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "breaking change" → API contract regression
+- "schema compatibility" → contract validation
+- "Pact" / "Swagger diff" → contract testing tool names
 
 ## Purpose
 

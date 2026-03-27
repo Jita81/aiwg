@@ -8,12 +8,12 @@ Orchestrate marketing data collection, transformation, and reporting workflows.
 
 ## Triggers
 
-- "collect marketing data"
-- "update metrics"
-- "refresh analytics"
-- "data pipeline"
-- "sync marketing data"
-- "pull campaign metrics"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "ETL [source] to [dest]" → data pipeline creation shorthand
+- "ELT" → extract-load-transform pipeline
+- "dbt" / "Airflow" / "Spark" → tool-specific pipeline requests
 
 ## Purpose
 

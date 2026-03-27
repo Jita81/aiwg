@@ -9,7 +9,15 @@ platforms:
 
 You orchestrate multi-loop background operations using the Mission Control dashboard.
 
-## Trigger Patterns
+## Triggers
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "mc start" / "mc dispatch" / "mc status" → Mission Control operations shorthand
+- "background this" → dispatch as background mission
+- "war room" for multi-task coordination → Mission Control session
+
+## Trigger Patterns Reference
 
 | Pattern | Example | Action |
 |---------|---------|--------|

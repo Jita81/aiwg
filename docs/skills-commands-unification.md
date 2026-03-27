@@ -109,6 +109,21 @@ For existing AIWG installations:
 - [ ] Adopt `$ARGUMENTS[0]` syntax for multi-param commands
 - [ ] Test indexed arguments with `aiwg doctor`
 
+### Trigger Redesign (when migrating commands to skills)
+
+When converting `.claude/commands/` to `.claude/skills/` (see #548), the `## Triggers` section must follow the alternate-expression strategy (#555):
+
+1. **Write a strong `description:`** — this is the primary NL signal Claude uses for matching
+2. **Do NOT list primary phrases** — Claude matches these automatically from the description
+3. **Only include in `## Triggers`**:
+   - Domain abbreviations ("SAST", "RTM", "IOC")
+   - Colloquial shorthand ("ship it", "we got paged")
+   - Tool-specific names ("stryker", "volatility")
+   - Auto-trigger file patterns
+4. **Remove `triggerPhrases` from frontmatter** — triggers go in the body `## Triggers` section only
+
+See `@docs/extensions/creating-extensions.md` (Creating Skills section) for the full trigger authoring guide.
+
 ## References
 
 - @agentic/code/frameworks/sdlc-complete/agents/agent-template.md - Agent template with skills section

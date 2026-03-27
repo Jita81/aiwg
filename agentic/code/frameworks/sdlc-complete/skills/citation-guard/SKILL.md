@@ -8,14 +8,12 @@ Automatically verify citations when agents generate content that makes factual c
 
 ## Triggers
 
-- "cite"
-- "reference"
-- "according to"
-- "research shows"
-- "studies demonstrate"
-- Agent writes to `.aiwg/research/`
-- Agent writes to `docs/`
-- Agent generates content with REF-XXX references
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "fabricated citations" / "hallucinated references" → citation authenticity check
+- "DOI check" → citation DOI validation
+- "verify sources" in research context → citation verification
 
 ## Purpose
 
