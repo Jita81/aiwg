@@ -325,4 +325,115 @@ describe('StateManager', () => {
       expect(() => stateManager.clear()).not.toThrow();
     });
   });
+
+  describe('setStateDir', () => {
+    it('should re-scope all file I/O to the new directory', () => {
+      const customDir = join(testDir, 'loops', 'ralph-my-task-a1b2c3d4');
+      stateManager.setStateDir(customDir);
+
+      stateManager.initialize({
+        objective: 'Test',
+        completionCriteria: 'done',
+      });
+
+      expect(existsSync(join(customDir, 'session-state.json'))).toBe(true);
+      // Default flat dir should NOT have been created
+      expect(existsSync(join(testDir, '.aiwg', 'ralph-external', 'session-state.json'))).toBe(false);
+    });
+
+    it('should update path helpers to use the new directory', () => {
+      const customDir = join(testDir, 'loops', 'ralph-my-task-a1b2c3d4');
+      stateManager.setStateDir(customDir);
+
+      expect(stateManager.getStateDir()).toBe(customDir);
+      expect(stateManager.getPromptPath(1)).toContain(customDir);
+      expect(stateManager.getOutputPaths(1).stdout).toContain(customDir);
+      expect(stateManager.getAnalysisPath(1)).toContain(customDir);
+    });
+
+    it('should allow load() to find state written after setStateDir', () => {
+      const customDir = join(testDir, 'loops', 'ralph-my-task-a1b2c3d4');
+      stateManager.setStateDir(customDir);
+
+      const original = stateManager.initialize({
+        objective: 'Scoped objective',
+        completionCriteria: 'done',
+      });
+
+      const loaded = stateManager.load();
+      expect(loaded?.loopId).toBe(original.loopId);
+      expect(loaded?.objective).toBe('Scoped objective');
+    });
+  });
+
+  describe('parallel loop isolation', () => {
+    it('two StateManagers with different stateDirs should not share files', () => {
+      const loopDirA = join(testDir, 'loops', 'ralph-loop-a');
+      const loopDirB = join(testDir, 'loops', 'ralph-loop-b');
+
+      const smA = new StateManager(testDir);
+      smA.setStateDir(loopDirA);
+
+      const smB = new StateManager(testDir);
+      smB.setStateDir(loopDirB);
+
+      smA.initialize({ objective: 'Task A', completionCriteria: 'A done' });
+      smB.initialize({ objective: 'Task B', completionCriteria: 'B done' });
+
+      const stateA = smA.load();
+      const stateB = smB.load();
+
+      // Each manager reads its own state, not the other's
+      expect(stateA?.objective).toBe('Task A');
+      expect(stateB?.objective).toBe('Task B');
+
+      // State files are in separate directories
+      expect(existsSync(join(loopDirA, 'session-state.json'))).toBe(true);
+      expect(existsSync(join(loopDirB, 'session-state.json'))).toBe(true);
+    });
+
+    it('updating one loop state should not affect the other', () => {
+      const loopDirA = join(testDir, 'loops', 'ralph-loop-a');
+      const loopDirB = join(testDir, 'loops', 'ralph-loop-b');
+
+      const smA = new StateManager(testDir);
+      smA.setStateDir(loopDirA);
+
+      const smB = new StateManager(testDir);
+      smB.setStateDir(loopDirB);
+
+      smA.initialize({ objective: 'Task A', completionCriteria: 'A done' });
+      smB.initialize({ objective: 'Task B', completionCriteria: 'B done' });
+
+      smA.update({ status: 'completed' });
+
+      const stateA = smA.load();
+      const stateB = smB.load();
+
+      expect(stateA?.status).toBe('completed');
+      expect(stateB?.status).toBe('running'); // B is unaffected
+    });
+
+    it('iteration files from each loop should be isolated', () => {
+      const loopDirA = join(testDir, 'loops', 'ralph-loop-a');
+      const loopDirB = join(testDir, 'loops', 'ralph-loop-b');
+
+      const smA = new StateManager(testDir);
+      smA.setStateDir(loopDirA);
+
+      const smB = new StateManager(testDir);
+      smB.setStateDir(loopDirB);
+
+      smA.initialize({ objective: 'Task A', completionCriteria: 'done' });
+      smB.initialize({ objective: 'Task B', completionCriteria: 'done' });
+
+      // Prompt paths for iteration 1 should be in separate directories
+      expect(smA.getPromptPath(1)).toContain(loopDirA);
+      expect(smB.getPromptPath(1)).toContain(loopDirB);
+      expect(smA.getPromptPath(1)).not.toBe(smB.getPromptPath(1));
+
+      // Output paths likewise
+      expect(smA.getOutputPaths(1).stdout).not.toBe(smB.getOutputPaths(1).stdout);
+    });
+  });
 });

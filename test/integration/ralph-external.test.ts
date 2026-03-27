@@ -441,7 +441,7 @@ describe('External Ralph Loop Integration', () => {
         enableCheckpoints: false,
       });
 
-      const reportPath = join(testDir, '.aiwg', 'ralph-external', 'completion-report.md');
+      const reportPath = join(orchestrator.stateManager.getStateDir(), 'completion-report.md');
       expect(existsSync(reportPath)).toBe(true);
 
       const report = readFileSync(reportPath, 'utf8');
@@ -592,8 +592,8 @@ describe('External Ralph Loop Integration', () => {
       expect(state?.iterations).toHaveLength(1);
       expect(state?.iterations[0].exitCode).toBe(0);
 
-      // Verify file artifacts on disk
-      const stateDir = join(testDir, '.aiwg', 'ralph-external');
+      // Verify file artifacts on disk — stateDir follows the loop through archiving
+      const stateDir = orchestrator.stateManager.getStateDir();
       expect(existsSync(join(stateDir, 'session-state.json'))).toBe(true);
 
       // Verify prompt was written
@@ -613,12 +613,11 @@ describe('External Ralph Loop Integration', () => {
         expect(stdout).toContain('"success":true');
       }
 
-      // Verify stderr file exists (may be empty)
+      // Verify stderr file exists via stateManager (handles archive-dir relocation)
       const stderrPath = state?.iterations[0].stderrFile;
       expect(stderrPath).toBeDefined();
-      if (stderrPath) {
-        expect(existsSync(stderrPath)).toBe(true);
-      }
+      const currentStderrPath = orchestrator.stateManager.getOutputPaths(1).stderr;
+      expect(existsSync(currentStderrPath)).toBe(true);
 
       // Verify completion report was generated
       const reportPath = join(stateDir, 'completion-report.md');

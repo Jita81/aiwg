@@ -182,7 +182,59 @@ export class Orchestrator {
    */
   async execute(config) {
     this._verbose = config.verbose || false;
-    // Initialize state with enhanced capture options
+
+    // ========== MULTI-PROVIDER SUPPORT ==========
+    await ensureProvidersRegistered();
+    const providerName = config.provider || 'claude';
+    this.providerAdapter = createProvider(providerName);
+    this.sessionLauncher.setProviderAdapter(this.providerAdapter);
+    this.outputAnalyzer.setProviderAdapter(this.providerAdapter);
+    this.stateAssessor.setProviderAdapter(this.providerAdapter);
+    console.log(`[External Ralph] Provider: ${providerName}`);
+
+    // ========== MULTI-LOOP COORDINATION (REF-086, REF-088) ==========
+    // Registration happens BEFORE stateManager.initialize() so we can scope
+    // the StateManager to the per-loop directory before any files are written,
+    // preventing collisions between concurrent loops (#586).
+    try {
+      this.multiLoopManager = new ExternalMultiLoopStateManager(this.projectRoot);
+      this.multiLoopManager.ensureBaseDir();
+
+      // Check concurrent loop limit
+      const activeLoops = this.multiLoopManager.listActiveLoops();
+      console.log(`[External Ralph] Active loops: ${activeLoops.length}`);
+
+      // Register this loop (will enforce limit unless --force was used)
+      const registration = await this.multiLoopManager.createLoop(
+        {
+          objective: config.objective,
+          completionCriteria: config.completionCriteria,
+          maxIterations: config.maxIterations || 5,
+          model: config.model || 'opus',
+          budgetPerIteration: config.budgetPerIteration || 2.0,
+          timeoutMinutes: config.timeoutMinutes || 60,
+          mcpConfig: config.mcpConfig,
+          workingDir: config.workingDir || this.projectRoot,
+          giteaIntegration: config.giteaIntegration,
+        },
+        { force: config.force || false }
+      );
+
+      this.registeredLoopId = registration.loopId;
+      console.log(`[External Ralph] Registered in multi-loop registry: ${registration.loopId}`);
+
+      // Re-scope StateManager to the per-loop directory so all file I/O
+      // (session-state.json, iterations/, prompts/, outputs/, analysis/)
+      // is isolated from other concurrent loops.
+      const loopDir = join(this.projectRoot, '.aiwg', 'ralph-external', 'loops', this.registeredLoopId);
+      this.stateManager.setStateDir(loopDir);
+    } catch (error) {
+      // If multi-loop manager fails, continue with single-loop mode (flat dir)
+      console.warn(`[External Ralph] Multi-loop coordination unavailable: ${error.message}`);
+      console.log('[External Ralph] Continuing in single-loop mode');
+    }
+
+    // Initialize state — now in the per-loop dir if registered, flat dir otherwise
     const state = this.stateManager.initialize({
       objective: config.objective,
       completionCriteria: config.completionCriteria,
@@ -221,48 +273,6 @@ export class Orchestrator {
     }
     if (state.config.enableCheckpoints) {
       console.log(`[External Ralph] Periodic checkpoints: ENABLED (${state.config.checkpointIntervalMinutes} min)`);
-    }
-
-    // ========== MULTI-PROVIDER SUPPORT ==========
-    await ensureProvidersRegistered();
-    const providerName = config.provider || 'claude';
-    this.providerAdapter = createProvider(providerName);
-    this.sessionLauncher.setProviderAdapter(this.providerAdapter);
-    this.outputAnalyzer.setProviderAdapter(this.providerAdapter);
-    this.stateAssessor.setProviderAdapter(this.providerAdapter);
-    console.log(`[External Ralph] Provider: ${providerName}`);
-
-    // ========== MULTI-LOOP COORDINATION (REF-086, REF-088) ==========
-    try {
-      this.multiLoopManager = new ExternalMultiLoopStateManager(this.projectRoot);
-      this.multiLoopManager.ensureBaseDir();
-
-      // Check concurrent loop limit
-      const activeLoops = this.multiLoopManager.listActiveLoops();
-      console.log(`[External Ralph] Active loops: ${activeLoops.length}`);
-
-      // Register this loop (will enforce limit unless --force was used)
-      const registration = await this.multiLoopManager.createLoop(
-        {
-          objective: config.objective,
-          completionCriteria: config.completionCriteria,
-          maxIterations: config.maxIterations || 5,
-          model: config.model || 'opus',
-          budgetPerIteration: config.budgetPerIteration || 2.0,
-          timeoutMinutes: config.timeoutMinutes || 60,
-          mcpConfig: config.mcpConfig,
-          workingDir: config.workingDir || this.projectRoot,
-          giteaIntegration: config.giteaIntegration,
-        },
-        { force: config.force || false }
-      );
-
-      this.registeredLoopId = registration.loopId;
-      console.log(`[External Ralph] Registered in multi-loop registry: ${registration.loopId}`);
-    } catch (error) {
-      // If multi-loop manager fails, continue with single-loop mode
-      console.warn(`[External Ralph] Multi-loop coordination unavailable: ${error.message}`);
-      console.log('[External Ralph] Continuing in single-loop mode');
     }
 
     // ========== INITIALIZE RESEARCH MODULES ==========
@@ -1453,9 +1463,14 @@ ${state.filesModified.length > 0 ? state.filesModified.map(f => `- ${f}`).join('
         lastUpdate: new Date().toISOString(),
       });
 
-      // Archive the loop (moves from active to archive)
+      // Archive the loop (moves from active loops/ to archive/)
       await this.multiLoopManager.archiveLoop(this.registeredLoopId);
       console.log(`[External Ralph] Loop archived: ${this.registeredLoopId} (${finalStatus})`);
+
+      // archiveLoop() renamed the loop directory, so re-scope StateManager to
+      // the new archive location so load() and getStateDir() remain valid.
+      const archiveDir = join(this.projectRoot, '.aiwg', 'ralph-external', 'archive', this.registeredLoopId);
+      this.stateManager.setStateDir(archiveDir);
     } catch (error) {
       console.warn(`[External Ralph] Multi-loop completion failed: ${error.message}`);
     }

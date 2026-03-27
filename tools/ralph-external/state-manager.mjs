@@ -347,6 +347,20 @@ export class StateManager {
   getStateDir() {
     return this.stateDir;
   }
+
+  /**
+   * Re-scope all file I/O to a new directory.
+   *
+   * Call this before initialize() to route state into an isolated per-loop
+   * directory (e.g. after receiving a loopId from ExternalMultiLoopStateManager).
+   *
+   * @param {string} dir - Absolute path to the new state directory
+   */
+  setStateDir(dir) {
+    this.stateDir = dir;
+    this.statePath = join(dir, STATE_FILENAME);
+    this.backupPath = `${this.statePath}${BACKUP_SUFFIX}`;
+  }
 }
 
 // Re-export multi-loop manager for backward compatibility and future use
