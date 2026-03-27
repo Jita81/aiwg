@@ -234,7 +234,7 @@ aiwg use <framework|addon>
 - `<addon>` - Addon name: `rlm`
 
 **Options:**
-- `--provider <name>` - Target platform (claude, copilot, factory, cursor, windsurf, warp, openai, opencode)
+- `--provider <name>` - Target platform (claude, copilot, factory, cursor, windsurf, warp, codex, opencode, hermes, openclaw, local)
 - `--model <name>` - Override model for all tiers (blanket)
 - `--reasoning-model <name>` - Override reasoning tier model (alias: `--reasoning`)
 - `--coding-model <name>` - Override coding tier model (alias: `--coding`)
@@ -310,16 +310,27 @@ aiwg use sdlc --model sonnet --save
 
 **Platform targets:**
 
-| Platform | ID | Support Level |
-|----------|-----|---------------|
-| Claude Code | `claude` | Full |
-| GitHub Copilot | `copilot` | Full |
-| Factory AI | `factory` | Full |
-| Cursor | `cursor` | Full |
-| Windsurf | `windsurf` | Experimental |
-| Warp Terminal | `warp` | Full |
-| OpenAI/Codex | `openai` | Full |
-| OpenCode | `opencode` | Full |
+| Platform | `--provider` ID | Artifact dirs | Behaviors |
+|----------|-----------------|---------------|-----------|
+| Claude Code | `claude` | `.claude/agents/`, `.claude/commands/`, `.claude/skills/`, `.claude/rules/` | — |
+| GitHub Copilot | `copilot` | `.github/agents/`, `.github/copilot-rules/`, `.github/skills/` | — |
+| Factory AI | `factory` | `.factory/droids/`, `.factory/commands/`, `.factory/skills/`, `.factory/rules/` | — |
+| Cursor | `cursor` | `.cursor/agents/`, `.cursor/commands/`, `.cursor/skills/`, `.cursor/rules/` | — |
+| Windsurf | `windsurf` | `AGENTS.md` (aggregated), `.windsurf/workflows/`, `.windsurf/skills/`, `.windsurf/rules/` | — |
+| Warp Terminal | `warp` | `.warp/agents/`, `.warp/commands/`, `.warp/skills/`, `.warp/rules/`, `WARP.md` (aggregated) | — |
+| OpenAI/Codex | `codex` | `.codex/agents/`, `~/.codex/prompts/`, `~/.codex/skills/`, `.codex/rules/` | — |
+| OpenCode | `opencode` | `.opencode/agent/`, `.opencode/command/`, `.opencode/skill/`, `.opencode/rule/` | — |
+| Hermes | `hermes` | `~/.hermes/skills/`, `AGENTS.md` (lean) | — |
+| OpenClaw | `openclaw` | `~/.openclaw/agents/`, `~/.openclaw/commands/`, `~/.openclaw/skills/`, `~/.openclaw/rules/`, `~/.openclaw/behaviors/` | ✓ |
+| Local/Ollama | `local` | Same as `claude` (local model, Claude Code paths) | — |
+
+**Notes:**
+- **Codex**: Commands and skills deploy to `~` (user-level) for availability across all projects; the provider ID is `codex`, not `openai`
+- **Windsurf**: Agents aggregated into `AGENTS.md` at project root; no separate agent files
+- **Warp**: Agents and commands also aggregated into `WARP.md` for single-file context loading
+- **Hermes**: Not a spawnable CLI — access via `ollama run hermes3` or MCP sidecar; deploy sets up skills and a lean AGENTS.md
+- **OpenClaw**: Only provider with behaviors support (`~/.openclaw/behaviors/`); all artifacts deploy to home directory
+- **Local/Ollama**: Uses Claude Code path layout; specify `--coding-model ollama/<model>` to route coding tasks to the local model
 
 ---
 
@@ -1248,7 +1259,7 @@ aiwg ralph "<task-description>"
 - `--completion "<criteria>"` - Success criteria (e.g., "npm test passes")
 - `--max-iterations <n>` - Maximum iterations (default: 10)
 - `--timeout <seconds>` - Per-iteration timeout (default: 300)
-- `--provider <name>` - CLI provider: claude (default), codex
+- `--provider <name>` - CLI provider: `claude` (default), `codex`, `opencode`, `local`
 - `--budget <usd>` - Budget per iteration in USD (default: 2.0)
 - `--gitea-issue` - Create/link Gitea issue for tracking
 - `--mcp-config <json>` - MCP server configuration JSON
@@ -2422,14 +2433,41 @@ ls .claude/commands
 ### Multi-Platform Deployment
 
 ```bash
-# Deploy to Claude Code
-aiwg use sdlc --provider claude
+# Claude Code (default — auto-detected)
+aiwg use sdlc
 
-# Deploy to GitHub Copilot
+# GitHub Copilot
 aiwg use sdlc --provider copilot
 
-# Deploy to Cursor
+# Cursor
 aiwg use sdlc --provider cursor
+
+# Windsurf
+aiwg use sdlc --provider windsurf
+
+# Warp Terminal
+aiwg use sdlc --provider warp
+
+# Factory AI
+aiwg use sdlc --provider factory
+
+# OpenAI / Codex  (commands + skills deploy to ~/.codex/)
+aiwg use sdlc --provider codex
+
+# OpenCode
+aiwg use sdlc --provider opencode
+
+# Hermes (MCP sidecar — skills + lean AGENTS.md)
+aiwg use sdlc --provider hermes
+
+# OpenClaw (includes behaviors in ~/.openclaw/behaviors/)
+aiwg use sdlc --provider openclaw
+
+# Local / Ollama  (Claude Code paths, route coding tasks to local model)
+aiwg use sdlc --provider local --coding-model ollama/qwen3.5:9b
+
+# All platforms at once
+aiwg use sdlc --provider all
 ```
 
 ### Framework Management
