@@ -63,6 +63,16 @@ const PLATFORM_CONFIGS: Record<Platform, PlatformSkillConfig> = {
     extension: '.md',
     supportsSkills: true,
   },
+  hermes: {
+    baseDir: '.hermes/skills',
+    extension: '.md',
+    supportsSkills: true,
+  },
+  openclaw: {
+    baseDir: '.openclaw/skills',
+    extension: '.md',
+    supportsSkills: true,
+  },
 };
 
 /**

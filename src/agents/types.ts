@@ -17,11 +17,13 @@
  * | warp       | .warp/agents/            | WARP.md              | ✅ Full       |
  * | windsurf   | .windsurf/agents/        | .windsurfrules       | 🧪 Experimental |
  * | copilot    | .github/agents/          | copilot-instructions | ✅ Full       |
+ * | hermes     | ~/.hermes/skills/        | AGENTS.md            | ✅ MCP sidecar |
+ * | openclaw   | ~/.openclaw/agents/      | AGENTS.md            | ✅ Full       |
  * | generic    | agents/                  | varies               | ✅ Full       |
  *
  * CLI usage: --provider <platform> or --platform <platform>
  */
-export type Platform = 'claude' | 'codex' | 'copilot' | 'cursor' | 'factory' | 'opencode' | 'warp' | 'windsurf' | 'generic';
+export type Platform = 'claude' | 'codex' | 'copilot' | 'cursor' | 'factory' | 'hermes' | 'opencode' | 'openclaw' | 'warp' | 'windsurf' | 'generic';
 export type AgentCategory = 'writing-quality' | 'sdlc' | 'security' | 'testing' | 'architecture' | 'documentation' | 'general';
 export type ArtifactType = 'agent' | 'command' | 'skill' | 'rule';
 export type SupportLevel = 'native' | 'conventional' | 'aggregated';

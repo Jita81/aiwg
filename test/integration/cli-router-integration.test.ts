@@ -466,8 +466,8 @@ describe('CLI Router Integration Tests', () => {
     it('should have all expected command categories in registry', async () => {
       const registry = await initRouter();
 
-      // Get all command extensions
-      const commands = registry.registry.getByType('command');
+      // Get all command extensions (skills are the canonical source format for CLI commands)
+      const commands = registry.registry.getByType('skill');
 
       // Extract categories
       const categories = new Set(

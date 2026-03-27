@@ -1,0 +1,15 @@
+{
+  "name": "aiwg-media",
+  "version": "2026.3.3",
+  "description": "AIWG Media & Marketing framework — 50 skills combining marketing operations (campaigns, content, brand, analytics) with media curation (artist analysis, source discovery, metadata management, archival).",
+  "homepage": "https://aiwg.io",
+  "repository": "https://github.com/jmagly/aiwg",
+  "skills": "./skills",
+  "includes": ["../media-curator/skills"],
+  "tags": ["marketing", "media", "content", "campaigns", "brand", "analytics", "curation", "archival"],
+  "license": "MIT",
+  "author": "AIWG Contributors",
+  "engines": {
+    "openclaw": ">=0.4.0"
+  }
+}

@@ -401,6 +401,8 @@ export class AgentDeployer {
       warp: '.warp/agents',
       generic: 'agents',
       windsurf: '.windsurf/agents',
+      hermes: '',
+      openclaw: '.openclaw/agents',
     };
 
     return path.resolve(target.projectPath, platformDirs[target.platform]);

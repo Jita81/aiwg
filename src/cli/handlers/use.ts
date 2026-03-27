@@ -78,7 +78,7 @@ const PROVIDER_PATHS: Record<string, { agents: string; skills: string; commands:
   opencode: {
     agents: '.opencode/agent',
     skills: '.opencode/skill',
-    commands: '.opencode/command',
+    commands: '.opencode/commands',
     rules: '.opencode/rule',
   },
   copilot: {

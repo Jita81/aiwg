@@ -245,6 +245,37 @@ export class ClawHubAdapter implements RegistryAdapter {
   }
 
   async publish(packageDir: string): Promise<void> {
+    // Ensure clawhub.json exists — generate from manifest.json if missing
+    const clawHubManifestPath = path.join(packageDir, 'clawhub.json');
+    if (!fs.existsSync(clawHubManifestPath)) {
+      const manifestPath = path.join(packageDir, 'manifest.json');
+      if (fs.existsSync(manifestPath)) {
+        const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+        const pkgJsonPath = path.resolve(packageDir, '..', '..', '..', '..', 'package.json');
+        let version = '0.0.0';
+        try {
+          const pkg = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf-8'));
+          version = pkg.version || version;
+        } catch {
+          // Use default version
+        }
+
+        const clawHubManifest = {
+          name: manifest.name || path.basename(packageDir),
+          version,
+          description: manifest.description || '',
+          homepage: 'https://aiwg.io',
+          repository: 'https://github.com/jmagly/aiwg',
+          skills: './skills',
+          tags: manifest.tags || manifest.keywords || [],
+          license: 'MIT',
+          author: 'AIWG Contributors',
+        };
+
+        fs.writeFileSync(clawHubManifestPath, JSON.stringify(clawHubManifest, null, 2) + '\n', 'utf-8');
+      }
+    }
+
     // Try CLI publish
     const cliResult = runClawHub(`publish "${packageDir}" 2>/dev/null`);
     if (cliResult !== null) return;

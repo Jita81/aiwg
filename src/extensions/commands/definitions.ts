@@ -11,7 +11,7 @@
  * @issue #42
  */
 
-import type { Extension, CommandMetadata } from '../types.js';
+import type { Extension, SkillMetadata } from '../types.js';
 
 // ============================================
 // Individual Command Definitions
@@ -21,7 +21,7 @@ import type { Extension, CommandMetadata } from '../types.js';
 
 export const helpCommand: Extension = {
   id: 'help',
-  type: 'command',
+  type: 'skill',
   name: 'Help',
   description: 'Show all CLI commands, arguments, and usage examples',
   version: '1.0.0',
@@ -37,15 +37,18 @@ export const helpCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    allowedTools: [],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['help', 'show commands', 'usage', 'what commands are available'],
+    commandHint: {
+      template: 'utility',
+      allowedTools: [],
+    },
+  } satisfies SkillMetadata,
 };
 
 export const versionCommand: Extension = {
   id: 'version',
-  type: 'command',
+  type: 'skill',
   name: 'Version',
   description: 'Show version and channel information',
   version: '1.0.0',
@@ -61,15 +64,18 @@ export const versionCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    allowedTools: ['Read'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['version', 'what version', 'show version', 'current version'],
+    commandHint: {
+      template: 'utility',
+      allowedTools: ['Read'],
+    },
+  } satisfies SkillMetadata,
 };
 
 export const doctorCommand: Extension = {
   id: 'doctor',
-  type: 'command',
+  type: 'skill',
   name: 'Doctor',
   description: 'Check installation health and diagnose issues',
   version: '1.0.0',
@@ -85,15 +91,18 @@ export const doctorCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    allowedTools: ['Read', 'Bash'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['doctor', 'check health', 'diagnose', 'troubleshoot installation'],
+    commandHint: {
+      template: 'utility',
+      allowedTools: ['Read', 'Bash'],
+    },
+  } satisfies SkillMetadata,
 };
 
 export const updateCommand: Extension = {
   id: 'update',
-  type: 'command',
+  type: 'skill',
   name: 'Update',
   description: 'Update AIWG and re-deploy installed frameworks from registry',
   version: '1.0.0',
@@ -109,22 +118,25 @@ export const updateCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    allowedTools: ['Bash', 'Read'],
-    argumentHint: '[--all] [--dry-run] [--provider <name>] [--skip-check]',
-    executionSteps: [
-      'Check for npm/git updates',
-      'Read .aiwg/frameworks/registry.json',
-      'Re-deploy installed frameworks',
-      'Report update summary',
-    ],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['update', 'upgrade aiwg', 'update aiwg', 'refresh frameworks'],
+    commandHint: {
+      template: 'utility',
+      allowedTools: ['Bash', 'Read'],
+      argumentHint: '[--all] [--dry-run] [--provider <name>] [--skip-check]',
+      executionSteps: [
+        'Check for npm/git updates',
+        'Read .aiwg/frameworks/registry.json',
+        'Re-deploy installed frameworks',
+        'Report update summary',
+      ],
+    },
+  } satisfies SkillMetadata,
 };
 
 export const syncCommand: Extension = {
   id: 'sync',
-  type: 'command',
+  type: 'skill',
   name: 'Sync',
   description: 'Sync AIWG to latest version and re-deploy all frameworks to active provider',
   version: '1.0.0',
@@ -140,26 +152,29 @@ export const syncCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    allowedTools: ['Bash', 'Read'],
-    argumentHint: '[--provider <name>] [--dry-run] [--frameworks <list>] [--channel <stable|next>] [--skip-update] [--quiet]',
-    executionSteps: [
-      'Detect active provider via runtime-info',
-      'Check current version vs latest on channel',
-      'Update package if newer available',
-      'Re-deploy all installed frameworks to provider',
-      'Run doctor health check',
-      'Output sync summary',
-    ],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['sync', 'sync aiwg', 'sync to latest', 'redeploy frameworks'],
+    commandHint: {
+      template: 'utility',
+      allowedTools: ['Bash', 'Read'],
+      argumentHint: '[--provider <name>] [--dry-run] [--frameworks <list>] [--channel <stable|next>] [--skip-update] [--quiet]',
+      executionSteps: [
+        'Detect active provider via runtime-info',
+        'Check current version vs latest on channel',
+        'Update package if newer available',
+        'Re-deploy all installed frameworks to provider',
+        'Run doctor health check',
+        'Output sync summary',
+      ],
+    },
+  } satisfies SkillMetadata,
 };
 
 // Framework Management Commands
 
 export const useCommand: Extension = {
   id: 'use',
-  type: 'command',
+  type: 'skill',
   name: 'Use',
   description: 'Deploy SDLC, marketing, or writing framework (or addon) to workspace',
   version: '1.0.0',
@@ -180,23 +195,26 @@ export const useCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'orchestration',
-    argumentHint: '<framework|addon>',
-    allowedTools: ['Read', 'Write', 'Bash', 'Glob'],
-    executionSteps: [
-      'Validate framework name',
-      'Check dependencies',
-      'Deploy framework files',
-      'Register in framework registry',
-      'Deploy platform-specific adaptations',
-    ],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['use framework', 'deploy framework', 'install framework', 'use sdlc', 'use addon'],
+    commandHint: {
+      template: 'orchestration',
+      argumentHint: '<framework|addon>',
+      allowedTools: ['Read', 'Write', 'Bash', 'Glob'],
+      executionSteps: [
+        'Validate framework name',
+        'Check dependencies',
+        'Deploy framework files',
+        'Register in framework registry',
+        'Deploy platform-specific adaptations',
+      ],
+    },
+  } satisfies SkillMetadata,
 };
 
 export const listCommand: Extension = {
   id: 'list',
-  type: 'command',
+  type: 'skill',
   name: 'List',
   description: 'List installed frameworks and addons',
   version: '1.0.0',
@@ -212,15 +230,18 @@ export const listCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    allowedTools: ['Read'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['list frameworks', 'show installed', 'list addons', 'what is installed'],
+    commandHint: {
+      template: 'utility',
+      allowedTools: ['Read'],
+    },
+  } satisfies SkillMetadata,
 };
 
 export const removeCommand: Extension = {
   id: 'remove',
-  type: 'command',
+  type: 'skill',
   name: 'Remove',
   description: 'Remove a framework or addon',
   version: '1.0.0',
@@ -236,18 +257,21 @@ export const removeCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'orchestration',
-    argumentHint: '<id>',
-    allowedTools: ['Read', 'Write', 'Bash'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['remove framework', 'uninstall framework', 'remove addon', 'uninstall addon'],
+    commandHint: {
+      template: 'orchestration',
+      argumentHint: '<id>',
+      allowedTools: ['Read', 'Write', 'Bash'],
+    },
+  } satisfies SkillMetadata,
 };
 
 // Project Setup Commands
 
 export const newCommand: Extension = {
   id: 'new',
-  type: 'command',
+  type: 'skill',
   name: 'New Project',
   description: 'Scaffold new project with .aiwg/ directory and templates',
   version: '1.0.0',
@@ -263,23 +287,26 @@ export const newCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'orchestration',
-    allowedTools: ['Read', 'Write', 'Bash'],
-    executionSteps: [
-      'Create .aiwg/ directory structure',
-      'Deploy SDLC templates',
-      'Deploy agents',
-      'Initialize framework registry',
-    ],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['new project', 'create project', 'init project', 'scaffold project'],
+    commandHint: {
+      template: 'orchestration',
+      allowedTools: ['Read', 'Write', 'Bash'],
+      executionSteps: [
+        'Create .aiwg/ directory structure',
+        'Deploy SDLC templates',
+        'Deploy agents',
+        'Initialize framework registry',
+      ],
+    },
+  } satisfies SkillMetadata,
 };
 
 // Workspace Management Commands
 
 export const statusCommand: Extension = {
   id: 'status',
-  type: 'command',
+  type: 'skill',
   name: 'Status',
   description: 'Show workspace health, installed frameworks, and artifacts',
   version: '1.0.0',
@@ -295,15 +322,18 @@ export const statusCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    allowedTools: ['Read', 'Bash'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['status', 'workspace status', 'show health', 'project status'],
+    commandHint: {
+      template: 'utility',
+      allowedTools: ['Read', 'Bash'],
+    },
+  } satisfies SkillMetadata,
 };
 
 export const migrateWorkspaceCommand: Extension = {
   id: 'migrate-workspace',
-  type: 'command',
+  type: 'skill',
   name: 'Migrate Workspace',
   description: 'Upgrade .aiwg/ structure to support multi-framework layout',
   version: '1.0.0',
@@ -319,15 +349,18 @@ export const migrateWorkspaceCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'orchestration',
-    allowedTools: ['Read', 'Write', 'Bash'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['migrate workspace', 'upgrade workspace', 'migrate aiwg directory'],
+    commandHint: {
+      template: 'orchestration',
+      allowedTools: ['Read', 'Write', 'Bash'],
+    },
+  } satisfies SkillMetadata,
 };
 
 export const rollbackWorkspaceCommand: Extension = {
   id: 'rollback-workspace',
-  type: 'command',
+  type: 'skill',
   name: 'Rollback Workspace',
   description: 'Restore workspace to pre-migration state from backup',
   version: '1.0.0',
@@ -343,17 +376,20 @@ export const rollbackWorkspaceCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'orchestration',
-    allowedTools: ['Read', 'Write', 'Bash'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['rollback workspace', 'restore workspace', 'undo migration', 'workspace backup'],
+    commandHint: {
+      template: 'orchestration',
+      allowedTools: ['Read', 'Write', 'Bash'],
+    },
+  } satisfies SkillMetadata,
 };
 
 // MCP Commands
 
 export const mcpCommand: Extension = {
   id: 'mcp',
-  type: 'command',
+  type: 'skill',
   name: 'MCP',
   description: 'MCP server operations (serve, install, add, remove, update, list, inject, info)',
   version: '1.0.0',
@@ -369,18 +405,21 @@ export const mcpCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'orchestration',
-    argumentHint: '<subcommand>',
-    allowedTools: ['Read', 'Write', 'Bash'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['mcp', 'mcp server', 'start mcp', 'mcp serve', 'mcp install'],
+    commandHint: {
+      template: 'orchestration',
+      argumentHint: '<subcommand>',
+      allowedTools: ['Read', 'Write', 'Bash'],
+    },
+  } satisfies SkillMetadata,
 };
 
 // Catalog Commands
 
 export const catalogCommand: Extension = {
   id: 'catalog',
-  type: 'command',
+  type: 'skill',
   name: 'Catalog',
   description: 'Model catalog operations (list, info, search)',
   version: '1.0.0',
@@ -396,18 +435,21 @@ export const catalogCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    argumentHint: '<subcommand>',
-    allowedTools: ['Read'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['catalog', 'model catalog', 'list models', 'search catalog'],
+    commandHint: {
+      template: 'utility',
+      argumentHint: '<subcommand>',
+      allowedTools: ['Read'],
+    },
+  } satisfies SkillMetadata,
 };
 
 // Skills Commands
 
 export const skillsCommand: Extension = {
   id: 'skills',
-  type: 'command',
+  type: 'skill',
   name: 'Skills Registry',
   description: 'Skill registry commands (search, info, list, install, publish)',
   version: '1.0.0',
@@ -423,18 +465,21 @@ export const skillsCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    argumentHint: '<subcommand>',
-    allowedTools: ['Read', 'Bash'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['skills', 'skills registry', 'search skills', 'install skill', 'publish skill'],
+    commandHint: {
+      template: 'utility',
+      argumentHint: '<subcommand>',
+      allowedTools: ['Read', 'Bash'],
+    },
+  } satisfies SkillMetadata,
 };
 
 // Index Commands
 
 export const indexCommand: Extension = {
   id: 'index',
-  type: 'command',
+  type: 'skill',
   name: 'Artifact Index',
   description: 'Artifact index commands (build, query, deps, stats)',
   version: '1.0.0',
@@ -450,18 +495,21 @@ export const indexCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    argumentHint: '<subcommand> [options]',
-    allowedTools: ['Read', 'Glob', 'Grep'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['index', 'build index', 'query index', 'artifact index', 'index stats'],
+    commandHint: {
+      template: 'utility',
+      argumentHint: '<subcommand> [options]',
+      allowedTools: ['Read', 'Glob', 'Grep'],
+    },
+  } satisfies SkillMetadata,
 };
 
 // Toolsmith Commands
 
 export const runtimeInfoCommand: Extension = {
   id: 'runtime-info',
-  type: 'command',
+  type: 'skill',
   name: 'Runtime Info',
   description: 'Display runtime environment, available tools, and capabilities',
   version: '1.0.0',
@@ -477,17 +525,20 @@ export const runtimeInfoCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    allowedTools: ['Read', 'Bash'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['runtime info', 'show runtime', 'available tools', 'runtime environment'],
+    commandHint: {
+      template: 'utility',
+      allowedTools: ['Read', 'Bash'],
+    },
+  } satisfies SkillMetadata,
 };
 
 // Utility Commands
 
 export const prefillCardsCommand: Extension = {
   id: 'prefill-cards',
-  type: 'command',
+  type: 'skill',
   name: 'Prefill Cards',
   description: 'Auto-populate SDLC artifact metadata from team configuration',
   version: '1.0.0',
@@ -503,15 +554,18 @@ export const prefillCardsCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'transformation',
-    allowedTools: ['Read', 'Write'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['prefill cards', 'populate metadata', 'fill sdlc cards', 'auto-populate artifacts'],
+    commandHint: {
+      template: 'transformation',
+      allowedTools: ['Read', 'Write'],
+    },
+  } satisfies SkillMetadata,
 };
 
 export const contributeStartCommand: Extension = {
   id: 'contribute-start',
-  type: 'command',
+  type: 'skill',
   name: 'Contribute Start',
   description: 'Initialize contribution with branch, issue tracking, and DCO',
   version: '1.0.0',
@@ -527,15 +581,18 @@ export const contributeStartCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'orchestration',
-    allowedTools: ['Read', 'Write', 'Bash'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['contribute start', 'start contribution', 'new contribution', 'init contribution'],
+    commandHint: {
+      template: 'orchestration',
+      allowedTools: ['Read', 'Write', 'Bash'],
+    },
+  } satisfies SkillMetadata,
 };
 
 export const validateMetadataCommand: Extension = {
   id: 'validate-metadata',
-  type: 'command',
+  type: 'skill',
   name: 'Validate Metadata',
   description: 'Validate extension metadata against schema requirements',
   version: '1.0.0',
@@ -551,17 +608,20 @@ export const validateMetadataCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    allowedTools: ['Read'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['validate metadata', 'check metadata', 'validate extensions', 'metadata quality'],
+    commandHint: {
+      template: 'utility',
+      allowedTools: ['Read'],
+    },
+  } satisfies SkillMetadata,
 };
 
 // Plugin Commands
 
 export const installPluginCommand: Extension = {
   id: 'install-plugin',
-  type: 'command',
+  type: 'skill',
   name: 'Install Plugin',
   description: 'Install Claude Code plugin',
   version: '1.0.0',
@@ -576,16 +636,19 @@ export const installPluginCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    argumentHint: '<name>',
-    allowedTools: ['Read', 'Write', 'Bash'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['install plugin', 'add plugin', 'plugin install'],
+    commandHint: {
+      template: 'utility',
+      argumentHint: '<name>',
+      allowedTools: ['Read', 'Write', 'Bash'],
+    },
+  } satisfies SkillMetadata,
 };
 
 export const uninstallPluginCommand: Extension = {
   id: 'uninstall-plugin',
-  type: 'command',
+  type: 'skill',
   name: 'Uninstall Plugin',
   description: 'Uninstall Claude Code plugin',
   version: '1.0.0',
@@ -600,16 +663,19 @@ export const uninstallPluginCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    argumentHint: '<name>',
-    allowedTools: ['Read', 'Write', 'Bash'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['uninstall plugin', 'remove plugin', 'plugin uninstall'],
+    commandHint: {
+      template: 'utility',
+      argumentHint: '<name>',
+      allowedTools: ['Read', 'Write', 'Bash'],
+    },
+  } satisfies SkillMetadata,
 };
 
 export const pluginStatusCommand: Extension = {
   id: 'plugin-status',
-  type: 'command',
+  type: 'skill',
   name: 'Plugin Status',
   description: 'Show Claude Code plugin status',
   version: '1.0.0',
@@ -624,15 +690,18 @@ export const pluginStatusCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    allowedTools: ['Read'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['plugin status', 'show plugins', 'list plugins'],
+    commandHint: {
+      template: 'utility',
+      allowedTools: ['Read'],
+    },
+  } satisfies SkillMetadata,
 };
 
 export const packagePluginCommand: Extension = {
   id: 'package-plugin',
-  type: 'command',
+  type: 'skill',
   name: 'Package Plugin',
   description: 'Bundle plugin for Claude Code marketplace distribution',
   version: '1.0.0',
@@ -648,16 +717,19 @@ export const packagePluginCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'orchestration',
-    argumentHint: '<name>',
-    allowedTools: ['Read', 'Write', 'Bash'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['package plugin', 'bundle plugin', 'publish plugin'],
+    commandHint: {
+      template: 'orchestration',
+      argumentHint: '<name>',
+      allowedTools: ['Read', 'Write', 'Bash'],
+    },
+  } satisfies SkillMetadata,
 };
 
 export const packageAllPluginsCommand: Extension = {
   id: 'package-all-plugins',
-  type: 'command',
+  type: 'skill',
   name: 'Package All Plugins',
   description: 'Bundle all plugins for marketplace in batch operation',
   version: '1.0.0',
@@ -673,17 +745,20 @@ export const packageAllPluginsCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'orchestration',
-    allowedTools: ['Read', 'Write', 'Bash'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['package all plugins', 'bundle all plugins', 'publish all plugins'],
+    commandHint: {
+      template: 'orchestration',
+      allowedTools: ['Read', 'Write', 'Bash'],
+    },
+  } satisfies SkillMetadata,
 };
 
 // Scaffolding Commands
 
 export const addAgentCommand: Extension = {
   id: 'add-agent',
-  type: 'command',
+  type: 'skill',
   name: 'Add Agent',
   description: 'Add agent to addon/framework',
   version: '1.0.0',
@@ -699,16 +774,19 @@ export const addAgentCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'orchestration',
-    argumentHint: '<name>',
-    allowedTools: ['Read', 'Write'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['add agent', 'create agent', 'scaffold agent', 'new agent'],
+    commandHint: {
+      template: 'orchestration',
+      argumentHint: '<name>',
+      allowedTools: ['Read', 'Write'],
+    },
+  } satisfies SkillMetadata,
 };
 
 export const addCommandCommand: Extension = {
   id: 'add-command',
-  type: 'command',
+  type: 'skill',
   name: 'Add Command',
   description: 'Add command to addon/framework',
   version: '1.0.0',
@@ -724,16 +802,19 @@ export const addCommandCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'orchestration',
-    argumentHint: '<name>',
-    allowedTools: ['Read', 'Write'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['add command', 'create command', 'scaffold command', 'new command'],
+    commandHint: {
+      template: 'orchestration',
+      argumentHint: '<name>',
+      allowedTools: ['Read', 'Write'],
+    },
+  } satisfies SkillMetadata,
 };
 
 export const addSkillCommand: Extension = {
   id: 'add-skill',
-  type: 'command',
+  type: 'skill',
   name: 'Add Skill',
   description: 'Add skill to addon/framework',
   version: '1.0.0',
@@ -749,16 +830,19 @@ export const addSkillCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'orchestration',
-    argumentHint: '<name>',
-    allowedTools: ['Read', 'Write'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['add skill', 'create skill', 'scaffold skill', 'new skill'],
+    commandHint: {
+      template: 'orchestration',
+      argumentHint: '<name>',
+      allowedTools: ['Read', 'Write'],
+    },
+  } satisfies SkillMetadata,
 };
 
 export const addBehaviorCommand: Extension = {
   id: 'add-behavior',
-  type: 'command',
+  type: 'skill',
   name: 'Add Behavior',
   description: 'Scaffold a new behavior with BEHAVIOR.md and scripts',
   version: '1.0.0',
@@ -775,16 +859,19 @@ export const addBehaviorCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'orchestration',
-    argumentHint: '<name>',
-    allowedTools: ['Read', 'Write'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['add behavior', 'create behavior', 'scaffold behavior', 'new behavior'],
+    commandHint: {
+      template: 'orchestration',
+      argumentHint: '<name>',
+      allowedTools: ['Read', 'Write'],
+    },
+  } satisfies SkillMetadata,
 };
 
 export const addTemplateCommand: Extension = {
   id: 'add-template',
-  type: 'command',
+  type: 'skill',
   name: 'Add Template',
   description: 'Add template to addon/framework',
   version: '1.0.0',
@@ -800,16 +887,19 @@ export const addTemplateCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'orchestration',
-    argumentHint: '<name>',
-    allowedTools: ['Read', 'Write'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['add template', 'create template', 'scaffold template', 'new template'],
+    commandHint: {
+      template: 'orchestration',
+      argumentHint: '<name>',
+      allowedTools: ['Read', 'Write'],
+    },
+  } satisfies SkillMetadata,
 };
 
 export const scaffoldAddonCommand: Extension = {
   id: 'scaffold-addon',
-  type: 'command',
+  type: 'skill',
   name: 'Scaffold Addon',
   description: 'Create new addon package',
   version: '1.0.0',
@@ -825,16 +915,19 @@ export const scaffoldAddonCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'orchestration',
-    argumentHint: '<name>',
-    allowedTools: ['Read', 'Write'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['scaffold addon', 'create addon', 'new addon package'],
+    commandHint: {
+      template: 'orchestration',
+      argumentHint: '<name>',
+      allowedTools: ['Read', 'Write'],
+    },
+  } satisfies SkillMetadata,
 };
 
 export const scaffoldExtensionCommand: Extension = {
   id: 'scaffold-extension',
-  type: 'command',
+  type: 'skill',
   name: 'Scaffold Extension',
   description: 'Create new extension package',
   version: '1.0.0',
@@ -850,16 +943,19 @@ export const scaffoldExtensionCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'orchestration',
-    argumentHint: '<name>',
-    allowedTools: ['Read', 'Write'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['scaffold extension', 'create extension', 'new extension package'],
+    commandHint: {
+      template: 'orchestration',
+      argumentHint: '<name>',
+      allowedTools: ['Read', 'Write'],
+    },
+  } satisfies SkillMetadata,
 };
 
 export const scaffoldFrameworkCommand: Extension = {
   id: 'scaffold-framework',
-  type: 'command',
+  type: 'skill',
   name: 'Scaffold Framework',
   description: 'Create new framework package',
   version: '1.0.0',
@@ -875,18 +971,21 @@ export const scaffoldFrameworkCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'orchestration',
-    argumentHint: '<name>',
-    allowedTools: ['Read', 'Write'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['scaffold framework', 'create framework', 'new framework package'],
+    commandHint: {
+      template: 'orchestration',
+      argumentHint: '<name>',
+      allowedTools: ['Read', 'Write'],
+    },
+  } satisfies SkillMetadata,
 };
 
 // Ralph Commands
 
 export const ralphCommand: Extension = {
   id: 'ralph',
-  type: 'command',
+  type: 'skill',
   name: 'Ralph',
   description: 'Start Ralph task execution loop',
   version: '1.0.0',
@@ -902,16 +1001,19 @@ export const ralphCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'orchestration',
-    argumentHint: '<task-description>',
-    allowedTools: ['Read', 'Write', 'Bash'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['ralph', 'start ralph', 'run ralph', 'ralph loop', 'start task loop'],
+    commandHint: {
+      template: 'orchestration',
+      argumentHint: '<task-description>',
+      allowedTools: ['Read', 'Write', 'Bash'],
+    },
+  } satisfies SkillMetadata,
 };
 
 export const ralphStatusCommand: Extension = {
   id: 'ralph-status',
-  type: 'command',
+  type: 'skill',
   name: 'Ralph Status',
   description: 'Show Ralph loop status',
   version: '1.0.0',
@@ -927,15 +1029,18 @@ export const ralphStatusCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    allowedTools: ['Read'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['ralph status', 'show ralph status', 'loop status'],
+    commandHint: {
+      template: 'utility',
+      allowedTools: ['Read'],
+    },
+  } satisfies SkillMetadata,
 };
 
 export const ralphAbortCommand: Extension = {
   id: 'ralph-abort',
-  type: 'command',
+  type: 'skill',
   name: 'Ralph Abort',
   description: 'Abort running Ralph loop',
   version: '1.0.0',
@@ -951,15 +1056,18 @@ export const ralphAbortCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    allowedTools: ['Read', 'Write'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['ralph abort', 'abort ralph', 'stop ralph', 'cancel ralph'],
+    commandHint: {
+      template: 'utility',
+      allowedTools: ['Read', 'Write'],
+    },
+  } satisfies SkillMetadata,
 };
 
 export const ralphResumeCommand: Extension = {
   id: 'ralph-resume',
-  type: 'command',
+  type: 'skill',
   name: 'Ralph Resume',
   description: 'Resume paused Ralph loop',
   version: '1.0.0',
@@ -975,15 +1083,18 @@ export const ralphResumeCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    allowedTools: ['Read', 'Write'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['ralph resume', 'resume ralph', 'continue ralph', 'unpause ralph'],
+    commandHint: {
+      template: 'utility',
+      allowedTools: ['Read', 'Write'],
+    },
+  } satisfies SkillMetadata,
 };
 
 export const ralphAttachCommand: Extension = {
   id: 'ralph-attach',
-  type: 'command',
+  type: 'skill',
   name: 'Ralph Attach',
   description: 'Attach to a running Ralph loop\'s live output stream. Press Ctrl+C to detach.',
   version: '1.0.0',
@@ -999,16 +1110,19 @@ export const ralphAttachCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    allowedTools: ['Read'],
-    argumentHint: '[--loop-id <id>]',
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['ralph attach', 'attach to ralph', 'follow ralph', 'watch ralph output'],
+    commandHint: {
+      template: 'utility',
+      allowedTools: ['Read'],
+      argumentHint: '[--loop-id <id>]',
+    },
+  } satisfies SkillMetadata,
 };
 
 export const ralphExternalCommand: Extension = {
   id: 'ralph-external',
-  type: 'command',
+  type: 'skill',
   name: 'Ralph External',
   description: 'Crash-resilient external loop with state persistence and CI/CD integration',
   version: '1.0.0',
@@ -1024,16 +1138,19 @@ export const ralphExternalCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    allowedTools: ['Bash', 'Read', 'Write'],
-    argumentHint: '"<objective>" --completion "<criteria>"',
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['ralph external', 'external ralph', 'crash-resilient loop', 'persistent ralph'],
+    commandHint: {
+      template: 'utility',
+      allowedTools: ['Bash', 'Read', 'Write'],
+      argumentHint: '"<objective>" --completion "<criteria>"',
+    },
+  } satisfies SkillMetadata,
 };
 
 export const ralphMemoryCommand: Extension = {
   id: 'ralph-memory',
-  type: 'command',
+  type: 'skill',
   name: 'Ralph Memory',
   description: 'Manage Ralph semantic memory entries (list, query, clear)',
   version: '1.0.0',
@@ -1049,16 +1166,19 @@ export const ralphMemoryCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    allowedTools: ['Read', 'Write'],
-    argumentHint: '<list|query|clear> [options]',
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['ralph memory', 'ralph memories', 'list ralph memory', 'query ralph memory'],
+    commandHint: {
+      template: 'utility',
+      allowedTools: ['Read', 'Write'],
+      argumentHint: '<list|query|clear> [options]',
+    },
+  } satisfies SkillMetadata,
 };
 
 export const ralphConfigCommand: Extension = {
   id: 'ralph-config',
-  type: 'command',
+  type: 'skill',
   name: 'Ralph Config',
   description: 'View and configure Ralph loop settings (show, set, reset, preset)',
   version: '1.0.0',
@@ -1074,18 +1194,21 @@ export const ralphConfigCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    allowedTools: ['Read', 'Write'],
-    argumentHint: '<show|set|reset|preset> [key] [value]',
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['ralph config', 'configure ralph', 'ralph settings', 'show ralph config'],
+    commandHint: {
+      template: 'utility',
+      allowedTools: ['Read', 'Write'],
+      argumentHint: '<show|set|reset|preset> [key] [value]',
+    },
+  } satisfies SkillMetadata,
 };
 
 // Mission Control Commands
 
 export const mcCommand: Extension = {
   id: 'mc',
-  type: 'command',
+  type: 'skill',
   name: 'Mission Control',
   description: 'Multi-loop background orchestration dashboard (start, dispatch, status, watch, stop)',
   version: '1.0.0',
@@ -1101,24 +1224,27 @@ export const mcCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'orchestration',
-    allowedTools: ['Bash', 'Read', 'Write'],
-    argumentHint: '<subcommand> [options]',
-    executionSteps: [
-      'Parse subcommand (start, dispatch, status, watch, abort, pause, resume, stop, list)',
-      'Route to appropriate subcommand handler',
-      'Read/write session state from .aiwg/ralph-external/mc/',
-      'Display results or status dashboard',
-    ],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['mission control', 'mc', 'start mission control', 'background orchestration', 'mc dispatch'],
+    commandHint: {
+      template: 'orchestration',
+      allowedTools: ['Bash', 'Read', 'Write'],
+      argumentHint: '<subcommand> [options]',
+      executionSteps: [
+        'Parse subcommand (start, dispatch, status, watch, abort, pause, resume, stop, list)',
+        'Route to appropriate subcommand handler',
+        'Read/write session state from .aiwg/ralph-external/mc/',
+        'Display results or status dashboard',
+      ],
+    },
+  } satisfies SkillMetadata,
 };
 
 // Cost & Metrics Commands
 
 export const costReportCommand: Extension = {
   id: 'cost-report',
-  type: 'command',
+  type: 'skill',
   name: 'Cost Report',
   description: 'Generate token cost and spending report for workflows',
   version: '1.0.0',
@@ -1134,16 +1260,19 @@ export const costReportCommand: Extension = {
     core: false,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    allowedTools: ['Read', 'Bash'],
-    cliDisabled: true,
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['cost report', 'show costs', 'token spending', 'cost summary', 'budget report'],
+    commandHint: {
+      template: 'utility',
+      allowedTools: ['Read', 'Bash'],
+      cliDisabled: true,
+    },
+  } satisfies SkillMetadata,
 };
 
 export const costHistoryCommand: Extension = {
   id: 'cost-history',
-  type: 'command',
+  type: 'skill',
   name: 'Cost History',
   description: 'Show historical cost data across workflow sessions',
   version: '1.0.0',
@@ -1159,16 +1288,19 @@ export const costHistoryCommand: Extension = {
     core: false,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    allowedTools: ['Read'],
-    cliDisabled: true,
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['cost history', 'historical costs', 'spending history', 'cost trends'],
+    commandHint: {
+      template: 'utility',
+      allowedTools: ['Read'],
+      cliDisabled: true,
+    },
+  } satisfies SkillMetadata,
 };
 
 export const metricsTokensCommand: Extension = {
   id: 'metrics-tokens',
-  type: 'command',
+  type: 'skill',
   name: 'Metrics Tokens',
   description: 'Analyze token efficiency and compare to MetaGPT baseline',
   version: '1.0.0',
@@ -1184,18 +1316,21 @@ export const metricsTokensCommand: Extension = {
     core: false,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    allowedTools: ['Read', 'Bash'],
-    cliDisabled: true,
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['metrics tokens', 'token efficiency', 'token metrics', 'analyze tokens'],
+    commandHint: {
+      template: 'utility',
+      allowedTools: ['Read', 'Bash'],
+      cliDisabled: true,
+    },
+  } satisfies SkillMetadata,
 };
 
 // Documentation Commands
 
 export const docSyncCommand: Extension = {
   id: 'doc-sync',
-  type: 'command',
+  type: 'skill',
   name: 'Doc Sync',
   description: 'Synchronize documentation and code to eliminate drift with parallel audit and auto-fix',
   version: '1.0.0',
@@ -1211,27 +1346,30 @@ export const docSyncCommand: Extension = {
     core: false,
   },
   metadata: {
-    type: 'command',
-    template: 'orchestration',
-    argumentHint: '<direction> [--dry-run --scope <path> --incremental]',
-    allowedTools: ['Task', 'Read', 'Write', 'Bash', 'Glob', 'Grep', 'Edit'],
-    executionSteps: [
-      'Parse direction and options',
-      'Dispatch parallel domain auditors',
-      'Run cross-reference validation',
-      'Generate drift report',
-      'Apply auto-fixes and Ralph refinement',
-      'Validate changes',
-    ],
-    cliDisabled: true,
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['doc sync', 'sync docs', 'documentation sync', 'fix doc drift', 'reconcile docs'],
+    commandHint: {
+      template: 'orchestration',
+      argumentHint: '<direction> [--dry-run --scope <path> --incremental]',
+      allowedTools: ['Task', 'Read', 'Write', 'Bash', 'Glob', 'Grep', 'Edit'],
+      executionSteps: [
+        'Parse direction and options',
+        'Dispatch parallel domain auditors',
+        'Run cross-reference validation',
+        'Generate drift report',
+        'Apply auto-fixes and Ralph refinement',
+        'Validate changes',
+      ],
+      cliDisabled: true,
+    },
+  } satisfies SkillMetadata,
 };
 
 // Code Analysis Commands
 
 export const cleanupAuditCommand: Extension = {
   id: 'cleanup-audit',
-  type: 'command',
+  type: 'skill',
   name: 'Cleanup Audit',
   description: 'Audit codebase for dead code, unused exports, orphaned files, and stale manifests',
   version: '1.0.0',
@@ -1247,27 +1385,30 @@ export const cleanupAuditCommand: Extension = {
     core: false,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    argumentHint: '[--scope <path>] [--type <exports|files|deps|manifests>] [--json] [--fix] [--dry-run]',
-    allowedTools: ['Bash', 'Read', 'Write', 'Glob', 'Grep'],
-    executionSteps: [
-      'Determine analysis scope',
-      'Analyze unused exports',
-      'Detect orphaned files',
-      'Audit dependencies',
-      'Check manifest entries',
-      'Compile confidence-rated report',
-    ],
-    cliDisabled: true,
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['cleanup audit', 'dead code audit', 'find dead code', 'orphan files', 'unused exports'],
+    commandHint: {
+      template: 'utility',
+      argumentHint: '[--scope <path>] [--type <exports|files|deps|manifests>] [--json] [--fix] [--dry-run]',
+      allowedTools: ['Bash', 'Read', 'Write', 'Glob', 'Grep'],
+      executionSteps: [
+        'Determine analysis scope',
+        'Analyze unused exports',
+        'Detect orphaned files',
+        'Audit dependencies',
+        'Check manifest entries',
+        'Compile confidence-rated report',
+      ],
+      cliDisabled: true,
+    },
+  } satisfies SkillMetadata,
 };
 
 // SDLC Orchestration Commands
 
 export const sdlcAccelerateCommand: Extension = {
   id: 'sdlc-accelerate',
-  type: 'command',
+  type: 'skill',
   name: 'SDLC Accelerate',
   description: 'End-to-end SDLC ramp-up from idea to construction-ready with automated phase transitions',
   version: '1.0.0',
@@ -1283,27 +1424,30 @@ export const sdlcAccelerateCommand: Extension = {
     core: false,
   },
   metadata: {
-    type: 'command',
-    template: 'orchestration',
-    argumentHint: '<description> [--from-codebase <path> --resume --dry-run]',
-    allowedTools: ['Task', 'Read', 'Write', 'Glob', 'TodoWrite'],
-    executionSteps: [
-      'Detect entry point',
-      'Execute intake phase',
-      'Evaluate LOM gate',
-      'Execute elaboration phase',
-      'Evaluate ABM gate',
-      'Execute construction prep',
-      'Generate Construction Ready Brief',
-    ],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['sdlc accelerate', 'accelerate sdlc', 'bootstrap project', 'ramp up sdlc', 'construction ready'],
+    commandHint: {
+      template: 'orchestration',
+      argumentHint: '<description> [--from-codebase <path> --resume --dry-run]',
+      allowedTools: ['Task', 'Read', 'Write', 'Glob', 'TodoWrite'],
+      executionSteps: [
+        'Detect entry point',
+        'Execute intake phase',
+        'Evaluate LOM gate',
+        'Execute elaboration phase',
+        'Evaluate ABM gate',
+        'Execute construction prep',
+        'Generate Construction Ready Brief',
+      ],
+    },
+  } satisfies SkillMetadata,
 };
 
 // Reproducibility Commands
 
 export const executionModeCommand: Extension = {
   id: 'execution-mode',
-  type: 'command',
+  type: 'skill',
   name: 'Execution Mode',
   description: 'Set reproducibility mode for deterministic workflow execution',
   version: '1.0.0',
@@ -1319,17 +1463,20 @@ export const executionModeCommand: Extension = {
     core: false,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    argumentHint: '<mode> [--seed <value>]',
-    allowedTools: ['Read', 'Write'],
-    cliDisabled: true,
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['execution mode', 'set execution mode', 'reproducibility mode', 'deterministic mode'],
+    commandHint: {
+      template: 'utility',
+      argumentHint: '<mode> [--seed <value>]',
+      allowedTools: ['Read', 'Write'],
+      cliDisabled: true,
+    },
+  } satisfies SkillMetadata,
 };
 
 export const snapshotCommand: Extension = {
   id: 'snapshot',
-  type: 'command',
+  type: 'skill',
   name: 'Snapshot',
   description: 'Capture, list, or replay workflow execution snapshots',
   version: '1.0.0',
@@ -1345,17 +1492,20 @@ export const snapshotCommand: Extension = {
     core: false,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    argumentHint: '<list|show|capture> [options]',
-    allowedTools: ['Read', 'Write', 'Bash'],
-    cliDisabled: true,
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['snapshot', 'capture snapshot', 'list snapshots', 'replay snapshot'],
+    commandHint: {
+      template: 'utility',
+      argumentHint: '<list|show|capture> [options]',
+      allowedTools: ['Read', 'Write', 'Bash'],
+      cliDisabled: true,
+    },
+  } satisfies SkillMetadata,
 };
 
 export const checkpointCommand: Extension = {
   id: 'checkpoint',
-  type: 'command',
+  type: 'skill',
   name: 'Checkpoint',
   description: 'Create, list, or restore workflow checkpoints for recovery',
   version: '1.0.0',
@@ -1371,17 +1521,20 @@ export const checkpointCommand: Extension = {
     core: false,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    argumentHint: '<list|recover|create> [options]',
-    allowedTools: ['Read', 'Write', 'Bash'],
-    cliDisabled: true,
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['checkpoint', 'create checkpoint', 'list checkpoints', 'recover checkpoint'],
+    commandHint: {
+      template: 'utility',
+      argumentHint: '<list|recover|create> [options]',
+      allowedTools: ['Read', 'Write', 'Bash'],
+      cliDisabled: true,
+    },
+  } satisfies SkillMetadata,
 };
 
 export const reproducibilityValidateCommand: Extension = {
   id: 'reproducibility-validate',
-  type: 'command',
+  type: 'skill',
   name: 'Reproducibility Validate',
   description: 'Verify workflow outputs match across multiple execution runs',
   version: '1.0.0',
@@ -1397,17 +1550,20 @@ export const reproducibilityValidateCommand: Extension = {
     core: false,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    argumentHint: '<workflow-id> [--runs <count>] [--threshold <value>]',
-    allowedTools: ['Read', 'Bash'],
-    cliDisabled: true,
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['reproducibility validate', 'validate reproducibility', 'verify reproducibility', 'compare workflow runs'],
+    commandHint: {
+      template: 'utility',
+      argumentHint: '<workflow-id> [--runs <count>] [--threshold <value>]',
+      allowedTools: ['Read', 'Bash'],
+      cliDisabled: true,
+    },
+  } satisfies SkillMetadata,
 };
 
 export const behaviorCommand: Extension = {
   id: 'behavior',
-  type: 'command',
+  type: 'skill',
   name: 'Behavior',
   description: 'Manage behavior YAML bundles that bind directives and toolsets to agent types',
   version: '1.0.0',
@@ -1423,16 +1579,19 @@ export const behaviorCommand: Extension = {
     core: false,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    argumentHint: '<list|info|apply|remove> [name] [--to <agent>] [--from <agent>]',
-    allowedTools: ['Read', 'Bash', 'Write'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['behavior', 'list behaviors', 'apply behavior', 'manage behaviors'],
+    commandHint: {
+      template: 'utility',
+      argumentHint: '<list|info|apply|remove> [name] [--to <agent>] [--from <agent>]',
+      allowedTools: ['Read', 'Bash', 'Write'],
+    },
+  } satisfies SkillMetadata,
 };
 
 export const daemonInitCommand: Extension = {
   id: 'daemon-init',
-  type: 'command',
+  type: 'skill',
   name: 'Daemon Init',
   description: 'Initialize daemon config from a profile template (default: manager)',
   version: '1.0.0',
@@ -1448,18 +1607,21 @@ export const daemonInitCommand: Extension = {
     core: false,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    argumentHint: '[profile-name] [--force]',
-    allowedTools: ['Bash', 'Read', 'Write'],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['daemon init', 'init daemon', 'initialize daemon', 'daemon setup'],
+    commandHint: {
+      template: 'utility',
+      argumentHint: '[profile-name] [--force]',
+      allowedTools: ['Bash', 'Read', 'Write'],
+    },
+  } satisfies SkillMetadata,
 };
 
 // Config Commands
 
 export const configCommand: Extension = {
   id: 'config',
-  type: 'command',
+  type: 'skill',
   name: 'Config',
   description: 'Manage user-level AIWG configuration (get, set, list, validate, reset, path, edit)',
   version: '1.0.0',
@@ -1475,24 +1637,27 @@ export const configCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    argumentHint: '<get|set|list|validate|reset|path|edit> [key] [value] [--config-dir <path>]',
-    allowedTools: ['Read', 'Write', 'Bash'],
-    executionSteps: [
-      'Parse subcommand and flags',
-      'Resolve config directory (AIWG_CONFIG → --config-dir → ~/.aiwg → ~/.config/aiwg)',
-      'Execute subcommand operation',
-      'Display results',
-    ],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['config', 'aiwg config', 'show config', 'get config', 'set config', 'configuration'],
+    commandHint: {
+      template: 'utility',
+      argumentHint: '<get|set|list|validate|reset|path|edit> [key] [value] [--config-dir <path>]',
+      allowedTools: ['Read', 'Write', 'Bash'],
+      executionSteps: [
+        'Parse subcommand and flags',
+        'Resolve config directory (AIWG_CONFIG → --config-dir → ~/.aiwg → ~/.config/aiwg)',
+        'Execute subcommand operation',
+        'Display results',
+      ],
+    },
+  } satisfies SkillMetadata,
 };
 
 // Ops Commands
 
 export const opsCommand: Extension = {
   id: 'ops',
-  type: 'command',
+  type: 'skill',
   name: 'Ops',
   description: 'Manage ops ecosystem — init workspaces, deploy frameworks, manage multi-repo ops suites',
   version: '1.0.0',
@@ -1508,18 +1673,21 @@ export const opsCommand: Extension = {
     core: true,
   },
   metadata: {
-    type: 'command',
-    template: 'utility',
-    argumentHint: '<init|status|use|list|push> [options]',
-    allowedTools: ['Bash', 'Read', 'Write'],
-    executionSteps: [
-      'Parse subcommand and options',
-      'Resolve ops workspace from registry',
-      'Execute workspace operation',
-      'Update ops registry',
-      'Display results',
-    ],
-  } satisfies CommandMetadata,
+    type: 'skill',
+    triggerPhrases: ['ops', 'ops init', 'ops status', 'manage ops', 'ops workspace'],
+    commandHint: {
+      template: 'utility',
+      argumentHint: '<init|status|use|list|push> [options]',
+      allowedTools: ['Bash', 'Read', 'Write'],
+      executionSteps: [
+        'Parse subcommand and options',
+        'Resolve ops workspace from registry',
+        'Execute workspace operation',
+        'Update ops registry',
+        'Display results',
+      ],
+    },
+  } satisfies SkillMetadata,
 };
 
 // ============================================

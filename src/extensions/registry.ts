@@ -92,7 +92,7 @@ export class ExtensionRegistry {
     this.addToTypeIndex(extension);
 
     // Register command aliases if present
-    if (extension.type === 'command' && 'aliases' in extension.metadata) {
+    if ((extension.type === 'command' || extension.type === 'skill') && 'aliases' in extension.metadata) {
       const aliases = (extension.metadata as any).aliases;
       if (Array.isArray(aliases)) {
         aliases.forEach((alias: string) => {
@@ -101,8 +101,8 @@ export class ExtensionRegistry {
       }
     }
 
-    // Register primary command name
-    if (extension.type === 'command') {
+    // Register primary command/skill name
+    if (extension.type === 'command' || extension.type === 'skill') {
       this.aliasMap.set(id, id);
     }
   }

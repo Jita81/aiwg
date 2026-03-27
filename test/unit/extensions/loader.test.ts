@@ -67,10 +67,10 @@ describe('loader', () => {
 
     it('should register commands by type', async () => {
       const result = await loadRegistry();
-      const commands = result.registry.getByType('command');
+      const commands = result.registry.getByType('skill');
 
       expect(commands.length).toBeGreaterThan(0);
-      expect(commands[0].type).toBe('command');
+      expect(commands[0].type).toBe('skill');
     });
   });
 
@@ -159,7 +159,7 @@ describe('loader', () => {
       // Get extension definition
       const extension = result.registry.get(commandId!);
       expect(extension).toBeDefined();
-      expect(extension?.type).toBe('command');
+      expect(extension?.type).toBe('skill');
 
       // Get handler
       const handler = result.handlerMap.get(commandId!);
@@ -178,16 +178,16 @@ describe('loader', () => {
     it('should handle command with metadata correctly', async () => {
       const result = await loadRegistry();
 
-      // Get a command extension
-      const commands = result.registry.getByType('command');
-      expect(commands.length).toBeGreaterThan(0);
+      // Get a skill extension (formerly command)
+      const skills = result.registry.getByType('skill');
+      expect(skills.length).toBeGreaterThan(0);
 
-      const helpCommand = commands.find(c => c.id === 'help');
+      const helpCommand = skills.find(c => c.id === 'help');
       expect(helpCommand).toBeDefined();
-      expect(helpCommand?.metadata.type).toBe('command');
+      expect(helpCommand?.metadata.type).toBe('skill');
 
-      const metadata = helpCommand?.metadata as CommandMetadata;
-      expect(metadata.template).toBeDefined();
+      const metadata = helpCommand?.metadata as { commandHint?: CommandMetadata };
+      expect(metadata.commandHint).toBeDefined();
     });
   });
 });

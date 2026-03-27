@@ -82,7 +82,7 @@ Every provider gets a path for every artifact type. Paths follow the provider's 
 | **Copilot** | `.github/agents/` | `.github/commands/` | `.github/skills/` | `.github/copilot-rules/` | Commands get own directory instead of merging into agents/. Rules avoid `.github/rules/` conflict with GitHub's own rules feature. |
 | **Factory** | `.factory/droids/` | `.factory/commands/` | `.factory/skills/` | `.factory/rules/` | Skills and rules are new conventional directories. |
 | **Cursor** | `.cursor/agents/` | `.cursor/commands/` | `.cursor/skills/` | `.cursor/rules/` | Agents, commands, and skills are new. Rules remain native (MDC). |
-| **OpenCode** | `.opencode/agent/` | `.opencode/command/` | `.opencode/skill/` | `.opencode/rule/` | Skills and rules are new. Follows OpenCode's singular naming convention (`agent/` not `agents/`). |
+| **OpenCode** | `.opencode/agent/` | `.opencode/commands/` | `.opencode/skill/` | `.opencode/rule/` | Skills and rules are new. Commands use plural (`commands/`) per OpenCode source. Follows OpenCode's singular naming for other types (`agent/` not `agents/`). **Archived upstream** — successor is `charmbracelet/crush`. |
 | **Warp** | `.warp/agents/` | `.warp/commands/` | `.warp/skills/` | `.warp/rules/` | All 4 are new conventional directories. WARP.md aggregation continues separately. |
 | **Windsurf** | `.windsurf/agents/` | `.windsurf/workflows/` | `.windsurf/skills/` | `.windsurf/rules/` | Agents and rules are new. Workflows keeps current path. AGENTS.md aggregation continues separately. |
 

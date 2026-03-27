@@ -6,6 +6,7 @@
 
 import { Platform } from '../agents/types.js';
 import { join } from 'path';
+import { homedir } from 'os';
 
 /**
  * Get the commands directory for a given platform
@@ -21,12 +22,18 @@ export function getCommandsDirectory(platform: Platform, projectPath: string): s
     'cursor': '.cursor/commands',
     'codex': '.codex/commands',
     'copilot': '.github/agents',
-    'opencode': '.opencode/command',
+    'hermes': '', // Served via MCP, not file-deployed
+    'opencode': '.opencode/commands',
+    'openclaw': join(homedir(), '.openclaw', 'commands'),
     'warp': '.warp/commands', // Not natively discovered — content delivered via WARP.md
     'windsurf': '.windsurf/workflows',
     'generic': 'commands',
   };
-  return join(projectPath, dirs[platform]);
+  const dir = dirs[platform];
+  if (!dir) return '';
+  // Absolute paths (home-dir providers) are returned as-is
+  if (dir.startsWith('/')) return dir;
+  return join(projectPath, dir);
 }
 
 /**
@@ -43,12 +50,17 @@ export function getAgentsDirectory(platform: Platform, projectPath: string): str
     'cursor': '.cursor/agents',
     'codex': '.codex/agents',
     'copilot': '.github/agents',
+    'hermes': '', // Aggregated into AGENTS.md at project root
     'opencode': '.opencode/agent',
+    'openclaw': join(homedir(), '.openclaw', 'agents'),
     'warp': '.warp/agents', // Not natively discovered — content delivered via WARP.md
     'windsurf': '.windsurf/agents',
     'generic': 'agents',
   };
-  return join(projectPath, dirs[platform]);
+  const dir = dirs[platform];
+  if (!dir) return '';
+  if (dir.startsWith('/')) return dir;
+  return join(projectPath, dir);
 }
 
 /**
@@ -67,12 +79,17 @@ export function getSkillsDirectory(platform: Platform, projectPath: string): str
     'cursor': '.cursor/skills',
     'codex': '.codex/skills',
     'copilot': '.github/skills',
+    'hermes': join(homedir(), '.hermes', 'skills'),
     'opencode': '.opencode/skill',
+    'openclaw': join(homedir(), '.openclaw', 'skills'),
     'warp': '.warp/skills',
     'windsurf': '.windsurf/skills',
     'generic': 'skills',
   };
-  return join(projectPath, dirs[platform]);
+  const dir = dirs[platform];
+  if (!dir) return '';
+  if (dir.startsWith('/')) return dir;
+  return join(projectPath, dir);
 }
 
 /**
@@ -100,12 +117,17 @@ export function getRulesDirectory(platform: Platform, projectPath: string): stri
     'cursor': '.cursor/rules',
     'codex': '.codex/rules',
     'copilot': '.github/copilot-rules',
+    'hermes': '', // Not applicable — Hermes uses AGENTS.md
     'opencode': '.opencode/rule',
+    'openclaw': join(homedir(), '.openclaw', 'rules'),
     'warp': '.warp/rules', // Not natively discovered — content delivered via WARP.md
     'windsurf': '.windsurf/rules',
     'generic': 'rules',
   };
-  return join(projectPath, dirs[platform]);
+  const dir = dirs[platform];
+  if (!dir) return '';
+  if (dir.startsWith('/')) return dir;
+  return join(projectPath, dir);
 }
 
 /**
@@ -131,7 +153,9 @@ export function getConfigFileName(platform: Platform): string {
     'cursor': '.cursorrules',
     'codex': 'AGENTS.md',
     'copilot': 'copilot-instructions.md',
+    'hermes': 'AGENTS.md',
     'opencode': 'AGENTS.md',
+    'openclaw': 'AGENTS.md',
     'warp': 'WARP.md',
     'windsurf': '.windsurfrules',
     'generic': 'README.md',

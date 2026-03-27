@@ -40,17 +40,19 @@ This ADR does not change the universal deployment strategy from `adr-universal-p
 
 Based on current provider documentation:
 
-| Provider | Commands Support | Skills Support | Notes |
-|----------|-----------------|----------------|-------|
-| Claude Code | Legacy (deprecated) | **Native (primary)** | Migrate to skills |
-| Codex CLI | Native (home dir) | **Native (adopted standard)** | Both; translate skills→commands still useful |
-| GitHub Copilot | Via YAML agents | Partial | Commands generated as agents |
-| Factory AI | Native | Conventional | Still needs commands for native use |
-| Cursor | Conventional | **Native (adopted standard)** | Skills primary; commands conventional |
-| OpenCode | Native | Conventional | Still needs commands for native use |
-| Warp | Aggregated (WARP.md) | Conventional | Commands in aggregation |
-| Windsurf | Via workflows | Conventional | Skills primary; workflows from skills |
-| OpenClaw | Native | Native | Both; user choice |
+| Provider | Commands Support | Skills Support | SKILL.md Standard? | Translation Needed? | Notes |
+|----------|-----------------|----------------|--------------------|---------------------|-------|
+| Claude Code | **Deprecated** | **Native (primary)** | ✅ Originator | No | Skills-only |
+| Codex CLI | Native (home dir) | **Native** | ✅ Adopted | Yes | Generate prompts for `~/.codex/prompts/` |
+| GitHub Copilot | Via YAML agents | Conventional | ❌ | Yes | Generate YAML agents |
+| Factory AI | Native | Conventional | ❌ | Yes | Generate commands |
+| Cursor | Conventional | **Native** | ✅ Adopted | No | Skills-only |
+| OpenCode | Native (`.opencode/commands/`) | **None** (not read) | ❌ No skills system | Yes | Generate commands. **Archived upstream** |
+| Warp | Aggregated (WARP.md) | Conventional | ❌ | Yes | For WARP.md aggregation |
+| Windsurf | Via workflows | Conventional | ❌ | Yes | Generate workflows |
+| Hermes Agent | N/A (MCP sidecar) | **Native** (SKILL.md) | ✅ Native | No | Skills-only via MCP |
+| OpenClaw | Native | **Native** | ✅ | Yes | User gets both |
+| Gemini CLI | Native (`.gemini/commands/`, TOML) | Has skill system | ⚠️ Own format | Yes | Uses `.toml` commands, has skills but format TBD |
 
 ## Decision
 

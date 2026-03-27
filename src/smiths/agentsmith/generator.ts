@@ -520,6 +520,8 @@ export class AgentGenerator {
       warp: '.warp/agents',
       generic: 'agents',
       windsurf: '.windsurf/agents',
+      hermes: '',
+      openclaw: '.openclaw/agents',
     };
 
     const ext = this.packager.getFileExtension(platform);

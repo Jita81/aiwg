@@ -37,18 +37,20 @@ describe('SDLC Accelerate Integration', () => {
   describe('Command Definition', () => {
     it('should have correct metadata', () => {
       expect(sdlcAccelerateCommand.id).toBe('sdlc-accelerate');
-      expect(sdlcAccelerateCommand.type).toBe('command');
+      expect(sdlcAccelerateCommand.type).toBe('skill');
       expect(sdlcAccelerateCommand.category).toBe('sdlc-orchestration');
     });
 
     it('should specify orchestration template', () => {
       const meta = sdlcAccelerateCommand.metadata as Record<string, unknown>;
-      expect(meta.template).toBe('orchestration');
+      const hint = meta.commandHint as Record<string, unknown>;
+      expect(hint.template).toBe('orchestration');
     });
 
     it('should have correct allowed tools', () => {
       const meta = sdlcAccelerateCommand.metadata as Record<string, unknown>;
-      const tools = meta.allowedTools as string[];
+      const hint = meta.commandHint as Record<string, unknown>;
+      const tools = hint.allowedTools as string[];
       expect(tools).toContain('Task');
       expect(tools).toContain('Read');
       expect(tools).toContain('Write');
@@ -58,7 +60,8 @@ describe('SDLC Accelerate Integration', () => {
 
     it('should define all 7 execution steps', () => {
       const meta = sdlcAccelerateCommand.metadata as Record<string, unknown>;
-      const steps = meta.executionSteps as string[];
+      const hint = meta.commandHint as Record<string, unknown>;
+      const steps = hint.executionSteps as string[];
       expect(steps).toHaveLength(7);
       expect(steps[0]).toBe('Detect entry point');
       expect(steps[6]).toBe('Generate Construction Ready Brief');
@@ -66,11 +69,12 @@ describe('SDLC Accelerate Integration', () => {
 
     it('should have argument hint with key switches', () => {
       const meta = sdlcAccelerateCommand.metadata as Record<string, unknown>;
-      const hint = meta.argumentHint as string;
-      expect(hint).toContain('<description>');
-      expect(hint).toContain('--from-codebase');
-      expect(hint).toContain('--resume');
-      expect(hint).toContain('--dry-run');
+      const hint = meta.commandHint as Record<string, unknown>;
+      const argumentHint = hint.argumentHint as string;
+      expect(argumentHint).toContain('<description>');
+      expect(argumentHint).toContain('--from-codebase');
+      expect(argumentHint).toContain('--resume');
+      expect(argumentHint).toContain('--dry-run');
     });
   });
 

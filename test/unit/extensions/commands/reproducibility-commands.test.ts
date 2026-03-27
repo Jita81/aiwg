@@ -24,7 +24,7 @@ describe('Reproducibility Commands', () => {
   describe('executionModeCommand', () => {
     it('should have correct id and type', () => {
       expect(executionModeCommand.id).toBe('execution-mode');
-      expect(executionModeCommand.type).toBe('command');
+      expect(executionModeCommand.type).toBe('skill');
     });
 
     it('should reference all four modes in keywords', () => {
@@ -43,16 +43,16 @@ describe('Reproducibility Commands', () => {
     });
 
     it('should have argument hint for mode selection', () => {
-      const meta = executionModeCommand.metadata as { argumentHint?: string };
-      expect(meta.argumentHint).toBeDefined();
-      expect(meta.argumentHint).toContain('mode');
+      const meta = executionModeCommand.metadata as { commandHint?: { argumentHint?: string } };
+      expect(meta.commandHint?.argumentHint).toBeDefined();
+      expect(meta.commandHint?.argumentHint).toContain('mode');
     });
   });
 
   describe('snapshotCommand', () => {
     it('should have correct id and type', () => {
       expect(snapshotCommand.id).toBe('snapshot');
-      expect(snapshotCommand.type).toBe('command');
+      expect(snapshotCommand.type).toBe('skill');
     });
 
     it('should have snapshot and replay capabilities', () => {
@@ -65,17 +65,17 @@ describe('Reproducibility Commands', () => {
     });
 
     it('should have sub-command argument hint', () => {
-      const meta = snapshotCommand.metadata as { argumentHint?: string };
-      expect(meta.argumentHint).toBeDefined();
-      expect(meta.argumentHint).toContain('list');
-      expect(meta.argumentHint).toContain('show');
+      const meta = snapshotCommand.metadata as { commandHint?: { argumentHint?: string } };
+      expect(meta.commandHint?.argumentHint).toBeDefined();
+      expect(meta.commandHint?.argumentHint).toContain('list');
+      expect(meta.commandHint?.argumentHint).toContain('show');
     });
   });
 
   describe('checkpointCommand', () => {
     it('should have correct id and type', () => {
       expect(checkpointCommand.id).toBe('checkpoint');
-      expect(checkpointCommand.type).toBe('command');
+      expect(checkpointCommand.type).toBe('skill');
     });
 
     it('should have checkpoint and recovery capabilities', () => {
@@ -88,16 +88,16 @@ describe('Reproducibility Commands', () => {
     });
 
     it('should have sub-command argument hint', () => {
-      const meta = checkpointCommand.metadata as { argumentHint?: string };
-      expect(meta.argumentHint).toBeDefined();
-      expect(meta.argumentHint).toContain('recover');
+      const meta = checkpointCommand.metadata as { commandHint?: { argumentHint?: string } };
+      expect(meta.commandHint?.argumentHint).toBeDefined();
+      expect(meta.commandHint?.argumentHint).toContain('recover');
     });
   });
 
   describe('reproducibilityValidateCommand', () => {
     it('should have correct id and type', () => {
       expect(reproducibilityValidateCommand.id).toBe('reproducibility-validate');
-      expect(reproducibilityValidateCommand.type).toBe('command');
+      expect(reproducibilityValidateCommand.type).toBe('skill');
     });
 
     it('should have validation and compliance capabilities', () => {
@@ -110,9 +110,9 @@ describe('Reproducibility Commands', () => {
     });
 
     it('should have workflow-id argument hint', () => {
-      const meta = reproducibilityValidateCommand.metadata as { argumentHint?: string };
-      expect(meta.argumentHint).toBeDefined();
-      expect(meta.argumentHint).toContain('workflow-id');
+      const meta = reproducibilityValidateCommand.metadata as { commandHint?: { argumentHint?: string } };
+      expect(meta.commandHint?.argumentHint).toBeDefined();
+      expect(meta.commandHint?.argumentHint).toContain('workflow-id');
     });
   });
 

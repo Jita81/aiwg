@@ -17,7 +17,7 @@
 import { describe, it, expect } from 'vitest';
 import { commandDefinitions } from '../../../../src/extensions/commands/definitions.js';
 import { allHandlers } from '../../../../src/cli/handlers/index.js';
-import type { CommandMetadata } from '../../../../src/extensions/types.js';
+import type { SkillMetadata } from '../../../../src/extensions/types.js';
 
 describe('Handler Coverage', () => {
   describe('every command definition has a handler or is cliDisabled', () => {
@@ -26,11 +26,11 @@ describe('Handler Coverage', () => {
 
     // Separate definitions into those that opt out and those that must have a handler
     const disabledCommands = commandDefinitions.filter(
-      (cmd) => (cmd.metadata as CommandMetadata)?.cliDisabled === true
+      (cmd) => (cmd.metadata as SkillMetadata)?.commandHint?.cliDisabled === true
     );
 
     const requiredCommands = commandDefinitions.filter(
-      (cmd) => (cmd.metadata as CommandMetadata)?.cliDisabled !== true
+      (cmd) => (cmd.metadata as SkillMetadata)?.commandHint?.cliDisabled !== true
     );
 
     // Compute the missing handlers up front so the failure message is maximally useful

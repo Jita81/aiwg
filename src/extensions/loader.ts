@@ -85,7 +85,7 @@ export async function loadRegistry(options?: LoaderOptions): Promise<LoadedRegis
 
   // Build alias map from command metadata
   for (const definition of commandDefinitions) {
-    if (definition.type === 'command') {
+    if (definition.type === 'command' || definition.type === 'skill') {
       // Find matching handler to get aliases
       const handler = allHandlers.find(h => h.id === definition.id);
       if (handler) {

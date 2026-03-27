@@ -22,7 +22,7 @@ describe('Cost & Metrics Commands', () => {
   describe('costReportCommand', () => {
     it('should have correct id and type', () => {
       expect(costReportCommand.id).toBe('cost-report');
-      expect(costReportCommand.type).toBe('command');
+      expect(costReportCommand.type).toBe('skill');
     });
 
     it('should have cost-tracking capability', () => {
@@ -42,14 +42,14 @@ describe('Cost & Metrics Commands', () => {
 
     it('should have valid metadata', () => {
       expect(costReportCommand.metadata).toBeDefined();
-      expect(costReportCommand.metadata.type).toBe('command');
+      expect(costReportCommand.metadata.type).toBe('skill');
     });
   });
 
   describe('costHistoryCommand', () => {
     it('should have correct id and type', () => {
       expect(costHistoryCommand.id).toBe('cost-history');
-      expect(costHistoryCommand.type).toBe('command');
+      expect(costHistoryCommand.type).toBe('skill');
     });
 
     it('should have history capability', () => {
@@ -65,7 +65,7 @@ describe('Cost & Metrics Commands', () => {
   describe('metricsTokensCommand', () => {
     it('should have correct id and type', () => {
       expect(metricsTokensCommand.id).toBe('metrics-tokens');
-      expect(metricsTokensCommand.type).toBe('command');
+      expect(metricsTokensCommand.type).toBe('skill');
     });
 
     it('should reference token efficiency in description', () => {

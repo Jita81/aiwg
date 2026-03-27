@@ -69,8 +69,11 @@ export function generateHelp(registry: ExtensionRegistry): string {
   lines.push('Usage: aiwg <command> [options]');
   lines.push('');
 
-  // Get commands by category
-  const commands = registry.getByType('command');
+  // Get commands by category (skills are the canonical source format for CLI commands)
+  const commands = [
+    ...registry.getByType('skill'),
+    ...registry.getByType('command'),
+  ];
   const byCategory = groupByCategory(commands);
 
   // Generate sections in order

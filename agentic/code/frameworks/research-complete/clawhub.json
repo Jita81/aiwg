@@ -1,0 +1,14 @@
+{
+  "name": "aiwg-research",
+  "version": "2026.3.3",
+  "description": "AIWG Research framework — 10 skills for academic research workflows including paper discovery, quality assessment, citation management, literature notes, corpus health, and W3C PROV-compliant provenance tracking.",
+  "homepage": "https://aiwg.io",
+  "repository": "https://github.com/jmagly/aiwg",
+  "skills": "./skills",
+  "tags": ["research", "academic", "citations", "provenance", "literature", "quality-assessment"],
+  "license": "MIT",
+  "author": "AIWG Contributors",
+  "engines": {
+    "openclaw": ">=0.4.0"
+  }
+}

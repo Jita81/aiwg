@@ -31,6 +31,22 @@ export type ExtensionType =
   | 'behavior';
 
 /**
+ * Types that are authored as source artifacts.
+ *
+ * Skills are the canonical source format for workflows. All new workflows
+ * should be authored as skills, not commands.
+ */
+export type SourceExtensionType = Exclude<ExtensionType, 'command'>;
+
+/**
+ * Types that are generated at deploy time from source artifacts.
+ *
+ * Commands are generated from skills for providers that require command format
+ * natively (Factory, OpenCode, Warp/Windsurf aggregation, legacy Codex).
+ */
+export type DeploymentExtensionType = 'command';
+
+/**
  * Extension lifecycle status
  */
 export type ExtensionStatus =
@@ -503,6 +519,13 @@ export interface CommandOption {
 
 /**
  * Command-specific metadata
+ *
+ * @deprecated As a source format. Commands are now generated from skills at deploy time.
+ * This type is retained for providers that require command format natively
+ * (Factory, OpenCode, Warp/Windsurf aggregation, legacy Codex).
+ * New workflows should use `type: 'skill'` with `commandHint` for translation metadata.
+ *
+ * @see SkillMetadata.commandHint
  */
 export interface CommandMetadata {
   type: 'command';
@@ -559,6 +582,12 @@ export interface CommandMetadata {
    * Exempts it from handler coverage checks.
    */
   cliDisabled?: boolean;
+
+  /**
+   * Skill ID that produced this command (set at generation time by the translation layer).
+   * Present only on commands generated from skills, not hand-authored commands.
+   */
+  generatedFrom?: string;
 }
 
 /**
@@ -571,6 +600,67 @@ export interface SkillReference {
   description: string;
   /** Reference content path */
   path: string;
+}
+
+/**
+ * Command translation hints for generating command artifacts from skills.
+ *
+ * Used by the skill→command translation layer when deploying to providers
+ * that require command format natively (Factory, OpenCode, Warp/Windsurf, legacy Codex).
+ */
+export interface CommandHint {
+  /**
+   * Argument hint for help display
+   *
+   * @example "<file-path>"
+   * @example "[options] <input>"
+   */
+  argumentHint?: string;
+
+  /**
+   * Allowed tools to declare in the generated command
+   *
+   * @example ["Read", "Write", "Grep"]
+   */
+  allowedTools?: string[];
+
+  /**
+   * Command template type for generated commands
+   */
+  template?: 'utility' | 'transformation' | 'orchestration';
+
+  /**
+   * Command arguments for generated command files
+   */
+  arguments?: CommandArgument[];
+
+  /**
+   * Command options/flags for generated command files
+   */
+  options?: CommandOption[];
+
+  /**
+   * Execution steps for generated command documentation
+   */
+  executionSteps?: string[];
+
+  /**
+   * Success criteria for generated command documentation
+   */
+  successCriteria?: string[];
+
+  /**
+   * Model preference for the generated command
+   *
+   * @example "sonnet"
+   */
+  model?: string;
+
+  /**
+   * When true, this skill has no CLI handler (slash-command-only).
+   * Exempts it from handler coverage checks.
+   */
+  cliDisabled?: boolean;
 }
 
 /**
@@ -617,6 +707,61 @@ export interface SkillMetadata {
    * Output format description
    */
   outputFormat?: string;
+
+  // ============================================
+  // Official Claude Code SKILL.md Frontmatter
+  // ============================================
+
+  /**
+   * Model effort override (1=low, 2=medium, 3=high)
+   *
+   * Controls reasoning effort when the skill is invoked.
+   */
+  effort?: 1 | 2 | 3;
+
+  /**
+   * Whether this skill can be invoked by the user via slash command.
+   *
+   * @default true
+   */
+  userInvocable?: boolean;
+
+  /**
+   * When true, prevents model from auto-invoking this skill.
+   * The skill can only be triggered explicitly by the user.
+   *
+   * @default false
+   */
+  disableModelInvocation?: boolean;
+
+  /**
+   * Execution context isolation mode.
+   *
+   * - 'fork': Skill runs in an isolated context (new conversation)
+   * - 'inherit': Skill runs in the current conversation context
+   */
+  context?: 'fork' | 'inherit';
+
+  /**
+   * Tool access restriction for this skill when invoked in Claude Code.
+   *
+   * Note: Distinct from `commandHint.allowedTools` which describes tools
+   * declared in generated command files for legacy providers.
+   */
+  allowedTools?: string[];
+
+  // ============================================
+  // Command Translation
+  // ============================================
+
+  /**
+   * Command translation hints for generating command artifacts.
+   *
+   * Used by the skill→command translation layer when deploying to providers
+   * that require command format natively. Skills without `commandHint` will
+   * still be translated using defaults derived from the skill's own fields.
+   */
+  commandHint?: CommandHint;
 }
 
 /**

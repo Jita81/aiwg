@@ -1,0 +1,14 @@
+{
+  "name": "aiwg-sdlc",
+  "version": "2026.3.3",
+  "description": "AIWG SDLC framework — 106 skills covering full software lifecycle from Inception through Production. Includes specialized agents, phase workflows, artifact management, testing, security, and deployment orchestration.",
+  "homepage": "https://aiwg.io",
+  "repository": "https://github.com/jmagly/aiwg",
+  "skills": "./skills",
+  "tags": ["sdlc", "agile", "testing", "security", "architecture", "documentation", "deployment", "requirements", "quality"],
+  "license": "MIT",
+  "author": "AIWG Contributors",
+  "engines": {
+    "openclaw": ">=0.4.0"
+  }
+}

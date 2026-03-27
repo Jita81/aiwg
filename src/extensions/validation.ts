@@ -182,6 +182,8 @@ export const CommandOptionSchema = z.object({
 
 /**
  * Command-specific metadata
+ *
+ * @deprecated As a source format — commands are generated from skills at deploy time.
  */
 export const CommandMetadataSchema = z.object({
   type: z.literal('command'),
@@ -193,6 +195,23 @@ export const CommandMetadataSchema = z.object({
   model: z.string().optional(),
   executionSteps: z.array(z.string()).optional(),
   successCriteria: z.array(z.string()).optional(),
+  cliDisabled: z.boolean().optional(),
+  generatedFrom: z.string().optional(),
+});
+
+/**
+ * Command translation hints for skill→command generation
+ */
+export const CommandHintSchema = z.object({
+  argumentHint: z.string().optional(),
+  allowedTools: z.array(z.string()).optional(),
+  template: z.enum(['utility', 'transformation', 'orchestration']).optional(),
+  arguments: z.array(CommandArgumentSchema).optional(),
+  options: z.array(CommandOptionSchema).optional(),
+  executionSteps: z.array(z.string()).optional(),
+  successCriteria: z.array(z.string()).optional(),
+  model: z.string().optional(),
+  cliDisabled: z.boolean().optional(),
 });
 
 /**
@@ -216,6 +235,14 @@ export const SkillMetadataSchema = z.object({
   references: z.array(SkillReferenceSchema).optional(),
   inputRequirements: z.array(z.string()).optional(),
   outputFormat: z.string().optional(),
+  // Official Claude Code SKILL.md frontmatter
+  effort: z.union([z.literal(1), z.literal(2), z.literal(3)]).optional(),
+  userInvocable: z.boolean().optional(),
+  disableModelInvocation: z.boolean().optional(),
+  context: z.enum(['fork', 'inherit']).optional(),
+  allowedTools: z.array(z.string()).optional(),
+  // Command translation hints
+  commandHint: CommandHintSchema.optional(),
 });
 
 /**

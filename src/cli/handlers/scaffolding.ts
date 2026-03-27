@@ -52,23 +52,36 @@ class AddAgentHandler extends ScaffoldingHandler {
  * Add Command Handler
  *
  * Scaffolds a new slash command for Claude Code/Cursor.
+ *
+ * @deprecated Use `aiwg add-skill` instead. Commands are now generated from
+ * skills at deploy time. See ADR: Skills as Canonical Extension Type.
  */
 class AddCommandHandler extends ScaffoldingHandler {
   id = 'add-command';
   name = 'Add Command';
-  description = 'Create a new slash command';
+  description = 'Create a new slash command (deprecated — use add-skill)';
   scriptPath = 'tools/scaffolding/add-command.mjs';
+
+  override async execute(ctx: HandlerContext): Promise<HandlerResult> {
+    console.warn(
+      '\x1b[33m⚠ DEPRECATED:\x1b[0m `aiwg add-command` is deprecated. ' +
+      'Use `aiwg add-skill` instead.\n' +
+      '  Commands are now generated from skills at deploy time.\n' +
+      '  See: .aiwg/architecture/adr-skills-canonical-extension-type.md\n'
+    );
+    return super.execute(ctx);
+  }
 }
 
 /**
  * Add Skill Handler
  *
- * Scaffolds a new skill for Warp Terminal.
+ * Scaffolds a new skill (SKILL.md format) — the canonical extension type for workflows.
  */
 class AddSkillHandler extends ScaffoldingHandler {
   id = 'add-skill';
   name = 'Add Skill';
-  description = 'Create a new Warp skill';
+  description = 'Create a new skill (canonical workflow format)';
   scriptPath = 'tools/scaffolding/add-skill.mjs';
 }
 
