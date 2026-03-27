@@ -128,7 +128,6 @@ Latest:  2026.3.15
 $ aiwg sync
 Updating aiwg... 2026.3.12 → 2026.3.15
 Re-deploying sdlc-complete to claude-code... done
-Re-deploying ring-methodology to claude-code... done
 
 $ aiwg doctor
 All checks passed.
@@ -141,11 +140,10 @@ All checks passed.
 ### Actions Taken
 1. Updated AIWG 2026.3.12 → 2026.3.15
 2. Re-deployed sdlc-complete (38 rules, 94 agents, 47 commands)
-3. Re-deployed ring-methodology
 
 ### Post-Check
 - Health: All checks passed
-- Changes: Version bump + 2 frameworks re-deployed
+- Changes: Version bump + 1 framework re-deployed
 ```
 
 ### Example 2: Cross-Provider Deploy

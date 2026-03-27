@@ -84,7 +84,7 @@ aiwg sync --dry-run
 aiwg sync
 ```
 
-**Response**: "Updated AIWG 2026.3.12 -> 2026.3.15 and re-deployed sdlc-complete + ring-methodology to claude-code. Health check passed."
+**Response**: "Updated AIWG 2026.3.12 -> 2026.3.15 and re-deployed sdlc-complete to claude-code. Health check passed."
 
 ### Example 3: Provider-specific
 

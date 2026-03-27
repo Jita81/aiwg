@@ -60,37 +60,6 @@ Most AI-assisted work fails at the verification step — you generate something,
 
 ---
 
-## Ring Methodology — Four-layer verification
-
-The ring methodology enforces a structured completion standard. Work moves through four verification layers in sequence — no shortcuts.
-
-```bash
-aiwg use ring
-```
-
-### The four layers
-
-| Layer | What gets verified |
-|-------|-------------------|
-| **Developer Reality** | Unit tests pass, code compiles, logic is sound |
-| **Integration Reality** | Services connect, data flows correctly, contracts hold |
-| **User Surface Reality** | UI works, flows complete, edge cases handled |
-| **Generative Reflection** | AI reviews the implementation end-to-end |
-
-A feature is done when all four layers pass — not when the developer thinks it looks right.
-
-### Process health measurement
-
-The ring methodology tracks **spectral gap**: the fraction of features where Layer C (User Surface) passes on the first try. When this rate drops, the system warns you before problems compound. When it drops far enough, it halts new work until the underlying issue is addressed.
-
-```bash
-aiwg ring status          # Process health dashboard
-aiwg ring check           # Check completion for current feature
-aiwg ring circuit-breaker # Manual circuit breaker
-```
-
----
-
 ## RLM — Recursive Language Models
 
 RLM enables agents to work with codebases and document sets too large to fit in a single context window. Instead of loading everything at once, it treats large contexts as an external environment that the agent selectively accesses.
@@ -245,7 +214,6 @@ Breaks the implementation into phases, validates each phase before proceeding, a
 
 ```bash
 aiwg use ralph              # Ralph iterative loops
-aiwg use ring               # Ring four-layer verification
 aiwg use rlm                # Recursive language models
 aiwg use writing            # Voice framework + writing quality
 aiwg use all                # Everything

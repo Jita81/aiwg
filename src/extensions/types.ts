@@ -1035,11 +1035,11 @@ export interface AddonMetadata {
    * @example
    * ```json
    * {
-   *   "namespace": "ring",
-   *   "description": "Ring methodology lifecycle operations",
+   *   "namespace": "my-addon",
+   *   "description": "My addon lifecycle operations",
    *   "entry": "commands/",
    *   "subcommands": {
-   *     "check": { "file": "commands/ring-check.mjs", "description": "Validate ring completion" }
+   *     "check": { "file": "commands/my-check.mjs", "description": "Validate completion" }
    *   }
    * }
    * ```

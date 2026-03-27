@@ -120,7 +120,7 @@ export async function tryExecuteCliExtension(
   const ns = registry[rawCommand];
   const subcommand = commandArgs[0];
 
-  // `aiwg ring --help` or `aiwg ring` with no subcommand
+  // `aiwg <addon> --help` or `aiwg <addon>` with no subcommand
   if (!subcommand || subcommand === '--help' || subcommand === '-h') {
     printNamespaceHelp(rawCommand, ns);
     return { exitCode: 0 };

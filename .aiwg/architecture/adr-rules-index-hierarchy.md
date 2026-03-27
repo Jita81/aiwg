@@ -12,16 +12,15 @@
 
 ### Problem Statement
 
-The current `RULES-INDEX.md` lives in `agentic/code/frameworks/sdlc-complete/rules/` and contains rules from three different components (sdlc-complete, ring-methodology, aiwg-utils) hardcoded in a single file. This creates two problems:
+The current `RULES-INDEX.md` lives in `agentic/code/frameworks/sdlc-complete/rules/` and contains rules from multiple components (sdlc-complete, aiwg-utils) hardcoded in a single file. This creates two problems:
 
 1. **Location implies scope**: The file lives in `sdlc-complete/` but contains rules from addons. New addons with rules have no mechanism to contribute to it without editing a file they don't own.
-2. **No extension point**: When a user runs `aiwg use ring`, there is no protocol for ring-methodology to register its rules in the index. The current monolith requires manual editing of the sdlc-complete file.
+2. **No extension point**: There is no protocol for addons to register their rules in the index. The current monolith requires manual editing of the sdlc-complete file.
 
 ### Current State
 
-- `sdlc-complete/rules/RULES-INDEX.md` — 43 rules from 3 components in one file (~500 lines)
+- `sdlc-complete/rules/RULES-INDEX.md` — rules from multiple components in one file (~500 lines)
 - `sdlc-complete/rules/manifest.json` — lists only sdlc-complete rules but RULES-INDEX includes others
-- `ring-methodology/manifest.json` — lists 7 rules but has no rules index
 - `aiwg-utils/manifest.json` — lists 7 rules but has no rules index
 - Rules `instruction-comprehension` and `research-before-decision` are duplicated: files exist in both `sdlc-complete/rules/` and `aiwg-utils/rules/`
 
@@ -34,7 +33,6 @@ Adopt a two-level hierarchy: **component indexes** owned by each component, and 
 ```
 agentic/code/RULES-INDEX.md                          ← Global index (aggregator)
   → frameworks/sdlc-complete/rules/RULES-INDEX.md    ← SDLC component index
-  → addons/ring-methodology/rules/RULES-INDEX.md     ← Ring component index
   → addons/aiwg-utils/rules/RULES-INDEX.md           ← Utils component index
   → [future components contribute their own]
 ```
@@ -125,7 +123,6 @@ When building the deployed index:
 ## Related Issues
 
 - #496 — This ADR (architecture spec)
-- #497 — Create ring-methodology/rules/RULES-INDEX.md
 - #498 — Create aiwg-utils/rules/RULES-INDEX.md
 - #499 — Refactor sdlc-complete RULES-INDEX to sdlc-only + create global index
 - #500 — CLI: update deploy to assemble from component indexes

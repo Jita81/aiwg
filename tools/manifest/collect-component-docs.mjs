@@ -125,7 +125,6 @@ function componentSection(kind, name, parentId) {
     'rlm': { title: 'RLM Addon', summary: 'Recursive Language Model — deployment, multi-provider, integration guides' },
     'agent-persistence': { title: 'Agent Persistence', summary: 'Cross-session agent state and HITL integration' },
     'aiwg-utils': { title: 'AIWG Utils', summary: 'Core utility addon documentation' },
-    'ring-methodology': { title: 'Ring Methodology', summary: 'Ring-based delivery methodology docs' },
     'voice-framework': { title: 'Voice Framework', summary: 'Voice profile documentation' },
     // Tools
     'ralph-external': { title: 'External Ralph', summary: 'Crash-resilient external loop — snapshot manager and provider API' },

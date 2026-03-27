@@ -285,7 +285,7 @@ The orchestration pattern: **Primary Author → Parallel Reviewers → Synthesiz
 - **334 artifact templates** — progressive disclosure templates for requirements, architecture, testing, security, deployment, and more
 - **8 platform support** — deploy to Claude Code, Copilot, Cursor, Warp, Factory AI, OpenCode, Codex, and Windsurf
 - **6 complete frameworks** — SDLC, Digital Forensics, Marketing Operations, Research Management, Media Curation, Ops Infrastructure
-- **21 addons** — RLM recursive decomposition, voice profiles, testing quality, mutation testing, UAT automation, ring methodology, and more
+- **21 addons** — RLM recursive decomposition, voice profiles, testing quality, mutation testing, UAT automation, and more
 - **Ralph Loop** — iterative task execution with automatic error recovery and crash resilience (6-8 hour sessions)
 - **RLM addon** — recursive context decomposition for processing 10M+ tokens via sub-agent delegation
 - **YAML metalanguage** — declarative schema-validated workflow definitions (JSON Schema 2020-12)
