@@ -19,7 +19,8 @@ type ExtensionType =
   | 'framework'    // Complete workflow bundles
   | 'addon'        // Feature extension packs
   | 'template'     // Document templates
-  | 'prompt';      // Reusable prompts
+  | 'prompt'       // Reusable prompts
+  | 'team';        // Multi-agent team compositions
 ```
 
 ---
@@ -699,6 +700,69 @@ interface ValidationRules {
 - `platforms` - At least one platform
 - `deployment` - Deployment configuration
 - `metadata` - Type-specific metadata
+
+---
+
+## Team Extensions
+
+Multi-agent team compositions that work across all AIWG providers. On Claude Code, teams invoke agents natively. On all other providers, teams are emulated via `aiwg mc` (Mission Control) orchestration.
+
+**Source format:** JSON files in `agentic/code/frameworks/*/teams/`
+**Schema:** `agentic/code/frameworks/sdlc-complete/teams/schema.json`
+**CLI:** `aiwg team run|list|info`
+
+### TeamDefinition
+
+```typescript
+interface TeamDefinition {
+  name: string;                             // Human-readable team name
+  slug: string;                             // CLI identifier (kebab-case)
+  description: string;                      // One-line purpose
+  dispatch?: 'parallel' | 'sequential' | 'consensus';  // Execution mode
+  agents: TeamMember[];                     // 2-8 agents
+  use_cases?: string[];                     // Scenarios where team excels
+  handoffs?: TeamHandoff[];                 // Inter-agent artifact passing
+  sdlc_phases?: string[];                   // Active SDLC phases
+  max_context_agents?: number;              // Context budget limit (2-4)
+  overlap_resolution?: Record<string, string>;  // Capability conflict resolution
+}
+
+interface TeamMember {
+  agent: string;                            // Agent filename without .md
+  role: 'lead' | 'contributor' | 'reviewer' | 'advisor';
+  responsibilities?: string[];
+}
+
+interface TeamHandoff {
+  from: string;                             // Source agent
+  to: string;                               // Target agent
+  artifact: string;                         // What gets passed
+  gate: string;                             // Quality check before handoff
+}
+```
+
+### Provider Routing
+
+| Provider | Native Teams | Fallback |
+|----------|-------------|---------|
+| Claude Code | Native agent dispatch | — |
+| Warp, Copilot, Cursor, Windsurf, OpenCode, Factory, Codex, OpenClaw | — | `aiwg mc` orchestration |
+
+### Built-in Teams
+
+| Slug | Agents | Dispatch | Purpose |
+|------|--------|----------|---------|
+| `api-development` | 4 | sequential | API design and implementation |
+| `full-stack` | 4 | sequential | Full-stack feature delivery |
+| `greenfield` | 4 | sequential | New project kickoff |
+| `maintenance` | 4 | sequential | Code review and bug fixing |
+| `migration` | 4 | sequential | Technology migrations |
+| `sdlc-review` | 4 | parallel | Phase gate validation |
+| `security-review` | 3 | sequential | Security audits |
+
+### Deployment
+
+Teams are deployed as part of `aiwg use <framework>`. Project-local teams can be placed in `.aiwg/teams/<slug>.json` and take precedence over framework teams.
 
 ---
 

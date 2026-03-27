@@ -1,0 +1,77 @@
+{
+  "name": "SDLC Review Team",
+  "slug": "sdlc-review",
+  "description": "Full SDLC phase gate review team covering security, testing, requirements, and documentation",
+  "dispatch": "parallel",
+  "agents": [
+    {
+      "agent": "security-architect",
+      "role": "reviewer",
+      "responsibilities": [
+        "Security gate validation for phase transition",
+        "Threat model review and sign-off",
+        "Compliance requirements verification"
+      ]
+    },
+    {
+      "agent": "test-architect",
+      "role": "reviewer",
+      "responsibilities": [
+        "Test coverage adequacy review",
+        "Test strategy alignment with phase objectives",
+        "CI/CD quality gate validation"
+      ]
+    },
+    {
+      "agent": "requirements-analyst",
+      "role": "reviewer",
+      "responsibilities": [
+        "Requirements traceability verification",
+        "Acceptance criteria completeness check",
+        "Scope creep detection"
+      ]
+    },
+    {
+      "agent": "technical-writer",
+      "role": "reviewer",
+      "responsibilities": [
+        "Documentation completeness review",
+        "Clarity and consistency validation",
+        "Readiness for phase handoff"
+      ]
+    }
+  ],
+  "use_cases": [
+    "Phase gate validation (Inception → Elaboration → Construction → Transition)",
+    "Release readiness review",
+    "Sprint completion review",
+    "Architecture baseline sign-off",
+    "Pre-deployment checklist"
+  ],
+  "handoffs": [
+    {
+      "from": "requirements-analyst",
+      "to": "test-architect",
+      "artifact": "Requirements traceability matrix",
+      "gate": "All requirements have corresponding test cases; no gaps identified"
+    },
+    {
+      "from": "security-architect",
+      "to": "requirements-analyst",
+      "artifact": "Security requirements and threat model",
+      "gate": "All security requirements are traceable to use cases"
+    },
+    {
+      "from": "test-architect",
+      "to": "technical-writer",
+      "artifact": "Test results and coverage report",
+      "gate": "All test results documented; coverage thresholds met"
+    }
+  ],
+  "sdlc_phases": ["inception", "elaboration", "construction", "transition"],
+  "max_context_agents": 4,
+  "overlap_resolution": {
+    "documentation_review": "technical-writer handles docs quality; requirements-analyst handles requirements completeness",
+    "security_requirements": "security-architect owns threat model; requirements-analyst owns traceability"
+  }
+}

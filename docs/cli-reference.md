@@ -24,6 +24,7 @@ Complete reference for all `aiwg` CLI commands.
 - [Plugin Commands](#plugin-commands)
 - [Scaffolding Commands](#scaffolding-commands)
 - [Mission Control Commands](#mission-control-commands)
+- [Agent Team Commands](#agent-team-commands)
 - [Ralph Commands](#ralph-commands)
 - [Documentation Commands](#documentation-commands)
 - [SDLC Orchestration Commands](#sdlc-orchestration-commands)
@@ -1323,6 +1324,109 @@ aiwg mc stop mc-abc123 --drain
 
 ---
 
+## Agent Team Commands
+
+Agent teams provide a provider-agnostic abstraction for multi-agent collaboration. On Claude Code, teams use native agent dispatch. On all other providers (Copilot, Cursor, Warp, Windsurf, OpenCode, Factory, Codex, OpenClaw), teams are emulated via `aiwg mc` (Mission Control) orchestration.
+
+### team
+
+Multi-agent team orchestration across all providers.
+
+```bash
+aiwg team <subcommand> [options]
+aiwg teams <subcommand> [options]
+```
+
+**Capabilities:** orchestration, agent-teams, multi-provider, mission-control
+**Platforms:** All (native on Claude Code, emulated via aiwg mc on others)
+**Category:** orchestration
+
+#### Subcommands
+
+| Subcommand | Description |
+|-----------|-------------|
+| `run <name>` | Execute a team workflow |
+| `list` | List available teams |
+| `info <name>` | Show team definition and roster |
+
+#### Provider Routing
+
+| Provider | Backend | Behavior |
+|----------|---------|----------|
+| Claude Code | Native | @agent-name dispatch instructions |
+| Warp, Copilot, Cursor, Windsurf, OpenCode, Factory, Codex, OpenClaw | `aiwg mc` emulation | Generates `mc start` + `mc dispatch` commands |
+
+#### Options
+
+| Option | Description |
+|--------|-------------|
+| `--provider <p>` | Override provider detection |
+| `--objective "<text>"` | Objective string passed to mc dispatch agents |
+| `--json` | Machine-readable output |
+
+#### Examples
+
+```bash
+# Run a team (auto-detects provider)
+aiwg team run sdlc-review
+
+# Run with explicit provider override
+aiwg team run sdlc-review --provider cursor
+
+# Run with custom objective
+aiwg team run security-review --objective "Pre-release audit for SOC2"
+
+# List all available teams
+aiwg team list
+
+# Machine-readable team list
+aiwg team list --json
+
+# Inspect team definition
+aiwg team info sdlc-review
+aiwg team info api-development --json
+```
+
+#### Built-in Teams (sdlc-complete framework)
+
+| Team | Agents | Dispatch | Best For |
+|------|--------|----------|----------|
+| `api-development` | 4 | sequential | API design and implementation |
+| `full-stack` | 4 | sequential | Full-stack feature delivery |
+| `greenfield` | 4 | sequential | New project setup |
+| `maintenance` | 4 | sequential | Code review and bug fixing |
+| `migration` | 4 | sequential | Technology migrations |
+| `sdlc-review` | 4 | parallel | Phase gate validation |
+| `security-review` | 3 | sequential | Security audits |
+
+#### Team Definition Format
+
+Teams are defined as JSON files (with an optional `dispatch` field for `parallel | sequential | consensus`):
+
+```json
+{
+  "name": "SDLC Review Team",
+  "slug": "sdlc-review",
+  "description": "Full SDLC phase gate review team",
+  "dispatch": "parallel",
+  "agents": [
+    { "agent": "security-architect", "role": "reviewer" },
+    { "agent": "test-architect",     "role": "reviewer" },
+    { "agent": "requirements-analyst", "role": "reviewer" },
+    { "agent": "technical-writer",   "role": "reviewer" }
+  ],
+  "use_cases": ["Phase gate validation", "Release readiness review"],
+  "sdlc_phases": ["inception", "elaboration", "construction", "transition"]
+}
+```
+
+Custom teams can be placed in `.aiwg/teams/<slug>.json` for project-local overrides.
+
+**Source:** `agentic/code/frameworks/sdlc-complete/teams/`
+**Schema:** `agentic/code/frameworks/sdlc-complete/teams/schema.json`
+
+---
+
 ## Ralph Commands
 
 Ralph is the iterative task execution loop with advanced control layers (Epic #26).
@@ -2285,6 +2389,7 @@ All commands are registered as extensions in the unified schema. This enables:
 | **Daemon** | 2 | behavior, daemon-init |
 | **Ralph** | 8 | ralph, ralph-status, ralph-abort, ralph-resume, ralph-attach, ralph-external, ralph-memory, ralph-config |
 | **Mission Control** | 1 | mc (9 subcommands) |
+| **Agent Teams** | 1 | team (3 subcommands) |
 | **Metrics** | 3 | cost-report, cost-history, metrics-tokens |
 | **Documentation** | 1 | doc-sync |
 | **SDLC Orchestration** | 1 | sdlc-accelerate |

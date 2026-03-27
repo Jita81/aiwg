@@ -8,6 +8,7 @@
     "greenfield.json",
     "maintenance.json",
     "migration.json",
+    "sdlc-review.json",
     "security-review.json"
   ],
   "docs": [

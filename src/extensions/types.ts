@@ -28,7 +28,8 @@ export type ExtensionType =
   | 'template'
   | 'prompt'
   | 'soul'
-  | 'behavior';
+  | 'behavior'
+  | 'team';
 
 /**
  * Types that are authored as source artifacts.

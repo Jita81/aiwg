@@ -1351,6 +1351,42 @@ export const mcCommand: Extension = {
   } satisfies SkillMetadata,
 };
 
+// Agent Team Commands
+
+export const teamCommand: Extension = {
+  id: 'team',
+  type: 'skill',
+  name: 'Agent Teams',
+  description: 'Multi-agent team orchestration across all providers (run, list, info)',
+  version: '1.0.0',
+  capabilities: ['cli', 'orchestration', 'agent-teams', 'multi-provider', 'mission-control'],
+  keywords: ['team', 'teams', 'agents', 'multi-agent', 'orchestration', 'provider', 'dispatch'],
+  category: 'orchestration',
+  platforms: {
+    claude: 'full',
+    generic: 'full',
+  },
+  deployment: {
+    pathTemplate: '.{platform}/commands/{id}.md',
+    core: true,
+  },
+  metadata: {
+    type: 'skill',
+    triggerPhrases: ['team run', 'team list', 'team info', 'agent team', 'run team', 'list teams'],
+    commandHint: {
+      template: 'orchestration',
+      allowedTools: ['Bash', 'Read', 'Write'],
+      argumentHint: '<subcommand> [options]',
+      executionSteps: [
+        'Parse subcommand (run, list, info)',
+        'Detect provider (native Claude Code vs emulated via aiwg mc)',
+        'Load team definition from .aiwg/teams/ or framework source',
+        'Dispatch natively or emit aiwg mc commands for emulation',
+      ],
+    },
+  } satisfies SkillMetadata,
+};
+
 // Cost & Metrics Commands
 
 export const costReportCommand: Extension = {
@@ -2074,6 +2110,9 @@ export const commandDefinitions: Extension[] = [
 
   // Mission Control (1)
   mcCommand,
+
+  // Agent Teams (1)
+  teamCommand,
 
   // Metrics (3)
   costReportCommand,

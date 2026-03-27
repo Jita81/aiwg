@@ -171,6 +171,18 @@ async function handleRuntimeInfo(args: string[]): Promise<void> {
         console.log(`    macOS:         brew install chrony`);
       }
 
+      // Team backend detection
+      const teamBackend = isClaudeCodeContext
+        ? 'native (Claude Code agent teams)'
+        : 'aiwg mc emulation';
+
+      console.log(`\nAgent Teams:`);
+      console.log(`  Backend:  ${teamBackend}`);
+
+      if (!isClaudeCodeContext) {
+        console.log(`  Note:     Run 'aiwg team run <name>' to dispatch via Mission Control`);
+      }
+
       console.log(`\nRun 'aiwg runtime-info --discover' to refresh catalog`);
       console.log(`\nRun 'aiwg runtime-info --check <tool>' to check a specific tool`);
     }

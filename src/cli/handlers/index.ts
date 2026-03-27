@@ -83,6 +83,7 @@ import { runtimeInfoHandler } from './runtime-info.js';
 import { syncHandler } from './sync.js';
 import { mcHandler, mcHandlers } from './mc.js';
 import { sdlcAccelerateHandler } from './sdlc-accelerate.js';
+import { teamHandler, teamHandlers } from './team.js';
 import { installHandler } from './install.js';
 import { packagesHandler } from './packages.js';
 import { initHandler } from './init.js';
@@ -173,6 +174,9 @@ export {
 
   // SDLC Orchestration
   sdlcAccelerateHandler,
+
+  // Agent Teams
+  teamHandler,
 };
 
 // Re-export handler arrays
@@ -183,6 +187,7 @@ export {
   ralphHandlers,
   subcommandHandlers,
   mcHandlers,
+  teamHandlers,
   daemonHandlers,
 };
 
@@ -241,6 +246,9 @@ export const allHandlers: CommandHandler[] = [
 
   // Mission Control
   ...mcHandlers,
+
+  // Agent Teams
+  ...teamHandlers,
 
   // SDLC Orchestration
   sdlcAccelerateHandler,
