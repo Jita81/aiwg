@@ -62,15 +62,15 @@ export async function main(args: string[]): Promise<void> {
 
 async function handleChunk(args: string[]): Promise<void> {
   let file: string | undefined;
-  let chunkSize = 2000;     // lines per chunk
-  let overlap = 100;         // lines overlap between chunks
+  let chunkSize = 2000;          // lines per chunk
+  let overlapArg: number | undefined;  // resolved after chunkSize is known
   let format: 'json' | 'text' = 'json';
   let outputDir: string | undefined;
 
   for (let i = 0; i < args.length; i++) {
     switch (args[i]) {
       case '--size': chunkSize = parseInt(args[++i], 10); break;
-      case '--overlap': overlap = parseInt(args[++i], 10); break;
+      case '--overlap': overlapArg = parseInt(args[++i], 10); break;
       case '--format': format = args[++i] as 'json' | 'text'; break;
       case '--output': outputDir = args[++i]; break;
       default:
@@ -82,13 +82,20 @@ async function handleChunk(args: string[]): Promise<void> {
     throw new Error('Usage: aiwg chunk <file> [--size N] [--overlap N] [--format json|text] [--output <dir>]');
   }
 
+  // Default overlap is 5% of chunkSize, clamped to [0, chunkSize-1] so stride is always ≥ 1.
+  const overlap = overlapArg !== undefined
+    ? Math.min(overlapArg, chunkSize - 1)
+    : Math.min(Math.floor(chunkSize * 0.05), chunkSize - 1);
+
   const absoluteFile = path.resolve(file);
   if (!fs.existsSync(absoluteFile)) {
     throw new Error(`File not found: ${absoluteFile}`);
   }
 
   const content = fs.readFileSync(absoluteFile, 'utf-8');
-  const lines = content.split('\n');
+  const rawLines = content.split('\n');
+  // Remove trailing empty line produced by files ending with \n
+  const lines = rawLines[rawLines.length - 1] === '' ? rawLines.slice(0, -1) : rawLines;
   const totalLines = lines.length;
 
   if (totalLines <= chunkSize) {
@@ -118,8 +125,10 @@ async function handleChunk(args: string[]): Promise<void> {
     chunks.push({ index: chunkIndex, start, end, file: chunkFile, lines: chunkLines.length });
 
     chunkIndex++;
-    // Advance with overlap: next chunk starts (chunkSize - overlap) lines ahead
-    start += chunkSize - overlap;
+    // Advance with overlap: next chunk starts (chunkSize - overlap) lines ahead.
+    // Clamp stride to at least 1 to prevent infinite loop when overlap >= chunkSize.
+    const stride = Math.max(1, chunkSize - overlap);
+    start += stride;
     if (start >= totalLines) break;
   }
 
@@ -175,6 +184,10 @@ async function handleFanout(args: string[]): Promise<void> {
   // Resolve manifest
   let manifestFile: string;
   const absoluteChunks = path.resolve(chunksPath);
+
+  if (!fs.existsSync(absoluteChunks)) {
+    throw new Error(`Manifest not found: ${absoluteChunks}. Run 'aiwg chunk' first.`);
+  }
 
   if (fs.statSync(absoluteChunks).isDirectory()) {
     manifestFile = path.join(absoluteChunks, 'manifest.json');
