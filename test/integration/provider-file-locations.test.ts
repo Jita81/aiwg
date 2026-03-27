@@ -11,11 +11,11 @@
  * - Claude:   .claude/agents/, .claude/commands/, .claude/skills/, .claude/rules/
  * - Codex:    .codex/agents/, .codex/rules/ (project) + ~/.codex/prompts/, ~/.codex/skills/ (home)
  * - Factory:  .factory/droids/, .factory/commands/, .factory/skills/, .factory/rules/
- * - Copilot:  .github/agents/ (agents+commands as YAML), .github/skills/, .github/copilot-rules/
+ * - Copilot:  .github/agents/ (.agent.md), .github/prompts/ (.prompt.md), .github/skills/, .github/instructions/ (.instructions.md)
  * - Cursor:   .cursor/agents/, .cursor/commands/, .cursor/skills/, .cursor/rules/
  * - OpenCode: .opencode/agent/, .opencode/command/, .opencode/skill/, .opencode/rule/
  * - Warp:     .warp/agents/, .warp/commands/, .warp/skills/, .warp/rules/ + WARP.md
- * - Windsurf: .windsurf/workflows/, .windsurf/skills/, .windsurf/rules/ + AGENTS.md (aggregated agents), .windsurfrules
+ * - Windsurf: .windsurf/workflows/, .windsurf/skills/, .windsurf/rules/, .agents/skills/ + AGENTS.md (aggregated agents), .windsurfrules (deprecated stub)
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
@@ -91,9 +91,9 @@ const PROVIDERS: Record<string, ProviderConfig> = {
   },
   copilot: {
     name: 'copilot',
-    projectPaths: ['.github/agents', '.github/skills', '.github/copilot-rules'],  // Commands → .github/agents/ (converted to agent YAML)
+    projectPaths: ['.github/agents', '.github/prompts', '.github/skills', '.github/instructions'],
     forbiddenPaths: ['.claude', '.codex', '.factory'],
-    fileExtension: '.yaml',  // Copilot uses .yaml not .yml
+    fileExtension: '.agent.md',  // Copilot uses .agent.md for agents
     minArtifacts: 5,
   },
   cursor: {
@@ -120,8 +120,8 @@ const PROVIDERS: Record<string, ProviderConfig> = {
   },
   windsurf: {
     name: 'windsurf',
-    projectPaths: ['.windsurf/skills', '.windsurf/rules'],  // Agents → aggregated AGENTS.md (root file); commands migrated to skills (#551)
-    rootFiles: ['AGENTS.md', '.windsurfrules'],
+    projectPaths: ['.windsurf/skills', '.windsurf/rules', '.agents/skills'],  // Agents → aggregated AGENTS.md; commands → skills (#551); cross-agent skills (#576)
+    rootFiles: ['AGENTS.md', '.windsurfrules'],  // .windsurfrules is now a deprecated stub pointing to .windsurf/rules/aiwg-orchestration.md
     forbiddenPaths: ['.claude/agents', '.codex'],
     fileExtension: '.md',
     minArtifacts: 5,
@@ -347,7 +347,7 @@ describe.skipIf(!GIT_INIT_AVAILABLE)('Provider File Locations', () => {
         cursor: ['.cursor'],
         opencode: ['.opencode'],
         warp: ['.warp'],  // Discrete files + WARP.md aggregated
-        windsurf: ['.windsurf', '.windsurfrules'],
+        windsurf: ['.windsurf', '.windsurfrules', '.agents'],  // .agents/skills/ cross-agent compat (#576)
       };
 
       for (const [provider, expectedDirs] of Object.entries(providerDirs)) {

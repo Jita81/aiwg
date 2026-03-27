@@ -1,12 +1,16 @@
 ---
 name: aiwg-regenerate-windsurfrules
-description: Regenerate .windsurfrules for Windsurf with preserved team directives
+description: Regenerate .windsurf/rules/aiwg-context.md (trigger: always_on) for Windsurf with preserved team directives
 args: "[--no-backup] [--dry-run] [--show-preserved] [--full] [--interactive] [--guidance "text"]"
 ---
 
-# Regenerate .windsurfrules
+# Regenerate Windsurf Rules
 
-Regenerate the `.windsurfrules` file for Windsurf (Codeium) integration, analyzing current project state while preserving team directives and organizational requirements.
+Regenerate the `.windsurf/rules/aiwg-context.md` file for Windsurf integration, analyzing current project state while preserving team directives. Uses `trigger: always_on` frontmatter so Windsurf includes the context in every conversation.
+
+**Primary target:** `.windsurf/rules/aiwg-context.md` with `trigger: always_on` frontmatter (Windsurf reads this natively).
+
+**Deprecated stub:** Also updates `.windsurfrules` with a deprecation notice pointing to the new location (retained for backward compat only — Windsurf may silently ignore root-level `.windsurfrules`).
 
 ## Parameters
 
