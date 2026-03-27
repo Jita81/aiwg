@@ -11,7 +11,7 @@
  *   - Rules: <project>/.codex/rules/ (project-local, conventional)
  *
  * Special features:
- *   - Model replacement (opus/sonnet/haiku -> gpt-5.3-codex/codex-mini-latest/gpt-5-codex-mini)
+ *   - Model replacement (opus/sonnet/haiku -> gpt-5.4/gpt-5.3-codex/gpt-5.1-codex-mini)
  *   - --as-agents-md aggregation option
  *   - Delegates commands to deploy-prompts-codex.mjs (deploys to ~/.codex/prompts/)
  *   - Delegates skills to deploy-skills-codex.mjs (deploys to ~/.codex/skills/)
@@ -80,9 +80,9 @@ export const capabilities = {
  */
 export function mapModel(originalModel, modelCfg, modelsConfig) {
   const gptModels = {
-    'opus': 'gpt-5.3-codex',
-    'sonnet': 'codex-mini-latest',
-    'haiku': 'gpt-5-codex-mini'
+    'opus': 'gpt-5.4',
+    'sonnet': 'gpt-5.3-codex',
+    'haiku': 'gpt-5.1-codex-mini'
   };
 
   // Handle override models first
@@ -145,9 +145,9 @@ export function transformAgent(srcPath, content, opts) {
   const { reasoningModel, codingModel, efficiencyModel } = opts;
 
   const models = {
-    reasoning: reasoningModel || 'gpt-5.3-codex',
-    coding: codingModel || 'codex-mini-latest',
-    efficiency: efficiencyModel || 'gpt-5-codex-mini'
+    reasoning: reasoningModel || 'gpt-5.4',
+    coding: codingModel || 'gpt-5.3-codex',
+    efficiency: efficiencyModel || 'gpt-5.1-codex-mini'
   };
 
   return replaceModelFrontmatter(content, models);

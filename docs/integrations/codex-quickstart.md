@@ -10,20 +10,20 @@ OpenAI Codex is available across multiple interfaces:
 
 | Interface | Model Default | Best For |
 |-----------|---------------|----------|
-| **Codex CLI** | `codex-mini-latest` | Terminal-first development, automation |
-| **Codex App** (macOS) | `gpt-5.3-codex` | Parallel agents, long-running tasks |
+| **Codex CLI** | `gpt-5.3-codex` | Terminal-first development, automation |
+| **Codex App** (macOS) | `gpt-5.4` | Parallel agents, long-running tasks |
 | **Codex in Copilot** | `gpt-5.3-codex` | GitHub-integrated workflows |
-| **Codex API** | `codex-mini-latest` | Custom tooling, CI/CD integration |
+| **Codex API** | `gpt-5.3-codex` | Custom tooling, CI/CD integration |
 
 ---
 
-## Available Models (February 2026)
+## Available Models (March 2026)
 
 | Model | Capability | Pricing | Notes |
 |-------|-----------|---------|-------|
-| **GPT-5.3-Codex** | Most capable | Premium tier | Combines Codex + GPT-5 stacks, tops SWE-Bench Pro |
-| **GPT-5-Codex-Mini** | Cost-effective | 4x more usage | Auto-offered at 90% of usage limit |
-| **codex-mini-latest** | API default | $1.50/$6 per 1M tokens | Fine-tuned o4-mini, 75% prompt caching discount |
+| **GPT-5.4** | Newest flagship | Premium tier | Priority 0, latest generation |
+| **GPT-5.3-Codex** | Proven flagship | Premium tier | Priority 0, combines Codex + GPT-5 stacks |
+| **GPT-5.1-Codex-Mini** | Budget | Free-tier compat | Listed, priority 12, cost-effective |
 
 Switch models mid-session with `/model` or configure in `config.toml`.
 
@@ -113,17 +113,17 @@ cp $(npm root -g)/aiwg/agentic/code/frameworks/sdlc-complete/templates/codex/con
 
 ```toml
 # Model selection
-model = "codex-mini-latest"          # Default CLI model (cost-effective)
-review_model = "gpt-5.3-codex"       # Most capable for /review
+model = "gpt-5.3-codex"              # Default CLI model (proven flagship)
+review_model = "gpt-5.4"             # Most capable for /review
 
 # Profiles for different workflows
 [profiles.aiwg-sdlc]
-model = "gpt-5.3-codex"
+model = "gpt-5.4"
 model_reasoning_effort = "high"
 approval_policy = "on-request"
 
 [profiles.aiwg-dev]
-model = "codex-mini-latest"
+model = "gpt-5.3-codex"
 model_reasoning_effort = "medium"
 ```
 
@@ -241,9 +241,9 @@ When AIWG deploys agents, model shorthands are mapped:
 
 | AIWG Shorthand | Codex Model | Use Case |
 |----------------|-------------|----------|
-| `opus` | `gpt-5.3-codex` | Architecture, complex reasoning |
-| `sonnet` | `codex-mini-latest` | Code generation, implementation |
-| `haiku` | `gpt-5-codex-mini` | Quick tasks, file operations |
+| `opus` | `gpt-5.4` | Architecture, complex reasoning |
+| `sonnet` | `gpt-5.3-codex` | Code generation, implementation |
+| `haiku` | `gpt-5.1-codex-mini` | Quick tasks, file operations |
 
 ---
 
@@ -270,7 +270,7 @@ aiwg ralph-external "Migrate codebase to TypeScript" \
   --budget 5.0
 ```
 
-Model mapping: opus → gpt-5.3-codex, sonnet → codex-mini-latest, haiku → gpt-5-codex-mini.
+Model mapping: opus → gpt-5.4, sonnet → gpt-5.3-codex, haiku → gpt-5.1-codex-mini.
 
 See [Ralph Guide](../ralph-guide.md) for full documentation.
 
@@ -297,7 +297,7 @@ Restart Codex after installing new skills.
 
 **Model not available?** Check your tier:
 - GPT-5.3-Codex requires Pro/Team plan
-- codex-mini-latest available on all plans
+- gpt-5.1-codex-mini available on all plans (including free tier)
 - GPT-5-Codex-Mini auto-offered at 90% usage
 
 **Verify installation:**

@@ -38,16 +38,16 @@
 
   "openai": {
     "reasoning": {
-      "model": "gpt-5",
-      "description": "OpenAI's most capable reasoning model for strategic planning"
+      "model": "gpt-5.4",
+      "description": "GPT-5.4 - Newest flagship for strategic planning (Mar 2026)"
     },
     "coding": {
-      "model": "gpt-5-codex",
-      "description": "OpenAI's balanced model for content generation"
+      "model": "gpt-5.3-codex",
+      "description": "GPT-5.3-Codex - Proven flagship for content generation"
     },
     "efficiency": {
-      "model": "gpt-5-codex",
-      "description": "OpenAI's fast model for production tasks"
+      "model": "gpt-5.1-codex-mini",
+      "description": "GPT-5.1-Codex-Mini - Budget model for production tasks"
     }
   },
 

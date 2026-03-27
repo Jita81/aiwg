@@ -20,9 +20,9 @@ These models are fully supported and configured automatically when using AIWG wi
 
 | Model | AIWG Tier | Context | Tool Use | Status |
 |-------|-----------|---------|----------|--------|
-| gpt-5.3-codex | opus | 256K | Yes | Fully supported |
-| codex-mini-latest | sonnet | 256K | Yes | Fully supported |
-| gpt-5-codex-mini | haiku | 128K | Yes | Fully supported |
+| gpt-5.4 | opus | 256K | Yes | Fully supported |
+| gpt-5.3-codex | sonnet | 256K | Yes | Fully supported |
+| gpt-5.1-codex-mini | haiku | 192K | Yes | Fully supported |
 
 ### Google
 

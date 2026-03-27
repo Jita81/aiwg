@@ -37,7 +37,7 @@ function makeTmpDir(): string {
 const LIVE_BASE_CONFIG = {
   provider: 'codex',
   maxIterations: 3,
-  model: 'haiku',           // Maps to gpt-5-codex-mini (cheapest)
+  model: 'haiku',           // Maps to gpt-5.4 via codex adapter (all tiers use flagship for CLI)
   timeoutMinutes: 3,
   enablePIDControl: false,
   enableOverseer: false,

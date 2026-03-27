@@ -87,37 +87,37 @@
     "openai": {
       "models": {
         "reasoning": {
-          "default": "gpt-5",
-          "aliases": ["gpt5", "openai-reasoning", "o3"],
+          "default": "gpt-5.4",
+          "aliases": ["gpt5.4", "openai-reasoning", "gpt-5.3-codex"],
           "capabilities": ["reasoning", "code-generation", "vision", "tool-use"],
-          "contextWindow": 128000,
-          "costPer1kTokens": { "input": 0.01, "output": 0.03 }
+          "contextWindow": 256000,
+          "costPer1kTokens": { "input": 0.01, "output": 0.04 }
         },
         "coding": {
-          "default": "gpt-5-codex",
-          "aliases": ["codex", "openai-coding", "gpt5-codex"],
+          "default": "gpt-5.3-codex",
+          "aliases": ["codex", "openai-coding", "gpt5.3-codex"],
           "capabilities": ["code-generation", "reasoning", "tool-use"],
-          "contextWindow": 128000,
-          "costPer1kTokens": { "input": 0.005, "output": 0.015 }
+          "contextWindow": 192000,
+          "costPer1kTokens": { "input": 0.01, "output": 0.04 }
         },
         "efficiency": {
-          "default": "gpt-4o-mini",
-          "aliases": ["gpt4o-mini", "openai-fast", "mini"],
+          "default": "gpt-5.1-codex-mini",
+          "aliases": ["gpt5.1-codex-mini", "openai-fast", "codex-mini"],
           "capabilities": ["fast-response", "code-generation"],
-          "contextWindow": 128000,
-          "costPer1kTokens": { "input": 0.00015, "output": 0.0006 }
+          "contextWindow": 192000,
+          "costPer1kTokens": { "input": 0.001, "output": 0.004 }
         }
       },
       "tierOverrides": {
         "max-quality": {
-          "reasoning": "gpt-5.2",
-          "coding": "gpt-5",
-          "efficiency": "gpt-5-codex"
+          "reasoning": "gpt-5.4",
+          "coding": "gpt-5.4",
+          "efficiency": "gpt-5.3-codex"
         },
         "premium": {
-          "reasoning": "gpt-5",
-          "coding": "gpt-5-codex",
-          "efficiency": "gpt-4o"
+          "reasoning": "gpt-5.4",
+          "coding": "gpt-5.3-codex",
+          "efficiency": "gpt-5.1-codex-mini"
         }
       }
     },

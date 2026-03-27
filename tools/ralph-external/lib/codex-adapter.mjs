@@ -14,7 +14,7 @@
  * - No --mcp-config flag
  * - No --append-system-prompt flag (inject into main prompt)
  * - No --max-budget-usd flag
- * - Model: gpt-5.3-codex (all aliases map here; mini models are API-only)
+ * - Model: gpt-5.4 (all aliases map here for CLI execution)
  *
  * @implements Plan: Multi-Provider Support for External Ralph Loop
  */
@@ -24,15 +24,15 @@ import { ProviderAdapter, registerProvider } from './provider-adapter.mjs';
 /**
  * Model mapping from generic names to Codex-specific models.
  *
- * gpt-5.3-codex is the current production model (confirmed working).
- * codex-mini-latest and gpt-5-codex-mini are API-only and not available
- * to ChatGPT Pro accounts — map everything to the working model.
+ * gpt-5.4 is the current flagship (priority 0, confirmed working).
+ * All aliases map here for CLI execution since mini models may not be
+ * available to all account types.
  * Users can override by passing a model ID directly (e.g., --model gpt-5.3-codex).
  */
 const MODEL_MAP = {
-  'opus':   'gpt-5.3-codex',
-  'sonnet': 'gpt-5.3-codex',
-  'haiku':  'gpt-5.3-codex',
+  'opus':   'gpt-5.4',
+  'sonnet': 'gpt-5.4',
+  'haiku':  'gpt-5.4',
 };
 
 export class CodexAdapter extends ProviderAdapter {

@@ -24,30 +24,33 @@
   "factory": {
     "reasoning": {
       "model": "claude-opus-4-6",
+      "reasoningEffort": "high",
       "description": "Factory AI uses bare Claude model identifiers (no anthropic/ prefix)"
     },
     "coding": {
       "model": "claude-sonnet-4-6",
+      "reasoningEffort": "medium",
       "description": "Factory AI uses bare Claude model identifiers (no anthropic/ prefix)"
     },
     "efficiency": {
       "model": "claude-haiku-4-5-20251001",
+      "reasoningEffort": "low",
       "description": "Factory AI uses bare Claude model identifiers (no anthropic/ prefix)"
     }
   },
 
   "openai": {
     "reasoning": {
-      "model": "gpt-5.3-codex",
-      "description": "GPT-5.3-Codex - Most capable, combines Codex + GPT-5 training stacks (Feb 2026)"
+      "model": "gpt-5.4",
+      "description": "GPT-5.4 - Newest flagship, priority 0 in Codex CLI model catalog (Mar 2026)"
     },
     "coding": {
-      "model": "codex-mini-latest",
-      "description": "codex-mini-latest - Fine-tuned o4-mini, default CLI model, cost-effective ($1.50/1M input)"
+      "model": "gpt-5.3-codex",
+      "description": "GPT-5.3-Codex - Proven flagship coding model, priority 0 (Feb 2026)"
     },
     "efficiency": {
-      "model": "gpt-5-codex-mini",
-      "description": "GPT-5-Codex-Mini - Smaller model, 4x more usage than full GPT-5.3-Codex"
+      "model": "gpt-5.1-codex-mini",
+      "description": "GPT-5.1-Codex-Mini - Listed budget model, free-tier compatible (priority 12)"
     }
   },
 

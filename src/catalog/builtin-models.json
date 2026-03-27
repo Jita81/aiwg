@@ -265,39 +265,39 @@
       "source": "builtin",
       "lastVerified": "2026-02-06"
     },
-    "codex-mini-latest": {
+    "gpt-5.4": {
       "provider": "openai",
-      "displayName": "Codex Mini (Latest)",
-      "releaseDate": "2026-01-15",
+      "displayName": "GPT-5.4",
+      "releaseDate": "2026-03-01",
       "status": "active",
       "deprecated": false,
       "deprecationDate": null,
       "successorModel": null,
       "capabilities": {
-        "contextWindow": 192000,
+        "contextWindow": 256000,
         "maxOutputTokens": 16384,
         "vision": true,
         "toolUse": true,
         "streaming": true,
-        "reasoning": "good",
+        "reasoning": "excellent",
         "coding": "excellent",
-        "speed": "excellent"
+        "speed": "good"
       },
       "pricing": {
-        "inputPer1kTokens": 0.0015,
-        "outputPer1kTokens": 0.006,
+        "inputPer1kTokens": 0.01,
+        "outputPer1kTokens": 0.04,
         "currency": "USD",
-        "lastUpdated": "2026-02-06"
+        "lastUpdated": "2026-03-27"
       },
-      "aliases": ["codex-mini"],
-      "tags": ["coding", "efficient", "default-cli", "codex"],
+      "aliases": ["gpt5.4"],
+      "tags": ["flagship", "coding", "reasoning", "codex"],
       "source": "builtin",
-      "lastVerified": "2026-02-06"
+      "lastVerified": "2026-03-27"
     },
-    "gpt-5-codex-mini": {
+    "gpt-5.1-codex-mini": {
       "provider": "openai",
-      "displayName": "GPT-5-Codex-Mini",
-      "releaseDate": "2026-01-10",
+      "displayName": "GPT-5.1-Codex-Mini",
+      "releaseDate": "2026-02-01",
       "status": "active",
       "deprecated": false,
       "deprecationDate": null,
@@ -316,12 +316,70 @@
         "inputPer1kTokens": 0.001,
         "outputPer1kTokens": 0.004,
         "currency": "USD",
+        "lastUpdated": "2026-03-27"
+      },
+      "aliases": ["gpt5.1-codex-mini"],
+      "tags": ["budget", "coding", "efficient", "codex", "free-tier"],
+      "source": "builtin",
+      "lastVerified": "2026-03-27"
+    },
+    "codex-mini-latest": {
+      "provider": "openai",
+      "displayName": "Codex Mini (Latest) [Deprecated]",
+      "releaseDate": "2026-01-15",
+      "status": "deprecated",
+      "deprecated": true,
+      "deprecationDate": "2026-03-27",
+      "successorModel": "gpt-5.1-codex-mini",
+      "capabilities": {
+        "contextWindow": 192000,
+        "maxOutputTokens": 16384,
+        "vision": true,
+        "toolUse": true,
+        "streaming": true,
+        "reasoning": "good",
+        "coding": "excellent",
+        "speed": "excellent"
+      },
+      "pricing": {
+        "inputPer1kTokens": 0.0015,
+        "outputPer1kTokens": 0.006,
+        "currency": "USD",
+        "lastUpdated": "2026-02-06"
+      },
+      "aliases": ["codex-mini"],
+      "tags": ["coding", "efficient", "codex", "deprecated"],
+      "source": "builtin",
+      "lastVerified": "2026-03-27"
+    },
+    "gpt-5-codex-mini": {
+      "provider": "openai",
+      "displayName": "GPT-5-Codex-Mini [Deprecated]",
+      "releaseDate": "2026-01-10",
+      "status": "deprecated",
+      "deprecated": true,
+      "deprecationDate": "2026-03-27",
+      "successorModel": "gpt-5.1-codex-mini",
+      "capabilities": {
+        "contextWindow": 192000,
+        "maxOutputTokens": 16384,
+        "vision": true,
+        "toolUse": true,
+        "streaming": true,
+        "reasoning": "good",
+        "coding": "good",
+        "speed": "excellent"
+      },
+      "pricing": {
+        "inputPer1kTokens": 0.001,
+        "outputPer1kTokens": 0.004,
+        "currency": "USD",
         "lastUpdated": "2026-02-06"
       },
       "aliases": ["gpt5-codex-mini"],
-      "tags": ["budget", "coding", "efficient", "codex"],
+      "tags": ["budget", "coding", "efficient", "codex", "deprecated"],
       "source": "builtin",
-      "lastVerified": "2026-02-06"
+      "lastVerified": "2026-03-27"
     },
     "gpt-4-turbo": {
       "provider": "openai",
