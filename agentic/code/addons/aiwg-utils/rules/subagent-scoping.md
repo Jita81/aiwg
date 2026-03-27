@@ -194,6 +194,16 @@ Depth: 2 levels maximum
 
 If deeper decomposition is needed, the parent agent should handle it.
 
+**RLM Mode Exception**: When processing tasks that require recursive decomposition beyond 2 levels (e.g., large corpus analysis, 10M+ token tasks), use **RLM mode** instead of manual delegation chains. RLM mode (`/rlm-mode`, `/rlm-query`, `/rlm-batch`) is explicitly designed for deep recursive delegation and overrides this depth limit. See `@agentic/code/addons/rlm/README.md` for when to enter RLM mode.
+
+**Criteria for entering RLM mode** (overrides depth-2 limit):
+- Task involves files or data exceeding available context window
+- Same operation applied to many files requiring >2 levels of decomposition
+- Problem requires recursive synthesis across 3+ levels (e.g., corpus → files → sections → paragraphs)
+- Cross-cutting analysis spanning entire codebases or documentation corpora
+
+**Research foundation**: REF-089 (Zhang et al., 2026) demonstrates that RLM's recursive environment interaction is lossless and 3x cheaper than summarization, because the agent selectively accesses only relevant context portions rather than loading everything. See `.aiwg/research/findings/REF-089-recursive-language-models.md`.
+
 ### Rule 7: Context Budget Estimation
 
 Before delegating, estimate whether the task fits comfortably in context. If `AIWG_CONTEXT_WINDOW` is set in the project context file, use that value as the available context. Otherwise, assume the platform default.
@@ -501,8 +511,10 @@ Before limiting the number of subagents spawned:
 - @.claude/rules/research-before-decision.md - Informed delegation
 - @.claude/rules/anti-laziness.md - Complete work without shortcuts
 - @.claude/rules/tao-loop.md - TAO loop standardization
+- @agentic/code/addons/rlm/README.md - RLM mode for deep recursive delegation (overrides depth-2 limit)
+- `.aiwg/research/findings/REF-089-recursive-language-models.md` - Research evidence for RLM depth trade-offs
 
 ---
 
 **Rule Status**: ACTIVE
-**Last Updated**: 2026-02-09
+**Last Updated**: 2026-03-27

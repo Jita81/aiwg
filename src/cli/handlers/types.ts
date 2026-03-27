@@ -87,7 +87,8 @@ export type CommandCategory =
   | 'orchestration' // Mission Control
   | 'daemon'        // Daemon and behavior management
   | 'config'        // User-level config management
-  | 'ops';          // Operations ecosystem management
+  | 'ops'           // Operations ecosystem management
+  | 'agentic-tools'; // Support tools for agentic sessions (RLM chunk, fanout, etc.)
 
 /**
  * Handler factory function type

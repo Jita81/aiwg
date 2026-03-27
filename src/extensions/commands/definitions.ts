@@ -1690,12 +1690,185 @@ export const opsCommand: Extension = {
   } satisfies SkillMetadata,
 };
 
+// Agentic Tools Commands (RLM support tools)
+
+export const chunkCommand: Extension = {
+  id: 'chunk',
+  type: 'skill',
+  name: 'Chunk',
+  description: 'Split a file into overlapping chunks for parallel fanout processing',
+  version: '1.0.0',
+  capabilities: ['rlm', 'chunking', 'agentic-tools', 'context-decomposition'],
+  keywords: ['chunk', 'split', 'fanout', 'rlm', 'decompose', 'context'],
+  category: 'agentic-tools',
+  platforms: {
+    claude: 'full',
+    generic: 'full',
+  },
+  deployment: {
+    pathTemplate: '.{platform}/commands/{id}.md',
+    core: false,
+  },
+  metadata: {
+    type: 'skill',
+    triggerPhrases: ['chunk file', 'split file', 'prepare for fanout', 'chunk for rlm'],
+    commandHint: {
+      template: 'utility',
+      argumentHint: '<file> [--size N] [--overlap N] [--format json|text] [--output <dir>]',
+      allowedTools: ['Read', 'Write', 'Bash'],
+      executionSteps: [
+        'Read source file',
+        'Apply chunking strategy (semantic-boundary or fixed-count)',
+        'Write chunk files with overlap',
+        'Output JSON manifest of chunk locations',
+      ],
+    },
+  } satisfies SkillMetadata,
+};
+
+export const fanoutCommand: Extension = {
+  id: 'fanout',
+  type: 'skill',
+  name: 'Fanout',
+  description: 'Dispatch parallel subagent queries across a chunk manifest',
+  version: '1.0.0',
+  capabilities: ['rlm', 'fanout', 'agentic-tools', 'parallel-search'],
+  keywords: ['fanout', 'parallel', 'search', 'rlm', 'subagent', 'dispatch'],
+  category: 'agentic-tools',
+  platforms: {
+    claude: 'full',
+    generic: 'full',
+  },
+  deployment: {
+    pathTemplate: '.{platform}/commands/{id}.md',
+    core: false,
+  },
+  metadata: {
+    type: 'skill',
+    triggerPhrases: ['fanout search', 'parallel search chunks', 'dispatch across chunks'],
+    commandHint: {
+      template: 'utility',
+      argumentHint: '<query> --chunks <dir|manifest.json> [--parallel N] [--model haiku|sonnet|opus]',
+      allowedTools: ['Read', 'Bash', 'Glob', 'Grep'],
+      executionSteps: [
+        'Read chunk manifest',
+        'Dispatch parallel subagents up to --parallel limit',
+        'Each subagent queries one chunk',
+        'Collect and aggregate results with provenance',
+      ],
+    },
+  } satisfies SkillMetadata,
+};
+
+export const rlmPrepCommand: Extension = {
+  id: 'rlm-prep',
+  type: 'skill',
+  name: 'RLM Prep',
+  description: 'Prepare source content for RLM processing (chunk + index + manifest)',
+  version: '1.0.0',
+  capabilities: ['rlm', 'prep', 'agentic-tools', 'indexing'],
+  keywords: ['rlm-prep', 'prepare', 'index', 'rlm', 'manifest', 'chunk'],
+  category: 'agentic-tools',
+  platforms: {
+    claude: 'full',
+    generic: 'full',
+  },
+  deployment: {
+    pathTemplate: '.{platform}/commands/{id}.md',
+    core: false,
+  },
+  metadata: {
+    type: 'skill',
+    triggerPhrases: ['prepare for rlm', 'rlm prep', 'index for recursive search'],
+    commandHint: {
+      template: 'utility',
+      argumentHint: '<file|dir> [--output <dir>] [--strategy semantic-boundary|fixed-count|adaptive] [--size N]',
+      allowedTools: ['Read', 'Write', 'Glob', 'Bash'],
+      executionSteps: [
+        'Discover all files in source path',
+        'Apply chunking strategy per file',
+        'Build searchable index',
+        'Write manifest.json with chunk locations and metadata',
+      ],
+    },
+  } satisfies SkillMetadata,
+};
+
+export const rlmSearchCommand: Extension = {
+  id: 'rlm-search',
+  type: 'skill',
+  name: 'RLM Search',
+  description: 'Full recursive search pipeline: decompose source, fanout query, synthesize results',
+  version: '1.0.0',
+  capabilities: ['rlm', 'search', 'agentic-tools', 'recursive', 'synthesis'],
+  keywords: ['rlm-search', 'recursive', 'search', 'fanout', 'synthesize', 'rlm'],
+  category: 'agentic-tools',
+  platforms: {
+    claude: 'full',
+    generic: 'full',
+  },
+  deployment: {
+    pathTemplate: '.{platform}/commands/{id}.md',
+    core: false,
+  },
+  metadata: {
+    type: 'skill',
+    triggerPhrases: ['rlm search', 'recursive search', 'search large codebase', 'fanout and synthesize'],
+    commandHint: {
+      template: 'utility',
+      argumentHint: '<query> --source <file|dir> [--depth N] [--parallel N] [--budget N]',
+      allowedTools: ['Read', 'Write', 'Glob', 'Grep', 'Bash'],
+      executionSteps: [
+        'Run rlm-prep on source if not already prepped',
+        'Fanout query across all chunks (respecting --parallel)',
+        'If results exceed context: chunk again and recurse',
+        'When synthesis fits in single window: produce final answer',
+        'Output result with provenance and cost summary',
+      ],
+    },
+  } satisfies SkillMetadata,
+};
+
+export const rlmStatusCommand: Extension = {
+  id: 'rlm-status',
+  type: 'skill',
+  name: 'RLM Status',
+  description: 'Show active RLM task tree, progress, and cost breakdown',
+  version: '1.0.0',
+  capabilities: ['rlm', 'status', 'agentic-tools', 'monitoring'],
+  keywords: ['rlm-status', 'status', 'task-tree', 'progress', 'cost', 'rlm'],
+  category: 'agentic-tools',
+  platforms: {
+    claude: 'full',
+    generic: 'full',
+  },
+  deployment: {
+    pathTemplate: '.{platform}/commands/{id}.md',
+    core: false,
+  },
+  metadata: {
+    type: 'skill',
+    triggerPhrases: ['rlm status', 'show rlm progress', 'rlm task tree', 'rlm cost'],
+    commandHint: {
+      template: 'utility',
+      argumentHint: '[--cost] [--tree] [--json] [--task-id <id>]',
+      allowedTools: ['Read', 'Bash'],
+      executionSteps: [
+        'Read active task tree from .aiwg/ralph/rlm-state.json',
+        'Show progress per node (pending/running/complete/failed)',
+        'Display cost breakdown if --cost flag set',
+        'Output as JSON if --json flag set',
+      ],
+    },
+  } satisfies SkillMetadata,
+};
+
 // ============================================
 // Aggregated Exports
 // ============================================
 
 /**
- * All command definitions (54 total)
+ * All command definitions (59 total)
  *
  * Organized by category:
  * - Maintenance (5): help, version, doctor, update, sync
@@ -1719,6 +1892,7 @@ export const opsCommand: Extension = {
  * - Daemon (2): behavior, daemon-init
  * - Config (1): config
  * - Ops (1): ops
+ * - Agentic Tools (5): chunk, fanout, rlm-prep, rlm-search, rlm-status
  */
 export const commandDefinitions: Extension[] = [
   // Maintenance (5)
@@ -1818,6 +1992,13 @@ export const commandDefinitions: Extension[] = [
 
   // Ops (1)
   opsCommand,
+
+  // Agentic Tools (5) — RLM support tools
+  chunkCommand,
+  fanoutCommand,
+  rlmPrepCommand,
+  rlmSearchCommand,
+  rlmStatusCommand,
 ];
 
 // ============================================

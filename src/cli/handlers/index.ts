@@ -72,6 +72,11 @@ import {
   skillsHandler,
   configHandler,
   opsHandler,
+  chunkHandler,
+  fanoutHandler,
+  rlmPrepHandler,
+  rlmSearchHandler,
+  rlmStatusCliHandler,
   subcommandHandlers,
 } from './subcommands.js';
 import { runtimeInfoHandler } from './runtime-info.js';
@@ -111,6 +116,13 @@ export {
   configHandler,
   opsHandler,
   runtimeInfoHandler,
+
+  // Agentic Tools (RLM)
+  chunkHandler,
+  fanoutHandler,
+  rlmPrepHandler,
+  rlmSearchHandler,
+  rlmStatusCliHandler,
 
   // Utilities
   prefillCardsHandler,
@@ -229,6 +241,13 @@ export const allHandlers: CommandHandler[] = [
 
   // Ops
   opsHandler,
+
+  // Agentic Tools (RLM support tools)
+  chunkHandler,
+  fanoutHandler,
+  rlmPrepHandler,
+  rlmSearchHandler,
+  rlmStatusCliHandler,
 ];
 
 /**

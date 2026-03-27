@@ -34,6 +34,7 @@ const CATEGORY_ORDER: { category: CommandCategory; title: string }[] = [
   { category: 'orchestration', title: 'Orchestration (Mission Control)' },
   { category: 'index', title: 'Artifact Index' },
   { category: 'daemon', title: 'Daemon & Behaviors' },
+  { category: 'agentic-tools', title: 'Agentic Tools (RLM chunk, fanout, search)' },
 ];
 
 /**

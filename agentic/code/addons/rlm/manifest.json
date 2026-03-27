@@ -41,8 +41,17 @@
   "commands": [
     "rlm-query",
     "rlm-batch",
-    "rlm-status"
+    "rlm-status",
+    "chunk",
+    "fanout",
+    "rlm-prep",
+    "rlm-search"
   ],
+  "agenticTools": {
+    "category": "agentic-tools",
+    "description": "Support tools for agentic sessions. Callable by users but primarily used by agents during recursive and fanout operations.",
+    "tools": ["chunk", "fanout", "rlm-prep", "rlm-search", "rlm-status"]
+  },
   "skills": [
     "rlm-mode"
   ],
