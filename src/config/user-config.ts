@@ -58,6 +58,7 @@ export const KNOWN_CONFIG_FILES: ConfigFileSpec[] = [
   { filename: 'models.json', description: 'Model tier and provider overrides' },
   { filename: 'ops.json', description: 'Ops workspace registry' },
   { filename: 'mcp-servers.json', description: 'MCP server registry (single source of truth)' },
+  { filename: 'packages.yaml', description: 'Installed remote packages (aiwg install)' },
 ];
 
 /**
