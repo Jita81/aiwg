@@ -26,8 +26,7 @@ const PLATFORM_CONFIGS: Record<Platform, PlatformSkillConfig> = {
   cursor: {
     baseDir: '.cursor/skills',
     extension: '.md',
-    supportsSkills: false,
-    alternativeStrategy: 'command',
+    supportsSkills: true,
   },
   codex: {
     baseDir: '.codex/skills',

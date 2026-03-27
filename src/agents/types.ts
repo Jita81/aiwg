@@ -11,7 +11,7 @@
  * |------------|--------------------------|----------------------|---------------|
  * | claude     | .claude/agents/          | CLAUDE.md            | ✅ Full       |
  * | factory    | .factory/droids/         | AGENTS.md            | ✅ Full       |
- * | cursor     | .cursor/agents/          | .cursorrules         | ✅ Full       |
+ * | cursor     | .cursor/agents/          | .cursor/rules/ (MDC) | ✅ Full       |
  * | codex      | .codex/agents/           | AGENTS.md            | ✅ Full       |
  * | opencode   | .opencode/agent/         | AGENTS.md            | ✅ Full       |
  * | warp       | .warp/agents/            | WARP.md              | ✅ Full       |

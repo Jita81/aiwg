@@ -21,7 +21,7 @@ SkillSmith generates skills with proper SKILL.md format and deploys them to plat
 | Claude | `.claude/skills/` | Yes | - |
 | Generic | `skills/` | Yes | - |
 | Factory | `.factory/skills/` | No | Command |
-| Cursor | `.cursor/skills/` | No | Command |
+| Cursor | `.cursor/skills/` | Yes | - |
 | Codex | `.codex/skills/` | No | Command |
 | Windsurf | `.windsurf/skills/` | No | Command |
 | Copilot | `.github/copilot/skills/` | No | None |

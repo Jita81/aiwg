@@ -12,7 +12,7 @@ AIWG works across multiple AI platforms. **One command deploys everything.**
 | OpenAI/Codex | `aiwg use sdlc --provider codex` | AGENTS.md |
 | GitHub Copilot | `aiwg use sdlc --provider copilot` | copilot-instructions.md |
 | Factory AI | `aiwg use sdlc --provider factory` | AGENTS.md |
-| Cursor | `aiwg use sdlc --provider cursor` | .cursorrules |
+| Cursor | `aiwg use sdlc --provider cursor` | .cursor/rules/ (MDC) |
 | OpenCode | `aiwg use sdlc --provider opencode` | OpenCode.md |
 | Warp Terminal | `aiwg use sdlc --provider warp` | WARP.md |
 | Windsurf | `aiwg use sdlc --provider windsurf` | .windsurfrules |
@@ -39,7 +39,7 @@ All four artifact types deploy automatically in each platform's native format:
 | OpenAI/Codex | native | native | native | conventional |
 | GitHub Copilot | native | conventional | conventional | conventional |
 | Factory AI | native | native | conventional | conventional |
-| Cursor | conventional | conventional | conventional | native |
+| Cursor | conventional | conventional | native | native |
 | OpenCode | contextPaths | conventional | none | contextPaths |
 | Warp Terminal | aggregated | aggregated | conventional | conventional |
 | Windsurf | aggregated | native | conventional | conventional |

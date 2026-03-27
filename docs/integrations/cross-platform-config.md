@@ -23,7 +23,7 @@ The `WARP.md` file is a **symbolic link** to `CLAUDE.md`. This enables configura
 | Warp Terminal | WARP.md → CLAUDE.md | Inline in WARP.md |
 | Factory AI | AGENTS.md | .factory/droids/ |
 | OpenCode | AGENTS.md | .opencode/agent/ |
-| Cursor | .cursorrules | .cursor/rules/ |
+| Cursor | .cursor/rules/ (MDC) | .cursor/rules/ |
 | OpenAI/Codex | AGENTS.md | .codex/agents/ |
 | Windsurf | .windsurfrules | Inline |
 

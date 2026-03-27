@@ -52,12 +52,11 @@ describe('SkillSmith', () => {
       expect(PlatformSkillResolver.supportsSkills('claude')).toBe(true);
       expect(PlatformSkillResolver.supportsSkills('generic')).toBe(true);
       expect(PlatformSkillResolver.supportsSkills('factory')).toBe(false);
-      expect(PlatformSkillResolver.supportsSkills('cursor')).toBe(false);
+      expect(PlatformSkillResolver.supportsSkills('cursor')).toBe(true);
     });
 
     it('should provide alternative strategies for non-skill platforms', () => {
       expect(PlatformSkillResolver.getAlternativeStrategy('factory')).toBe('command');
-      expect(PlatformSkillResolver.getAlternativeStrategy('cursor')).toBe('command');
       expect(PlatformSkillResolver.getAlternativeStrategy('copilot')).toBe('none');
     });
   });
