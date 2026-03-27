@@ -13,7 +13,7 @@
  * - Factory:  .factory/droids/, .factory/commands/, .factory/skills/, .factory/rules/
  * - Copilot:  .github/agents/ (.agent.md), .github/prompts/ (.prompt.md), .github/skills/, .github/instructions/ (.instructions.md)
  * - Cursor:   .cursor/agents/, .cursor/commands/, .cursor/skills/, .cursor/rules/
- * - OpenCode: .opencode/agent/, .opencode/command/, .opencode/skill/, .opencode/rule/
+ * - OpenCode: .opencode/agent/, .opencode/commands/, .opencode/skill/, .opencode/rule/
  * - Warp:     .warp/skills/ (native) + WARP.md (aggregated agents/commands/rules)
  * - Windsurf: .windsurf/workflows/, .windsurf/skills/, .windsurf/rules/, .agents/skills/ + AGENTS.md (aggregated agents), .windsurfrules (deprecated stub)
  */
@@ -105,7 +105,7 @@ const PROVIDERS: Record<string, ProviderConfig> = {
   },
   opencode: {
     name: 'opencode',
-    projectPaths: ['.opencode/agent', '.opencode/command', '.opencode/skill', '.opencode/rule'],
+    projectPaths: ['.opencode/agent', '.opencode/commands', '.opencode/skill', '.opencode/rule'],
     forbiddenPaths: ['.claude', '.codex', '.cursor'],
     fileExtension: '.md',
     minArtifacts: 5,

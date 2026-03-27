@@ -1024,7 +1024,7 @@ All 8 platforms receive agents, commands, skills, and rules. Deployment adapts t
 | **Warp Terminal** | Tested | `.warp/agents/` + WARP.md | `.warp/commands/` | `.warp/skills/` | `.warp/rules/` | `--provider warp` |
 | **Factory AI** | Tested | `.factory/droids/` | `.factory/commands/` | `.factory/skills/` | `.factory/rules/` | `--provider factory` |
 | **Cursor** | Tested | `.cursor/agents/` | `.cursor/commands/` | `.cursor/skills/` | `.cursor/rules/` | `--provider cursor` |
-| **OpenCode** | Tested | `.opencode/agent/` | `.opencode/command/` | `.opencode/skill/` | `.opencode/rule/` | `--provider opencode` |
+| **OpenCode** | Tested | `.opencode/agent/` | `.opencode/commands/` | `.opencode/skill/` | `.opencode/rule/` | `--provider opencode` |
 | **OpenAI/Codex** | Tested | `.codex/agents/` | `~/.codex/prompts/` | `~/.codex/skills/` | `.codex/rules/` | `--provider openai` |
 | **Windsurf** | Experimental | AGENTS.md | `.windsurf/workflows/` | `.windsurf/skills/` | `.windsurf/rules/` | `--provider windsurf` |
 

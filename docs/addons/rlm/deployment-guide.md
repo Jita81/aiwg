@@ -47,9 +47,9 @@ done
 | Artifact | Claude Code | Codex | Copilot | Factory | Cursor | OpenCode | Warp | Windsurf |
 |----------|-------------|-------|---------|---------|--------|----------|------|----------|
 | **rlm-agent.md** | `.claude/agents/` | `.codex/agents/` | `.github/agents/` | `.factory/droids/` | `.cursor/agents/` | `.opencode/agent/` | `.warp/agents/` + WARP.md | AGENTS.md |
-| **rlm-query.md** | `.claude/commands/` | `~/.codex/prompts/` | `.github/agents/` (YAML) | `.factory/commands/` | `.cursor/commands/` | `.opencode/command/` | `.warp/commands/` + WARP.md | `.windsurf/workflows/` |
-| **rlm-batch.md** | `.claude/commands/` | `~/.codex/prompts/` | `.github/agents/` (YAML) | `.factory/commands/` | `.cursor/commands/` | `.opencode/command/` | `.warp/commands/` + WARP.md | `.windsurf/workflows/` |
-| **rlm-status.md** | `.claude/commands/` | `~/.codex/prompts/` | `.github/agents/` (YAML) | `.factory/commands/` | `.cursor/commands/` | `.opencode/command/` | `.warp/commands/` + WARP.md | `.windsurf/workflows/` |
+| **rlm-query.md** | `.claude/commands/` | `~/.codex/prompts/` | `.github/agents/` (YAML) | `.factory/commands/` | `.cursor/commands/` | `.opencode/commands/` | `.warp/commands/` + WARP.md | `.windsurf/workflows/` |
+| **rlm-batch.md** | `.claude/commands/` | `~/.codex/prompts/` | `.github/agents/` (YAML) | `.factory/commands/` | `.cursor/commands/` | `.opencode/commands/` | `.warp/commands/` + WARP.md | `.windsurf/workflows/` |
+| **rlm-status.md** | `.claude/commands/` | `~/.codex/prompts/` | `.github/agents/` (YAML) | `.factory/commands/` | `.cursor/commands/` | `.opencode/commands/` | `.warp/commands/` + WARP.md | `.windsurf/workflows/` |
 | **rlm-mode.md** | `.claude/skills/` | `~/.codex/skills/` | `.github/skills/` | `.factory/skills/` | `.cursor/skills/` | `.opencode/skill/` | `.warp/skills/` | `.windsurf/skills/` |
 | **rlm-context-management.md** | `.claude/rules/` | `.codex/rules/` | `.github/copilot-rules/` | `.factory/rules/` | `.cursor/rules/` | `.opencode/rule/` | `.warp/rules/` | `.windsurf/rules/` |
 
@@ -358,14 +358,14 @@ aiwg use rlm --provider opencode
 
 **What Happens**:
 - Agents → `.opencode/agent/` (singular)
-- Commands → `.opencode/command/` (singular)
+- Commands → `.opencode/commands/` (plural)
 - Skills → `.opencode/skill/` (singular)
 - Rules → `.opencode/rule/` (singular)
 
 **Verification**:
 ```bash
 ls .opencode/agent/rlm-agent.md
-ls .opencode/command/rlm-*.md
+ls .opencode/commands/rlm-*.md
 ls .opencode/skill/rlm-mode.md
 ls .opencode/rule/rlm-context-management.md
 ```
@@ -588,7 +588,7 @@ If `aiwg remove` fails, manually delete:
 | Copilot | `.github/agents/rlm-*.{md,yml}`, `.github/skills/rlm-mode.md`, `.github/copilot-rules/rlm-context-management.md` |
 | Factory | `.factory/droids/rlm-agent.md`, `.factory/commands/rlm-*.md`, `.factory/skills/rlm-mode.md`, `.factory/rules/rlm-context-management.md` |
 | Cursor | `.cursor/agents/rlm-agent.md`, `.cursor/commands/rlm-*.md`, `.cursor/skills/rlm-mode.md`, `.cursor/rules/rlm-context-management.md` |
-| OpenCode | `.opencode/agent/rlm-agent.md`, `.opencode/command/rlm-*.md`, `.opencode/skill/rlm-mode.md`, `.opencode/rule/rlm-context-management.md` |
+| OpenCode | `.opencode/agent/rlm-agent.md`, `.opencode/commands/rlm-*.md`, `.opencode/skill/rlm-mode.md`, `.opencode/rule/rlm-context-management.md` |
 | Warp | `.warp/agents/rlm-agent.md`, `.warp/commands/rlm-*.md`, `.warp/skills/rlm-mode.md`, `.warp/rules/rlm-context-management.md`, remove from `WARP.md` |
 | Windsurf | Remove from `AGENTS.md`, `.windsurf/workflows/rlm-*.md`, `.windsurf/skills/rlm-mode.md`, `.windsurf/rules/rlm-context-management.md` |
 

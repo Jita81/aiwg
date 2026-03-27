@@ -1,7 +1,7 @@
 /**
  * Project-Level AIWG Config
  *
- * Manages `.aiwg/aiwg.config.json` — the project-level record of:
+ * Manages `.aiwg/aiwg.config` — the project-level record of:
  *   - Which AI provider toolchains this project targets
  *   - Which frameworks/addons are deployed (with uninstall metadata)
  *   - User-defined scripts callable via `aiwg run`
@@ -13,7 +13,7 @@ import { readFile, writeFile, mkdir, access } from 'fs/promises';
 import { createHash } from 'crypto';
 import { resolve, join } from 'path';
 
-const CONFIG_FILENAME = 'aiwg.config.json';
+const CONFIG_FILENAME = 'aiwg.config';
 const AIWG_DIR = '.aiwg';
 
 /**
@@ -52,7 +52,7 @@ export interface InstalledEntry {
 }
 
 /**
- * Top-level shape of .aiwg/aiwg.config.json
+ * Top-level shape of .aiwg/aiwg.config
  */
 export interface AiwgConfig {
   $schema?: string;
@@ -100,14 +100,14 @@ export function emptyConfig(providers: string[] = ['claude']): AiwgConfig {
 }
 
 /**
- * Resolve path to .aiwg/aiwg.config.json for a project directory
+ * Resolve path to .aiwg/aiwg.config for a project directory
  */
 export function getConfigPath(projectDir: string): string {
   return resolve(projectDir, AIWG_DIR, CONFIG_FILENAME);
 }
 
 /**
- * Read .aiwg/aiwg.config.json.
+ * Read .aiwg/aiwg.config.
  * Returns null if the file does not exist.
  */
 export async function readAiwgConfig(projectDir: string): Promise<AiwgConfig | null> {
@@ -130,7 +130,7 @@ export async function readAiwgConfig(projectDir: string): Promise<AiwgConfig | n
 }
 
 /**
- * Write .aiwg/aiwg.config.json, creating .aiwg/ if needed.
+ * Write .aiwg/aiwg.config, creating .aiwg/ if needed.
  */
 export async function writeAiwgConfig(projectDir: string, config: AiwgConfig): Promise<void> {
   const dir = resolve(projectDir, AIWG_DIR);

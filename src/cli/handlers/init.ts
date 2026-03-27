@@ -2,7 +2,7 @@
  * Init Command Handler
  *
  * Implements `aiwg init` — the first-run wizard that creates
- * `.aiwg/aiwg.config.json` for the current project.
+ * `.aiwg/aiwg.config` for the current project.
  *
  * Prompts:
  *   1. Which AI provider toolchains does this project target?
@@ -98,7 +98,7 @@ async function askProviders(rl: readline.Interface): Promise<string[]> {
 export const initHandler: CommandHandler = {
   id: 'init',
   name: 'Init',
-  description: 'Initialise project with .aiwg/aiwg.config.json (provider registry + scripts)',
+  description: 'Initialise project with .aiwg/aiwg.config (provider registry + scripts)',
   category: 'project',
   aliases: [],
 

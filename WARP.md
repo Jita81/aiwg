@@ -74,7 +74,7 @@ All 8 providers receive all 4 artifact types (agents, commands, skills, rules). 
 | GitHub Copilot | `.github/agents/` | `.github/agents/` | `.github/skills/` | `.github/copilot-rules/` | `aiwg use sdlc --provider copilot` |
 | Factory AI | `.factory/droids/` | `.factory/commands/` | `.factory/skills/` | `.factory/rules/` | `aiwg use sdlc --provider factory` |
 | Cursor | `.cursor/agents/` | `.cursor/commands/` | `.cursor/skills/` | `.cursor/rules/` | `aiwg use sdlc --provider cursor` |
-| OpenCode | `.opencode/agent/` | `.opencode/command/` | `.opencode/skill/` | `.opencode/rule/` | `aiwg use sdlc --provider opencode` |
+| OpenCode | `.opencode/agent/` | `.opencode/commands/` | `.opencode/skill/` | `.opencode/rule/` | `aiwg use sdlc --provider opencode` |
 | Warp Terminal | `.warp/agents/` + WARP.md | `.warp/commands/` | `.warp/skills/` | `.warp/rules/` | `aiwg use sdlc --provider warp` |
 | Windsurf | AGENTS.md | `.windsurf/workflows/` | `.windsurf/skills/` | `.windsurf/rules/` | `aiwg use sdlc --provider windsurf` |
 

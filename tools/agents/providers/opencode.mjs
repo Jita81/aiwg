@@ -6,7 +6,7 @@
  *
  * Deployment paths:
  *   - Agents: .opencode/agent/
- *   - Commands: .opencode/command/
+ *   - Commands: .opencode/commands/
  *   - Skills: .opencode/skill/
  *   - Rules: .opencode/rule/
  *
@@ -48,7 +48,7 @@ export const aliases = [];
 
 export const paths = {
   agents: '.opencode/agent/',
-  commands: '.opencode/command/',
+  commands: '.opencode/commands/',
   skills: '.opencode/skill/',
   rules: '.opencode/rule/'
 };
@@ -279,7 +279,7 @@ export function deployAgents(agentFiles, targetDir, opts) {
 }
 
 /**
- * Deploy commands to .opencode/command/
+ * Deploy commands to .opencode/commands/
  */
 export function deployCommands(commandFiles, targetDir, opts) {
   const destDir = path.join(targetDir, paths.commands);

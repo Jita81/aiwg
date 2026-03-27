@@ -319,7 +319,7 @@ aiwg use sdlc --model sonnet --save
 | Windsurf | `windsurf` | `AGENTS.md` (aggregated), `.windsurf/workflows/`, `.windsurf/skills/`, `.windsurf/rules/` | — |
 | Warp Terminal | `warp` | `.warp/agents/`, `.warp/commands/`, `.warp/skills/`, `.warp/rules/`, `WARP.md` (aggregated) | — |
 | OpenAI/Codex | `codex` | `.codex/agents/`, `~/.codex/prompts/`, `~/.codex/skills/`, `.codex/rules/` | — |
-| OpenCode | `opencode` | `.opencode/agent/`, `.opencode/command/`, `.opencode/skill/`, `.opencode/rule/` | — |
+| OpenCode | `opencode` | `.opencode/agent/`, `.opencode/commands/`, `.opencode/skill/`, `.opencode/rule/` | — |
 | Hermes | `hermes` | `~/.hermes/skills/`, `AGENTS.md` (lean) | — |
 | OpenClaw | `openclaw` | `~/.openclaw/agents/`, `~/.openclaw/commands/`, `~/.openclaw/skills/`, `~/.openclaw/rules/`, `~/.openclaw/behaviors/` | ✓ |
 | Local/Ollama | `local` | Same as `claude` (local model, Claude Code paths) | — |

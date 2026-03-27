@@ -43,7 +43,7 @@
  *   factory   - Factory AI - .factory/droids/, .factory/commands/, .factory/skills/, .factory/rules/
  *   codex     - OpenAI Codex - .codex/agents/, .codex/commands/, .codex/skills/, .codex/rules/
  *   openai    - Alias for codex
- *   opencode  - OpenCode - .opencode/agent/, .opencode/command/, .opencode/skill/, .opencode/rule/
+ *   opencode  - OpenCode - .opencode/agent/, .opencode/commands/, .opencode/skill/, .opencode/rule/
  *   copilot   - GitHub Copilot - .github/agents/, .github/commands/, .github/skills/, .github/copilot-rules/
  *   cursor    - Cursor IDE - .cursor/agents/, .cursor/commands/, .cursor/skills/, .cursor/rules/
  *   warp      - Warp Terminal - .warp/agents/, .warp/commands/, .warp/skills/, .warp/rules/ + WARP.md
@@ -202,7 +202,7 @@ Providers (all deploy agents, commands, skills, and rules):
   codex     - OpenAI Codex (alias: openai)
               Paths: .codex/agents/, .codex/commands/, .codex/skills/, .codex/rules/
   opencode  - OpenCode
-              Paths: .opencode/agent/, .opencode/command/, .opencode/skill/, .opencode/rule/
+              Paths: .opencode/agent/, .opencode/commands/, .opencode/skill/, .opencode/rule/
   copilot   - GitHub Copilot
               Paths: .github/agents/, .github/commands/, .github/skills/, .github/copilot-rules/
   cursor    - Cursor IDE

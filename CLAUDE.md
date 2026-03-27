@@ -80,7 +80,7 @@ All 9 providers receive all 4 artifact types (agents, commands, skills, rules). 
 | GitHub Copilot | `.github/agents/` | `.github/skills/` | `.github/prompts/` | `.github/instructions/` | `aiwg use sdlc --provider copilot` |
 | Factory AI | `.factory/droids/` | `.factory/skills/` | `.factory/commands/` | `.factory/rules/` | `aiwg use sdlc --provider factory` |
 | Cursor | `.cursor/agents/` | `.cursor/skills/` | `.cursor/commands/` | `.cursor/rules/` | `aiwg use sdlc --provider cursor` |
-| OpenCode | `.opencode/agent/` | `.opencode/skill/` | `.opencode/command/` | `.opencode/rule/` | `aiwg use sdlc --provider opencode` |
+| OpenCode | `.opencode/agent/` | `.opencode/skill/` | `.opencode/commands/` | `.opencode/rule/` | `aiwg use sdlc --provider opencode` |
 | Warp Terminal | `.warp/agents/` + WARP.md | `.warp/skills/` | `.warp/commands/` | `.warp/rules/` | `aiwg use sdlc --provider warp` |
 | Windsurf | AGENTS.md | `.windsurf/skills/` | `.windsurf/workflows/` | `.windsurf/rules/` | `aiwg use sdlc --provider windsurf` |
 | OpenClaw | `~/.openclaw/agents/` | `~/.openclaw/skills/` | `~/.openclaw/commands/` | `~/.openclaw/rules/` | `aiwg use sdlc --provider openclaw` |

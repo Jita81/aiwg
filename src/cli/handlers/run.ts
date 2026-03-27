@@ -2,7 +2,7 @@
  * Run Command Handler
  *
  * Implements `aiwg run <script>` — executes user-defined scripts from
- * `.aiwg/aiwg.config.json` `scripts` section.
+ * `.aiwg/aiwg.config` `scripts` section.
  *
  * Modelled on `npm run`. With no arguments, lists available scripts.
  *
@@ -46,7 +46,7 @@ function runScript(
 export const runHandler: CommandHandler = {
   id: 'run',
   name: 'Run Script',
-  description: 'Run a user-defined script from aiwg.config.json',
+  description: 'Run a user-defined script from aiwg.config',
   category: 'utility',
   aliases: [],
 
@@ -60,7 +60,7 @@ export const runHandler: CommandHandler = {
       return {
         exitCode: 1,
         message: [
-          "Error: No .aiwg/aiwg.config.json found in this project.",
+          "Error: No .aiwg/aiwg.config found in this project.",
           '',
           "Run 'aiwg init' to create one and define scripts.",
         ].join('\n'),
@@ -77,7 +77,7 @@ export const runHandler: CommandHandler = {
 
       const entries = Object.entries(scripts);
       if (entries.length === 0) {
-        ui.dim('  No scripts defined in .aiwg/aiwg.config.json');
+        ui.dim('  No scripts defined in .aiwg/aiwg.config');
         ui.blank();
         ui.dim('  Add scripts to the "scripts" section, e.g.:');
         ui.dim('    "deploy": "aiwg use all"');

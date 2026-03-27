@@ -432,10 +432,10 @@ This is a test agent for OpenCode integration.
   });
 
   describe('Command Configuration', () => {
-    it.skipIf(!OPENCODE_AVAILABLE)('validates .opencode/command/ directory structure', async () => {
+    it.skipIf(!OPENCODE_AVAILABLE)('validates .opencode/commands/ directory structure', async () => {
       // Create test directory with proper structure
       const testDir = path.join(os.tmpdir(), 'opencode-command-test-' + Date.now());
-      const commandDir = path.join(testDir, '.opencode', 'command');
+      const commandDir = path.join(testDir, '.opencode', 'commands');
       fs.mkdirSync(commandDir, { recursive: true });
 
       // Create a test command file with OpenCode format

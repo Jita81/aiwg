@@ -528,7 +528,7 @@ export class UseHandler implements CommandHandler {
     const providers = explicitProvider ? [explicitProvider] : (config?.providers ?? ['claude']);
 
     if (!explicitProvider && !config) {
-      ui.warn("No .aiwg/aiwg.config.json found — run 'aiwg init' to configure providers for this project");
+      ui.warn("No .aiwg/aiwg.config found — run 'aiwg init' to configure providers for this project");
     }
 
     const targetIdx = remainingArgs.findIndex(a => a === '--target');

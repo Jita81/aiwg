@@ -170,7 +170,7 @@ export const syncHandler: CommandHandler = {
             if (!quiet) ui.success('All deployments up to date');
           }
         } else {
-          if (!quiet) ui.dim('  No aiwg.config.json — skipping stale check');
+          if (!quiet) ui.dim('  No aiwg.config — skipping stale check');
         }
       } catch {
         if (!quiet) ui.dim('  Stale check skipped (non-critical)');
