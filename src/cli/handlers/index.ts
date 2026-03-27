@@ -83,6 +83,10 @@ import { runtimeInfoHandler } from './runtime-info.js';
 import { syncHandler } from './sync.js';
 import { mcHandler, mcHandlers } from './mc.js';
 import { sdlcAccelerateHandler } from './sdlc-accelerate.js';
+import { installHandler } from './install.js';
+import { packagesHandler } from './packages.js';
+import { initHandler } from './init.js';
+import { runHandler } from './run.js';
 
 import type { CommandHandler } from './types.js';
 
@@ -99,6 +103,10 @@ export {
   useHandler,
   listHandler,
   removeHandler,
+  installHandler,
+  packagesHandler,
+  initHandler,
+  runHandler,
 
   // Project
   newProjectHandler,
@@ -195,9 +203,13 @@ export const allHandlers: CommandHandler[] = [
   useHandler,
   listHandler,
   removeHandler,
+  installHandler,
+  packagesHandler,
 
   // Project setup
   newProjectHandler,
+  initHandler,
+  runHandler,
 
   // Workspace management
   ...workspaceHandlers,

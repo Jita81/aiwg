@@ -275,9 +275,10 @@ describe('CLI Router Characterization Tests', () => {
      */
 
     describe('use command', () => {
-      it('should require framework name', () => {
+      it('should require framework name or config when no args given', () => {
+        // Without aiwg.config.json the zero-arg form emits an error (#621)
         const result = runCli(['use']);
-        expect(result.stderr).toMatch(/Framework or addon name required/i);
+        expect(result.stderr).toMatch(/No framework specified/i);
         expect(result.exitCode).toBe(1);
       });
 

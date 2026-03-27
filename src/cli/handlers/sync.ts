@@ -7,12 +7,14 @@
  *
  * @implements @agentic/code/frameworks/sdlc-complete/rules/self-maintenance.md
  * @source @src/cli/router.ts
- * @issue #482
+ * @issue #482, #557
  */
 
 import type { CommandHandler, HandlerContext, HandlerResult } from './types.js';
 import { createScriptRunner } from './script-runner.js';
 import { getFrameworkRoot } from '../../channel/manager.mjs';
+import { refreshAllPackages } from '../../packages/registry.js';
+import { readAiwgConfig, hashManifest } from '../../config/aiwg-config.js';
 import * as ui from '../ui.js';
 
 /**
@@ -42,6 +44,7 @@ export const syncHandler: CommandHandler = {
     const dryRun = hasFlag(ctx.args, '--dry-run');
     const quiet = hasFlag(ctx.args, '--quiet');
     const skipUpdate = hasFlag(ctx.args, '--skip-update');
+    const packagesOnly = hasFlag(ctx.args, '--packages-only');
     const provider = parseFlag(ctx.args, '--provider');
     const channel = parseFlag(ctx.args, '--channel');
     const frameworksArg = parseFlag(ctx.args, '--frameworks');
@@ -65,6 +68,30 @@ export const syncHandler: CommandHandler = {
     if (!quiet) ui.info('Checking version...');
     await runner.run('tools/cli/version.mjs', ['--json'], { capture: true });
     if (!quiet) ui.success('Version check complete');
+
+    // Step 2.5: Refresh remote packages (always, unless --packages-only skips npm)
+    if (!quiet) ui.info(dryRun ? 'Would refresh remote packages...' : 'Refreshing remote packages...');
+    if (!dryRun) {
+      try {
+        const refreshed = await refreshAllPackages();
+        if (refreshed.length > 0) {
+          if (!quiet) ui.success(`Refreshed ${refreshed.length} remote package${refreshed.length > 1 ? 's' : ''}: ${refreshed.join(', ')}`);
+        } else {
+          if (!quiet) ui.dim('  No remote packages registered');
+        }
+      } catch (error) {
+        if (!quiet) ui.warn(`Remote package refresh failed: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    }
+
+    if (packagesOnly) {
+      if (!quiet) {
+        ui.rule();
+        ui.success('Remote packages refreshed (--packages-only, skipping npm update and framework deploy)');
+        ui.blank();
+      }
+      return { exitCode: 0 };
+    }
 
     // Step 3: Update package (unless --skip-update)
     if (!skipUpdate) {
@@ -107,6 +134,46 @@ export const syncHandler: CommandHandler = {
         for (const fw of targets) {
           ui.dim(`    Would re-deploy: ${fw}`);
         }
+      }
+    }
+
+    // Step 4.5: Stale deployment check (#621)
+    if (!quiet) ui.info('Checking for stale deployments...');
+    if (!dryRun) {
+      try {
+        const { getFrameworkRoot } = await import('../../channel/manager.mjs');
+        const { join } = await import('path');
+        const config = await readAiwgConfig(process.cwd());
+        if (config) {
+          const MANIFEST_PATHS: Record<string, string> = {
+            sdlc: 'agentic/code/frameworks/sdlc-complete/manifest.json',
+            marketing: 'agentic/code/frameworks/media-marketing-kit/manifest.json',
+            'media-curator': 'agentic/code/frameworks/media-curator/manifest.json',
+            research: 'agentic/code/frameworks/research-complete/manifest.json',
+          };
+          const frameworkRoot = await getFrameworkRoot();
+          const stale: string[] = [];
+          for (const [name, entry] of Object.entries(config.installed)) {
+            if (!entry.manifestHash) continue;
+            const relPath = MANIFEST_PATHS[name];
+            if (!relPath) continue;
+            const currentHash = await hashManifest(join(frameworkRoot, relPath));
+            if (currentHash && currentHash !== entry.manifestHash) {
+              stale.push(name);
+            }
+          }
+          if (stale.length > 0) {
+            for (const name of stale) {
+              ui.warn(`Stale deployment: ${name} — run 'aiwg use ${name}' to redeploy`);
+            }
+          } else {
+            if (!quiet) ui.success('All deployments up to date');
+          }
+        } else {
+          if (!quiet) ui.dim('  No aiwg.config.json — skipping stale check');
+        }
+      } catch {
+        if (!quiet) ui.dim('  Stale check skipped (non-critical)');
       }
     }
 

@@ -267,6 +267,117 @@ export const removeCommand: Extension = {
   } satisfies SkillMetadata,
 };
 
+export const installCommand: Extension = {
+  id: 'install',
+  type: 'skill',
+  name: 'Install Package',
+  description: 'Install a framework, addon, or extension from a Git repository',
+  version: '1.0.0',
+  capabilities: ['cli', 'framework', 'install', 'git'],
+  keywords: ['install', 'package', 'git', 'remote', 'addon', 'framework'],
+  category: 'framework',
+  platforms: {
+    claude: 'full',
+    generic: 'full',
+  },
+  deployment: {
+    pathTemplate: '.{platform}/commands/{id}.md',
+    core: true,
+  },
+  metadata: {
+    type: 'skill',
+    triggerPhrases: ['install package', 'install addon from git', 'install remote package'],
+    commandHint: {
+      template: 'orchestration',
+      argumentHint: '<ref>',
+      allowedTools: ['Read', 'Write', 'Bash'],
+    },
+  } satisfies SkillMetadata,
+};
+
+export const packagesCommand: Extension = {
+  id: 'packages',
+  type: 'skill',
+  name: 'Packages',
+  description: 'Manage installed remote packages (list, info, remove)',
+  version: '1.0.0',
+  capabilities: ['cli', 'framework', 'query', 'uninstall'],
+  keywords: ['packages', 'list', 'installed', 'remote', 'registry'],
+  category: 'framework',
+  platforms: {
+    claude: 'full',
+    generic: 'full',
+  },
+  deployment: {
+    pathTemplate: '.{platform}/commands/{id}.md',
+    core: true,
+  },
+  metadata: {
+    type: 'skill',
+    triggerPhrases: ['list packages', 'show packages', 'package info', 'remove package'],
+    commandHint: {
+      template: 'utility',
+      argumentHint: '[list|info|remove]',
+      allowedTools: ['Read'],
+    },
+  } satisfies SkillMetadata,
+};
+
+export const initCommand: Extension = {
+  id: 'init',
+  type: 'skill',
+  name: 'Init',
+  description: 'Initialise project with .aiwg/aiwg.config.json (provider registry + scripts)',
+  version: '1.0.0',
+  capabilities: ['cli', 'project', 'config', 'setup'],
+  keywords: ['init', 'setup', 'config', 'providers', 'wizard'],
+  category: 'project',
+  platforms: {
+    claude: 'full',
+    generic: 'full',
+  },
+  deployment: {
+    pathTemplate: '.{platform}/commands/{id}.md',
+    core: true,
+  },
+  metadata: {
+    type: 'skill',
+    triggerPhrases: ['init project', 'setup project config', 'configure providers'],
+    commandHint: {
+      template: 'utility',
+      allowedTools: ['Read', 'Write'],
+    },
+  } satisfies SkillMetadata,
+};
+
+export const runCommand: Extension = {
+  id: 'run',
+  type: 'skill',
+  name: 'Run Script',
+  description: 'Run a user-defined script from .aiwg/aiwg.config.json',
+  version: '1.0.0',
+  capabilities: ['cli', 'utility', 'scripts'],
+  keywords: ['run', 'script', 'execute', 'npm-run'],
+  category: 'utility',
+  platforms: {
+    claude: 'full',
+    generic: 'full',
+  },
+  deployment: {
+    pathTemplate: '.{platform}/commands/{id}.md',
+    core: true,
+  },
+  metadata: {
+    type: 'skill',
+    triggerPhrases: ['run script', 'aiwg run', 'list scripts'],
+    commandHint: {
+      template: 'utility',
+      argumentHint: '[script-name]',
+      allowedTools: ['Read', 'Bash'],
+    },
+  } satisfies SkillMetadata,
+};
+
 // Project Setup Commands
 
 export const newCommand: Extension = {
@@ -1902,13 +2013,17 @@ export const commandDefinitions: Extension[] = [
   updateCommand,
   syncCommand,
 
-  // Framework (3)
+  // Framework (5)
   useCommand,
   listCommand,
   removeCommand,
+  installCommand,
+  packagesCommand,
 
-  // Project (1)
+  // Project (3)
   newCommand,
+  initCommand,
+  runCommand,
 
   // Workspace (3)
   statusCommand,
