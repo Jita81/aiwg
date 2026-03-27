@@ -1351,6 +1351,49 @@ export const mcCommand: Extension = {
   } satisfies SkillMetadata,
 };
 
+// Steward Commands
+
+export const stewardCommand: Extension = {
+  id: 'steward',
+  type: 'skill',
+  name: 'Steward',
+  description: 'Provider capability awareness and command routing intelligence (capabilities, find)',
+  version: '1.0.0',
+  capabilities: ['cli', 'maintenance', 'capability-matrix', 'provider-routing', 'diagnostics'],
+  keywords: ['steward', 'capabilities', 'provider', 'routing', 'native', 'emulated', 'feature', 'matrix'],
+  category: 'maintenance',
+  platforms: {
+    claude: 'full',
+    generic: 'full',
+  },
+  deployment: {
+    pathTemplate: '.{platform}/commands/{id}.md',
+    core: true,
+  },
+  metadata: {
+    type: 'skill',
+    triggerPhrases: [
+      'steward capabilities',
+      'steward find',
+      'what does my provider support',
+      'does my provider support',
+      'what command should I use',
+      'provider capability',
+      'capability matrix',
+    ],
+    commandHint: {
+      template: 'utility',
+      allowedTools: ['Bash', 'Read'],
+      argumentHint: 'capabilities [--provider <p>] [--feature <f>] [--all] | find --capability <c>',
+      executionSteps: [
+        'Read agentic/code/providers/capability-matrix.yaml',
+        'Detect current provider via runtime-info or env heuristics',
+        'Return native vs emulated routing advice for the requested feature/provider',
+      ],
+    },
+  } satisfies SkillMetadata,
+};
+
 // Agent Team Commands
 
 export const teamCommand: Extension = {
@@ -2110,6 +2153,9 @@ export const commandDefinitions: Extension[] = [
 
   // Mission Control (1)
   mcCommand,
+
+  // Steward (1)
+  stewardCommand,
 
   // Agent Teams (1)
   teamCommand,

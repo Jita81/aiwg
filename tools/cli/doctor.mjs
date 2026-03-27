@@ -116,7 +116,65 @@ async function runDoctor() {
     check('MCP Server', 'warn', 'Not found');
   }
 
-  // 9. Check .gitignore for AIWG runtime patterns (warning if missing)
+  // 9. Provider capability summary
+  try {
+    const { readFile } = await import('node:fs/promises');
+    const matrixPath = path.join(AIWG_ROOT, 'agentic/code/providers/capability-matrix.yaml');
+    const matrixRaw = await readFile(matrixPath, 'utf-8').catch(() => null);
+
+    if (matrixRaw) {
+      // Detect current provider via environment heuristics
+      let detectedProvider = null;
+      if (process.env.CLAUDE_CODE_VERSION || process.env.ANTHROPIC_API_KEY) detectedProvider = 'claude-code';
+      else if (process.env.CURSOR_TRACE_ID || process.env.CURSOR_VERSION) detectedProvider = 'cursor';
+      else if (process.env.WINDSURF_VERSION) detectedProvider = 'windsurf';
+      else if (process.env.WARP_SESSION_ID || process.env.WARP_TERMINAL) detectedProvider = 'warp';
+      else if (process.env.COPILOT_AGENT || process.env.GITHUB_COPILOT_TOKEN) detectedProvider = 'copilot';
+      else if (process.env.OPENCLAW_VERSION) detectedProvider = 'openclaw';
+      else if (process.env.FACTORY_AGENT_ID) detectedProvider = 'factory';
+      else if (process.env.OPENCODE_VERSION) detectedProvider = 'opencode';
+      else if (process.env.OPENAI_API_KEY) detectedProvider = 'codex';
+
+      if (detectedProvider) {
+        // Parse minimal provider block from YAML (avoid full YAML dep in doctor)
+        // We extract native: true/false counts for the detected provider section
+        const providerSection = matrixRaw.split(/\n  [a-z\-]+:\n/);
+        const providerHeader = `\n  ${detectedProvider}:\n`;
+        const idx = matrixRaw.indexOf(providerHeader);
+
+        let nativeCount = 0;
+        let emulatedCount = 0;
+        let notSupportedCount = 0;
+
+        if (idx >= 0) {
+          // Count native: true vs native: false in this provider's block (heuristic)
+          const nextProviderIdx = matrixRaw.indexOf('\n  ', idx + providerHeader.length + 10);
+          const block = nextProviderIdx > 0
+            ? matrixRaw.slice(idx, nextProviderIdx)
+            : matrixRaw.slice(idx);
+
+          const nativeMatches = block.match(/native: true/g);
+          const emulatedMatches = block.match(/native: false/g);
+          const nullToolMatches = block.match(/native_tool: null/g);
+
+          nativeCount = nativeMatches?.length ?? 0;
+          emulatedCount = (emulatedMatches?.length ?? 0) - (nullToolMatches?.length ?? 0);
+          notSupportedCount = nullToolMatches?.length ?? 0;
+        }
+
+        const summary = `Provider: ${detectedProvider} — ${nativeCount} native, ${emulatedCount} emulated, ${notSupportedCount} not supported`;
+        check('Provider Capabilities', 'ok', summary);
+      } else {
+        check('Provider Capabilities', 'info', 'Provider not detected — run: aiwg steward capabilities');
+      }
+    } else {
+      check('Provider Capabilities', 'info', 'capability-matrix.yaml not found (run: aiwg sync)');
+    }
+  } catch {
+    check('Provider Capabilities', 'info', 'Could not read capability matrix');
+  }
+
+  // 10. Check .gitignore for AIWG runtime patterns (warning if missing)
   const AIWG_RUNTIME_PATTERNS = ['.aiwg/working/', '.aiwg/ralph/', '.aiwg/ralph-external/'];
   const gitignorePath = path.join(process.cwd(), '.gitignore');
   try {

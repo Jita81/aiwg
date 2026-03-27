@@ -88,6 +88,7 @@ import { installHandler } from './install.js';
 import { packagesHandler } from './packages.js';
 import { initHandler } from './init.js';
 import { runHandler } from './run.js';
+import { stewardHandler, stewardHandlers } from './steward.js';
 
 import type { CommandHandler } from './types.js';
 
@@ -177,6 +178,9 @@ export {
 
   // Agent Teams
   teamHandler,
+
+  // Steward
+  stewardHandler,
 };
 
 // Re-export handler arrays
@@ -188,6 +192,7 @@ export {
   subcommandHandlers,
   mcHandlers,
   teamHandlers,
+  stewardHandlers,
   daemonHandlers,
 };
 
@@ -249,6 +254,9 @@ export const allHandlers: CommandHandler[] = [
 
   // Agent Teams
   ...teamHandlers,
+
+  // Steward (capability awareness)
+  ...stewardHandlers,
 
   // SDLC Orchestration
   sdlcAccelerateHandler,
