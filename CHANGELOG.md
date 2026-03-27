@@ -5,7 +5,7 @@ All notable changes to AIWG project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with npm-compatible format (`YYYY.M.PATCH`).
 
-## [2026.3.3] - 2026-03-25 – "Identity, Ring & Autonomous Systems"
+## [2026.3.4] - 2026-03-27 – "Identity, Ring & Autonomous Systems"
 
 | What changed | Why you care |
 |---|---|
@@ -35,6 +35,15 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 | **OpenClaw as first-class platform** | 10th deployment platform. First to support behaviors (`~/.openclaw/behaviors/`). `aiwg use sdlc --provider openclaw`. ClawHub package publication documented. (#535) |
 | **Getting-started guide series** | 15 scenario-based guides written in user vocabulary: project setup paths, all five frameworks, key addon deep-dives, and a complete flow/gate/sdlc-accelerate reference. |
 | **Skills, config, and ops CLI subsystems** | Three new typed source modules: provider-agnostic `aiwg skills` registry, user-level `aiwg config` management (`~/.aiwg` / XDG resolution), and `aiwg ops` workspace registry (`ops.yaml`). Full unit test coverage. |
+| **Skills as canonical extension type** | SKILL.md is now the source format for all AIWG extensions. Commands become a generated deployment artifact — providers that need them (Factory, OpenCode, Warp, Windsurf, Copilot, Codex, OpenClaw) receive auto-translated commands; Claude Code and Cursor use skills natively. `aiwg add-command` now emits a deprecation warning. (#546–#552, #555) |
+| **Copilot provider overhaul** | Agents deploy as `.agent.md` (Markdown + YAML frontmatter) in `.github/agents/`. Commands deploy as `.prompt.md` in `.github/prompts/`. Rules deploy as `.instructions.md` with `applyTo` globs in `.github/instructions/`. `aiwg mcp install copilot` generates `.vscode/mcp.json`. (#577–#580) |
+| **Windsurf provider update** | Rules migrate from `.windsurfrules` to `.windsurf/rules/` with `trigger: always_on` injected on all files. Skills now deploy to both `.windsurf/skills/` and `.agents/skills/` for cross-agent compatibility. `.windsurfrules` retained as deprecated stub. (#574–#576) |
+| **Factory AI: reasoningEffort** | Per-agent reasoning effort overrides at deploy time. Reviewer/auditor/grounding agents → high; archivist → low. Reads `reasoningEffort` frontmatter if present; falls back to override map then per-model-tier config. |
+| **RLM addon enhancements** | `quality_gate` on TaskNode — enforces minimum score threshold with iterative refinement. `preferred_model` per node (haiku/sonnet/opus tiering). `chunking_strategy` (semantic-boundary, fixed-count, adaptive). `batch_size` for map-reduce patterns. New examples: rlm-self-refine, rlm-divide-conquer, rlm-filter-recurse. Antipatterns section with 6 AIWG-specific patterns. (#618–#620) |
+| **Prose-integration addon** | New addon integrating OpenProse programs into AIWG workflows. Five skills: `prose-setup`, `prose-reader`, `prose-run`, `prose-validate`, `forme-manifest`. Rule: `prose-bridge`. Formal gap analysis across 5 dimensions. `aiwg use prose-integration`. (#619, #620) |
+| **Agent-loop rename** | `ralph-loop` skill renamed to `agent-loop`. Added loop taxonomy clarifying different loop archetypes. Added `al:` shortcut for faster invocation. (#558) |
+| **Hermes v0.4.0 documentation** | Hermes v0.4.0 capabilities documented: hermes MCP CLI, OAuth PKCE flow, real-time config reload. `qwen3.5:9b` metadata references corrected across non-Hermes files. (#595, #596) |
+| **Codex model ID update** | Model IDs updated to gpt-5.4 generation. All `gpt-5.3-codex` variant aliases now map to correct canonical IDs. Previously caused 404 errors on valid model invocations. (#590) |
 
 ### Added
 
@@ -81,6 +90,19 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 - **Ops workspace registry** (`src/ops/`) — `aiwg ops list|add|remove|switch|status`; manages `ops.yaml` in the user config dir; tracks workspace definitions, repo locations, and cross-repo wiring; unit tests (#544)
 - **MCP registry** (`src/mcp/registry.{ts,mjs}`) — MCP server registry with install/list/remove and multi-provider resolution; unit tests
 - **ADR: skills as canonical extension type** (`.aiwg/architecture/adr-skills-canonical-extension-type.md`) — decision record establishing skills as the canonical AIWG extension type across all providers
+- **Skills as canonical extension type** (#546–#552, #555, #538) — `SourceExtensionType` / `DeploymentExtensionType` aliases added to the type system; `CommandHint` interface; `SkillMetadata` expanded with `commandHint`, `effort`, `userInvocable`, `disableModelInvocation`, `context`, `allowedTools`; `CommandMetadata` marked `@deprecated` with `generatedFrom` field; all 56 command definitions converted from `type:'command'` to `type:'skill'` with `triggerPhrases` and `commandHint`; skill-command translator (`src/plugin/skill-command-translator.ts`) with `translateSkillsToCommands()`, `translateSingleSkill()`, `parseFrontmatter()`, `generateCommandContent()`; provider classification — Factory, OpenCode, Warp, Windsurf, Copilot, Codex, OpenClaw receive generated commands; Claude Code and Cursor use skills natively; `userInvocable:false` skips command generation; all framework command sources migrated to SKILL.md format; NL trigger strategy redesigned with alternate expressions in SKILL.md header; 28 unit tests; `aiwg add-command` emits deprecation warning pointing to `aiwg add-skill`; provider support table, CLI reference, and CLAUDE.md updated for skills-first model
+- **Copilot provider overhaul** (#577–#580) — agents deploy as `.agent.md` files with Markdown body and YAML frontmatter in `.github/agents/` (replaces YAML-only format); commands deploy as `.prompt.md` files invocable as `/command` in `.github/prompts/`; rules deploy as `.instructions.md` with `applyTo` globs in `.github/instructions/`; `aiwg mcp install copilot` generates `.vscode/mcp.json` for the AIWG MCP server
+- **Windsurf provider update** (#574–#576) — rules migrate from `.windsurfrules` to `.windsurf/rules/` with `trigger: always_on` frontmatter injected on all rule files (required for Windsurf to load them); `.windsurfrules` retained as deprecated stub for backward compatibility; skills now deploy to both `.windsurf/skills/` (primary) and `.agents/skills/` (cross-agent compatibility path)
+- **Factory AI: reasoningEffort** — `mapReasoningEffort()` function with per-agent deploy-time overrides; `REASONING_EFFORT_OVERRIDES` map: reviewer/auditor/grounding agents → high; archivist → low; default mapping by model tier (opus=high, haiku=low); reads `reasoningEffort` frontmatter if present, falls back to override map then per-tier config
+- **RLM addon enhancements** (#618–#620) — `quality_gate` added to TaskNode schema enforcing minimum score threshold with iterative refinement (scorer agent, max iterations, fallback behavior); `preferred_model` per node for haiku/sonnet/opus tiering by role; `chunking_strategy` field (semantic-boundary, fixed-count, adaptive); `batch_size` for map-reduce patterns (default 25); README additions: model tiering guide, quality gates guide, chunking strategies guide, antipatterns section with 6 AIWG-specific patterns from OpenProse guidance; new examples: `rlm-self-refine`, `rlm-divide-conquer`, `rlm-filter-recurse`
+- **Prose-integration addon** (`agentic/code/addons/prose-integration/`, #619, #620) — new addon integrating OpenProse programs into AIWG workflows; five skills: `prose-setup` (clone/update OpenProse repo; auto-invoked on first use), `prose-reader` (parse .md contracts into structured representation), `prose-run` (execute programs via two-phase Forme+VM model using Opus), `prose-validate` (validate contract grammar), `forme-manifest` (generate wiring manifest and dependency graph); rule: `prose-bridge` covering when and how to invoke Prose from AIWG flows; formal gap analysis between Prose and AIWG across 5 dimensions with 7 gaps each direction and Adopt/Adapt/Leave/Contribute recommendations; deployed via `aiwg use prose-integration`
+- **Agent-loop rename** (#558) — `ralph-loop` skill renamed to `agent-loop`; loop taxonomy added clarifying different loop archetypes; `al:` shortcut added for faster invocation
+- **Hermes v0.4.0 documentation** (#595, #596) — Hermes v0.4.0 capabilities documented: hermes MCP CLI, OAuth PKCE flow, real-time config reload; `qwen3.5:9b` metadata references corrected across non-Hermes files
+- **Provider alignment audits** (#560–#569) — full alignment audits completed for all 11 platforms: Claude Code, GitHub Copilot, Cursor, Windsurf, OpenCode, Warp, Factory AI, Codex, Hermes, OpenClaw, Local/Ollama; capabilities, agentic tools, and documentation updated for each
+- **`.gitignore` advisory** (#553) — `aiwg use` and `aiwg new` now advise `.gitignore` patterns for AIWG runtime directories (`.aiwg/working/`, `.aiwg/ralph/`, `.claude/`, etc.)
+- **MCP config injection** (#554) — `aiwg config` can inject MCP server configurations into supported providers
+- **Claude Code reference expansion** (#570–#573) — Agent Teams experimental feature documented in depth; scheduled agents and remote triggers documented; worktree isolation for parallel agent work documented; AIWG `subagent_type` catalog audited against Claude Code built-in types
+- **Test fixtures refactor** (#614) — hardcoded model names extracted into shared fixtures across test suites
 
 ### Changed
 
@@ -110,6 +132,9 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 - **Incorrect provider configs** — Hermes was listed as a spawnable binary (it is not; it is model-series-only accessible via Ollama or MCP); OpenCode's `promptPrefix` was missing `['run']`, causing invocations without the required subcommand
 - **Codex model aliases** — all `gpt-5.3-codex` variant aliases (including `codex-mini`, `codex-mini-latest`) now map correctly to the canonical model ID; previous mapping caused 404 errors on valid codex-mini invocations
 - **OpenCode 1.0.x adapter** — event-stream output parsing updated for the `opencode run` protocol change in 1.0.x; dangerous mode now passes `--dangerously-skip-permissions` at the correct position; adapter was silently dropping output on all 1.0.x installs
+- **`aiwg doctor` — `AIWG_ROOT` resolution** — `AIWG_ROOT` now resolved from script location instead of a hardcoded legacy path; previously failed on non-standard install locations
+- **`CommandCategory` type** — added `'daemon'` variant; fixed missing categories in help order
+- **Codex model IDs** (#590) — model IDs updated to gpt-5.4 generation; all `gpt-5.3-codex` variant aliases now map to correct canonical IDs; previously caused 404 errors on valid model invocations
 
 ### Added (RC5)
 
@@ -117,6 +142,12 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 - **`aiwg mcp install windsurf` and `aiwg mcp install warp`** — two missing install targets added to `aiwg mcp install`; generate `~/.codeium/windsurf/mcp_config.json` and `~/.warp/mcp.json` respectively; guidance messages in `agent-spawn.ts` for cursor/warp/windsurf updated to reference `aiwg mcp install <target>`
 - **`aiwg ralph --attach`** — stay attached to a ralph loop's output after launch; streams `daemon-output.log` to stdout in real time; Ctrl+C detaches without stopping the background loop
 - **`aiwg ralph-attach [--loop-id <id>]`** — re-attach to any running Ralph loop's output stream from any terminal session; 50-command count now 50
+
+---
+
+## [2026.3.3] - 2026-03-25 – Service Release
+
+Intermediate build. All features and fixes from this iteration are included in the [2026.3.4] stable release above.
 
 ---
 
