@@ -318,13 +318,13 @@ describe('CodexAdapter', () => {
   });
 
   describe('model mapping', () => {
-    it('maps all generic aliases to gpt-5.3-codex (mini models are API-only)', () => {
+    it('maps all generic aliases to gpt-5.4', () => {
       const mappings = [
-        { input: 'opus',   expected: 'gpt-5.3-codex' },
-        { input: 'sonnet', expected: 'gpt-5.3-codex' },
-        { input: 'haiku',  expected: 'gpt-5.3-codex' },
-        { input: 'OPUS',   expected: 'gpt-5.3-codex' },
-        { input: 'Sonnet', expected: 'gpt-5.3-codex' },
+        { input: 'opus',   expected: 'gpt-5.4' },
+        { input: 'sonnet', expected: 'gpt-5.4' },
+        { input: 'haiku',  expected: 'gpt-5.4' },
+        { input: 'OPUS',   expected: 'gpt-5.4' },
+        { input: 'Sonnet', expected: 'gpt-5.4' },
       ];
 
       for (const { input, expected } of mappings) {
@@ -333,7 +333,7 @@ describe('CodexAdapter', () => {
     });
 
     it('passes through unknown model names', () => {
-      const models = ['gpt-5.3-codex', 'custom-model'];
+      const models = ['gpt-5.4', 'custom-model'];
       for (const model of models) {
         expect(adapter.mapModel(model)).toBe(model);
       }
@@ -357,7 +357,7 @@ describe('CodexAdapter', () => {
         model: 'opus',
       });
       expect(args).toContain('--model');
-      expect(args).toContain('gpt-5.3-codex');
+      expect(args).toContain('gpt-5.4');
     });
 
     it('injects system prompt into main prompt', () => {
@@ -407,7 +407,7 @@ describe('CodexAdapter', () => {
         agent: 'ralph-output-analyzer',
       });
       expect(args).toContain('--model');
-      expect(args).toContain('gpt-5.3-codex');
+      expect(args).toContain('gpt-5.4');
       expect(args).not.toContain('--agent');
     });
   });
