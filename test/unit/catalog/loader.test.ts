@@ -8,6 +8,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { existsSync } from 'fs';
 import { readFile } from 'fs/promises';
+import { CATALOG_MOCK, PROVIDERS } from '../../fixtures/models.js';
 
 // Mock fs modules
 vi.mock('fs', () => ({
@@ -251,10 +252,10 @@ describe('Catalog Loader', () => {
       vi.mocked(readFile).mockResolvedValue(
         JSON.stringify({
           models: {
-            'claude-opus-4-5': {
-              id: 'claude-opus-4-5',
-              provider: 'anthropic',
-              displayName: 'Claude Opus 4.5',
+            [CATALOG_MOCK.claudeOpus.id]: {
+              id: CATALOG_MOCK.claudeOpus.id,
+              provider: CATALOG_MOCK.claudeOpus.provider,
+              displayName: CATALOG_MOCK.claudeOpus.displayName,
               status: 'active',
               deprecated: false,
               capabilities: {
@@ -267,7 +268,7 @@ describe('Catalog Loader', () => {
                 coding: 'excellent',
                 speed: 'good',
               },
-              aliases: ['opus', 'opus-4.5'],
+              aliases: CATALOG_MOCK.claudeOpus.aliases,
               tags: ['flagship'],
               source: 'builtin',
               lastVerified: '2025-12-12',
@@ -285,15 +286,15 @@ describe('Catalog Loader', () => {
     });
 
     it('should find model by ID', async () => {
-      const model = await getModel('claude-opus-4-5');
+      const model = await getModel(CATALOG_MOCK.claudeOpus.id);
       expect(model).toBeDefined();
-      expect(model?.id).toBe('claude-opus-4-5');
+      expect(model?.id).toBe(CATALOG_MOCK.claudeOpus.id);
     });
 
     it('should find model by alias', async () => {
       const model = await getModel('opus');
       expect(model).toBeDefined();
-      expect(model?.id).toBe('claude-opus-4-5');
+      expect(model?.id).toBe(CATALOG_MOCK.claudeOpus.id);
     });
 
     it('should return null for non-existent model', async () => {
@@ -368,9 +369,9 @@ describe('Catalog Loader', () => {
     });
 
     it('should filter by provider', async () => {
-      const models = await listModels({ provider: 'anthropic' });
+      const models = await listModels({ provider: PROVIDERS.ANTHROPIC });
       expect(models).toHaveLength(1);
-      expect(models[0].provider).toBe('anthropic');
+      expect(models[0].provider).toBe(PROVIDERS.ANTHROPIC);
     });
 
     it('should filter by status', async () => {
@@ -398,10 +399,10 @@ describe('Catalog Loader', () => {
       vi.mocked(readFile).mockResolvedValue(
         JSON.stringify({
           models: {
-            'claude-opus-4-5': {
-              id: 'claude-opus-4-5',
-              provider: 'anthropic',
-              displayName: 'Claude Opus 4.5',
+            [CATALOG_MOCK.claudeOpus.id]: {
+              id: CATALOG_MOCK.claudeOpus.id,
+              provider: CATALOG_MOCK.claudeOpus.provider,
+              displayName: CATALOG_MOCK.claudeOpus.displayName,
               status: 'active',
               deprecated: false,
               capabilities: {
@@ -414,15 +415,15 @@ describe('Catalog Loader', () => {
                 coding: 'excellent',
                 speed: 'good',
               },
-              aliases: ['opus', 'opus-4.5'],
+              aliases: CATALOG_MOCK.claudeOpus.aliases,
               tags: ['flagship', 'reasoning'],
               source: 'builtin',
               lastVerified: '2025-12-12',
             },
-            'gpt-4o': {
-              id: 'gpt-4o',
-              provider: 'openai',
-              displayName: 'GPT-4o',
+            [CATALOG_MOCK.gpt4o.id]: {
+              id: CATALOG_MOCK.gpt4o.id,
+              provider: CATALOG_MOCK.gpt4o.provider,
+              displayName: CATALOG_MOCK.gpt4o.displayName,
               status: 'active',
               deprecated: false,
               capabilities: {
@@ -435,7 +436,7 @@ describe('Catalog Loader', () => {
                 coding: 'excellent',
                 speed: 'excellent',
               },
-              aliases: ['gpt4o'],
+              aliases: CATALOG_MOCK.gpt4o.aliases,
               tags: ['multimodal', 'fast'],
               source: 'builtin',
               lastVerified: '2025-12-12',
@@ -455,7 +456,7 @@ describe('Catalog Loader', () => {
     it('should search by model ID', async () => {
       const models = await searchModels('opus');
       expect(models).toHaveLength(1);
-      expect(models[0].id).toBe('claude-opus-4-5');
+      expect(models[0].id).toBe(CATALOG_MOCK.claudeOpus.id);
     });
 
     it('should search by display name', async () => {
@@ -465,9 +466,9 @@ describe('Catalog Loader', () => {
     });
 
     it('should search by alias', async () => {
-      const models = await searchModels('gpt4o');
+      const models = await searchModels(CATALOG_MOCK.gpt4o.aliases[0]);
       expect(models).toHaveLength(1);
-      expect(models[0].id).toBe('gpt-4o');
+      expect(models[0].id).toBe(CATALOG_MOCK.gpt4o.id);
     });
 
     it('should search by tag', async () => {
@@ -479,7 +480,7 @@ describe('Catalog Loader', () => {
     it('should be case-insensitive', async () => {
       const models = await searchModels('OPUS');
       expect(models).toHaveLength(1);
-      expect(models[0].id).toBe('claude-opus-4-5');
+      expect(models[0].id).toBe(CATALOG_MOCK.claudeOpus.id);
     });
 
     it('should return empty array for no matches', async () => {

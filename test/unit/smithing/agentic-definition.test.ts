@@ -8,6 +8,7 @@ import { describe, it, expect } from 'vitest';
 import * as yaml from 'js-yaml';
 import * as fs from 'fs';
 import * as path from 'path';
+import { LEGACY_MODELS } from '../../fixtures/models.js';
 
 // Types for agentic definition
 interface AgentConfig {
@@ -242,7 +243,7 @@ describe('AgenticDefinition', () => {
       const invalidDef: AgenticDefinition = {
         platform: { provider: 'claude' },
         agent_config: {
-          models: ['gpt-4', 'claude-3'],
+          models: [LEGACY_MODELS.gpt4, 'claude-3'],
           tools: { available: ['Read'] },
         },
         skill_config: { supported: true },
@@ -459,7 +460,7 @@ describe('Agent Specification', () => {
         version: '1.0.0',
         description: 'Test',
         agent: {
-          model: 'gpt-4',
+          model: LEGACY_MODELS.gpt4,
           tools: ['Read'],
         },
         tags: ['test'],
@@ -642,7 +643,7 @@ describe('Command Specification', () => {
         description: 'Test',
         command: {
           category: 'utilities',
-          model: 'gpt-4',
+          model: LEGACY_MODELS.gpt4,
           allowed_tools: ['Read'],
         },
         tags: ['test'],

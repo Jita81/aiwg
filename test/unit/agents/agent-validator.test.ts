@@ -5,6 +5,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { AgentValidator } from '../../../src/agents/agent-validator.ts';
 import type { AgentInfo, AgentMetadata } from '../../../src/agents/types.ts';
+import { LEGACY_MODELS } from '../../fixtures/models.js';
 
 describe('AgentValidator', () => {
   let validator: AgentValidator;
@@ -70,7 +71,7 @@ describe('AgentValidator', () => {
     });
 
     it('should accept valid models and warn on unrecognized ones', () => {
-      const validModels = ['sonnet', 'opus', 'haiku', 'gpt-4'];
+      const validModels = ['sonnet', 'opus', 'haiku', LEGACY_MODELS.gpt4];
 
       // Test valid models - should have no warnings
       for (const model of validModels) {

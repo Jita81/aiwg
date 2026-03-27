@@ -12,6 +12,12 @@
  */
 
 import { describe, it, expect } from 'vitest';
+import {
+  FACTORY_DEPLOY_MODELS,
+  DEFAULT_SHORTHAND,
+  LEGACY_MODELS,
+  buildFactoryModelsConfig,
+} from '../../fixtures/models.js';
 
 // Import the functions we need to test
 // We test the provider mapModel functions directly since deploy-agents.mjs
@@ -73,62 +79,50 @@ describe('Model Override - Claude Provider', () => {
 });
 
 describe('Model Override - Factory Provider', () => {
-  const defaultModelsConfig = {
-    factory: {
-      reasoning: { model: 'claude-opus-4-6' },
-      coding: { model: 'claude-sonnet-4-6' },
-      efficiency: { model: 'claude-haiku-4-5-20251001' },
-    },
-    shorthand: {
-      opus: 'claude-opus-4-6',
-      sonnet: 'claude-sonnet-4-6',
-      haiku: 'claude-haiku-4-5-20251001',
-      inherit: 'inherit',
-    },
-  };
+  const defaultModelsConfig = buildFactoryModelsConfig();
 
   describe('mapModel with CLI overrides', () => {
     it('should use reasoningModel for opus agents', () => {
-      const result = factoryMapModel('opus', { reasoningModel: 'gpt-5.3-codex' }, defaultModelsConfig);
-      expect(result).toBe('gpt-5.3-codex');
+      const result = factoryMapModel('opus', { reasoningModel: LEGACY_MODELS.gpt53codex }, defaultModelsConfig);
+      expect(result).toBe(LEGACY_MODELS.gpt53codex);
     });
 
     it('should use codingModel for sonnet agents', () => {
-      const result = factoryMapModel('sonnet', { codingModel: 'gpt-5.3-codex' }, defaultModelsConfig);
-      expect(result).toBe('gpt-5.3-codex');
+      const result = factoryMapModel('sonnet', { codingModel: LEGACY_MODELS.gpt53codex }, defaultModelsConfig);
+      expect(result).toBe(LEGACY_MODELS.gpt53codex);
     });
 
     it('should use efficiencyModel for haiku agents', () => {
-      const result = factoryMapModel('haiku', { efficiencyModel: 'gpt-5-codex-mini' }, defaultModelsConfig);
-      expect(result).toBe('gpt-5-codex-mini');
+      const result = factoryMapModel('haiku', { efficiencyModel: LEGACY_MODELS.gpt5codexMini }, defaultModelsConfig);
+      expect(result).toBe(LEGACY_MODELS.gpt5codexMini);
     });
 
     it('should handle blanket override (all three set to same value)', () => {
       const modelCfg = {
-        reasoningModel: 'claude-sonnet-4-6',
-        codingModel: 'claude-sonnet-4-6',
-        efficiencyModel: 'claude-sonnet-4-6',
+        reasoningModel: FACTORY_DEPLOY_MODELS.coding,
+        codingModel: FACTORY_DEPLOY_MODELS.coding,
+        efficiencyModel: FACTORY_DEPLOY_MODELS.coding,
       };
-      expect(factoryMapModel('opus', modelCfg, defaultModelsConfig)).toBe('claude-sonnet-4-6');
-      expect(factoryMapModel('sonnet', modelCfg, defaultModelsConfig)).toBe('claude-sonnet-4-6');
-      expect(factoryMapModel('haiku', modelCfg, defaultModelsConfig)).toBe('claude-sonnet-4-6');
+      expect(factoryMapModel('opus', modelCfg, defaultModelsConfig)).toBe(FACTORY_DEPLOY_MODELS.coding);
+      expect(factoryMapModel('sonnet', modelCfg, defaultModelsConfig)).toBe(FACTORY_DEPLOY_MODELS.coding);
+      expect(factoryMapModel('haiku', modelCfg, defaultModelsConfig)).toBe(FACTORY_DEPLOY_MODELS.coding);
     });
   });
 
   describe('mapModel with modelsConfig (no CLI overrides)', () => {
     it('should resolve opus via shorthand to factory model', () => {
       const result = factoryMapModel('opus', {}, defaultModelsConfig);
-      expect(result).toBe('claude-opus-4-6');
+      expect(result).toBe(FACTORY_DEPLOY_MODELS.reasoning);
     });
 
     it('should resolve sonnet via shorthand to factory model', () => {
       const result = factoryMapModel('sonnet', {}, defaultModelsConfig);
-      expect(result).toBe('claude-sonnet-4-6');
+      expect(result).toBe(FACTORY_DEPLOY_MODELS.coding);
     });
 
     it('should resolve haiku via shorthand to factory model', () => {
       const result = factoryMapModel('haiku', {}, defaultModelsConfig);
-      expect(result).toBe('claude-haiku-4-5-20251001');
+      expect(result).toBe(FACTORY_DEPLOY_MODELS.efficiency);
     });
 
     it('should use factory_shorthand when available', () => {
@@ -146,14 +140,14 @@ describe('Model Override - Factory Provider', () => {
 
     it('should default to coding model when model is null', () => {
       const result = factoryMapModel(null, {}, defaultModelsConfig);
-      expect(result).toBe('claude-sonnet-4-6');
+      expect(result).toBe(FACTORY_DEPLOY_MODELS.coding);
     });
   });
 
   describe('mapModel with empty config', () => {
     it('should fall back to DEFAULT_FACTORY_MODELS', () => {
       const result = factoryMapModel('opus', {}, {});
-      expect(result).toBe('claude-opus-4-6');
+      expect(result).toBe(FACTORY_DEPLOY_MODELS.reasoning);
     });
   });
 });

@@ -13,6 +13,7 @@ import fs from 'fs/promises';
 import { mkdtempSync, rmSync } from 'fs';
 import path from 'path';
 import os from 'os';
+import { LEGACY_MODELS } from '../fixtures/models.js';
 import { execFileSync, spawnSync } from 'child_process';
 
 // Test directories
@@ -323,7 +324,7 @@ describe.skipIf(!GIT_INIT_AVAILABLE)('Codex Integration', () => {
       // Create initial config.toml
       await fs.writeFile(
         path.join(TEST_CODEX_DIR, 'config.toml'),
-        '# Existing config\nmodel = "gpt-5.1"\n'
+`# Existing config\nmodel = "${LEGACY_MODELS.gpt51}"\n`
       );
 
       runAiwg(['mcp', 'install', 'codex']);
@@ -575,11 +576,11 @@ This is a test prompt with $ARGUMENTS placeholder.
       await fs.mkdir(path.join(testDir, '.codex'), { recursive: true });
 
       const configContent = `# Codex configuration
-model = "gpt-4"
+model = "${LEGACY_MODELS.gpt4}"
 project_doc_fallback_filenames = ["CLAUDE.md", "AGENTS.md", "README.md"]
 
 [profiles.aiwg-sdlc]
-model = "gpt-4-turbo"
+model = "${LEGACY_MODELS.gpt4turbo}"
 
 # MCP configuration
 [mcp_servers.aiwg]

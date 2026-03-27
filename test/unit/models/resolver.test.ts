@@ -11,6 +11,12 @@ import { writeFile, mkdir, rm } from 'fs/promises';
 import { resolve } from 'path';
 import { ModelResolver } from '../../../src/models/resolver.js';
 import type { UserProjectConfig } from '../../../src/models/types.js';
+import {
+  CLAUDE_MODELS,
+  OPENAI_MODELS,
+  LEGACY_MODELS,
+  PROVIDERS,
+} from '../../fixtures/models.js';
 
 describe('ModelResolver', () => {
   let testDir: string;
@@ -41,7 +47,7 @@ describe('ModelResolver', () => {
           agent: 'software-implementer',
           role: undefined,
           expected: {
-            modelId: 'claude-sonnet-4-5-20250929',
+            modelId: CLAUDE_MODELS.coding,
             provider: 'claude',
             tier: 'standard',
             role: 'coding',
@@ -53,7 +59,7 @@ describe('ModelResolver', () => {
           agent: 'architecture-designer',
           role: 'reasoning',
           expected: {
-            modelId: 'claude-opus-4-5-20251101',
+            modelId: CLAUDE_MODELS.reasoning,
             role: 'reasoning',
             tier: 'premium',
           },
@@ -64,7 +70,7 @@ describe('ModelResolver', () => {
           agent: 'software-implementer',
           role: 'coding',
           expected: {
-            modelId: 'claude-opus-4-5-20251101',
+            modelId: CLAUDE_MODELS.reasoning,
             tier: 'max-quality',
             source: 'cli',
           },
@@ -96,7 +102,7 @@ describe('ModelResolver', () => {
 
       const result = await resolver.resolve('software-implementer', 'coding', 'premium');
 
-      expect(result.modelId).toBe('claude-sonnet-4-5-20250929');
+      expect(result.modelId).toBe(CLAUDE_MODELS.coding);
       expect(result.tier).toBe('premium');
       expect(result.source).toBe('agent');
     });
@@ -106,13 +112,13 @@ describe('ModelResolver', () => {
       resolver = new ModelResolver({ tier: 'economy' }, testDir);
       const withMinimums = await resolver.resolve('executive-orchestrator', 'reasoning');
       expect(withMinimums.tier).toBe('premium'); // Upgraded from economy
-      expect(withMinimums.modelId).toBe('claude-opus-4-5-20251101');
+      expect(withMinimums.modelId).toBe(CLAUDE_MODELS.reasoning);
 
       // Test with minimums ignored
       resolver = new ModelResolver({ tier: 'economy', respectMinimums: false }, testDir);
       const withoutMinimums = await resolver.resolve('executive-orchestrator', 'reasoning');
       expect(withoutMinimums.tier).toBe('economy'); // Not upgraded
-      expect(withoutMinimums.modelId).toBe('claude-haiku-3-5');
+      expect(withoutMinimums.modelId).toBe(CLAUDE_MODELS.efficiency);
     });
 
     it('should use different provider when specified', async () => {
@@ -121,7 +127,7 @@ describe('ModelResolver', () => {
       const result = await resolver.resolve('software-implementer', 'coding');
 
       expect(result.provider).toBe('openai');
-      expect(result.modelId).toBe('gpt-5-codex');
+      expect(result.modelId).toBe(OPENAI_MODELS.coding);
     });
 
     it('should handle project config overrides', async () => {
@@ -143,11 +149,11 @@ describe('ModelResolver', () => {
           config: {
             agentOverrides: {
               'software-implementer': {
-                'model-override': 'claude-opus-4-1-20250805',
+                'model-override': LEGACY_MODELS.claudeOpusOld,
               },
             },
           },
-          expectedModelId: 'claude-opus-4-1-20250805',
+          expectedModelId: LEGACY_MODELS.claudeOpusOld,
           expectedSource: 'agent',
         },
       ];
@@ -193,9 +199,9 @@ describe('ModelResolver', () => {
       const cases = [
         {
           name: 'exact ID',
-          query: 'claude-opus-4-5-20251101',
+          query: CLAUDE_MODELS.reasoning,
           expected: {
-            id: 'claude-opus-4-5-20251101',
+            id: CLAUDE_MODELS.reasoning,
             provider: 'claude',
             role: 'reasoning',
             contextWindow: 200000,
@@ -205,12 +211,12 @@ describe('ModelResolver', () => {
           name: 'alias',
           query: 'opus',
           expected: {
-            id: 'claude-opus-4-5-20251101',
+            id: CLAUDE_MODELS.reasoning,
           },
         },
         {
           name: 'with cost info',
-          query: 'claude-sonnet-4-5-20250929',
+          query: CLAUDE_MODELS.coding,
           expected: {
             costPer1kTokens: {
               input: 0.003,
@@ -303,34 +309,34 @@ describe('ModelResolver', () => {
           name: 'economy uses efficiency',
           tier: 'economy',
           assertions: [
-            { role: 'reasoning', expected: 'claude-haiku-3-5' },
-            { role: 'coding', expected: 'claude-haiku-3-5' },
+            { role: 'reasoning', expected: CLAUDE_MODELS.efficiency },
+            { role: 'coding', expected: CLAUDE_MODELS.efficiency },
           ],
         },
         {
           name: 'standard is balanced',
           tier: 'standard',
           assertions: [
-            { role: 'reasoning', expected: 'claude-sonnet-4-5-20250929' },
-            { role: 'coding', expected: 'claude-sonnet-4-5-20250929' },
-            { role: 'efficiency', expected: 'claude-haiku-3-5' },
+            { role: 'reasoning', expected: CLAUDE_MODELS.coding },
+            { role: 'coding', expected: CLAUDE_MODELS.coding },
+            { role: 'efficiency', expected: CLAUDE_MODELS.efficiency },
           ],
         },
         {
           name: 'premium for high quality',
           tier: 'premium',
           assertions: [
-            { role: 'reasoning', expected: 'claude-opus-4-5-20251101' },
-            { role: 'coding', expected: 'claude-sonnet-4-5-20250929' },
+            { role: 'reasoning', expected: CLAUDE_MODELS.reasoning },
+            { role: 'coding', expected: CLAUDE_MODELS.coding },
           ],
         },
         {
           name: 'max-quality for best',
           tier: 'max-quality',
           assertions: [
-            { role: 'reasoning', expected: 'claude-opus-4-5-20251101' },
-            { role: 'coding', expected: 'claude-opus-4-5-20251101' },
-            { role: 'efficiency', expected: 'claude-sonnet-4-5-20250929' },
+            { role: 'reasoning', expected: CLAUDE_MODELS.reasoning },
+            { role: 'coding', expected: CLAUDE_MODELS.reasoning },
+            { role: 'efficiency', expected: CLAUDE_MODELS.coding },
           ],
         },
       ];
@@ -352,7 +358,7 @@ describe('ModelResolver', () => {
 
     it('should inherit models from parent provider', async () => {
       const result = await resolver.resolve('test-agent', 'coding');
-      expect(result.modelId).toBe('claude-sonnet-4-5-20250929');
+      expect(result.modelId).toBe(CLAUDE_MODELS.coding);
 
       const models = await resolver.listModels('factory');
       expect(models.length).toBeGreaterThan(0);
@@ -406,7 +412,7 @@ describe('ModelResolver', () => {
       }, testDir);
 
       const result2 = await resolver.resolve('software-implementer', 'reasoning');
-      expect(result2.modelId).toBe('claude-haiku-3-5');
+      expect(result2.modelId).toBe(CLAUDE_MODELS.efficiency);
     });
   });
 

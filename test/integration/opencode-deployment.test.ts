@@ -9,6 +9,7 @@ import { execSync, spawnSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
+import { OPENCODE_DEPLOY_MODELS } from '../fixtures/models.js';
 
 // OpenCode is installed at ~/.opencode/bin/opencode
 const OPENCODE_PATH = path.join(os.homedir(), '.opencode', 'bin', 'opencode');
@@ -244,8 +245,8 @@ describe('OpenCode Deployment', () => {
     it('should accept model overrides', () => {
       execSync(
         `node ${deployScript} --target ${testDir} --provider opencode --mode sdlc ` +
-        `--reasoning-model anthropic/claude-opus-4-20250514 ` +
-        `--coding-model anthropic/claude-sonnet-4-20250514`,
+        `--reasoning-model ${OPENCODE_DEPLOY_MODELS.reasoning} ` +
+        `--coding-model ${OPENCODE_DEPLOY_MODELS.coding}`,
         { encoding: 'utf-8' }
       );
 
@@ -256,8 +257,8 @@ describe('OpenCode Deployment', () => {
       let foundOverride = false;
       for (const agent of agents) {
         const content = fs.readFileSync(path.join(agentDir, agent), 'utf-8');
-        if (content.includes('anthropic/claude-sonnet-4-20250514') ||
-            content.includes('anthropic/claude-opus-4-20250514')) {
+        if (content.includes(OPENCODE_DEPLOY_MODELS.coding) ||
+            content.includes(OPENCODE_DEPLOY_MODELS.reasoning)) {
           foundOverride = true;
           break;
         }
@@ -334,7 +335,7 @@ describe('OpenCode MCP Configuration', () => {
 
     // Create existing config
     fs.writeFileSync(configPath, JSON.stringify({
-      model: 'anthropic/claude-sonnet-4-20250514',
+      model: OPENCODE_DEPLOY_MODELS.coding,
       mcp: {
         existing: { type: 'local', command: ['existing-server'] }
       }
@@ -349,7 +350,7 @@ describe('OpenCode MCP Configuration', () => {
     const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
 
     // Should preserve existing config
-    expect(config.model).toBe('anthropic/claude-sonnet-4-20250514');
+    expect(config.model).toBe(OPENCODE_DEPLOY_MODELS.coding);
     expect(config.mcp.existing).toBeDefined();
 
     // Should add AIWG MCP
@@ -395,7 +396,7 @@ describe('OpenCode CLI Integration', () => {
       const agentContent = `---
 description: Test agent for validation
 mode: subagent
-model: anthropic/claude-sonnet-4-20250514
+model: ${OPENCODE_DEPLOY_MODELS.coding}
 temperature: 0.5
 maxSteps: 50
 tools:
@@ -471,7 +472,7 @@ This is a test command for OpenCode integration.
       fs.mkdirSync(testDir, { recursive: true });
 
       const configContent = {
-        model: 'anthropic/claude-sonnet-4-20250514',
+        model: OPENCODE_DEPLOY_MODELS.coding,
         mcp: {
           aiwg: {
             type: 'local',
@@ -479,7 +480,7 @@ This is a test command for OpenCode integration.
           },
         },
         agent: {
-          defaultModel: 'anthropic/claude-sonnet-4-20250514',
+          defaultModel: OPENCODE_DEPLOY_MODELS.coding,
         },
       };
 
@@ -492,7 +493,7 @@ This is a test command for OpenCode integration.
       const readBack = fs.readFileSync(path.join(testDir, 'opencode.json'), 'utf-8');
       const parsed = JSON.parse(readBack);
 
-      expect(parsed.model).toBe('anthropic/claude-sonnet-4-20250514');
+      expect(parsed.model).toBe(OPENCODE_DEPLOY_MODELS.coding);
       expect(parsed.mcp.aiwg).toBeDefined();
       expect(parsed.mcp.aiwg.type).toBe('local');
 

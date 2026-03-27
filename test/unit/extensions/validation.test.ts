@@ -23,6 +23,7 @@ import {
   PlatformCompatibilitySchema,
   DeploymentConfigSchema,
 } from '../../../src/extensions/validation.js';
+import { CLAUDE_MODELS } from '../../fixtures/models.js';
 import type { Extension } from '../../../src/extensions/types.js';
 import { ZodError } from 'zod';
 
@@ -180,7 +181,7 @@ describe('AgentMetadataSchema', () => {
     const testCases = [
       { input: baseMetadata, expected: true, desc: 'basic valid metadata' },
       { input: { ...baseMetadata, tools: [] }, expected: false, desc: 'empty tools array' },
-      { input: { ...baseMetadata, model: { tier: 'sonnet' as const, override: 'claude-opus-4-5-20251101' } }, expected: true, desc: 'model override' },
+      { input: { ...baseMetadata, model: { tier: 'sonnet' as const, override: CLAUDE_MODELS.reasoning } }, expected: true, desc: 'model override' },
       { input: { ...baseMetadata, model: { tier: 'invalid' } }, expected: false, desc: 'invalid model tier' },
     ];
 

@@ -13,6 +13,11 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import {
+  CODEX_ADAPTER_MODEL,
+  OPENCODE_ADAPTER_MODEL,
+  FACTORY_ADAPTER_MODELS,
+} from '../../fixtures/models.js';
 
 // Dynamic imports for .mjs modules
 let ProviderAdapter: any;
@@ -318,13 +323,13 @@ describe('CodexAdapter', () => {
   });
 
   describe('model mapping', () => {
-    it('maps all generic aliases to gpt-5.4', () => {
+    it('maps all generic aliases to codex model', () => {
       const mappings = [
-        { input: 'opus',   expected: 'gpt-5.4' },
-        { input: 'sonnet', expected: 'gpt-5.4' },
-        { input: 'haiku',  expected: 'gpt-5.4' },
-        { input: 'OPUS',   expected: 'gpt-5.4' },
-        { input: 'Sonnet', expected: 'gpt-5.4' },
+        { input: 'opus',   expected: CODEX_ADAPTER_MODEL },
+        { input: 'sonnet', expected: CODEX_ADAPTER_MODEL },
+        { input: 'haiku',  expected: CODEX_ADAPTER_MODEL },
+        { input: 'OPUS',   expected: CODEX_ADAPTER_MODEL },
+        { input: 'Sonnet', expected: CODEX_ADAPTER_MODEL },
       ];
 
       for (const { input, expected } of mappings) {
@@ -333,7 +338,7 @@ describe('CodexAdapter', () => {
     });
 
     it('passes through unknown model names', () => {
-      const models = ['gpt-5.4', 'custom-model'];
+      const models = [CODEX_ADAPTER_MODEL, 'custom-model'];
       for (const model of models) {
         expect(adapter.mapModel(model)).toBe(model);
       }
@@ -357,7 +362,7 @@ describe('CodexAdapter', () => {
         model: 'opus',
       });
       expect(args).toContain('--model');
-      expect(args).toContain('gpt-5.4');
+      expect(args).toContain(CODEX_ADAPTER_MODEL);
     });
 
     it('injects system prompt into main prompt', () => {
@@ -407,7 +412,7 @@ describe('CodexAdapter', () => {
         agent: 'ralph-output-analyzer',
       });
       expect(args).toContain('--model');
-      expect(args).toContain('gpt-5.4');
+      expect(args).toContain(CODEX_ADAPTER_MODEL);
       expect(args).not.toContain('--agent');
     });
   });
@@ -470,12 +475,12 @@ describe('OpenCodeAdapter', () => {
   });
 
   describe('model mapping', () => {
-    it('maps generic model names to opencode/big-pickle (free tier default)', () => {
+    it('maps generic model names to opencode model (free tier default)', () => {
       const mappings = [
-        { input: 'opus',   expected: 'opencode/big-pickle' },
-        { input: 'sonnet', expected: 'opencode/big-pickle' },
-        { input: 'haiku',  expected: 'opencode/big-pickle' },
-        { input: 'OPUS',   expected: 'opencode/big-pickle' },
+        { input: 'opus',   expected: OPENCODE_ADAPTER_MODEL },
+        { input: 'sonnet', expected: OPENCODE_ADAPTER_MODEL },
+        { input: 'haiku',  expected: OPENCODE_ADAPTER_MODEL },
+        { input: 'OPUS',   expected: OPENCODE_ADAPTER_MODEL },
       ];
 
       for (const { input, expected } of mappings) {
@@ -500,7 +505,7 @@ describe('OpenCodeAdapter', () => {
     it('maps model names with -m flag', () => {
       const args = adapter.buildSessionArgs({ prompt: 'task', model: 'sonnet' });
       expect(args).toContain('-m');
-      expect(args).toContain('opencode/big-pickle');
+      expect(args).toContain(OPENCODE_ADAPTER_MODEL);
     });
 
     it('supports session resume via -s flag', () => {
@@ -559,7 +564,7 @@ describe('OpenCodeAdapter', () => {
     it('maps model names', () => {
       const args = adapter.buildAnalysisArgs({ prompt: 'analyze', model: 'haiku' });
       expect(args).toContain('-m');
-      expect(args).toContain('opencode/big-pickle');
+      expect(args).toContain(OPENCODE_ADAPTER_MODEL);
     });
   });
 
@@ -595,7 +600,8 @@ describe('OpenCodeAdapter', () => {
     });
 
     it('passes through anthropic/* model IDs unchanged', () => {
-      expect(adapter.mapModel('anthropic/claude-sonnet-4-6')).toBe('anthropic/claude-sonnet-4-6');
+      const namespacedModel = 'anthropic/claude-sonnet-4-6';
+      expect(adapter.mapModel(namespacedModel)).toBe(namespacedModel);
     });
   });
 });
@@ -634,10 +640,10 @@ describe('FactoryAdapter', () => {
   describe('model mapping', () => {
     it('maps generic model names to Factory model IDs', () => {
       const mappings = [
-        { input: 'opus', expected: 'claude-opus-4-5-20251101' },
-        { input: 'sonnet', expected: 'claude-sonnet-4-5-20250929' },
-        { input: 'haiku', expected: 'claude-haiku-4-5-20251001' },
-        { input: 'HAIKU', expected: 'claude-haiku-4-5-20251001' },
+        { input: 'opus', expected: FACTORY_ADAPTER_MODELS.opus },
+        { input: 'sonnet', expected: FACTORY_ADAPTER_MODELS.sonnet },
+        { input: 'haiku', expected: FACTORY_ADAPTER_MODELS.haiku },
+        { input: 'HAIKU', expected: FACTORY_ADAPTER_MODELS.haiku },
       ];
 
       for (const { input, expected } of mappings) {
@@ -646,7 +652,8 @@ describe('FactoryAdapter', () => {
     });
 
     it('passes through unknown model names', () => {
-      expect(adapter.mapModel('gpt-5.1')).toBe('gpt-5.1');
+      const unknownModel = 'gpt-5.1';
+      expect(adapter.mapModel(unknownModel)).toBe(unknownModel);
     });
   });
 
@@ -663,7 +670,7 @@ describe('FactoryAdapter', () => {
     it('maps model names with -m flag', () => {
       const args = adapter.buildSessionArgs({ prompt: 'task', model: 'opus' });
       expect(args).toContain('-m');
-      expect(args).toContain('claude-opus-4-5-20251101');
+      expect(args).toContain(FACTORY_ADAPTER_MODELS.opus);
     });
 
     it('supports session resume via -s flag', () => {
@@ -714,7 +721,7 @@ describe('FactoryAdapter', () => {
     it('maps model names', () => {
       const args = adapter.buildAnalysisArgs({ prompt: 'analyze', model: 'sonnet' });
       expect(args).toContain('-m');
-      expect(args).toContain('claude-sonnet-4-5-20250929');
+      expect(args).toContain(FACTORY_ADAPTER_MODELS.sonnet);
     });
 
     it('silently skips unsupported agent flag', () => {
