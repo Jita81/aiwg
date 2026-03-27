@@ -294,10 +294,29 @@ function createOrUpdateSettings(aiwgPath, provider) {
           'coverage/',
           '.idea/',
           '.vscode/',
-          '.claude/settings.local.json'  // Personal Claude Code settings (not shared)
+          '',
+          '# Claude Code local session state',
+          '.claude/settings.local.json',
+          '',
+          '# AIWG — ignore only high-churn runtime subdirs, NOT .aiwg/ itself',
+          '.aiwg/working/',
+          '.aiwg/ralph/',
+          '.aiwg/ralph-external/',
         ].join('\n') + '\n';
         fs.writeFileSync(gi, gitignore, 'utf8');
         console.log('created .gitignore');
+      } else {
+        // Existing .gitignore: append missing AIWG runtime patterns
+        const existing = fs.readFileSync(gi, 'utf8');
+        const lines = existing.split('\n').map(l => l.trim());
+        const RUNTIME = ['.aiwg/working/', '.aiwg/ralph/', '.aiwg/ralph-external/'];
+        const isCovered = (p) => lines.includes(p) || lines.includes(p.replace(/\/$/, ''));
+        const missing = RUNTIME.filter(p => !isCovered(p));
+        if (missing.length > 0) {
+          const block = '\n# AIWG — ignore only high-churn runtime subdirs, NOT .aiwg/ itself\n' + missing.join('\n') + '\n';
+          fs.writeFileSync(gi, existing.endsWith('\n') ? existing + block : existing + '\n' + block, 'utf8');
+          console.log('updated .gitignore with AIWG runtime entries');
+        }
       }
       console.log('Initialized git repository on branch main.');
       console.log('Next steps:');

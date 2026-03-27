@@ -9,14 +9,20 @@
  *   reset [<key>]       — Reset key or all config to defaults
  *   path                — Print the active config directory path
  *   edit                — Open config in $EDITOR
+ *   gitignore           — Show/check/fix .gitignore for AIWG runtime dirs
  *
  * Global flags:
  *   --config-dir <path> — Override config directory
  *
  * @implements #545
+ * @implements #553
  */
 
+import { fileURLToPath } from 'url';
+import path from 'path';
 import { UserConfig } from './user-config.js';
+
+const _scriptDir = path.dirname(fileURLToPath(import.meta.url));
 
 /**
  * Main CLI entry point for `aiwg config <subcommand> [args]`
@@ -68,6 +74,10 @@ export async function main(args: string[]): Promise<void> {
 
     case 'edit':
       await handleEdit(config);
+      break;
+
+    case 'gitignore':
+      await handleGitignore(subArgs);
       break;
 
     default:
@@ -181,6 +191,16 @@ async function handleEdit(config: UserConfig): Promise<void> {
   }
 }
 
+async function handleGitignore(args: string[]): Promise<void> {
+  const { spawnSync } = await import('child_process');
+  // Locate the gitignore CLI script relative to this compiled module
+  const scriptPath = path.resolve(_scriptDir, '../../tools/cli/config-gitignore.mjs');
+  const result = spawnSync(process.execPath, [scriptPath, ...args], { stdio: 'inherit' });
+  if (result.status !== 0) {
+    process.exit(result.status ?? 1);
+  }
+}
+
 function printUsage(): void {
   console.log(`Usage: aiwg config <subcommand> [options]
 
@@ -192,6 +212,7 @@ Subcommands:
   reset [<key>]       Reset key or all config to defaults
   path                Print config directory path
   edit                Open config in $EDITOR
+  gitignore           Show/check/fix .gitignore AIWG entries
 
 Global flags:
   --config-dir <path> Override config directory
@@ -204,5 +225,8 @@ Examples:
   aiwg config validate
   aiwg config path
   aiwg config reset defaults.provider
-  aiwg config --config-dir /custom/path list`);
+  aiwg config --config-dir /custom/path list
+  aiwg config gitignore
+  aiwg config gitignore --fix
+  aiwg config gitignore --check`);
 }

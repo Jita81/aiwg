@@ -491,6 +491,17 @@ export class UseHandler implements CommandHandler {
       if (counts.rules > 0) ui.deployCount('Rules', counts.rules);
       ui.blank();
       printNextSteps(framework as Framework, provider);
+
+      // Advisory: check .gitignore for AIWG runtime patterns
+      try {
+        const { checkGitignore } = await import('../../config/gitignore.js');
+        const result = await checkGitignore(target);
+        if (result.missingRuntime.length > 0) {
+          ui.warn('Run "aiwg config gitignore --fix" to add recommended .gitignore entries');
+        }
+      } catch {
+        // Non-critical: gitignore check failure should not block deployment output
+      }
     }
 
     return {
