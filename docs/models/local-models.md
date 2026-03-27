@@ -26,7 +26,7 @@ curl -fsSL https://ollama.com/install.sh | sh
 ollama pull qwen2.5-coder:14b
 
 # Install OpenCode (the recommended agentic platform for local model use)
-npm install -g opencode-ai
+npm install -g opencode
 
 # Configure OpenCode to use your local Ollama instance
 # Create opencode.json in your project root:
@@ -67,7 +67,7 @@ OpenCode natively supports multiple model backends including Ollama and any Open
 
 ```bash
 # Install
-npm install -g opencode-ai
+npm install -g opencode
 
 # Configure with Ollama in opencode.json
 {

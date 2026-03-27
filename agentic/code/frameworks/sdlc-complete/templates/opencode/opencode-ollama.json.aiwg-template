@@ -33,6 +33,7 @@
 
   "instructions": [
     "AGENTS.md",
-    ".aiwg/instructions.md"
+    ".aiwg/instructions.md",
+    ".opencode/rule/*.md"
   ]
 }
