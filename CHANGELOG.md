@@ -34,6 +34,7 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 | **Behaviors — reactive artifact type** | New BEHAVIOR.md artifact type above skills: subscribe to system events (file writes, deploys, schedules) and react automatically. Cross-platform format spec, source dirs in all frameworks, `aiwg add-behavior` scaffolding, deploy to OpenClaw. (#540–#543) |
 | **OpenClaw as first-class platform** | 10th deployment platform. First to support behaviors (`~/.openclaw/behaviors/`). `aiwg use sdlc --provider openclaw`. ClawHub package publication documented. (#535) |
 | **Getting-started guide series** | 15 scenario-based guides written in user vocabulary: project setup paths, all five frameworks, key addon deep-dives, and a complete flow/gate/sdlc-accelerate reference. |
+| **Skills, config, and ops CLI subsystems** | Three new typed source modules: provider-agnostic `aiwg skills` registry, user-level `aiwg config` management (`~/.aiwg` / XDG resolution), and `aiwg ops` workspace registry (`ops.yaml`). Full unit test coverage. |
 
 ### Added
 
@@ -75,12 +76,18 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 - **Behaviors — reactive artifact type** — fifth AIWG artifact type alongside agents, commands, skills, and rules; BEHAVIOR.md format spec with `hooks:`, `triggers:`, `inputs:`, and `scripts/` (#540); behaviors source directories added to all framework manifests under `agentic/code/*/behaviors/` (#541); OpenClaw deploy to `~/.openclaw/behaviors/` (#542); `aiwg add-behavior <name> --hooks <event> --description "..."` scaffolding command (#543); behaviors guide at `docs/behaviors-guide.md`
 - **OpenClaw as first-class platform** (`tools/agents/providers/openclaw.mjs`) — 10th deployment target; deploys agents, commands, skills, rules, and behaviors to `~/.openclaw/`; first provider with behaviors support; `aiwg use sdlc --provider openclaw`; ClawHub package publication plan documented; all SKILL.md files updated with OpenClaw platform frontmatter (#535)
 - **Getting-started guide series** (`docs/getting-started/`) — 15 scenario-based articles written in user vocabulary: `just-try-it.md`, `new-project.md`, `existing-project.md`, `audit-existing-code.md`, `writing-and-content.md`, `team-setup.md`, `daemon-and-automation.md` (scenario guides); `sdlc-framework.md`, `marketing-framework.md`, `forensics-framework.md`, `research-framework.md`, `media-curator-framework.md` (framework guides); `key-addons.md` (Ralph, Ring, RLM, Voice, Testing Quality, Security, Context Curator, Auto Memory, Guided Implementation); `flow-and-gate-process.md` (intake → flows → gates → sdlc-accelerate end-to-end reference); updated `README.md` index with Frameworks and Going Deeper sections
+- **Skills CLI subsystem** (`src/skills/`) — provider-agnostic skill discovery, install, and publish; adapters for `local`, `clawhub`, and `openclaw` registries; `aiwg skills list|search|install|info` subcommands; `SkillResult` and `SkillInstallResult` types; unit tests (#539)
+- **User-level config subsystem** (`src/config/`) — `aiwg config get|set|list|validate|reset|path`; resolution order: `AIWG_CONFIG` env var → `--config-dir` flag → `~/.aiwg` → `~/.config/aiwg`; new config files written to whichever path already exists, defaulting to `~/.aiwg`; unit tests (#545)
+- **Ops workspace registry** (`src/ops/`) — `aiwg ops list|add|remove|switch|status`; manages `ops.yaml` in the user config dir; tracks workspace definitions, repo locations, and cross-repo wiring; unit tests (#544)
+- **MCP registry** (`src/mcp/registry.{ts,mjs}`) — MCP server registry with install/list/remove and multi-provider resolution; unit tests
+- **ADR: skills as canonical extension type** (`.aiwg/architecture/adr-skills-canonical-extension-type.md`) — decision record establishing skills as the canonical AIWG extension type across all providers
 
 ### Changed
 
 - **`tools/eval` — matric-eval dependency** (`#488`) — `tools/eval/` now depends on `@matric/eval-client` from the private Gitea npm registry instead of reimplementing evaluation infrastructure. `EvalRunner` renamed to `AiwgEvalRunner` (composes `MatricEvalClient`); `EvalRunner` kept as backward-compat alias. When the `matric-eval` binary is present, standard benchmark scores are included in the eval report via `EvalReport.matricBenchmarks`. Added `tools/eval/.npmrc` to scope `@matric` packages to the Gitea registry.
 - **`aiwg sync` and `aiwg mc`** — new commands added to Maintenance and Orchestration categories respectively; command count 47 → 49
-- **`CommandCategory` type** — extended with `'orchestration'` for Mission Control
+- **`CommandCategory` type** — extended with `'orchestration'` for Mission Control; further extended with `'config'` and `'ops'` for the new CLI subsystems
+- **CLI handler index** — `skillsHandler`, `configHandler`, `opsHandler` registered in `allHandlers`; 50 command definitions updated in `src/extensions/commands/definitions.ts`
 - **`aiwg use` output** — modern clean progress UI replacing legacy verbose output (#428)
 - **`aiwg index stats`** — `--graph` flag now optional; flexible graph type support (#425, #426)
 - **`aiwg index`** — deploy next-steps guidance added to post-build output; verbose mode flag
