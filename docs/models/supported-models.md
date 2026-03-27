@@ -39,7 +39,7 @@ Models tested with AIWG by the team or community, with confirmed compatibility r
 
 | Model | Size | Backend | AIWG Tier | Tool Use | Coding | Reasoning | SDLC Workflows | Tested By | Notes |
 |-------|------|---------|-----------|----------|--------|-----------|----------------|-----------|-------|
-| qwen3.5:9b | 9B | Ollama | sonnet | Yes | Good | Moderate | Partial | Community | Strong coding, reasoning degrades in long chains |
+| qwen3.5:9b | 9B | Ollama | sonnet | Yes | Good | Good | Partial | Community | Strong coding, vision support (256K context), reasoning degrades in long chains |
 | hermes-3-llama-3.1:8b | 8B | Ollama | haiku | Yes | Good | Moderate | Limited | Community | Good instruction following, limited multi-step planning |
 | codellama:34b | 34B | Ollama | sonnet | No | Excellent | Moderate | Limited | AIWG team | Strong code gen, no native tool use support |
 | qwen2.5-coder:14b | 14B | Ollama | sonnet | Yes | Excellent | Moderate | Partial | AIWG team | Best coding quality per VRAM of validated local models |
@@ -98,7 +98,7 @@ When configuring local models, map them to AIWG tiers based on their demonstrate
   "openai": {
     "reasoning": {
       "model": "qwen3.5:9b",
-      "description": "Local Qwen 3.5 for coding and moderate reasoning"
+      "description": "Local Qwen 3.5 for coding and reasoning"
     },
     "coding": {
       "model": "qwen2.5-coder:14b",

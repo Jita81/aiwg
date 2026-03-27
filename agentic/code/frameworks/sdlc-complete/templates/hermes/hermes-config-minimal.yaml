@@ -34,7 +34,8 @@ delegation:
 #   Coding / tool calls (via delegation.model config):
 #     qwen2.5-coder:14b — best tool call accuracy, recommended for AIWG workflows
 #     qwen2.5-coder:7b  — smaller variant, still excellent tool calls, lower VRAM
-#     qwen3:8b          — strong structured output, good alternative
+#     qwen3.5:9b        — vision + 256K context, strong structured output (8GB VRAM)
+#     qwen3:8b          — strong structured output, thinking/non-thinking modes
 #     phi4-mini          — compact alternative for low VRAM
 #
 #   Note: Qwen models have the best tool call accuracy open-weight. Use them

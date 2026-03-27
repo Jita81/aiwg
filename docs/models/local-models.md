@@ -138,14 +138,14 @@ AIWG agents rely heavily on tool use (function calling) — reading files, editi
 | Model | Size | Tool Use | AIWG Compatible | Tier | Notes |
 |-------|------|----------|-----------------|------|-------|
 | qwen2.5-coder:14b | 14B | Yes | Yes | sonnet | Best coding quality/VRAM ratio of validated local models |
-| qwen3.5:9b | 9B | Yes | Partial | sonnet | Strong coding, reasoning degrades on long chains |
+| qwen3.5:9b | 9B | Yes | Partial | sonnet | Strong coding, vision support (256K context), reasoning degrades on long chains |
 | hermes-3-llama-3.1:8b | 8B | Yes | Partial | haiku | Good instruction following, limited multi-step planning |
 | llama3.3:70b | 70B | Partial | Partial | opus | Closest to cloud quality; requires 48GB+ VRAM |
 | codellama:34b | 34B | No | No | — | Strong code gen but no tool use; cannot run AIWG agents |
 | llama3.1:8b | 8B | No | No | — | No tool use support |
 | llama3.2:3b | 3B | No | No | — | Summaries/formatting only via direct prompting |
 
-> **The 9B sweet spot**: Models in the 9B–14B range running on 8–12GB VRAM (RTX 3080/4070 class) can now run AIWG workflows reliably. This is the recommended entry point for local use on consumer hardware.
+> **The 9B–14B sweet spot**: Models in the 9B–14B range running on 8–12GB VRAM (RTX 3080/4070 class) can now run AIWG workflows reliably. This is the recommended entry point for local use on consumer hardware.
 
 ---
 
@@ -196,7 +196,7 @@ ollama --version
 | General reasoning (budget) | llama3.1:8b | ~5GB | 6GB |
 | Fast summaries (haiku-tier) | llama3.2:3b | ~2GB | 4GB |
 | Code completion | qwen2.5-coder:14b | ~9GB | 12GB |
-| Code + reasoning (community) | qwen3.5:9b | ~6GB | 8GB |
+| Code + reasoning (community) | qwen3.5:9b | ~6.6GB | 8GB |
 | Instruction following (community) | hermes-3-llama-3.1:8b | ~5GB | 6GB |
 
 ```bash
@@ -515,7 +515,7 @@ Create `models.json` in your project root to map AIWG tiers to local model names
     },
     "efficiency": {
       "model": "qwen3.5:9b",
-      "description": "9B model with good tool use on consumer hardware"
+      "description": "9B model with tool use, vision, and 256K context on consumer hardware"
     }
   },
   "shorthand": {

@@ -530,32 +530,32 @@
     "qwen3.5:9b": {
       "provider": "ollama",
       "displayName": "Qwen 3.5 9B",
-      "releaseDate": "2025-07-01",
+      "releaseDate": "2026-03-01",
       "status": "active",
       "deprecated": false,
       "deprecationDate": null,
       "successorModel": null,
       "local": true,
       "capabilities": {
-        "contextWindow": 32768,
+        "contextWindow": 262144,
         "maxOutputTokens": 8192,
-        "vision": false,
+        "vision": true,
         "toolUse": true,
         "streaming": true,
-        "reasoning": "fair",
+        "reasoning": "good",
         "coding": "good",
         "speed": "excellent"
       },
       "pricing": null,
       "hardware": {
-        "minVram": "8GB",
+        "minVram": "6GB",
         "recommendedVram": "8GB",
         "quantization": "Q4_K_M"
       },
       "aliases": ["qwen3.5", "qwen-3.5-9b"],
-      "tags": ["local", "efficiency", "tool-use", "ollama", "consumer-hardware"],
+      "tags": ["local", "efficiency", "tool-use", "ollama", "consumer-hardware", "vision"],
       "source": "builtin",
-      "lastVerified": "2026-03-01"
+      "lastVerified": "2026-03-27"
     },
     "hermes-3-llama-3.1:8b": {
       "provider": "ollama",

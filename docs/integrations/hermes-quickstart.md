@@ -45,6 +45,7 @@ Two roles, two models. The parent agent handles conversation; coding tasks are d
 |---|---|---|
 | `qwen2.5-coder:14b` ⭐ | 14B | Best tool call accuracy + coding quality; recommended for AIWG workflows |
 | `qwen2.5-coder:7b` | 7B | Smaller Qwen coding variant; excellent tool calls, lower VRAM |
+| `qwen3.5:9b` | 9B | Vision + 256K context; strong structured output and tool calls (8GB VRAM) |
 | `qwen3:8b` | 8B | Strong structured output; supports thinking/non-thinking modes |
 | `phi4-mini` | 3.8B | Microsoft; compact, strong at structured reasoning |
 | `deepseek-coder-v2:16b` | 16B | Strong coding quality; needs 16GB+ VRAM |
@@ -56,6 +57,26 @@ ollama pull qwen2.5-coder:14b
 ```
 
 Configure delegation model in `~/.hermes/config.yaml` under `delegation.model: "ollama/qwen2.5-coder:14b"` to route coding-heavy AIWG workflows to the coding model while keeping the parent conversation on `hermes3`.
+
+---
+
+## What's New in v0.4.0
+
+This guide targets Hermes Agent v0.4.0+. Key changes relevant to AIWG integration:
+
+| Feature | Description |
+|---|---|
+| **`hermes mcp` CLI** | Install and manage MCP servers via CLI — no manual config editing required |
+| **`hermes tools` TUI** | Interactive tool configuration interface |
+| **Real-time config reload** | Edit `~/.hermes/config.yaml` and changes apply immediately — no restart |
+| **`${ENV_VAR}` substitution** | Use environment variables in config values |
+| **`custom_models.yaml`** | Add user-managed models without editing the main config |
+| **CLAUDE.md recognition** | Hermes now loads `CLAUDE.md` as a context file alongside `AGENTS.md` |
+| **Delegation improvements** | `provider` and `model` now configurable per subagent; thread-safe concurrent delegation |
+| **New platform adapters** | Signal, DingTalk, SMS (Twilio), Mattermost, Matrix, Webhook, OpenAI-compatible API server |
+| **New inference providers** | GitHub Copilot (OAuth 2.1 PKCE), Alibaba DashScope, Kilo Code, OpenCode Zen/Go |
+
+See [Hermes v0.4.0 release notes](https://hermes-agent.nousresearch.com/changelog) for the full changelog.
 
 ---
 
@@ -93,7 +114,17 @@ aiwg mcp info    # Confirm MCP server is available
 
 Add the AIWG MCP server to Hermes configuration.
 
-**Edit `~/.hermes/config.yaml`:**
+**Option A — CLI install (v0.4.0+, recommended):**
+
+```bash
+hermes mcp install aiwg --command "aiwg" --args "mcp,serve"
+```
+
+This adds the entry to `~/.hermes/config.yaml` automatically. Config reloads in real-time — no restart needed.
+
+**Option B — Manual config edit:**
+
+Edit `~/.hermes/config.yaml`:
 
 ```yaml
 mcp_servers:
@@ -102,9 +133,9 @@ mcp_servers:
     args: ["mcp", "serve"]
 ```
 
-**Why this is lean by default:** AIWG's MCP server exposes exactly 5 tools (`workflow-run`, `artifact-read`, `artifact-write`, `template-render`, `agent-list`) — no more. This keeps the schema footprint to ~3,000 tokens. No tool whitelisting is needed because the server surface is already minimal.
+Config changes apply immediately (v0.4.0+) — no restart required.
 
-> **Note (v0.4.0+):** Hermes now reloads config changes in real-time — no restart required after editing `config.yaml`.
+**Why this is lean by default:** AIWG's MCP server exposes exactly 5 tools (`workflow-run`, `artifact-read`, `artifact-write`, `template-render`, `agent-list`) — no more. This keeps the schema footprint to ~3,000 tokens. No tool whitelisting is needed because the server surface is already minimal.
 
 **Verify:**
 
@@ -120,7 +151,9 @@ Hermes should list the 5 AIWG tools.
 
 Create an `AGENTS.md` at your project root that tells Hermes when to call AIWG.
 
-> **Critical context:** Hermes loads `AGENTS.md` in full on every turn. Every character costs tokens on every message. Keep this file under 1,000 characters.
+> **v0.4.0+:** Hermes now recognizes both `AGENTS.md` and `CLAUDE.md` as context files. If your project already has a `CLAUDE.md` (e.g., from Claude Code), Hermes will load it automatically — you can use it in place of `AGENTS.md` or alongside it. This makes AIWG integration portable: the same context file works for both Claude Code and Hermes without duplication.
+
+> **Critical context:** Hermes loads context files in full on every turn. Every character costs tokens on every message. Keep routing guidance under 1,000 characters total across both files.
 
 **Create `AGENTS.md` in your project root:**
 

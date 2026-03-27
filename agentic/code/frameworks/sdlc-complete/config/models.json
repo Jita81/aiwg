@@ -82,7 +82,7 @@
     },
     "efficiency": {
       "model": "qwen3.5:9b",
-      "description": "Qwen 3.5 9B — consumer hardware entry point with tool use support (8GB VRAM)"
+      "description": "Qwen 3.5 9B — consumer hardware entry point with tool use and vision support (8GB VRAM)"
     }
   },
 
