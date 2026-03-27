@@ -168,6 +168,73 @@ const DEFAULT_FACTORY_MODELS = {
 };
 
 /**
+ * Sonnet-tier agents that need higher reasoningEffort than the default "medium".
+ * These are deploy-time overrides — source agent files remain provider-agnostic.
+ *
+ * Rationale: these roles perform analysis, review, or verification where
+ * thoroughness is critical despite running on the cost-efficient sonnet tier.
+ */
+const REASONING_EFFORT_OVERRIDES = {
+  // Review & analysis — must be thorough
+  'code-reviewer': 'high',
+  'security-auditor': 'high',
+  'test-architect': 'high',
+  'requirements-reviewer': 'high',
+  'api-designer': 'high',
+  'regression-analyst': 'high',
+  'compliance-checker': 'high',
+  'privacy-officer': 'high',
+  'reliability-engineer': 'high',
+  'migration-planner': 'high',
+  'incident-responder': 'high',
+  // Grounding agents — verification accuracy is paramount
+  'security-grounding-agent': 'high',
+  'compliance-grounding-agent': 'high',
+  'technology-grounding-agent': 'high',
+  'performance-grounding-agent': 'high',
+  // Lightweight roles — mechanical, not analytical
+  'documentation-archivist': 'low',
+};
+
+/**
+ * Map model tier to Factory reasoningEffort level.
+ *
+ * Priority: agent-specific override > agent frontmatter > models.json per-tier > default by model tier.
+ * Valid levels: off, low, medium, high.
+ */
+export function mapReasoningEffort(originalModel, modelsConfig, frontmatterEffort, agentName) {
+  // Explicit frontmatter override wins (source-level)
+  if (frontmatterEffort && ['off', 'low', 'medium', 'high'].includes(frontmatterEffort)) {
+    return frontmatterEffort;
+  }
+
+  // Agent-specific deploy-time override (Factory provider policy)
+  const normalizedName = (agentName || '').toLowerCase().replace(/\s+/g, '-');
+  if (REASONING_EFFORT_OVERRIDES[normalizedName]) {
+    return REASONING_EFFORT_OVERRIDES[normalizedName];
+  }
+
+  const factoryConfig = modelsConfig?.factory || {};
+  const clean = (originalModel || 'sonnet').toLowerCase().replace(/['"]/g, '');
+
+  // Check models.json for per-tier reasoningEffort
+  if (/opus/i.test(clean) && factoryConfig.reasoning?.reasoningEffort) {
+    return factoryConfig.reasoning.reasoningEffort;
+  }
+  if (/haiku/i.test(clean) && factoryConfig.efficiency?.reasoningEffort) {
+    return factoryConfig.efficiency.reasoningEffort;
+  }
+  if (factoryConfig.coding?.reasoningEffort) {
+    return factoryConfig.coding.reasoningEffort;
+  }
+
+  // Default mapping by model tier
+  if (/opus/i.test(clean)) return 'high';
+  if (/haiku/i.test(clean)) return 'low';
+  return 'medium';
+}
+
+/**
  * Map model shorthand to Factory AI format
  */
 export function mapModel(originalModel, modelCfg, modelsConfig) {
@@ -224,12 +291,16 @@ export function transformAgent(srcPath, content, opts) {
   const description = frontmatter.match(/description:\s*(.+)/)?.[1]?.trim();
   const modelMatch = frontmatter.match(/model:\s*(.+)/)?.[1]?.trim();
   const toolsMatch = frontmatter.match(/tools:\s*(.+)/)?.[1]?.trim();
+  const effortMatch = frontmatter.match(/reasoningEffort:\s*(.+)/)?.[1]?.trim();
 
   // Convert name to kebab-case for Factory compatibility
   const name = toKebabCase(rawName);
 
   // Map model to Factory format
   const factoryModel = mapModel(modelMatch, opts, modelsConfig);
+
+  // Map reasoning effort based on model tier, with agent-specific overrides
+  const reasoningEffort = mapReasoningEffort(modelMatch, modelsConfig, effortMatch, name);
 
   // Map tools to Factory equivalents
   const factoryTools = mapToolsToFactory(toolsMatch, name);
@@ -239,6 +310,7 @@ export function transformAgent(srcPath, content, opts) {
 name: ${name}
 description: ${description || 'AIWG SDLC agent'}
 model: ${factoryModel}
+reasoningEffort: ${reasoningEffort}
 tools: ${JSON.stringify(factoryTools)}
 ---`;
 
@@ -453,6 +525,92 @@ export function enableFactoryCustomDroids(dryRun) {
 }
 
 // ============================================================================
+// Factory Hooks
+// ============================================================================
+
+/**
+ * Deploy SessionStart hook for AIWG pre-flight checks.
+ *
+ * Writes a SessionStart hook to ~/.factory/settings.json that runs
+ * `aiwg sync --dry-run --quiet` on every new session. Preserves
+ * existing hooks and settings.
+ */
+export function deployFactoryHooks(dryRun) {
+  const homeDir = process.env.HOME || process.env.USERPROFILE;
+  if (!homeDir) {
+    console.warn('Could not determine home directory, skipping Factory hooks configuration');
+    return;
+  }
+
+  const settingsDir = path.join(homeDir, '.factory');
+  const settingsPath = path.join(settingsDir, 'settings.json');
+
+  let settings = {};
+  let originalContent = '';
+  let hasExistingFile = false;
+
+  // Read existing settings if present
+  if (fs.existsSync(settingsPath)) {
+    hasExistingFile = true;
+    try {
+      originalContent = fs.readFileSync(settingsPath, 'utf8');
+      const jsonContent = stripJsonComments(originalContent);
+      settings = JSON.parse(jsonContent);
+    } catch (err) {
+      console.warn(`Warning: Could not parse Factory settings.json for hooks: ${err.message}`);
+      console.warn('Skipping hook deployment to avoid corrupting settings file.');
+      return;
+    }
+  }
+
+  // Define the AIWG pre-flight hook
+  const aiwgHook = {
+    type: 'command',
+    command: 'aiwg sync --dry-run --quiet'
+  };
+
+  const aiwgMatcher = {
+    matcher: '*',
+    hooks: [aiwgHook]
+  };
+
+  // Initialize hooks structure if missing
+  if (!settings.hooks) {
+    settings.hooks = {};
+  }
+  if (!settings.hooks.SessionStart) {
+    settings.hooks.SessionStart = [];
+  }
+
+  // Check if AIWG hook already exists (by command string)
+  const alreadyInstalled = settings.hooks.SessionStart.some(entry =>
+    entry.hooks?.some(h => h.command && h.command.includes('aiwg sync'))
+  );
+
+  if (alreadyInstalled) {
+    console.log('Factory SessionStart hook already installed for AIWG pre-flight');
+    return;
+  }
+
+  // Add the hook
+  settings.hooks.SessionStart.push(aiwgMatcher);
+
+  if (dryRun) {
+    console.log(`[dry-run] Would add SessionStart hook to ${settingsPath}`);
+    console.log(`[dry-run] Hook: aiwg sync --dry-run --quiet`);
+  } else {
+    if (!fs.existsSync(settingsDir)) {
+      fs.mkdirSync(settingsDir, { recursive: true });
+    }
+
+    // Since we've successfully parsed the JSON, safe to write back
+    fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2) + '\n', 'utf8');
+    console.log(`Deployed SessionStart hook to ${settingsPath}`);
+    console.log('Hook: aiwg sync --dry-run --quiet (runs on every new Factory session)');
+  }
+}
+
+// ============================================================================
 // Post-Deployment
 // ============================================================================
 
@@ -463,10 +621,122 @@ export async function postDeploy(targetDir, opts) {
   // Enable custom droids in Factory settings
   enableFactoryCustomDroids(opts.dryRun);
 
+  // Deploy SessionStart hook for AIWG pre-flight checks
+  deployFactoryHooks(opts.dryRun);
+
   // Create/update AGENTS.md if requested
   if (opts.createAgentsMd) {
     createAgentsMd(targetDir, opts.srcRoot, opts.dryRun);
   }
+}
+
+// ============================================================================
+// Factory Plugin Bundle
+// ============================================================================
+
+/**
+ * Generate a .factory-plugin/ bundle for distributing AIWG as a Factory plugin.
+ *
+ * Factory plugins use the structure:
+ *   .factory-plugin/
+ *     plugin.json       — manifest (name, version, description, contents)
+ *     droids/           — agent definitions
+ *     commands/         — command definitions
+ *     skills/           — skill definitions
+ *     rules/            — rule definitions
+ *     hooks.json        — hook configuration
+ *
+ * Invoke via: aiwg use sdlc --provider factory --as-plugin
+ */
+export function generatePluginBundle(targetDir, opts) {
+  const pluginDir = path.join(targetDir, '.factory-plugin');
+  const { dryRun, version } = opts;
+
+  // Read package.json for version info
+  let pkgVersion = version || 'unknown';
+  if (!version) {
+    try {
+      const pkgPath = path.join(opts.srcRoot, 'package.json');
+      if (fs.existsSync(pkgPath)) {
+        const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+        pkgVersion = pkg.version || 'unknown';
+      }
+    } catch (_) { /* use default */ }
+  }
+
+  // Count deployed artifacts
+  const droidDir = path.join(targetDir, paths.agents);
+  const cmdDir = path.join(targetDir, paths.commands);
+  const skillDir = path.join(targetDir, paths.skills);
+  const ruleDir = path.join(targetDir, paths.rules);
+
+  const countFiles = (dir, ext) => {
+    try {
+      return fs.readdirSync(dir).filter(f => f.endsWith(ext || '.md')).length;
+    } catch (_) { return 0; }
+  };
+
+  const droidCount = countFiles(droidDir);
+  const commandCount = countFiles(cmdDir);
+  const ruleCount = countFiles(ruleDir);
+  let skillCount = 0;
+  try {
+    skillCount = fs.readdirSync(skillDir).filter(f =>
+      fs.statSync(path.join(skillDir, f)).isDirectory()
+    ).length;
+  } catch (_) { /* 0 */ }
+
+  // Build plugin manifest
+  const manifest = {
+    name: 'aiwg-sdlc',
+    version: pkgVersion,
+    description: `AIWG SDLC Framework v${pkgVersion} — ${droidCount} droids, ${commandCount} commands, ${skillCount} skills, ${ruleCount} rules. Phase-based SDLC workflows with specialized agents for architecture, security, testing, and deployment.`,
+    author: {
+      name: 'AIWG Contributors',
+      email: 'support@aiwg.io'
+    },
+    homepage: 'https://aiwg.io',
+    repository: 'https://github.com/jmagly/aiwg',
+    license: 'MIT',
+    contents: {
+      droids: droidCount,
+      commands: commandCount,
+      skills: skillCount,
+      rules: ruleCount
+    },
+    hooks: {
+      SessionStart: [
+        {
+          matcher: '*',
+          hooks: [
+            {
+              type: 'command',
+              command: 'aiwg sync --dry-run --quiet'
+            }
+          ]
+        }
+      ]
+    },
+    keywords: [
+      'sdlc', 'software-development', 'project-management',
+      'security', 'testing', 'architecture', 'devops', 'aiwg'
+    ]
+  };
+
+  if (dryRun) {
+    console.log(`[dry-run] Would create ${pluginDir}/plugin.json`);
+    console.log(`[dry-run] Plugin: aiwg-sdlc v${pkgVersion} (${droidCount} droids, ${commandCount} commands, ${skillCount} skills, ${ruleCount} rules)`);
+    return;
+  }
+
+  ensureDir(pluginDir, false);
+  fs.writeFileSync(
+    path.join(pluginDir, 'plugin.json'),
+    JSON.stringify(manifest, null, 2) + '\n',
+    'utf8'
+  );
+  console.log(`Generated Factory plugin manifest: ${pluginDir}/plugin.json`);
+  console.log(`Plugin: aiwg-sdlc v${pkgVersion} (${droidCount} droids, ${commandCount} commands, ${skillCount} skills, ${ruleCount} rules)`);
 }
 
 // ============================================================================
@@ -577,6 +847,12 @@ export async function deploy(opts) {
   // Post-deployment
   await postDeploy(target, { ...opts, createAgentsMd: shouldCreateAgentsMd });
 
+  // Generate Factory plugin bundle if requested
+  if (opts.asPlugin) {
+    console.log('\nGenerating Factory plugin bundle...');
+    generatePluginBundle(target, opts);
+  }
+
   console.log('\n=== Factory deployment complete ===\n');
 }
 
@@ -593,6 +869,7 @@ export default {
   transformAgent,
   transformCommand,
   mapModel,
+  mapReasoningEffort,
   mapToolsToFactory,
   deployAgents,
   deployCommands,
@@ -600,6 +877,8 @@ export default {
   deployRules,
   createAgentsMd,
   enableFactoryCustomDroids,
+  deployFactoryHooks,
+  generatePluginBundle,
   postDeploy,
   getFileExtension,
   deploy

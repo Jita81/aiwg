@@ -220,11 +220,34 @@ enabled_tools = [
       })
     },
     warp: {
-      // Warp Terminal stores MCP config at ~/.warp/mcp.json
-      path: path.join(homeDir, '.warp/mcp.json'),
+      // Warp configures MCP servers via UI only (Settings > AI > MCP Servers)
+      // There is no documented file-based config path
+      path: null,
+      content: null,
+      handler: async () => {
+        console.log(`Warp MCP Server Setup (UI-based)\n`);
+        console.log(`Warp configures MCP servers through its UI, not config files.`);
+        console.log(`\nTo add the AIWG MCP server to Warp:\n`);
+        console.log(`  1. Open Warp Terminal`);
+        console.log(`  2. Go to Settings > AI > MCP Servers`);
+        console.log(`  3. Click "Add MCP Server"`);
+        console.log(`  4. Configure:`);
+        console.log(`       Name:    aiwg`);
+        console.log(`       Type:    stdio`);
+        console.log(`       Command: aiwg`);
+        console.log(`       Args:    mcp serve`);
+        console.log(`  5. Save and restart Warp\n`);
+        console.log(`Alternatively, use Warp's /add-mcp slash command.`);
+        return true;
+      }
+    },
+    vscode: {
+      // VS Code / Copilot stores MCP config in .vscode/mcp.json
+      path: path.join(projectDir === '.' ? process.cwd() : projectDir, '.vscode/mcp.json'),
       content: {
-        mcpServers: {
+        servers: {
           aiwg: {
+            type: 'stdio',
             command: 'aiwg',
             args: ['mcp', 'serve']
           }
@@ -232,11 +255,16 @@ enabled_tools = [
       },
       merge: (existing, content) => ({
         ...existing,
-        mcpServers: {
-          ...(existing.mcpServers || {}),
-          ...content.mcpServers
+        servers: {
+          ...(existing.servers || {}),
+          ...content.servers
         }
       })
+    },
+    copilot: {
+      // Alias for vscode
+      path: path.join(projectDir === '.' ? process.cwd() : projectDir, '.vscode/mcp.json'),
+      alias: 'vscode'
     },
     opencode: {
       // OpenCode stores MCP config in opencode.json at project root or .opencode/
@@ -682,11 +710,13 @@ export async function main(args = process.argv.slice(2)) {
             : path.join(projectDir, '.factory/mcp.json'),
           codex: path.join(homeDir, '.codex/config.toml'),
           openai: path.join(homeDir, '.codex/config.toml'),
+          vscode: '.vscode/mcp.json',
+          copilot: '.vscode/mcp.json',
           opencode: (projectDir === '.' || projectDir === 'global')
             ? 'opencode.json'
             : path.join(projectDir, 'opencode.json'),
           windsurf: path.join(homeDir, '.codeium/windsurf/mcp_config.json'),
-          warp: path.join(homeDir, '.warp/mcp.json')
+          warp: '(UI-based — Settings > AI > MCP Servers)'
         };
         console.log(`[DRY RUN] Config file: ${configPaths[target] || 'unknown'}`);
         break;

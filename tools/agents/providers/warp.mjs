@@ -6,13 +6,14 @@
  * while also deploying discrete files for all 4 artifact types.
  *
  * Deployment paths:
- *   - Agents: .warp/agents/ (discrete) + WARP.md (aggregated)
- *   - Commands: .warp/commands/ (discrete) + WARP.md (aggregated)
- *   - Skills: .warp/skills/ (discrete)
- *   - Rules: .warp/rules/ (discrete)
+ *   - Agents: WARP.md (aggregated only — Warp does not discover .warp/agents/)
+ *   - Commands: WARP.md (aggregated only — Warp does not discover .warp/commands/)
+ *   - Skills: .warp/skills/ (discrete — natively discovered by Warp)
+ *   - Rules: WARP.md (aggregated only — Warp does not discover .warp/rules/)
  *
  * Special features:
- *   - Dual deployment: discrete files + aggregated WARP.md
+ *   - Aggregated WARP.md for agents, commands, and rules
+ *   - Discrete .warp/skills/ for natively discovered skills
  *   - Section preservation (user vs AIWG managed sections in WARP.md)
  *   - Backup creation with timestamp
  *   - CLAUDE.md symlink support
@@ -24,23 +25,15 @@ import { spawn } from 'child_process';
 import {
   ensureDir,
   listMdFiles,
-  listMdFilesRecursive,
   listSkillDirs,
-  writeFile,
-  deployFiles,
   deploySkillDir,
-  parseFrontmatter,
   initializeFrameworkWorkspace,
-  filterAgentFiles,
   getAddonAgentFiles,
   getAddonCommandFiles,
   getAddonSkillDirs,
   getAddonRuleFiles,
   normalizeDeploymentMode,
-  collectFrameworkArtifacts,
-  cleanupOldRuleFiles,
-  filterCommandsAgainstSkills,
-  deploySoulCompanions
+  collectFrameworkArtifacts
 } from './base.mjs';
 
 // ============================================================================
@@ -51,17 +44,16 @@ export const name = 'warp';
 export const aliases = [];
 
 export const paths = {
-  agents: '.warp/agents/',
-  commands: '.warp/commands/',
-  skills: '.warp/skills/',
-  rules: '.warp/rules/'
+  skills: '.warp/skills/'
+  // agents, commands, rules: delivered via aggregated WARP.md only
+  // Warp does not discover .warp/agents/, .warp/commands/, or .warp/rules/
 };
 
 export const support = {
-  agents: 'aggregated',      // Primarily WARP.md, also discrete files
-  commands: 'aggregated',    // Primarily WARP.md, also discrete files
-  skills: 'conventional',    // Discrete files only
-  rules: 'conventional'      // Discrete files only
+  agents: 'aggregated',      // WARP.md only — no discrete .warp/agents/
+  commands: 'aggregated',    // WARP.md only — no discrete .warp/commands/
+  skills: 'native',          // .warp/skills/ — natively discovered by Warp
+  rules: 'aggregated'        // WARP.md only — no discrete .warp/rules/
 };
 
 export const capabilities = {
@@ -157,23 +149,9 @@ export function transformCommand(srcPath, content, opts) {
 // Deployment Functions
 // ============================================================================
 
-/**
- * Deploy agents to .warp/agents/
- */
-export function deployAgents(agentFiles, targetDir, opts) {
-  const destDir = path.join(targetDir, paths.agents);
-  ensureDir(destDir, opts.dryRun);
-  return deployFiles(agentFiles, destDir, opts, transformAgent);
-}
-
-/**
- * Deploy commands to .warp/commands/
- */
-export function deployCommands(commandFiles, targetDir, opts) {
-  const destDir = path.join(targetDir, paths.commands);
-  ensureDir(destDir, opts.dryRun);
-  return deployFiles(commandFiles, destDir, opts, transformCommand);
-}
+// Warp does not discover .warp/agents/, .warp/commands/, or .warp/rules/.
+// Agents, commands, and rules are delivered exclusively via aggregated WARP.md.
+// Only skills (.warp/skills/) are natively discovered.
 
 /**
  * Deploy skills to .warp/skills/
@@ -185,16 +163,6 @@ export function deploySkills(skillDirs, targetDir, opts) {
   for (const skillDir of skillDirs) {
     deploySkillDir(skillDir, destDir, opts);
   }
-}
-
-/**
- * Deploy rules to .warp/rules/
- */
-export function deployRules(ruleFiles, targetDir, opts) {
-  const destDir = path.join(targetDir, paths.rules);
-  ensureDir(destDir, opts.dryRun);
-  cleanupOldRuleFiles(destDir, opts);
-  return deployFiles(ruleFiles, destDir, opts, transformAgent);
 }
 
 /**
@@ -350,49 +318,27 @@ export async function deploy(opts) {
     consolidatedSdlcRules: true
   });
   agentFiles.push(...frameworkArtifacts.agents);
-  const soulFiles = [...(frameworkArtifacts.souls || [])];
   commandFiles.push(...frameworkArtifacts.commands);
   skillDirs.push(...frameworkArtifacts.skills);
   ruleFiles.push(...frameworkArtifacts.rules);
 
-  // Deploy discrete files for all artifact types
-  console.log('\n--- Deploying discrete files ---');
-
-  if (!commandsOnly && !skillsOnly && !rulesOnly) {
-    // Apply filters if specified
-    const filteredAgents = filterAgentFiles(agentFiles, opts);
-    if (opts.filter || opts.filterRole) {
-      console.log(`\nFiltered from ${agentFiles.length} to ${filteredAgents.length} agents`);
-    }
-    console.log(`\nDeploying ${filteredAgents.length} agents...`);
-    deployAgents(filteredAgents, target, opts);
-
-    // Deploy soul companion files alongside agents
-    if (soulFiles.length > 0) {
-      const destDir = path.join(target, paths.agents);
-      console.log(`\nDeploying ${soulFiles.length} soul files...`);
-      deploySoulCompanions(soulFiles, destDir, opts);
-    }
-  }
-
-  // Filter commands that collide with skills (skills take precedence)
-  const filteredCommands = (shouldDeploySkills || skillsOnly)
-    ? filterCommandsAgainstSkills(commandFiles, skillDirs)
-    : commandFiles;
-
-  if (shouldDeployCommands || commandsOnly) {
-    console.log(`\nDeploying ${filteredCommands.length} commands...`);
-    deployCommands(filteredCommands, target, opts);
-  }
+  // Warp only discovers .warp/skills/ natively.
+  // Agents, commands, and rules are delivered via aggregated WARP.md only.
+  console.log('\n--- Deploying discrete files (skills only) ---');
 
   if (shouldDeploySkills || skillsOnly) {
-    console.log(`\nDeploying ${skillDirs.length} skills...`);
+    console.log(`\nDeploying ${skillDirs.length} skills to .warp/skills/...`);
     deploySkills(skillDirs, target, opts);
   }
 
+  if (!commandsOnly && !skillsOnly && !rulesOnly) {
+    console.log(`\nSkipping discrete agent deployment (Warp uses WARP.md)`);
+  }
+  if (shouldDeployCommands || commandsOnly) {
+    console.log(`\nSkipping discrete command deployment (Warp uses WARP.md)`);
+  }
   if (shouldDeployRules || rulesOnly) {
-    console.log(`\nDeploying ${ruleFiles.length} rules...`);
-    deployRules(ruleFiles, target, opts);
+    console.log(`\nSkipping discrete rule deployment (Warp uses WARP.md)`);
   }
 
   // Generate aggregated WARP.md (existing behavior)
@@ -418,10 +364,7 @@ export default {
   transformAgent,
   transformCommand,
   mapModel,
-  deployAgents,
-  deployCommands,
   deploySkills,
-  deployRules,
   deployWarp,
   createAgentsMd,
   postDeploy,

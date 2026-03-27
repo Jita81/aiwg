@@ -77,7 +77,7 @@ All 9 providers receive all 4 artifact types (agents, commands, skills, rules). 
 |----------|--------|-----------------|---------------------|-------|--------|
 | Claude Code | `.claude/agents/` | `.claude/skills/` | `.claude/commands/` | `.claude/rules/` | `aiwg use sdlc` |
 | OpenAI/Codex | `.codex/agents/` | `~/.codex/skills/` | `~/.codex/prompts/` | `.codex/rules/` | `aiwg use sdlc --provider codex` |
-| GitHub Copilot | `.github/agents/` | `.github/skills/` | `.github/agents/` | `.github/copilot-rules/` | `aiwg use sdlc --provider copilot` |
+| GitHub Copilot | `.github/agents/` | `.github/skills/` | `.github/prompts/` | `.github/instructions/` | `aiwg use sdlc --provider copilot` |
 | Factory AI | `.factory/droids/` | `.factory/skills/` | `.factory/commands/` | `.factory/rules/` | `aiwg use sdlc --provider factory` |
 | Cursor | `.cursor/agents/` | `.cursor/skills/` | `.cursor/commands/` | `.cursor/rules/` | `aiwg use sdlc --provider cursor` |
 | OpenCode | `.opencode/agent/` | `.opencode/skill/` | `.opencode/command/` | `.opencode/rule/` | `aiwg use sdlc --provider opencode` |
@@ -87,7 +87,7 @@ All 9 providers receive all 4 artifact types (agents, commands, skills, rules). 
 
 **Special cases:**
 - **Codex**: Skills and generated commands deploy to home directory (`~/.codex/skills/`, `~/.codex/prompts/`) for user-level availability across all projects
-- **Copilot**: Skills are deployed natively; commands are converted to YAML agent format and deployed alongside agents in `.github/agents/`
+- **Copilot**: Agents deploy as `.agent.md` files; commands deploy as `.prompt.md` prompt files in `.github/prompts/`; rules deploy as `.instructions.md` with `applyTo` globs in `.github/instructions/`
 - **Warp**: Agents, skills, and commands are also aggregated into `WARP.md` for single-file context loading
 - **Windsurf**: Agents are aggregated into `AGENTS.md` at project root
 - **OpenClaw**: All artifacts deploy to home directory (`~/.openclaw/`). First provider to support behaviors (`~/.openclaw/behaviors/`)

@@ -14,7 +14,7 @@
  * - Copilot:  .github/agents/ (.agent.md), .github/prompts/ (.prompt.md), .github/skills/, .github/instructions/ (.instructions.md)
  * - Cursor:   .cursor/agents/, .cursor/commands/, .cursor/skills/, .cursor/rules/
  * - OpenCode: .opencode/agent/, .opencode/command/, .opencode/skill/, .opencode/rule/
- * - Warp:     .warp/agents/, .warp/commands/, .warp/skills/, .warp/rules/ + WARP.md
+ * - Warp:     .warp/skills/ (native) + WARP.md (aggregated agents/commands/rules)
  * - Windsurf: .windsurf/workflows/, .windsurf/skills/, .windsurf/rules/, .agents/skills/ + AGENTS.md (aggregated agents), .windsurfrules (deprecated stub)
  */
 
@@ -112,7 +112,7 @@ const PROVIDERS: Record<string, ProviderConfig> = {
   },
   warp: {
     name: 'warp',
-    projectPaths: ['.warp/agents', '.warp/commands', '.warp/skills', '.warp/rules'],
+    projectPaths: ['.warp/skills'],  // Only skills are natively discovered; agents/commands/rules via WARP.md
     rootFiles: ['WARP.md'],
     forbiddenPaths: ['.claude/agents'],
     fileExtension: '.md',
@@ -562,7 +562,7 @@ describe.skipIf(!GIT_INIT_AVAILABLE)('Consolidated Rules Deployment', () => {
 
   it('deploys consolidated rules for all file-copy providers', async () => {
     // Test representative file-copy providers
-    const fileCopyProviders = ['claude', 'factory', 'opencode', 'warp'];
+    const fileCopyProviders = ['claude', 'factory', 'opencode']; // warp delivers rules via WARP.md, not discrete files
 
     for (const provider of fileCopyProviders) {
       const env = await createTestEnv(`consolidated-${provider}`);

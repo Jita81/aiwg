@@ -1,19 +1,21 @@
 /**
  * GitHub Copilot Provider
  *
- * Deploys agents in GitHub Copilot Custom Agent YAML format.
- * Commands are converted to agents since Copilot doesn't have separate commands.
+ * Deploys agents in GitHub Copilot .agent.md format (Markdown with YAML frontmatter).
+ * Commands deploy as prompt files (.prompt.md) in .github/prompts/.
+ * Rules deploy as path-scoped instructions (.instructions.md) in .github/instructions/.
  *
  * Deployment paths:
- *   - Agents: .github/agents/
- *   - Commands: .github/agents/ (as agents)
+ *   - Agents: .github/agents/ (.agent.md)
+ *   - Commands: .github/prompts/ (.prompt.md)
  *   - Skills: .github/skills/
- *   - Rules: .github/copilot-rules/
+ *   - Rules: .github/instructions/ (.instructions.md)
  *
  * Special features:
- *   - YAML format output (.yaml extension)
- *   - Temperature and max_tokens per category
- *   - Tool mapping to Copilot equivalents
+ *   - .agent.md format with YAML frontmatter + markdown body
+ *   - .prompt.md format for commands (invocable as /command in Copilot Chat)
+ *   - .instructions.md format with applyTo globs for path-scoped rules
+ *   - Tool mapping to Copilot built-in tools
  *   - Creates copilot-instructions.md
  */
 
@@ -49,23 +51,23 @@ export const aliases = [];
 
 export const paths = {
   agents: '.github/agents/',
-  commands: '.github/agents/',  // Commands become agents
+  commands: '.github/prompts/',
   skills: '.github/skills/',
-  rules: '.github/copilot-rules/'
+  rules: '.github/instructions/'
 };
 
 export const support = {
   agents: 'native',
-  commands: 'conventional',
+  commands: 'native',
   skills: 'conventional',
-  rules: 'conventional'
+  rules: 'native'
 };
 
 export const capabilities = {
   skills: true,
   rules: true,
   aggregatedOutput: false,
-  yamlFormat: true
+  yamlFormat: false
 };
 
 // ============================================================================
@@ -73,12 +75,14 @@ export const capabilities = {
 // ============================================================================
 
 /**
- * Map model shorthand to GitHub Copilot format (GPT models)
+ * Map model shorthand to GitHub Copilot format.
+ * Copilot now supports Claude models (claude-opus-4-5, claude-sonnet-4-5)
+ * alongside GPT models (gpt-4o, gpt-4o-mini).
  */
 export function mapModel(originalModel, modelCfg, modelsConfig) {
   const copilotModels = {
-    'opus': 'gpt-4',
-    'sonnet': 'gpt-4',
+    'opus': 'claude-opus-4-5',
+    'sonnet': 'gpt-4o',
     'haiku': 'gpt-4o-mini'
   };
 
@@ -104,27 +108,30 @@ export function mapModel(originalModel, modelCfg, modelsConfig) {
 // ============================================================================
 
 /**
- * Get Copilot tools based on category and original tools
+ * Get Copilot tools based on category and original tools.
+ * Uses Copilot's built-in tool names (search/codebase, edit, web/fetch, agent, terminal).
  */
 export function getTools(category, toolsString) {
-  // Map AIWG tools to GitHub Copilot tools
+  // Map AIWG tools to GitHub Copilot built-in tools
   const toolMap = {
-    'Read': 'search',
-    'Write': 'createFile',
-    'MultiEdit': 'editFiles',
-    'Bash': 'runInTerminal',
-    'WebFetch': 'fetch',
-    'Glob': 'search',
-    'Grep': 'search',
-    'Task': 'runSubagent'
+    'Read': 'search/codebase',
+    'Write': 'edit',
+    'MultiEdit': 'edit',
+    'Edit': 'edit',
+    'Bash': 'terminal',
+    'WebFetch': 'web/fetch',
+    'Glob': 'search/codebase',
+    'Grep': 'search/codebase',
+    'Task': 'agent',
+    'Agent': 'agent'
   };
 
   // Default tools by category
   const categoryDefaults = {
-    analysis: ['search', 'fetch', 'githubRepo', 'problems'],
-    documentation: ['search', 'createFile', 'editFiles', 'fetch'],
-    planning: ['search', 'fetch', 'githubRepo', 'todos'],
-    implementation: ['createFile', 'createDirectory', 'editFiles', 'deleteFile', 'search', 'runInTerminal', 'fetch', 'runSubagent', 'todos', 'problems', 'changes']
+    analysis: ['search/codebase', 'web/fetch'],
+    documentation: ['search/codebase', 'edit', 'web/fetch'],
+    planning: ['search/codebase', 'web/fetch'],
+    implementation: ['search/codebase', 'edit', 'terminal', 'web/fetch', 'agent']
   };
 
   // If tools specified, map them
@@ -142,7 +149,8 @@ export function getTools(category, toolsString) {
 
     const mappedTools = new Set();
     for (const tool of originalTools) {
-      const mapped = toolMap[tool];
+      const cleanTool = tool.replace(/\(.*\)/, '').trim();
+      const mapped = toolMap[cleanTool];
       if (mapped) mappedTools.add(mapped);
     }
 
@@ -160,7 +168,8 @@ export function getTools(category, toolsString) {
 // ============================================================================
 
 /**
- * Transform AIWG agent to GitHub Copilot Custom Agent YAML format
+ * Transform AIWG agent to GitHub Copilot .agent.md format.
+ * Output: YAML frontmatter with name, description, tools, model + markdown body (system prompt).
  */
 export function transformAgent(srcPath, content, opts) {
   const { modelsConfig = {} } = opts;
@@ -187,70 +196,163 @@ export function transformAgent(srcPath, content, opts) {
   // Get Copilot-specific tools
   const copilotTools = getTools(category, toolsMatch);
 
-  // Temperature based on category
-  const temperature = category === 'analysis' ? 0.2 : category === 'documentation' ? 0.4 : 0.3;
-  const maxTokens = category === 'implementation' ? 8000 : 4000;
+  // Build YAML frontmatter
+  const fmLines = [
+    '---',
+    `name: ${name || 'aiwg-agent'}`,
+    `description: ${description || 'AIWG SDLC agent'}`
+  ];
 
-  // Generate Copilot agent YAML
-  let copilotYaml = `name: ${name || 'aiwg-agent'}
-description: ${description || 'AIWG SDLC agent'}
-model:
-  name: ${copilotModel}
-  temperature: ${temperature}
-  max_tokens: ${maxTokens}`;
-
-  // Add tools if applicable
   if (copilotTools.length > 0) {
-    copilotYaml += `\ntools: ${JSON.stringify(copilotTools)}`;
+    fmLines.push(`tools: [${copilotTools.map(t => `'${t}'`).join(', ')}]`);
   }
 
-  // Add instructions from body
+  fmLines.push(`model: ${copilotModel}`);
+  fmLines.push('---');
+
+  // Body is the system prompt (markdown)
   const cleanBody = body.trim();
-  if (cleanBody) {
-    const escapedBody = cleanBody.replace(/\\/g, '\\\\');
-    copilotYaml += `\ninstructions: |\n${escapedBody.split('\n').map(line => '  ' + line).join('\n')}`;
-  }
-
-  return copilotYaml;
+  return fmLines.join('\n') + '\n\n' + cleanBody + '\n';
 }
 
 /**
- * Transform AIWG command to GitHub Copilot agent format
+ * Transform AIWG command to GitHub Copilot .prompt.md format.
+ * Output: YAML frontmatter with name, description, model, tools + markdown body.
+ * Users invoke via /command-name in Copilot Chat.
  */
 export function transformCommand(srcPath, content, opts) {
+  const { modelsConfig = {} } = opts;
+
   // Parse existing frontmatter
   const fmMatch = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
   if (!fmMatch) {
-    // No frontmatter, create simple agent format
+    // No frontmatter, create simple prompt format
     const firstLine = content.split('\n')[0];
     const description = firstLine.replace(/^#\s*/, '').trim() || 'AIWG command';
-    const name = toKebabCase(description);
+    const cmdName = toKebabCase(description);
 
-    return `name: ${name}
-description: ${description}
-model:
-  name: gpt-4
-  temperature: 0.3
-  max_tokens: 4000
-instructions: |
-${content.split('\n').map(line => '  ' + line).join('\n')}`;
+    return `---\nname: ${cmdName}\ndescription: ${description}\nmodel: gpt-4o\n---\n\n${content.trim()}\n`;
   }
 
   const [, frontmatter, body] = fmMatch;
 
   // Extract metadata
   const description = frontmatter.match(/description:\s*(.+)/)?.[1]?.trim();
-  const name = toKebabCase(description || 'aiwg-command');
+  const argumentHint = frontmatter.match(/argument-hint:\s*(.+)/)?.[1]?.trim()?.replace(/^["']|["']$/g, '');
+  const modelMatch = frontmatter.match(/model:\s*(.+)/)?.[1]?.trim();
+  const toolsMatch = frontmatter.match(/(?:allowed-tools|tools):\s*(.+)/)?.[1]?.trim();
+  const cmdName = toKebabCase(description || 'aiwg-command');
 
-  // Build Copilot command as simple agent
-  return `name: ${name}
-description: ${description || 'AIWG command'}
-model:
-  name: gpt-4
-  temperature: 0.3
-  max_tokens: 4000
-instructions: |
-${body.trim().split('\n').map(line => '  ' + line).join('\n')}`;
+  // Map model
+  const copilotModel = mapModel(modelMatch, opts, modelsConfig);
+
+  // Map tools from allowed-tools
+  const copilotTools = getTools('implementation', toolsMatch);
+
+  // Build YAML frontmatter
+  const fmLines = [
+    '---',
+    `name: ${cmdName}`,
+    `description: ${description || 'AIWG command'}`
+  ];
+
+  if (copilotTools.length > 0) {
+    fmLines.push(`tools: [${copilotTools.map(t => `'${t}'`).join(', ')}]`);
+  }
+
+  fmLines.push(`model: ${copilotModel}`);
+
+  if (argumentHint) {
+    fmLines.push(`argument-hint: "${argumentHint}"`);
+  }
+
+  fmLines.push('---');
+
+  const cleanBody = body.trim();
+  return fmLines.join('\n') + '\n\n' + cleanBody + '\n';
+}
+
+/**
+ * Transform AIWG rule to GitHub Copilot .instructions.md format.
+ * Output: YAML frontmatter with name, description, applyTo + rule body.
+ */
+export function transformRule(srcPath, content, opts) {
+  // Rules may have frontmatter or be plain markdown
+  let frontmatter = '';
+  let body = content;
+
+  const fmMatch = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+  if (fmMatch) {
+    frontmatter = fmMatch[1];
+    body = fmMatch[2];
+  }
+
+  // Extract name from frontmatter or first heading
+  let name = frontmatter && frontmatter.match(/name:\s*(.+)/)?.[1]?.trim();
+  if (!name) {
+    const headingMatch = body.match(/^#\s+(.+)/m);
+    name = headingMatch ? headingMatch[1].trim() : path.basename(srcPath, '.md');
+  }
+
+  // Extract description from frontmatter or first bold line
+  let description = frontmatter && frontmatter.match(/description:\s*(.+)/)?.[1]?.trim();
+  if (!description) {
+    const scopeMatch = body.match(/\*\*(?:Scope|Summary)\*\*:\s*(.+)/);
+    description = scopeMatch ? scopeMatch[1].trim() : name;
+  }
+
+  // Derive applyTo from rule content or filename
+  const applyTo = deriveApplyTo(srcPath, body);
+
+  // Build instructions format
+  const fmLines = [
+    '---',
+    `name: ${name}`,
+    `description: ${description}`
+  ];
+
+  if (applyTo) {
+    fmLines.push(`applyTo: '${applyTo}'`);
+  }
+
+  fmLines.push('---');
+
+  const cleanBody = body.trim();
+  return fmLines.join('\n') + '\n\n' + cleanBody + '\n';
+}
+
+/**
+ * Derive applyTo glob patterns from rule content and filename.
+ */
+function deriveApplyTo(srcPath, body) {
+  const filename = path.basename(srcPath).toLowerCase();
+  const content = body.toLowerCase();
+
+  // Security rules apply to code files
+  if (filename.includes('security') || filename.includes('token') ||
+      content.includes('vulnerability') || content.includes('owasp')) {
+    return '**/*.{ts,js,mjs,cjs,py,go,java,rs}';
+  }
+
+  // Documentation rules apply to markdown
+  if (filename.includes('diagram') || filename.includes('documentation') ||
+      filename.includes('doc-') || content.includes('documentation artifact')) {
+    return '**/*.md';
+  }
+
+  // Agent/deployment rules apply to agent definitions
+  if (filename.includes('agent-deployment') || filename.includes('agent-')) {
+    return '**/*.{md,yaml,yml}';
+  }
+
+  // Code style/implementation rules
+  if (filename.includes('code') || filename.includes('implementation') ||
+      filename.includes('test') || filename.includes('lint')) {
+    return '**/*.{ts,js,mjs,cjs}';
+  }
+
+  // Default: apply to all files
+  return '**/*';
 }
 
 // ============================================================================
@@ -258,21 +360,21 @@ ${body.trim().split('\n').map(line => '  ' + line).join('\n')}`;
 // ============================================================================
 
 /**
- * Deploy agents to .github/agents/
+ * Deploy agents to .github/agents/ as .agent.md files
  */
 export function deployAgents(agentFiles, targetDir, opts) {
   const destDir = path.join(targetDir, paths.agents);
   ensureDir(destDir, opts.dryRun);
-  return deployFiles(agentFiles, destDir, { ...opts, fileExtension: '.yaml' }, transformAgent);
+  return deployFiles(agentFiles, destDir, { ...opts, fileExtension: '.agent.md' }, transformAgent);
 }
 
 /**
- * Deploy commands to .github/agents/ (as agents)
+ * Deploy commands to .github/prompts/ as .prompt.md files
  */
 export function deployCommands(commandFiles, targetDir, opts) {
   const destDir = path.join(targetDir, paths.commands);
   ensureDir(destDir, opts.dryRun);
-  return deployFiles(commandFiles, destDir, { ...opts, fileExtension: '.yaml' }, transformCommand);
+  return deployFiles(commandFiles, destDir, { ...opts, fileExtension: '.prompt.md' }, transformCommand);
 }
 
 /**
@@ -287,13 +389,13 @@ export function deploySkills(skillDirs, targetDir, opts) {
 }
 
 /**
- * Deploy rules to .github/copilot-rules/
+ * Deploy rules to .github/instructions/ as .instructions.md files
  */
 export function deployRules(ruleFiles, targetDir, opts) {
   const destDir = path.join(targetDir, paths.rules);
   ensureDir(destDir, opts.dryRun);
   cleanupOldRuleFiles(destDir, opts);
-  return deployFiles(ruleFiles, destDir, opts, transformAgent);
+  return deployFiles(ruleFiles, destDir, { ...opts, fileExtension: '.instructions.md' }, transformRule);
 }
 
 // ============================================================================
@@ -365,7 +467,12 @@ export async function postDeploy(targetDir, opts) {
 // ============================================================================
 
 export function getFileExtension(type) {
-  return '.yaml';
+  switch (type) {
+    case 'agent': return '.agent.md';
+    case 'command': return '.prompt.md';
+    case 'rule': return '.instructions.md';
+    default: return '.md';
+  }
 }
 
 // ============================================================================
@@ -429,7 +536,7 @@ export async function deploy(opts) {
 
   // Deploy
   if (!commandsOnly && !skillsOnly && !rulesOnly) {
-    console.log(`\nDeploying ${agentFiles.length} agents (YAML format)...`);
+    console.log(`\nDeploying ${agentFiles.length} agents (.agent.md format)...`);
     deployAgents(agentFiles, target, opts);
 
     // Deploy soul companion files alongside agents
@@ -446,7 +553,7 @@ export async function deploy(opts) {
     : commandFiles;
 
   if (shouldDeployCommands || commandsOnly) {
-    console.log(`\nDeploying ${filteredCommands.length} commands as agents (YAML format)...`);
+    console.log(`\nDeploying ${filteredCommands.length} commands (.prompt.md format)...`);
     deployCommands(filteredCommands, target, opts);
   }
 
@@ -477,6 +584,7 @@ export default {
   capabilities,
   transformAgent,
   transformCommand,
+  transformRule,
   mapModel,
   getTools,
   deployAgents,

@@ -102,7 +102,8 @@ function parseArgs() {
     save: false,            // Save model config to project models.json
     saveUser: false,        // Save model config to ~/.config/aiwg/models.json
     verbose: false,         // Show per-file deployment details
-    quiet: false            // Suppress all non-error output (for embedding in use.ts)
+    quiet: false,           // Suppress all non-error output (for embedding in use.ts)
+    asPlugin: false         // Generate .factory-plugin/ bundle (Factory provider only)
   };
   for (let i = 0; i < args.length; i++) {
     const a = args[i];
@@ -130,6 +131,7 @@ function parseArgs() {
     else if (a === '--save-user') cfg.saveUser = true;
     else if (a === '--verbose' || a === '-v') cfg.verbose = true;
     else if (a === '--quiet' || a === '-q') cfg.quiet = true;
+    else if (a === '--as-plugin') cfg.asPlugin = true;
     else if (a === '--help' || a === '-h') {
       printHelp();
       process.exit(0);
@@ -484,7 +486,8 @@ function deepMerge(target, source) {
     filterRole: cfg.filterRole,
     save: cfg.save,
     saveUser: cfg.saveUser,
-    verbose: cfg.verbose
+    verbose: cfg.verbose,
+    asPlugin: cfg.asPlugin
   };
 
   // Delegate to provider

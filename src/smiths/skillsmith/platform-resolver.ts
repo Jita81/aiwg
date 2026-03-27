@@ -44,8 +44,7 @@ const PLATFORM_CONFIGS: Record<Platform, PlatformSkillConfig> = {
   warp: {
     baseDir: '.warp/skills',
     extension: '.md',
-    supportsSkills: false,
-    alternativeStrategy: 'command',
+    supportsSkills: true,
   },
   windsurf: {
     baseDir: '.windsurf/skills',

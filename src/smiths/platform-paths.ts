@@ -22,7 +22,7 @@ export function getCommandsDirectory(platform: Platform, projectPath: string): s
     'codex': '.codex/commands',
     'copilot': '.github/agents',
     'opencode': '.opencode/command',
-    'warp': '.warp/commands',
+    'warp': '.warp/commands', // Not natively discovered — content delivered via WARP.md
     'windsurf': '.windsurf/workflows',
     'generic': 'commands',
   };
@@ -44,7 +44,7 @@ export function getAgentsDirectory(platform: Platform, projectPath: string): str
     'codex': '.codex/agents',
     'copilot': '.github/agents',
     'opencode': '.opencode/agent',
-    'warp': '.warp/agents',
+    'warp': '.warp/agents', // Not natively discovered — content delivered via WARP.md
     'windsurf': '.windsurf/agents',
     'generic': 'agents',
   };
@@ -101,7 +101,7 @@ export function getRulesDirectory(platform: Platform, projectPath: string): stri
     'codex': '.codex/rules',
     'copilot': '.github/copilot-rules',
     'opencode': '.opencode/rule',
-    'warp': '.warp/rules',
+    'warp': '.warp/rules', // Not natively discovered — content delivered via WARP.md
     'windsurf': '.windsurf/rules',
     'generic': 'rules',
   };
