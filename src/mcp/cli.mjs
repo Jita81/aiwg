@@ -10,6 +10,12 @@ import { startServer, createServer } from './server.mjs';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import {
+  McpServerRegistry,
+  injectServers,
+  SUPPORTED_PROVIDERS,
+  getProviderConfigPath,
+} from './registry.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -22,43 +28,56 @@ AIWG MCP Server
 
 Usage:
   aiwg mcp serve [options]     Start the MCP server
-  aiwg mcp install [target]    Generate MCP client configuration
+  aiwg mcp install [target]    Install AIWG MCP server into a provider
   aiwg mcp info                Show server capabilities
 
-Options:
+  aiwg mcp add <name> [opts]   Define an MCP server in the registry
+  aiwg mcp remove <name>       Remove a server from the registry
+  aiwg mcp update <name> [opts]  Update a server definition
+  aiwg mcp list                List registered MCP servers
+  aiwg mcp inject [opts]       Inject servers into provider configs
+
+Server Options (for add/update):
+  --url <url>          Server URL (for http/sse types)
+  --type <type>        Server type: http (default), stdio, sse
+  --command <cmd>      Command to run (for stdio type)
+  --args <a1,a2,...>   Command arguments (comma-separated, for stdio)
+  --env <K=V,...>      Environment variables (comma-separated K=V pairs)
+  --headers <K=V,...>  HTTP headers (comma-separated K=V pairs)
+  --description <text> Optional description
+
+Inject Options:
+  --provider <name>    Target provider (claude-code, cursor, factory, codex, opencode, windsurf, warp)
+  --all                Inject into all previously configured providers
+  --servers <a,b,...>  Only inject specific servers (comma-separated names)
+  --dry-run            Show what would change without writing
+
+Serve Options:
   --transport <type>   Transport type: stdio (default), http
   --port <number>      Port for HTTP transport (default: 3100)
-  --help               Show this help message
-
-Targets for 'install':
-  claude    Generate config for Claude Code (.claude/settings.local.json)
-  factory   Generate config for Factory AI (~/.factory/mcp.json)
-  codex     Generate config for OpenAI Codex (~/.codex/config.toml)
-  cursor    Generate config for Cursor (.cursor/mcp.json)
-  opencode  Generate config for OpenCode (opencode.json)
-  windsurf  Generate config for Windsurf (~/.codeium/windsurf/mcp_config.json)
-  warp      Generate config for Warp Terminal (~/.warp/mcp.json)
 
 Examples:
-  # Start MCP server with stdio (default)
-  aiwg mcp serve
+  # Define MCP servers
+  aiwg mcp add fortemi --url https://memory.s9.internal/mcp --type http
+  aiwg mcp add gitea --url https://mcp-gitea.integrolabs.net/mcp
+  aiwg mcp add mytools --type stdio --command npx --args mcp-server-mytools
 
-  # Start MCP server with HTTP transport
-  aiwg mcp serve --transport http --port 3100
+  # Inject into provider configs
+  aiwg mcp inject --provider claude-code
+  aiwg mcp inject --provider cursor --servers fortemi,gitea
+  aiwg mcp inject --all
 
-  # Generate Claude Code MCP configuration
+  # Update a server URL
+  aiwg mcp update fortemi --url https://new-url.internal/mcp
+  aiwg mcp inject --all   # re-inject to all providers
+
+  # List and manage
+  aiwg mcp list
+  aiwg mcp remove fortemi
+
+  # Install AIWG's own MCP server
   aiwg mcp install claude
-
-  # Generate Factory AI MCP configuration
-  aiwg mcp install factory
-
-  # Generate project-specific Factory MCP config
-  aiwg mcp install factory /path/to/project
-
-  # Generate OpenCode MCP configuration
-  aiwg mcp install opencode
-
-  # Show server capabilities
+  aiwg mcp serve
   aiwg mcp info
 `);
 }
@@ -377,14 +396,257 @@ For more information:
 `);
 }
 
+// ============================================
+// Registry subcommand handlers
+// ============================================
+
+/**
+ * Parse --key value pairs from args
+ */
+function parseFlag(args, flag) {
+  const idx = args.indexOf(flag);
+  if (idx === -1 || idx + 1 >= args.length) return undefined;
+  return args[idx + 1];
+}
+
+/**
+ * Parse comma-separated key=value pairs into an object
+ */
+function parseKVPairs(str) {
+  if (!str) return undefined;
+  const result = {};
+  for (const pair of str.split(',')) {
+    const eqIdx = pair.indexOf('=');
+    if (eqIdx === -1) continue;
+    result[pair.slice(0, eqIdx).trim()] = pair.slice(eqIdx + 1).trim();
+  }
+  return Object.keys(result).length > 0 ? result : undefined;
+}
+
+/**
+ * Handle `aiwg mcp add <name> [opts]`
+ */
+async function handleAdd(args) {
+  const positional = args.filter(a => !a.startsWith('--'));
+  const name = positional[0];
+
+  if (!name) {
+    console.error('Usage: aiwg mcp add <name> --url <url> [--type http|stdio|sse] [--command <cmd>] [--args <a,b>]');
+    process.exit(1);
+  }
+
+  const type = parseFlag(args, '--type') || 'http';
+  const url = parseFlag(args, '--url');
+  const command = parseFlag(args, '--command');
+  const argsStr = parseFlag(args, '--args');
+  const envStr = parseFlag(args, '--env');
+  const headersStr = parseFlag(args, '--headers');
+  const description = parseFlag(args, '--description');
+
+  if (type === 'stdio' && !command) {
+    console.error('Error: --command is required for stdio type servers');
+    process.exit(1);
+  }
+  if ((type === 'http' || type === 'sse') && !url) {
+    console.error(`Error: --url is required for ${type} type servers`);
+    process.exit(1);
+  }
+
+  const registry = new McpServerRegistry();
+  await registry.add({
+    name,
+    type,
+    url,
+    command,
+    args: argsStr ? argsStr.split(',') : undefined,
+    env: parseKVPairs(envStr),
+    headers: parseKVPairs(headersStr),
+    description,
+  });
+
+  console.log(`Added MCP server: ${name}`);
+  if (url) console.log(`  URL: ${url}`);
+  if (command) console.log(`  Command: ${command}`);
+  console.log(`  Type: ${type}`);
+  console.log(`\nUse "aiwg mcp inject --provider <name>" to inject into a provider config.`);
+}
+
+/**
+ * Handle `aiwg mcp remove <name>`
+ */
+async function handleRemove(args) {
+  const name = args.filter(a => !a.startsWith('--'))[0];
+  if (!name) {
+    console.error('Usage: aiwg mcp remove <name>');
+    process.exit(1);
+  }
+
+  const registry = new McpServerRegistry();
+  await registry.remove(name);
+  console.log(`Removed MCP server: ${name}`);
+  console.log(`\nNote: This does not remove the server from provider configs.`);
+  console.log(`Re-run "aiwg mcp inject --all" to update provider configs.`);
+}
+
+/**
+ * Handle `aiwg mcp update <name> [opts]`
+ */
+async function handleUpdate(args) {
+  const positional = args.filter(a => !a.startsWith('--'));
+  const name = positional[0];
+
+  if (!name) {
+    console.error('Usage: aiwg mcp update <name> --url <url> [--type <type>] ...');
+    process.exit(1);
+  }
+
+  const updates = {};
+  const url = parseFlag(args, '--url');
+  const type = parseFlag(args, '--type');
+  const command = parseFlag(args, '--command');
+  const argsStr = parseFlag(args, '--args');
+  const envStr = parseFlag(args, '--env');
+  const headersStr = parseFlag(args, '--headers');
+  const description = parseFlag(args, '--description');
+
+  if (url !== undefined) updates.url = url;
+  if (type !== undefined) updates.type = type;
+  if (command !== undefined) updates.command = command;
+  if (argsStr !== undefined) updates.args = argsStr.split(',');
+  if (envStr !== undefined) updates.env = parseKVPairs(envStr);
+  if (headersStr !== undefined) updates.headers = parseKVPairs(headersStr);
+  if (description !== undefined) updates.description = description;
+
+  if (Object.keys(updates).length === 0) {
+    console.error('No updates provided. Use --url, --type, --command, etc.');
+    process.exit(1);
+  }
+
+  const registry = new McpServerRegistry();
+  await registry.update(name, updates);
+  console.log(`Updated MCP server: ${name}`);
+  for (const [key, value] of Object.entries(updates)) {
+    console.log(`  ${key}: ${typeof value === 'object' ? JSON.stringify(value) : value}`);
+  }
+  console.log(`\nRe-run "aiwg mcp inject --all" to propagate changes to provider configs.`);
+}
+
+/**
+ * Handle `aiwg mcp list` (managed servers from registry)
+ */
+async function handleList() {
+  const registry = new McpServerRegistry();
+  const servers = await registry.list();
+
+  if (servers.length === 0) {
+    console.log('No MCP servers registered.');
+    console.log('\nUse "aiwg mcp add <name> --url <url>" to add one.');
+    return;
+  }
+
+  console.log(`MCP Servers (${servers.length}):\n`);
+
+  for (const server of servers) {
+    console.log(`  ${server.name}`);
+    console.log(`    Type: ${server.type}`);
+    if (server.url) console.log(`    URL: ${server.url}`);
+    if (server.command) console.log(`    Command: ${server.command}${server.args ? ' ' + server.args.join(' ') : ''}`);
+    if (server.description) console.log(`    Description: ${server.description}`);
+    if (server.injectedProviders && server.injectedProviders.length > 0) {
+      console.log(`    Injected into: ${server.injectedProviders.join(', ')}`);
+    }
+    console.log('');
+  }
+
+  console.log(`Registry: ${registry.getPath()}`);
+}
+
+/**
+ * Handle `aiwg mcp inject [opts]`
+ */
+async function handleInject(args) {
+  const provider = parseFlag(args, '--provider');
+  const injectAll = args.includes('--all');
+  const serversStr = parseFlag(args, '--servers');
+  const dryRun = args.includes('--dry-run');
+  const projectDir = parseFlag(args, '--project') || '.';
+
+  if (!provider && !injectAll) {
+    console.error('Usage: aiwg mcp inject --provider <name> [--servers a,b] [--dry-run]');
+    console.error('       aiwg mcp inject --all [--dry-run]');
+    console.error(`\nSupported providers: ${SUPPORTED_PROVIDERS.join(', ')}`);
+    process.exit(1);
+  }
+
+  const registry = new McpServerRegistry();
+  const serverFilter = serversStr ? serversStr.split(',').map(s => s.trim()) : undefined;
+
+  let providers;
+  if (injectAll) {
+    // Get all previously injected providers, or all supported if none yet
+    providers = await registry.getInjectedProviders();
+    if (providers.length === 0) {
+      console.error('No providers have been injected before. Use --provider <name> first.');
+      process.exit(1);
+    }
+  } else {
+    // Normalize provider name
+    const normalized = provider === 'claude' ? 'claude-code' : provider;
+    if (!SUPPORTED_PROVIDERS.includes(normalized) && normalized !== 'openai') {
+      console.error(`Unknown provider: ${provider}`);
+      console.error(`Supported providers: ${SUPPORTED_PROVIDERS.join(', ')}`);
+      process.exit(1);
+    }
+    providers = [normalized];
+  }
+
+  if (dryRun) {
+    console.log('[DRY RUN] Would inject servers into:');
+  }
+
+  let totalInjected = 0;
+
+  for (const p of providers) {
+    const result = await injectServers(registry, p, {
+      servers: serverFilter,
+      projectDir,
+      dryRun,
+    });
+
+    if (result.error) {
+      console.error(`  ${p}: ${result.error}`);
+      continue;
+    }
+
+    const prefix = dryRun ? '[DRY RUN] ' : '';
+    console.log(`${prefix}${p}: ${result.configPath}`);
+    if (result.serversInjected.length > 0) {
+      console.log(`  ${prefix}Injected: ${result.serversInjected.join(', ')}`);
+      totalInjected += result.serversInjected.length;
+    }
+    if (result.alreadyPresent.length > 0) {
+      console.log(`  ${prefix}Updated in place: ${result.alreadyPresent.join(', ')}`);
+    }
+  }
+
+  if (!dryRun && totalInjected > 0) {
+    console.log(`\nDone. Restart your provider(s) to pick up the changes.`);
+  }
+}
+
+// ============================================
+// Main CLI entry point
+// ============================================
+
 /**
  * Main CLI entry point
  */
 export async function main(args = process.argv.slice(2)) {
   const command = args[0];
+  const subArgs = args.slice(1);
 
   switch (command) {
-    case 'serve':
+    case 'serve': {
       // Parse options
       const transportIdx = args.indexOf('--transport');
       const transport = transportIdx !== -1 ? args[transportIdx + 1] : 'stdio';
@@ -399,8 +661,9 @@ export async function main(args = process.argv.slice(2)) {
 
       await startServer();
       break;
+    }
 
-    case 'install':
+    case 'install': {
       // Parse install arguments (skip flags)
       const installArgs = args.slice(1).filter(a => !a.startsWith('--'));
       const target = installArgs[0] || 'claude';
@@ -431,9 +694,32 @@ export async function main(args = process.argv.slice(2)) {
 
       await generateConfig(target, projectDir);
       break;
+    }
 
     case 'info':
       await showInfo();
+      break;
+
+    case 'add':
+      await handleAdd(subArgs);
+      break;
+
+    case 'remove':
+    case 'rm':
+      await handleRemove(subArgs);
+      break;
+
+    case 'update':
+      await handleUpdate(subArgs);
+      break;
+
+    case 'list':
+    case 'ls':
+      await handleList();
+      break;
+
+    case 'inject':
+      await handleInject(subArgs);
       break;
 
     case '--help':

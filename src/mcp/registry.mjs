@@ -1,0 +1,425 @@
+/**
+ * MCP Server Registry (Runtime ESM)
+ *
+ * Single source of truth for MCP server definitions.
+ * Stores server configs in the user config directory (~/.aiwg/mcp-servers.json)
+ * and injects them into provider-native config formats.
+ *
+ * This is the runtime .mjs version used by cli.mjs.
+ * The .ts version exists for type checking and vitest.
+ *
+ * @implements #554
+ */
+
+import { readFile, writeFile, mkdir } from 'fs/promises';
+import { resolve } from 'path';
+import { homedir } from 'os';
+import { existsSync } from 'fs';
+
+// ============================================
+// Config dir resolution (inlined from user-config.ts)
+// ============================================
+
+function resolveConfigDir(overridePath) {
+  const envOverride = process.env.AIWG_CONFIG;
+  if (overridePath) {
+    return resolve(overridePath);
+  }
+  if (envOverride) {
+    return resolve(envOverride);
+  }
+
+  const primaryPath = resolve(homedir(), '.aiwg');
+  if (existsSync(primaryPath)) {
+    return primaryPath;
+  }
+
+  const fallbackPath = resolve(homedir(), '.config/aiwg');
+  if (existsSync(fallbackPath)) {
+    return fallbackPath;
+  }
+
+  return primaryPath;
+}
+
+// ============================================
+// Registry
+// ============================================
+
+const REGISTRY_FILENAME = 'mcp-servers.json';
+
+const DEFAULT_REGISTRY = {
+  apiVersion: 'aiwg.io/v1',
+  kind: 'McpServerRegistry',
+  servers: {},
+};
+
+export class McpServerRegistry {
+  #configDir;
+  #cache = null;
+
+  constructor(configDirOverride) {
+    this.#configDir = resolveConfigDir(configDirOverride);
+  }
+
+  getPath() {
+    return resolve(this.#configDir, REGISTRY_FILENAME);
+  }
+
+  async load() {
+    if (this.#cache) return this.#cache;
+
+    const filePath = this.getPath();
+    try {
+      const content = await readFile(filePath, 'utf-8');
+      const parsed = JSON.parse(content);
+      this.#cache = {
+        ...DEFAULT_REGISTRY,
+        ...parsed,
+        servers: parsed.servers || {},
+      };
+    } catch {
+      this.#cache = { ...DEFAULT_REGISTRY, servers: {} };
+    }
+
+    return this.#cache;
+  }
+
+  async save() {
+    if (!this.#cache) return;
+    await mkdir(this.#configDir, { recursive: true });
+    const filePath = this.getPath();
+    await writeFile(filePath, JSON.stringify(this.#cache, null, 2) + '\n', 'utf-8');
+  }
+
+  async add(def) {
+    const data = await this.load();
+
+    if (data.servers[def.name]) {
+      throw new Error(`Server "${def.name}" already exists. Use "update" to modify it.`);
+    }
+
+    data.servers[def.name] = {
+      ...def,
+      injectedProviders: [],
+      addedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    await this.save();
+  }
+
+  async remove(name) {
+    const data = await this.load();
+
+    if (!data.servers[name]) {
+      throw new Error(`Server "${name}" not found.`);
+    }
+
+    delete data.servers[name];
+    await this.save();
+  }
+
+  async update(name, updates) {
+    const data = await this.load();
+
+    if (!data.servers[name]) {
+      throw new Error(`Server "${name}" not found.`);
+    }
+
+    data.servers[name] = {
+      ...data.servers[name],
+      ...updates,
+      name,
+      updatedAt: new Date().toISOString(),
+    };
+
+    await this.save();
+  }
+
+  async get(name) {
+    const data = await this.load();
+    return data.servers[name];
+  }
+
+  async list() {
+    const data = await this.load();
+    return Object.values(data.servers);
+  }
+
+  async recordInjection(name, provider) {
+    const data = await this.load();
+    const server = data.servers[name];
+    if (!server) return;
+
+    if (!server.injectedProviders) {
+      server.injectedProviders = [];
+    }
+    if (!server.injectedProviders.includes(provider)) {
+      server.injectedProviders.push(provider);
+    }
+
+    await this.save();
+  }
+
+  async getInjectedProviders() {
+    const data = await this.load();
+    const providers = new Set();
+    for (const server of Object.values(data.servers)) {
+      for (const p of server.injectedProviders || []) {
+        providers.add(p);
+      }
+    }
+    return [...providers];
+  }
+
+  clearCache() {
+    this.#cache = null;
+  }
+}
+
+// ============================================
+// Provider injection logic
+// ============================================
+
+function buildServerConfig(server, provider) {
+  switch (provider) {
+    case 'claude-code':
+    case 'claude': {
+      if (server.type === 'stdio') {
+        return {
+          command: server.command,
+          args: server.args || [],
+          ...(server.env ? { env: server.env } : {}),
+        };
+      }
+      return {
+        url: server.url,
+        ...(server.headers ? { headers: server.headers } : {}),
+      };
+    }
+
+    case 'cursor': {
+      if (server.type === 'stdio') {
+        return {
+          command: server.command,
+          args: server.args || [],
+          ...(server.env ? { env: server.env } : {}),
+        };
+      }
+      return {
+        url: server.url,
+        ...(server.headers ? { headers: server.headers } : {}),
+      };
+    }
+
+    case 'factory': {
+      if (server.type === 'stdio') {
+        return {
+          type: 'stdio',
+          command: server.command,
+          args: server.args || [],
+          disabled: false,
+          ...(server.env ? { env: server.env } : {}),
+        };
+      }
+      return {
+        type: server.type,
+        url: server.url,
+        disabled: false,
+        ...(server.headers ? { headers: server.headers } : {}),
+      };
+    }
+
+    case 'opencode': {
+      if (server.type === 'stdio') {
+        return {
+          type: 'local',
+          command: [server.command, ...(server.args || [])],
+          ...(server.env ? { env: server.env } : {}),
+        };
+      }
+      return {
+        type: 'remote',
+        url: server.url,
+        ...(server.headers ? { headers: server.headers } : {}),
+      };
+    }
+
+    case 'windsurf':
+    case 'warp': {
+      if (server.type === 'stdio') {
+        return {
+          command: server.command,
+          args: server.args || [],
+          ...(server.env ? { env: server.env } : {}),
+        };
+      }
+      return {
+        url: server.url,
+        ...(server.headers ? { headers: server.headers } : {}),
+      };
+    }
+
+    case 'codex':
+    case 'openai':
+      return {};
+
+    default:
+      return {};
+  }
+}
+
+function buildServerToml(server) {
+  const lines = [];
+  lines.push(`[mcp_servers.${server.name}]`);
+
+  if (server.type === 'stdio') {
+    lines.push(`command = "${server.command}"`);
+    if (server.args && server.args.length > 0) {
+      const argsStr = server.args.map(a => `"${a}"`).join(', ');
+      lines.push(`args = [${argsStr}]`);
+    }
+  } else {
+    lines.push(`url = "${server.url}"`);
+  }
+
+  lines.push(`startup_timeout_sec = 10.0`);
+  lines.push(`tool_timeout_sec = 60.0`);
+
+  return lines.join('\n');
+}
+
+export function getProviderConfigPath(provider, projectDir = '.') {
+  const homeDir = process.env.HOME || process.env.USERPROFILE || '';
+
+  const pathMap = {
+    'claude-code': resolve(projectDir, '.claude/settings.local.json'),
+    claude: resolve(projectDir, '.claude/settings.local.json'),
+    cursor: resolve(projectDir, '.cursor/mcp.json'),
+    factory: resolve(homeDir, '.factory/mcp.json'),
+    codex: resolve(homeDir, '.codex/config.toml'),
+    openai: resolve(homeDir, '.codex/config.toml'),
+    opencode: resolve(projectDir, 'opencode.json'),
+    windsurf: resolve(homeDir, '.codeium/windsurf/mcp_config.json'),
+    warp: resolve(homeDir, '.warp/mcp.json'),
+  };
+
+  return pathMap[provider] || '';
+}
+
+export async function injectServers(registry, provider, options = {}) {
+  const { servers: serverFilter, projectDir = '.', dryRun = false } = options;
+  const configPath = getProviderConfigPath(provider, projectDir);
+  const result = {
+    provider,
+    configPath,
+    serversInjected: [],
+    alreadyPresent: [],
+  };
+
+  let allServers = await registry.list();
+  if (serverFilter && serverFilter.length > 0) {
+    allServers = allServers.filter(s => serverFilter.includes(s.name));
+  }
+
+  if (allServers.length === 0) {
+    result.error = 'No servers to inject. Use "aiwg mcp add" first.';
+    return result;
+  }
+
+  if (provider === 'codex' || provider === 'openai') {
+    return injectToml(registry, allServers, configPath, provider, dryRun, result);
+  }
+
+  return injectJson(registry, allServers, configPath, provider, dryRun, result);
+}
+
+async function injectJson(registry, servers, configPath, provider, dryRun, result) {
+  let existing = {};
+  try {
+    const content = await readFile(configPath, 'utf-8');
+    existing = JSON.parse(content);
+  } catch {
+    // File doesn't exist
+  }
+
+  const mcpKey = provider === 'opencode' ? 'mcp' : 'mcpServers';
+  const existingServers = existing[mcpKey] || {};
+  const newServers = { ...existingServers };
+
+  for (const server of servers) {
+    if (existingServers[server.name]) {
+      result.alreadyPresent.push(server.name);
+    }
+    newServers[server.name] = buildServerConfig(server, provider);
+    result.serversInjected.push(server.name);
+  }
+
+  const merged = { ...existing, [mcpKey]: newServers };
+
+  if (!dryRun) {
+    await mkdir(resolve(configPath, '..'), { recursive: true });
+    await writeFile(configPath, JSON.stringify(merged, null, 2) + '\n', 'utf-8');
+
+    for (const server of servers) {
+      await registry.recordInjection(server.name, provider);
+    }
+  }
+
+  return result;
+}
+
+async function injectToml(registry, servers, configPath, provider, dryRun, result) {
+  let existing = '';
+  try {
+    existing = await readFile(configPath, 'utf-8');
+  } catch {
+    // File doesn't exist
+  }
+
+  const sectionsToAdd = [];
+
+  for (const server of servers) {
+    const sectionHeader = `[mcp_servers.${server.name}]`;
+    if (existing.includes(sectionHeader)) {
+      const sectionRegex = new RegExp(
+        `\\[mcp_servers\\.${escapeRegex(server.name)}\\][\\s\\S]*?(?=\\n\\[|$)`,
+      );
+      existing = existing.replace(sectionRegex, buildServerToml(server));
+      result.alreadyPresent.push(server.name);
+    } else {
+      sectionsToAdd.push(buildServerToml(server));
+    }
+    result.serversInjected.push(server.name);
+  }
+
+  if (sectionsToAdd.length > 0) {
+    existing = existing.trimEnd() + '\n\n' + sectionsToAdd.join('\n\n') + '\n';
+  }
+
+  if (!dryRun) {
+    await mkdir(resolve(configPath, '..'), { recursive: true });
+    await writeFile(configPath, existing, 'utf-8');
+
+    for (const server of servers) {
+      await registry.recordInjection(server.name, provider);
+    }
+  }
+
+  return result;
+}
+
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+export const SUPPORTED_PROVIDERS = [
+  'claude-code',
+  'cursor',
+  'factory',
+  'codex',
+  'opencode',
+  'windsurf',
+  'warp',
+];

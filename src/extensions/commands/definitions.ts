@@ -355,7 +355,7 @@ export const mcpCommand: Extension = {
   id: 'mcp',
   type: 'command',
   name: 'MCP',
-  description: 'MCP server operations (serve, install, info)',
+  description: 'MCP server operations (serve, install, add, remove, update, list, inject, info)',
   version: '1.0.0',
   capabilities: ['cli', 'mcp', 'server'],
   keywords: ['mcp', 'server', 'protocol'],
@@ -400,6 +400,33 @@ export const catalogCommand: Extension = {
     template: 'utility',
     argumentHint: '<subcommand>',
     allowedTools: ['Read'],
+  } satisfies CommandMetadata,
+};
+
+// Skills Commands
+
+export const skillsCommand: Extension = {
+  id: 'skills',
+  type: 'command',
+  name: 'Skills Registry',
+  description: 'Skill registry commands (search, info, list, install, publish)',
+  version: '1.0.0',
+  capabilities: ['cli', 'skills', 'registry', 'search', 'install', 'publish'],
+  keywords: ['skills', 'registry', 'search', 'install', 'publish', 'clawhub', 'openclaw'],
+  category: 'catalog',
+  platforms: {
+    claude: 'full',
+    generic: 'full',
+  },
+  deployment: {
+    pathTemplate: '.{platform}/commands/{id}.md',
+    core: true,
+  },
+  metadata: {
+    type: 'command',
+    template: 'utility',
+    argumentHint: '<subcommand>',
+    allowedTools: ['Read', 'Bash'],
   } satisfies CommandMetadata,
 };
 
@@ -1428,12 +1455,79 @@ export const daemonInitCommand: Extension = {
   } satisfies CommandMetadata,
 };
 
+// Config Commands
+
+export const configCommand: Extension = {
+  id: 'config',
+  type: 'command',
+  name: 'Config',
+  description: 'Manage user-level AIWG configuration (get, set, list, validate, reset, path, edit)',
+  version: '1.0.0',
+  capabilities: ['cli', 'configuration', 'user-config', 'preferences'],
+  keywords: ['config', 'configuration', 'settings', 'preferences', 'get', 'set', 'validate'],
+  category: 'config',
+  platforms: {
+    claude: 'full',
+    generic: 'full',
+  },
+  deployment: {
+    pathTemplate: '.{platform}/commands/{id}.md',
+    core: true,
+  },
+  metadata: {
+    type: 'command',
+    template: 'utility',
+    argumentHint: '<get|set|list|validate|reset|path|edit> [key] [value] [--config-dir <path>]',
+    allowedTools: ['Read', 'Write', 'Bash'],
+    executionSteps: [
+      'Parse subcommand and flags',
+      'Resolve config directory (AIWG_CONFIG → --config-dir → ~/.aiwg → ~/.config/aiwg)',
+      'Execute subcommand operation',
+      'Display results',
+    ],
+  } satisfies CommandMetadata,
+};
+
+// Ops Commands
+
+export const opsCommand: Extension = {
+  id: 'ops',
+  type: 'command',
+  name: 'Ops',
+  description: 'Manage ops ecosystem — init workspaces, deploy frameworks, manage multi-repo ops suites',
+  version: '1.0.0',
+  capabilities: ['cli', 'ops', 'infrastructure', 'workspace', 'multi-repo'],
+  keywords: ['ops', 'operations', 'init', 'workspace', 'sysops', 'devops', 'itops'],
+  category: 'ops',
+  platforms: {
+    claude: 'full',
+    generic: 'full',
+  },
+  deployment: {
+    pathTemplate: '.{platform}/commands/{id}.md',
+    core: true,
+  },
+  metadata: {
+    type: 'command',
+    template: 'utility',
+    argumentHint: '<init|status|use|list|push> [options]',
+    allowedTools: ['Bash', 'Read', 'Write'],
+    executionSteps: [
+      'Parse subcommand and options',
+      'Resolve ops workspace from registry',
+      'Execute workspace operation',
+      'Update ops registry',
+      'Display results',
+    ],
+  } satisfies CommandMetadata,
+};
+
 // ============================================
 // Aggregated Exports
 // ============================================
 
 /**
- * All command definitions (52 total)
+ * All command definitions (54 total)
  *
  * Organized by category:
  * - Maintenance (5): help, version, doctor, update, sync
@@ -1455,6 +1549,8 @@ export const daemonInitCommand: Extension = {
  * - Index (1): index
  * - Reproducibility (4): execution-mode, snapshot, checkpoint, reproducibility-validate
  * - Daemon (2): behavior, daemon-init
+ * - Config (1): config
+ * - Ops (1): ops
  */
 export const commandDefinitions: Extension[] = [
   // Maintenance (5)
@@ -1480,8 +1576,9 @@ export const commandDefinitions: Extension[] = [
   // MCP (1)
   mcpCommand,
 
-  // Catalog (1)
+  // Catalog (2)
   catalogCommand,
+  skillsCommand,
 
   // Toolsmith (1)
   runtimeInfoCommand,
@@ -1547,6 +1644,12 @@ export const commandDefinitions: Extension[] = [
   // Daemon (2)
   behaviorCommand,
   daemonInitCommand,
+
+  // Config (1)
+  configCommand,
+
+  // Ops (1)
+  opsCommand,
 ];
 
 // ============================================

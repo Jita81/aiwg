@@ -69,6 +69,9 @@ import {
   packagePluginHandler,
   packageAllPluginsHandler,
   indexHandler,
+  skillsHandler,
+  configHandler,
+  opsHandler,
   subcommandHandlers,
 } from './subcommands.js';
 import { runtimeInfoHandler } from './runtime-info.js';
@@ -104,6 +107,9 @@ export {
   mcpHandler,
   catalogHandler,
   indexHandler,
+  skillsHandler,
+  configHandler,
+  opsHandler,
   runtimeInfoHandler,
 
   // Utilities
@@ -184,10 +190,11 @@ export const allHandlers: CommandHandler[] = [
   // Workspace management
   ...workspaceHandlers,
 
-  // Subcommand handlers (MCP, catalog, index)
+  // Subcommand handlers (MCP, catalog, index, skills)
   mcpHandler,
   catalogHandler,
   indexHandler,
+  skillsHandler,
   runtimeInfoHandler,
 
   // Utilities
@@ -216,6 +223,12 @@ export const allHandlers: CommandHandler[] = [
 
   // Daemon
   ...daemonHandlers,
+
+  // Config
+  configHandler,
+
+  // Ops
+  opsHandler,
 ];
 
 /**

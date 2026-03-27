@@ -1,0 +1,286 @@
+/**
+ * UserConfig Tests
+ *
+ * @source @src/config/user-config.ts
+ * @implements #545
+ */
+
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { mkdtemp, rm, readFile, writeFile, mkdir } from 'fs/promises';
+import { tmpdir } from 'os';
+import { join } from 'path';
+import {
+  UserConfig,
+  resolveConfigDir,
+  parseYamlSimple,
+  serializeYamlSimple,
+  DEFAULT_USER_CONFIG,
+  KNOWN_CONFIG_FILES,
+} from '../../../src/config/user-config.js';
+
+describe('UserConfig', () => {
+  let tempDir: string;
+
+  beforeEach(async () => {
+    tempDir = await mkdtemp(join(tmpdir(), 'aiwg-config-test-'));
+  });
+
+  afterEach(async () => {
+    await rm(tempDir, { recursive: true, force: true });
+  });
+
+  describe('resolveConfigDir', () => {
+    it('should return override path when provided', () => {
+      const result = resolveConfigDir('/custom/path');
+      expect(result).toBe('/custom/path');
+    });
+
+    it('should respect AIWG_CONFIG env var', () => {
+      const original = process.env.AIWG_CONFIG;
+      process.env.AIWG_CONFIG = '/env/override';
+      try {
+        const result = resolveConfigDir();
+        expect(result).toBe('/env/override');
+      } finally {
+        if (original !== undefined) {
+          process.env.AIWG_CONFIG = original;
+        } else {
+          delete process.env.AIWG_CONFIG;
+        }
+      }
+    });
+
+    it('should prefer override over env var', () => {
+      const original = process.env.AIWG_CONFIG;
+      process.env.AIWG_CONFIG = '/env/path';
+      try {
+        const result = resolveConfigDir('/override/path');
+        expect(result).toBe('/override/path');
+      } finally {
+        if (original !== undefined) {
+          process.env.AIWG_CONFIG = original;
+        } else {
+          delete process.env.AIWG_CONFIG;
+        }
+      }
+    });
+  });
+
+  describe('getPath', () => {
+    it('should return the resolved config directory', () => {
+      const config = new UserConfig(tempDir);
+      expect(config.getPath()).toBe(tempDir);
+    });
+  });
+
+  describe('ensureDir', () => {
+    it('should create the config directory if it does not exist', async () => {
+      const subDir = join(tempDir, 'nested', 'dir');
+      const config = new UserConfig(subDir);
+      await config.ensureDir();
+
+      const { existsSync } = await import('fs');
+      expect(existsSync(subDir)).toBe(true);
+    });
+  });
+
+  describe('get/set', () => {
+    it('should return default values for unset keys', async () => {
+      const config = new UserConfig(tempDir);
+      const value = await config.get('defaults.provider');
+      expect(value).toBe('claude');
+    });
+
+    it('should return undefined for nonexistent keys', async () => {
+      const config = new UserConfig(tempDir);
+      const value = await config.get('nonexistent.key');
+      expect(value).toBeUndefined();
+    });
+
+    it('should set and get a string value', async () => {
+      const config = new UserConfig(tempDir);
+      await config.set('defaults.provider', 'openai');
+      const value = await config.get('defaults.provider');
+      expect(value).toBe('openai');
+    });
+
+    it('should set and get a boolean value', async () => {
+      const config = new UserConfig(tempDir);
+      await config.set('telemetry.enabled', 'true');
+      const value = await config.get('telemetry.enabled');
+      expect(value).toBe(true);
+    });
+
+    it('should persist values to config.yaml', async () => {
+      const config = new UserConfig(tempDir);
+      await config.set('defaults.verbosity', 'verbose');
+
+      // Read the file directly
+      const content = await readFile(join(tempDir, 'config.yaml'), 'utf-8');
+      expect(content).toContain('verbose');
+    });
+
+    it('should create nested keys that do not exist yet', async () => {
+      const config = new UserConfig(tempDir);
+      await config.set('custom.nested.key', 'value');
+      const value = await config.get('custom.nested.key');
+      expect(value).toBe('value');
+    });
+  });
+
+  describe('list', () => {
+    it('should return config.yaml defaults when no files exist', async () => {
+      const config = new UserConfig(tempDir);
+      const result = await config.list();
+      expect(result['config.yaml']).toBeDefined();
+    });
+
+    it('should include models.json when present', async () => {
+      // Create a models.json
+      await writeFile(join(tempDir, 'models.json'), '{"version": "2"}', 'utf-8');
+
+      const config = new UserConfig(tempDir);
+      const result = await config.list();
+      expect(result['models.json']).toBeDefined();
+      expect((result['models.json'] as Record<string, unknown>).version).toBe('2');
+    });
+  });
+
+  describe('validate', () => {
+    it('should report info when config directory does not exist', async () => {
+      const config = new UserConfig(join(tempDir, 'nonexistent'));
+      const issues = await config.validate();
+      expect(issues.length).toBe(1);
+      expect(issues[0].severity).toBe('info');
+    });
+
+    it('should return no issues for valid config', async () => {
+      const config = new UserConfig(tempDir);
+      // Write a valid config
+      await config.set('defaults.provider', 'claude');
+      const issues = await config.validate();
+      expect(issues.length).toBe(0);
+    });
+
+    it('should report error for invalid JSON in models.json', async () => {
+      await writeFile(join(tempDir, 'models.json'), 'not json{', 'utf-8');
+      const config = new UserConfig(tempDir);
+      const issues = await config.validate();
+      const jsonIssue = issues.find(i => i.file === 'models.json');
+      expect(jsonIssue).toBeDefined();
+      expect(jsonIssue!.severity).toBe('error');
+    });
+  });
+
+  describe('reset', () => {
+    it('should reset a specific key to its default', async () => {
+      const config = new UserConfig(tempDir);
+      await config.set('defaults.provider', 'openai');
+      await config.reset('defaults.provider');
+      const value = await config.get('defaults.provider');
+      expect(value).toBe('claude');
+    });
+
+    it('should reset all config to defaults', async () => {
+      const config = new UserConfig(tempDir);
+      await config.set('defaults.provider', 'openai');
+      await config.set('telemetry.enabled', 'true');
+      await config.reset();
+
+      // Re-create instance to clear cache
+      const freshConfig = new UserConfig(tempDir);
+      const provider = await freshConfig.get('defaults.provider');
+      expect(provider).toBe('claude');
+    });
+  });
+
+  describe('KNOWN_CONFIG_FILES', () => {
+    it('should include config.yaml, models.json, and ops.yaml', () => {
+      const filenames = KNOWN_CONFIG_FILES.map(f => f.filename);
+      expect(filenames).toContain('config.yaml');
+      expect(filenames).toContain('models.json');
+      expect(filenames).toContain('ops.json');
+    });
+  });
+
+  describe('DEFAULT_USER_CONFIG', () => {
+    it('should have correct structure', () => {
+      expect(DEFAULT_USER_CONFIG.apiVersion).toBe('aiwg.io/v1');
+      expect(DEFAULT_USER_CONFIG.kind).toBe('UserConfig');
+      expect(DEFAULT_USER_CONFIG.defaults.provider).toBe('claude');
+      expect(DEFAULT_USER_CONFIG.telemetry.enabled).toBe(false);
+      expect(DEFAULT_USER_CONFIG.updates.channel).toBe('stable');
+    });
+  });
+});
+
+describe('YAML helpers', () => {
+  describe('parseYamlSimple', () => {
+    it('should parse top-level key-value pairs', () => {
+      const result = parseYamlSimple('name: test\nversion: 1');
+      expect(result.name).toBe('test');
+      expect(result.version).toBe(1);
+    });
+
+    it('should parse nested sections', () => {
+      const result = parseYamlSimple('defaults:\n  provider: claude\n  verbosity: normal');
+      const defaults = result.defaults as Record<string, unknown>;
+      expect(defaults.provider).toBe('claude');
+      expect(defaults.verbosity).toBe('normal');
+    });
+
+    it('should parse booleans', () => {
+      const result = parseYamlSimple('enabled: true\ndisabled: false');
+      expect(result.enabled).toBe(true);
+      expect(result.disabled).toBe(false);
+    });
+
+    it('should skip comments and empty lines', () => {
+      const result = parseYamlSimple('# comment\n\nkey: value');
+      expect(result.key).toBe('value');
+      expect(Object.keys(result)).toHaveLength(1);
+    });
+
+    it('should handle quoted strings', () => {
+      const result = parseYamlSimple('name: "hello world"');
+      expect(result.name).toBe('hello world');
+    });
+  });
+
+  describe('serializeYamlSimple', () => {
+    it('should serialize flat key-value pairs', () => {
+      const result = serializeYamlSimple({ name: 'test', version: 1 });
+      expect(result).toContain('name: test');
+      expect(result).toContain('version: 1');
+    });
+
+    it('should serialize nested objects', () => {
+      const result = serializeYamlSimple({
+        defaults: { provider: 'claude' },
+      });
+      expect(result).toContain('defaults:');
+      expect(result).toContain('  provider: claude');
+    });
+
+    it('should serialize booleans correctly', () => {
+      const result = serializeYamlSimple({ enabled: true, disabled: false });
+      expect(result).toContain('enabled: true');
+      expect(result).toContain('disabled: false');
+    });
+
+    it('should roundtrip with parseYamlSimple', () => {
+      const original = {
+        apiVersion: 'aiwg.io/v1',
+        kind: 'UserConfig',
+        defaults: { provider: 'claude', verbosity: 'normal' },
+        telemetry: { enabled: false },
+      };
+      const yaml = serializeYamlSimple(original);
+      const parsed = parseYamlSimple(yaml);
+      expect(parsed.apiVersion).toBe('aiwg.io/v1');
+      expect(parsed.kind).toBe('UserConfig');
+      expect((parsed.defaults as Record<string, unknown>).provider).toBe('claude');
+      expect((parsed.telemetry as Record<string, unknown>).enabled).toBe(false);
+    });
+  });
+});

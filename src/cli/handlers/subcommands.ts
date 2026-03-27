@@ -26,7 +26,7 @@ import { registerDeployedExtensions } from "../../extensions/deployment-registra
 export const mcpHandler: CommandHandler = {
   id: "mcp",
   name: "MCP Server",
-  description: "MCP server commands (serve, install, info)",
+  description: "MCP server commands (serve, install, add, remove, update, list, inject, info)",
   category: "mcp",
   aliases: [],
 
@@ -401,6 +401,105 @@ export const indexHandler: CommandHandler = {
 };
 
 /**
+ * Skills command handler
+ *
+ * Dynamically imports and delegates to src/skills/cli.ts.
+ * Handles subcommands: search, info, list, install, publish
+ *
+ * @implements #539
+ */
+export const skillsHandler: CommandHandler = {
+  id: "skills",
+  name: "Skills Registry",
+  description: "Skill commands (search, info, list, install, publish)",
+  category: "catalog",
+  aliases: [],
+
+  async execute(ctx: HandlerContext): Promise<HandlerResult> {
+    try {
+      const { main } = await import("../../skills/cli.js");
+      await main(ctx.args);
+
+      return {
+        exitCode: 0,
+      };
+    } catch (error) {
+      return {
+        exitCode: 1,
+        message: `Skills command failed: ${error instanceof Error ? error.message : String(error)}`,
+        error: error instanceof Error ? error : new Error(String(error)),
+      };
+    }
+  },
+};
+
+/**
+ * Config command handler
+ *
+ * Dynamically imports and delegates to src/config/cli.ts.
+ * Handles subcommands: get, set, list, validate, reset, path, edit
+ *
+ * @implements #545
+ */
+export const configHandler: CommandHandler = {
+  id: "config",
+  name: "Config",
+  description: "User config commands (get, set, list, validate, reset, path, edit)",
+  category: "config",
+  aliases: [],
+
+  async execute(ctx: HandlerContext): Promise<HandlerResult> {
+    try {
+      const { main } = await import("../../config/cli.js");
+      await main(ctx.args);
+
+      return {
+        exitCode: 0,
+      };
+    } catch (error) {
+      return {
+        exitCode: 1,
+        message: `Config command failed: ${error instanceof Error ? error.message : String(error)}`,
+        error: error instanceof Error ? error : new Error(String(error)),
+      };
+    }
+  },
+};
+
+/**
+ * Ops command handler
+ *
+ * Dynamically imports and delegates to src/ops/cli.ts.
+ * Handles subcommands: init, status, use, list, push
+ *
+ * @implements #544
+ */
+export const opsHandler: CommandHandler = {
+  id: "ops",
+  name: "Ops",
+  description: "Ops ecosystem commands (init, status, use, list, push)",
+  category: "ops",
+  aliases: [],
+
+  async execute(ctx: HandlerContext): Promise<HandlerResult> {
+    try {
+      const { main } = await import("../../ops/cli.js");
+      await main(ctx.args);
+
+      return {
+        exitCode: 0,
+      };
+    } catch (error) {
+      return {
+        exitCode: 1,
+        message: `Ops command failed: ${error instanceof Error ? error.message : String(error)}`,
+        error: error instanceof Error ? error : new Error(String(error)),
+      };
+    }
+  },
+};
+
+/**
  * All subcommand handlers
  */
 export const subcommandHandlers: CommandHandler[] = [
@@ -415,4 +514,7 @@ export const subcommandHandlers: CommandHandler[] = [
   packagePluginHandler,
   packageAllPluginsHandler,
   indexHandler,
+  skillsHandler,
+  configHandler,
+  opsHandler,
 ];

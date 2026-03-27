@@ -85,7 +85,9 @@ export type CommandCategory =
   | 'ralph'         // Ralph loop
   | 'index'         // Artifact index
   | 'orchestration' // Mission Control
-  | 'daemon';       // Daemon and behavior management
+  | 'daemon'        // Daemon and behavior management
+  | 'config'        // User-level config management
+  | 'ops';          // Operations ecosystem management
 
 /**
  * Handler factory function type

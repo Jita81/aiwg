@@ -43,6 +43,18 @@ vi.mock("../../../../src/artifacts/cli.js", () => ({
   main: mockIndexMain,
 }));
 
+// Mock config CLI module
+const mockConfigMain = vi.fn().mockResolvedValue(undefined);
+vi.mock("../../../../src/config/cli.js", () => ({
+  main: mockConfigMain,
+}));
+
+// Mock ops CLI module
+const mockOpsMain = vi.fn().mockResolvedValue(undefined);
+vi.mock("../../../../src/ops/cli.js", () => ({
+  main: mockOpsMain,
+}));
+
 // Import handlers after mocks are set up
 import {
   mcpHandler,
@@ -56,6 +68,8 @@ import {
   packagePluginHandler,
   packageAllPluginsHandler,
   indexHandler,
+  configHandler,
+  opsHandler,
   subcommandHandlers,
 } from "../../../../src/cli/handlers/subcommands.js";
 
@@ -78,7 +92,7 @@ describe("Subcommand Handlers", () => {
       expect(mcpHandler.category).toBe("mcp");
       expect(mcpHandler.aliases).toEqual([]);
       expect(mcpHandler.name).toBe("MCP Server");
-      expect(mcpHandler.description).toMatch(/MCP server/i);
+      expect(mcpHandler.description).toMatch(/MCP server commands/i);
     });
 
     it("should handle dynamic import, subcommands, success, and errors", async () => {
@@ -377,9 +391,89 @@ describe("Subcommand Handlers", () => {
     });
   });
 
+  describe("configHandler", () => {
+    it("should have correct metadata", () => {
+      expect(configHandler.id).toBe("config");
+      expect(configHandler.category).toBe("config");
+      expect(configHandler.aliases).toEqual([]);
+      expect(configHandler.name).toBe("Config");
+      expect(configHandler.description).toMatch(/config/i);
+    });
+
+    it("should handle dynamic import, subcommands, success, and errors", async () => {
+      // Test dynamic import and call
+      mockContext.args = ["get", "defaults.provider"];
+      await configHandler.execute(mockContext);
+      expect(mockConfigMain).toHaveBeenCalledWith(["get", "defaults.provider"]);
+
+      // Test multiple subcommands
+      const subcommands = ["get", "set", "list", "validate", "reset", "path"];
+      for (const subcmd of subcommands) {
+        vi.clearAllMocks();
+        mockContext.args = [subcmd];
+        await configHandler.execute(mockContext);
+        expect(mockConfigMain).toHaveBeenCalledWith([subcmd]);
+      }
+
+      // Test success
+      vi.clearAllMocks();
+      mockContext.args = [];
+      const successResult = await configHandler.execute(mockContext);
+      expect(successResult.exitCode).toBe(0);
+
+      // Test error handling
+      const testError = new Error("Config failed");
+      mockConfigMain.mockRejectedValueOnce(testError);
+      const errorResult = await configHandler.execute(mockContext);
+      expect(errorResult.exitCode).toBe(1);
+      expect(errorResult.error).toBe(testError);
+      expect(errorResult.message).toMatch(/config command failed/i);
+    });
+  });
+
+  describe("opsHandler", () => {
+    it("should have correct metadata", () => {
+      expect(opsHandler.id).toBe("ops");
+      expect(opsHandler.category).toBe("ops");
+      expect(opsHandler.aliases).toEqual([]);
+      expect(opsHandler.name).toBe("Ops");
+      expect(opsHandler.description).toMatch(/ops/i);
+    });
+
+    it("should handle dynamic import, subcommands, success, and errors", async () => {
+      // Test dynamic import and call
+      mockContext.args = ["init", "--silent"];
+      await opsHandler.execute(mockContext);
+      expect(mockOpsMain).toHaveBeenCalledWith(["init", "--silent"]);
+
+      // Test multiple subcommands
+      const subcommands = ["init", "status", "use", "list", "push"];
+      for (const subcmd of subcommands) {
+        vi.clearAllMocks();
+        mockContext.args = [subcmd];
+        await opsHandler.execute(mockContext);
+        expect(mockOpsMain).toHaveBeenCalledWith([subcmd]);
+      }
+
+      // Test success
+      vi.clearAllMocks();
+      mockContext.args = [];
+      const successResult = await opsHandler.execute(mockContext);
+      expect(successResult.exitCode).toBe(0);
+
+      // Test error handling
+      const testError = new Error("Ops failed");
+      mockOpsMain.mockRejectedValueOnce(testError);
+      const errorResult = await opsHandler.execute(mockContext);
+      expect(errorResult.exitCode).toBe(1);
+      expect(errorResult.error).toBe(testError);
+      expect(errorResult.message).toMatch(/ops command failed/i);
+    });
+  });
+
   describe("subcommandHandlers array", () => {
     it("should export all subcommand handlers with correct IDs", () => {
-      expect(subcommandHandlers).toHaveLength(11);
+      expect(subcommandHandlers).toHaveLength(14);
 
       const handlerIds = subcommandHandlers.map((h) => h.id);
       const expectedIds = [
@@ -394,6 +488,9 @@ describe("Subcommand Handlers", () => {
         "package-plugin",
         "package-all-plugins",
         "index",
+        "skills",
+        "config",
+        "ops",
       ];
 
       for (const expectedId of expectedIds) {
