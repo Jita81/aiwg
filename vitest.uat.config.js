@@ -9,7 +9,7 @@ import path from 'path';
  */
 export default defineConfig({
   test: {
-    include: ['test/uat/ralph-external.uat.ts', 'test/uat/daemon-supervisor.test.mjs', 'test/uat/rlm-cli.uat.ts'],
+    include: ['test/uat/ralph-external.uat.ts', 'test/uat/daemon-supervisor.test.mjs', 'test/uat/rlm-cli.uat.ts', 'test/uat/aiwg-config-flow.uat.ts'],
     exclude: ['test/uat/ralph-live-*.uat.ts'],
     environment: 'node',
     globals: false,
