@@ -37,25 +37,25 @@ Two roles, two models. The parent agent handles conversation; coding tasks are d
 | `mistral:7b` | 7B | Solid general-purpose conversation |
 | `gemma2:9b` | 9B | Strong nuanced dialogue, good at following persona instructions |
 
-#### Coding & Tool Calls (delegate_task target)
+#### Coding & Tool Calls (delegation model)
 
 > **Qwen models have the best tool call accuracy of any open-weight family.** For AIWG workflows involving structured output, function calling, or code generation, Qwen should be the first choice.
 
 | Model | Size | Notes |
 |---|---|---|
-| `qwen3.5:9b` ⭐ | 9B | Best tool call accuracy; recommended for AIWG workflows |
+| `qwen2.5-coder:14b` ⭐ | 14B | Best tool call accuracy + coding quality; recommended for AIWG workflows |
 | `qwen2.5-coder:7b` | 7B | Smaller Qwen coding variant; excellent tool calls, lower VRAM |
-| `qwen2.5-coder:14b` | 14B | Higher quality at more VRAM cost |
+| `qwen3:8b` | 8B | Strong structured output; supports thinking/non-thinking modes |
 | `phi4-mini` | 3.8B | Microsoft; compact, strong at structured reasoning |
 | `deepseek-coder-v2:16b` | 16B | Strong coding quality; needs 16GB+ VRAM |
 
 ```bash
 # Pull both recommended models
 ollama pull hermes3
-ollama pull qwen3.5:9b
+ollama pull qwen2.5-coder:14b
 ```
 
-Use `delegate_task(model="ollama/qwen3.5:9b")` to route coding-heavy AIWG workflows to the coding model while keeping the parent conversation on `hermes3`.
+Configure delegation model in `~/.hermes/config.yaml` under `delegation.model: "ollama/qwen2.5-coder:14b"` to route coding-heavy AIWG workflows to the coding model while keeping the parent conversation on `hermes3`.
 
 ---
 
@@ -63,7 +63,7 @@ Use `delegate_task(model="ollama/qwen3.5:9b")` to route coding-heavy AIWG workfl
 
 - Hermes Agent installed ([installation guide](https://hermes-agent.nousresearch.com/docs))
 - AIWG installed (`npm install -g aiwg`)
-- Local models via Ollama: `hermes3` (conversation, soul features) and `qwen3.5:9b` (coding tasks)
+- Local models via Ollama: `hermes3` (conversation, soul features) and `qwen2.5-coder:14b` (coding tasks)
 - A project directory with source code
 
 ---
@@ -100,27 +100,19 @@ mcp_servers:
   aiwg:
     command: "aiwg"
     args: ["mcp", "serve"]
-    tools:
-      include:
-        - workflow-run
-        - artifact-read
-        - artifact-write
-        - template-render
-        - agent-list
-      prompts: false
-      resources: false
 ```
 
-**Why this whitelist:** MCP tool schemas accumulate in the context window. Each connected server adds schema overhead before any tool is called. A 5-tool whitelist keeps AIWG's footprint to ~3,000 tokens (vs. ~12,000+ with full surface). On a 12GB VRAM model with 32K context, this is the difference between 81% and 54% of context available for conversation.
+**Why this is lean by default:** AIWG's MCP server exposes exactly 5 tools (`workflow-run`, `artifact-read`, `artifact-write`, `template-render`, `agent-list`) — no more. This keeps the schema footprint to ~3,000 tokens. No tool whitelisting is needed because the server surface is already minimal.
 
-**Reload and verify:**
+> **Note (v0.4.0+):** Hermes now reloads config changes in real-time — no restart required after editing `config.yaml`.
+
+**Verify:**
 
 ```bash
-# Restart Hermes or reload MCP servers
 hermes chat "What AIWG tools are available?"
 ```
 
-Hermes should list the 5 whitelisted tools.
+Hermes should list the 5 AIWG tools.
 
 ---
 
@@ -151,7 +143,8 @@ Handle in Hermes directly: one-off questions, short tasks, conversation.
 When AIWG returns an artifact: store path + one-sentence summary in MEMORY.md.
 Do NOT copy artifact body text into memory. Reference, don't replicate.
 
-Use `delegate_task(skip_context_files=True, skip_memory=True)` for AIWG workflows.
+Use `delegate_task(goal="...", context="...")` for AIWG workflows.
+Child agents automatically exclude context files and memory.
 
 ## Artifact Store (.aiwg/)
 
@@ -216,6 +209,8 @@ After the base flow works, add a convenience skill that uses `delegate_task` to 
 
 **Why:** Direct MCP calls add 3,000-8,000 tokens to the parent context per workflow. `delegate_task` reduces this to ~200 tokens — a 95% reduction.
 
+> **API note (v0.4.0):** `delegate_task` automatically excludes context files (AGENTS.md, SOUL.md) and memory (MEMORY.md, USER.md) from child agents — this is hardcoded behavior, not a per-call parameter. The delegation model is configured globally in `~/.hermes/config.yaml` under `delegation.model`.
+
 **Create `~/.hermes/skills/aiwg-orchestrate/SKILL.md`:**
 
 ```markdown
@@ -223,9 +218,11 @@ After the base flow works, add a convenience skill that uses `delegate_task` to 
 name: aiwg-orchestrate
 description: Route structured artifact work to AIWG workflows via MCP
 version: 1.0.0
-platforms: [hermes]
+author: aiwg
+license: MIT
 metadata:
-  tags: [aiwg, sdlc, artifacts, delegation, mcp]
+  hermes:
+    tags: [aiwg, sdlc, artifacts, delegation, mcp]
 ---
 
 ## When to Use
@@ -238,11 +235,11 @@ test plan, or any structured artifact that persists in .aiwg/.
 1. Confirm the task needs a persistent AIWG artifact
 2. Use delegate_task to isolate the AIWG interaction:
    delegate_task(
-       task="Run AIWG workflow for [description]",
-       skip_context_files=True,
-       skip_memory=True,
-       model="ollama/qwen3.5:9b"  # Use coding model for structured output
+       goal="Run AIWG workflow for [description]",
+       context="Project: [name]. Save artifact to .aiwg/[category]/[filename].md"
    )
+   Note: Child agents automatically exclude context files and memory.
+   The delegation model is configured in config.yaml under delegation.model.
 3. Store artifact path + one-sentence summary in MEMORY.md
 4. Report result to user
 
@@ -264,7 +261,9 @@ A template is available at `agentic/code/frameworks/sdlc-complete/templates/herm
 
 Understanding the token budget helps configure Hermes for local hardware.
 
-### With lean AGENTS.md + 5-tool whitelist (recommended)
+### With lean AGENTS.md (recommended)
+
+AIWG's MCP server exposes exactly 5 tools — no more, no less. The main variable is AGENTS.md size.
 
 | Component | Tokens |
 |---|---|
@@ -276,7 +275,9 @@ Understanding the token budget helps configure Hermes for local hardware.
 | **Total overhead** | **~6,050** |
 | **Available for conversation** (32K context) | **~26,700 (81%)** |
 
-### Without lean approach (full surface)
+### With verbose AGENTS.md
+
+If AGENTS.md grows beyond the 1,000-character target:
 
 | Component | Tokens |
 |---|---|
@@ -284,11 +285,11 @@ Understanding the token budget helps configure Hermes for local hardware.
 | AGENTS.md (~5,000 chars) | ~1,500 |
 | MEMORY.md | ~800 |
 | USER.md | ~500 |
-| AIWG MCP schema (20+ tools) | ~12,000 |
-| **Total overhead** | **~16,300** |
-| **Available for conversation** (32K context) | **~16,468 (50%)** |
+| AIWG MCP schema (5 tools) | ~3,000 |
+| **Total overhead** | **~7,300** |
+| **Available for conversation** (32K context) | **~25,468 (77%)** |
 
-The compression threshold fires at 50% of context by default. With the lean approach, you get ~16,384 tokens of conversation before compression. With the full approach, compression fires at ~9,200 tokens — very early.
+The compression threshold fires at 50% of context by default (30% recommended for local models). Keep AGENTS.md under 1,000 characters for maximum conversation headroom.
 
 ### Recommended compression config for 12GB VRAM
 
@@ -296,36 +297,28 @@ The compression threshold fires at 50% of context by default. With the lean appr
 compression:
   enabled: true
   threshold: 0.30
-  summary_model: "ollama/qwen3.5:9b"
+  summary_model: "ollama/qwen2.5-coder:7b"
   summary_provider: "custom"
   summary_base_url: "http://localhost:11434/v1"
 ```
 
 ---
 
-## Part 8: Advanced — Prompt Exposure
+## Part 8: Advanced — Delegation Model Configuration
 
-After the basic integration is stable, you can enable AIWG prompt exposure for richer workflow access.
+After the basic integration is stable, configure the delegation model for optimal AIWG workflow performance.
 
-**Update `~/.hermes/config.yaml`:**
+**Add delegation config to `~/.hermes/config.yaml`:**
 
 ```yaml
-mcp_servers:
-  aiwg:
-    command: "aiwg"
-    args: ["mcp", "serve"]
-    tools:
-      include:
-        - workflow-run
-        - artifact-read
-        - artifact-write
-        - template-render
-        - agent-list
-      prompts: true          # Enable after baseline is stable
-      resources: false
+delegation:
+  model: "ollama/qwen2.5-coder:14b"    # Coding model for structured output
+  max_iterations: 50                     # Max tool rounds per child agent
 ```
 
-This adds AIWG workflow prompts as callable templates. Only enable after Part 4 is working reliably.
+This routes AIWG workflows delegated via `delegate_task` to a coding-optimized model while the parent stays on `hermes3` for conversation. Only configure after Part 4 is working reliably.
+
+**New in v0.4.0:** Use `hermes tools` to interactively manage MCP tool configuration and `hermes mcp` to install new MCP servers with OAuth 2.1 PKCE support.
 
 ---
 
@@ -363,7 +356,7 @@ Run these checks to confirm the integration is working:
 
 **Context filling up too fast:**
 - Check AGENTS.md character count (`wc -c AGENTS.md`) — keep under 1,000
-- Verify `prompts: false` and `resources: false` in MCP config
+- AIWG MCP server exposes only 5 tools (~3,000 tokens) — check other MCP servers for bloat
 - Use `delegate_task` for AIWG workflows to isolate context cost
 - Lower compression threshold to 0.30
 

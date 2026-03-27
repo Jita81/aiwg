@@ -123,6 +123,8 @@ interface AgentMetadata {
 
 ## Command Extensions
 
+> **Deployment artifact.** Commands are typically generated from `skill` source files during `aiwg use` deployment. Directly authoring a command extension is an advanced pattern — prefer `aiwg add-skill` for new workflows.
+
 CLI and slash commands with argument parsing and execution logic.
 
 ### CommandMetadata
@@ -239,7 +241,24 @@ interface CommandOption {
 
 ## Skill Extensions
 
-Natural language workflows triggered by phrases or conditions.
+**Primary workflow extension type.** Skills are the canonical source for all agentic workflows. During `aiwg use` deployment, AIWG deploys skills natively for platforms that support them (Claude Code, OpenCode, etc.) and generates a corresponding command file for platforms that need it (legacy or generated-command providers).
+
+Use `aiwg add-skill` to create new skills. The `description:` frontmatter field is the primary natural-language signal Claude uses to autonomously decide when to invoke a skill — write it to describe intent, not implementation.
+
+### SKILL.md Frontmatter Reference
+
+| Field | Source | Purpose |
+|-------|--------|---------|
+| `name:` | Official | Skill name (also controls slash-command path when a command is generated) |
+| `description:` | Official | **Primary NL signal** — Claude reads this at session start and matches user intent against it for autonomous invocation. Write it well. |
+| `effort:` | Official | Model effort override: `1` (low), `2` (medium), `3` (high) |
+| `user-invocable:` | Official | `false` = background-only; skill does not appear in `/` autocomplete |
+| `disable-model-invocation:` | Official | `true` = explicit user-only; prevents autonomous invocation by the model |
+| `context:` | Official | Execution isolation: `fork` (isolated context) or `inherit` (shared context) |
+| `allowed-tools:` | Official | Restrict which tools the skill may use |
+| `platforms:` | AIWG-internal | Multi-provider deployment targets (e.g., `claude`, `codex`, `all`) |
+| `autoTrigger:` | AIWG-internal | AIWG-level auto-trigger annotation; supplements `description:` matching |
+| `commandHint:` | AIWG-internal | Override the generated command's `argument-hint` frontmatter when a command is synthesized from this skill |
 
 ### SkillMetadata
 

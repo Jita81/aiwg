@@ -1,34 +1,29 @@
-# Hermes Agent + AIWG — Advanced MCP Configuration (with prompts)
+# Hermes Agent + AIWG — Advanced Configuration (with delegation + toolsets)
 #
 # Use this ONLY after the minimal config is stable and working.
-# Enabling prompts exposes AIWG workflow prompts as callable templates.
-# This adds schema overhead — only enable when the extra capability is needed.
+# Adds delegation model config and toolset restrictions for child agents.
 #
 # Prerequisites:
 #   1. hermes-config-minimal.yaml is working
 #   2. You have verified artifact-read/write and workflow-run
-#   3. You understand the token cost of prompt schemas
+#   3. You understand the token cost implications
 
 mcp_servers:
   aiwg:
     command: "aiwg"
     args: ["mcp", "serve"]
-    tools:
-      include:
-        - workflow-run
-        - artifact-read
-        - artifact-write
-        - template-render
-        - agent-list
-      prompts: true          # Enable AIWG prompt exposure
-      resources: false       # Resources still suppressed (use artifact-read instead)
 
-# Model strategy: hermes3 (parent/conversation) + qwen3.5:9b (coding via delegate_task)
+# Delegation config — coding model for AIWG structured output
+delegation:
+  model: "ollama/qwen2.5-coder:14b"
+  max_iterations: 50
+
+# Model strategy: hermes3 (parent/conversation) + qwen2.5-coder:14b (coding via delegation)
 # Same compression settings as minimal config
 compression:
   enabled: true
   threshold: 0.30
-  summary_model: "ollama/qwen3.5:9b"
+  summary_model: "ollama/qwen2.5-coder:7b"
   summary_provider: "custom"
   summary_base_url: "http://localhost:11434/v1"
 

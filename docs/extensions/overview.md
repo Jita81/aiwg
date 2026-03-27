@@ -16,8 +16,8 @@ Extensions are the building blocks of AIWG frameworks and addons. They include:
 | Type | Purpose | Examples |
 |------|---------|----------|
 | **agent** | Specialized AI personas | API Designer, Test Engineer |
-| **command** | CLI and slash commands | `/mention-wire`, `aiwg use sdlc` |
-| **skill** | Natural language workflows | Project awareness, voice application |
+| **skill** | Primary workflow extension — NL-triggered, deployed natively | Project awareness, voice application, ralph loop |
+| **command** | Deployment artifact generated from skill sources; also CLI entry points | `/mention-wire`, `aiwg use sdlc` |
 | **hook** | Lifecycle event handlers | Pre-session setup, post-write validation |
 | **tool** | External utilities | git, jq, npm |
 | **mcp-server** | MCP protocol servers | AIWG MCP server |
@@ -25,6 +25,8 @@ Extensions are the building blocks of AIWG frameworks and addons. They include:
 | **addon** | Feature bundles | Voice Framework, Testing Quality |
 | **template** | Document templates | Use case template, ADR template |
 | **prompt** | Reusable prompts | Code review, security audit |
+
+> **Skills are the canonical source type for agentic workflows.** When you author a `SKILL.md`, AIWG deploys it natively for providers that support skills and generates a corresponding command file for providers that need it. Use `aiwg add-skill` to create new workflows; `aiwg add-command` is for advanced direct-command authoring only.
 
 ---
 

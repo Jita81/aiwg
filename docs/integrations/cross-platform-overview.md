@@ -16,6 +16,7 @@ AIWG works across multiple AI platforms. **One command deploys everything.**
 | OpenCode | `aiwg use sdlc --provider opencode` | OpenCode.md |
 | Warp Terminal | `aiwg use sdlc --provider warp` | WARP.md |
 | Windsurf | `aiwg use sdlc --provider windsurf` | .windsurfrules |
+| Hermes Agent | `aiwg mcp serve` (MCP sidecar) | AGENTS.md |
 
 ---
 
@@ -42,6 +43,7 @@ All four artifact types deploy automatically in each platform's native format:
 | OpenCode | contextPaths | conventional | none | contextPaths |
 | Warp Terminal | aggregated | aggregated | conventional | conventional |
 | Windsurf | aggregated | native | conventional | conventional |
+| Hermes Agent | MCP | MCP | native | MCP |
 
 **Legend**:
 - **native** - Platform auto-discovers artifacts in standard directories
@@ -49,6 +51,7 @@ All four artifact types deploy automatically in each platform's native format:
 - **aggregated** - Single-file compilation + discrete files for compatibility
 - **contextPaths** - Injected via explicit `contextPaths` config (user must configure)
 - **none** - Artifact type has no equivalent on this platform
+- **MCP** - Accessed via MCP tool calls (`aiwg mcp serve`), not file deployment
 
 ---
 
@@ -82,6 +85,7 @@ Most providers follow `.<provider>/<type>/`:
 | **Windsurf** | Agents aggregated to `AGENTS.md`<br>Commands → `.windsurf/workflows/` |
 | **Cursor** | Rules use `.mdc` extension (MDC format) |
 | **OpenCode** | Commands → `.opencode/commands/` (Ctrl+K palette)<br>Agents/Rules → `.opencode/agent/` and `.opencode/rule/` (require `contextPaths` config)<br>Context file → `OpenCode.md` (auto-loaded) |
+| **Hermes Agent** | MCP sidecar model — not `aiwg use --provider`.<br>Skills → `~/.hermes/skills/` (native SKILL.md format)<br>All other artifacts accessed via MCP tool calls |
 
 ---
 
@@ -135,6 +139,7 @@ See [Ralph Guide](../ralph-guide.md) for full documentation.
 | OpenCode | [Setup Guide](opencode-quickstart.md) |
 | Warp Terminal | [Setup Guide](warp-terminal-quickstart.md) |
 | Windsurf | [Setup Guide](windsurf-quickstart.md) |
+| Hermes Agent | [Setup Guide](hermes-quickstart.md) |
 
 ---
 

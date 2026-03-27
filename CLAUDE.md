@@ -73,22 +73,22 @@ Use `@path/to/file.md` in your message to load specific documentation:
 
 All 9 providers receive all 4 artifact types (agents, commands, skills, rules). OpenClaw additionally receives behaviors. Support level indicates how the platform discovers artifacts: **native** (auto-discovered), **conventional** (AIWG directory), **aggregated** (single-file + discrete).
 
-| Platform | Agents | Commands | Skills | Rules | Command |
-|----------|--------|----------|--------|-------|---------|
-| Claude Code | `.claude/agents/` | `.claude/commands/` | `.claude/skills/` | `.claude/rules/` | `aiwg use sdlc` |
-| OpenAI/Codex | `.codex/agents/` | `~/.codex/prompts/` | `~/.codex/skills/` | `.codex/rules/` | `aiwg use sdlc --provider codex` |
-| GitHub Copilot | `.github/agents/` | `.github/agents/` | `.github/skills/` | `.github/copilot-rules/` | `aiwg use sdlc --provider copilot` |
-| Factory AI | `.factory/droids/` | `.factory/commands/` | `.factory/skills/` | `.factory/rules/` | `aiwg use sdlc --provider factory` |
-| Cursor | `.cursor/agents/` | `.cursor/commands/` | `.cursor/skills/` | `.cursor/rules/` | `aiwg use sdlc --provider cursor` |
-| OpenCode | `.opencode/agent/` | `.opencode/command/` | `.opencode/skill/` | `.opencode/rule/` | `aiwg use sdlc --provider opencode` |
-| Warp Terminal | `.warp/agents/` + WARP.md | `.warp/commands/` | `.warp/skills/` | `.warp/rules/` | `aiwg use sdlc --provider warp` |
-| Windsurf | AGENTS.md | `.windsurf/workflows/` | `.windsurf/skills/` | `.windsurf/rules/` | `aiwg use sdlc --provider windsurf` |
-| OpenClaw | `~/.openclaw/agents/` | `~/.openclaw/commands/` | `~/.openclaw/skills/` | `~/.openclaw/rules/` | `aiwg use sdlc --provider openclaw` |
+| Platform | Agents | Skills (primary) | Commands (generated) | Rules | Deploy |
+|----------|--------|-----------------|---------------------|-------|--------|
+| Claude Code | `.claude/agents/` | `.claude/skills/` | `.claude/commands/` | `.claude/rules/` | `aiwg use sdlc` |
+| OpenAI/Codex | `.codex/agents/` | `~/.codex/skills/` | `~/.codex/prompts/` | `.codex/rules/` | `aiwg use sdlc --provider codex` |
+| GitHub Copilot | `.github/agents/` | `.github/skills/` | `.github/agents/` | `.github/copilot-rules/` | `aiwg use sdlc --provider copilot` |
+| Factory AI | `.factory/droids/` | `.factory/skills/` | `.factory/commands/` | `.factory/rules/` | `aiwg use sdlc --provider factory` |
+| Cursor | `.cursor/agents/` | `.cursor/skills/` | `.cursor/commands/` | `.cursor/rules/` | `aiwg use sdlc --provider cursor` |
+| OpenCode | `.opencode/agent/` | `.opencode/skill/` | `.opencode/command/` | `.opencode/rule/` | `aiwg use sdlc --provider opencode` |
+| Warp Terminal | `.warp/agents/` + WARP.md | `.warp/skills/` | `.warp/commands/` | `.warp/rules/` | `aiwg use sdlc --provider warp` |
+| Windsurf | AGENTS.md | `.windsurf/skills/` | `.windsurf/workflows/` | `.windsurf/rules/` | `aiwg use sdlc --provider windsurf` |
+| OpenClaw | `~/.openclaw/agents/` | `~/.openclaw/skills/` | `~/.openclaw/commands/` | `~/.openclaw/rules/` | `aiwg use sdlc --provider openclaw` |
 
 **Special cases:**
-- **Codex**: Commands and skills deploy to home directory (`~/.codex/prompts/`, `~/.codex/skills/`) for user-level availability across all projects
-- **Copilot**: Commands are converted to YAML agent format and deployed alongside agents in `.github/agents/`
-- **Warp**: Agents and commands are also aggregated into `WARP.md` for single-file context loading
+- **Codex**: Skills and generated commands deploy to home directory (`~/.codex/skills/`, `~/.codex/prompts/`) for user-level availability across all projects
+- **Copilot**: Skills are deployed natively; commands are converted to YAML agent format and deployed alongside agents in `.github/agents/`
+- **Warp**: Agents, skills, and commands are also aggregated into `WARP.md` for single-file context loading
 - **Windsurf**: Agents are aggregated into `AGENTS.md` at project root
 - **OpenClaw**: All artifacts deploy to home directory (`~/.openclaw/`). First provider to support behaviors (`~/.openclaw/behaviors/`)
 

@@ -223,7 +223,7 @@ aiwg sync --quiet
 
 ### use
 
-Install and deploy framework or addon to your project.
+Install and deploy framework or addon to your project. Skills are deployed natively for providers that support them; commands are generated from skill sources for providers that need them. Each provider receives all artifact types (agents, skills, commands, rules) regardless of native platform support.
 
 ```bash
 aiwg use <framework|addon>
@@ -926,6 +926,21 @@ aiwg package-all-plugins
 
 Commands for creating new extensions within addons/frameworks.
 
+### Skills vs Commands — Provider Support
+
+Skills are the **canonical source type** for agentic workflows. During `aiwg use` deployment:
+
+| Provider support | Behavior |
+|-----------------|---------|
+| **Native skill support** (Claude Code, OpenCode, Warp, etc.) | Skill deployed as-is to `.{platform}/skills/{id}/SKILL.md` |
+| **Generated-command providers** (Copilot, Factory, etc.) | Command file generated from skill source, deployed alongside skill |
+| **Legacy direct commands** | Authored command files still supported; not generated from a skill |
+
+**Authoring guidance:**
+- New workflow? → `aiwg add-skill` — AIWG handles deployment and command generation
+- Modifying an existing workflow? → Edit the `SKILL.md` source, not the generated command files
+- Advanced direct command? → `aiwg add-command` (deprecated path, still supported)
+
 ### add-agent
 
 Add agent to addon/framework.
@@ -957,6 +972,8 @@ Creates: `agents/api-designer.md`
 ---
 
 ### add-command
+
+> **Deprecated**: Use `aiwg add-skill` instead. Skills are the primary workflow extension type; commands are generated from skills during deployment. `add-command` remains available for direct command authoring in advanced cases.
 
 Add command to addon/framework.
 

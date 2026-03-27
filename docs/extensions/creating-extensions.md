@@ -193,7 +193,9 @@ interface AgentMetadata {
 
 ---
 
-## Creating Commands
+## Creating Commands (Advanced / Legacy)
+
+> **Prefer `aiwg add-skill`** for new workflows. Skills are the primary extension type — AIWG generates the corresponding command file automatically during deployment. Direct command authoring is for advanced cases where you need to write command-format content that doesn't originate from a skill source.
 
 Commands are CLI and slash commands with argument parsing.
 
@@ -381,6 +383,21 @@ A strong description enables Claude to match user intent without explicit trigge
 | **Domain-scoped** | "Continuous risk identification, assessment, tracking, and retirement throughout SDLC" | "Manage risks" |
 | **Includes key terms** | "STRIDE threat modeling, vulnerability scanning, and security control validation" | "Security stuff" |
 | **Differentiating** | "Detects AI-generated writing patterns and suggests authentic alternatives" | "Check writing quality" |
+
+### SKILL.md Frontmatter Reference
+
+| Field | Source | Purpose |
+|-------|--------|---------|
+| `name:` | Official | Skill name; also controls the generated command's slash-command path |
+| `description:` | Official | **Primary NL signal.** Claude reads this at session start and autonomously invokes the skill when user intent matches. A weak description degrades discoverability. |
+| `effort:` | Official | Model effort override: `1` (low), `2` (medium), `3` (high) |
+| `user-invocable:` | Official | `false` = background-only; not shown in `/` autocomplete |
+| `disable-model-invocation:` | Official | `true` = explicit user-only; disables autonomous model invocation |
+| `context:` | Official | `fork` (isolated) or `inherit` (shared context) |
+| `allowed-tools:` | Official | Restrict which tools the skill may use |
+| `platforms:` | AIWG-internal | Multi-provider deployment targets |
+| `autoTrigger:` | AIWG-internal | AIWG-level auto-trigger annotation |
+| `commandHint:` | AIWG-internal | Overrides the `argument-hint` in the generated command file |
 
 ### Skill Structure
 

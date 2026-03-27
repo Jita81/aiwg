@@ -4,6 +4,8 @@
 
 **ACCEPTED AND IMPLEMENTED**
 
+> **See also**: `adr-skills-canonical-extension-type.md` — the skills-as-source layer that sits above this ADR. Skills are the canonical authoring format; this ADR governs how all artifact types (including skill-generated commands) are universally deployed to all providers. In the support matrix below, `commands` should be understood as `generated` for most providers — derived from skill sources rather than authored directly.
+
 ## Date
 
 2026-02-06

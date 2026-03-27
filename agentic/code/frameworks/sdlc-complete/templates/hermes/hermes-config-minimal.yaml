@@ -1,30 +1,28 @@
 # Hermes Agent + AIWG — Minimal MCP Configuration
 #
-# This config connects AIWG as an MCP sidecar with a restricted tool surface.
-# Schema overhead: ~3,000 tokens (vs. ~12,000+ with full surface).
+# This config connects AIWG as an MCP sidecar.
+# AIWG exposes exactly 5 tools: workflow-run, artifact-read, artifact-write,
+# template-render, agent-list. Schema overhead: ~3,000 tokens.
 #
 # Architecture: Hermes (host) → MCP → AIWG (sidecar)
 # Hermes owns: conversation, memory, sessions
 # AIWG owns: .aiwg/ artifacts, workflows, templates
 #
 # Usage:
-#   1. Copy the mcp_servers block into ~/.hermes/config.yaml
-#   2. Restart Hermes or reload MCP servers
+#   1. Copy the mcp_servers and delegation blocks into ~/.hermes/config.yaml
+#   2. Config reloads automatically (v0.4.0+) — no restart needed
 #   3. Verify: ask Hermes "what AIWG tools are available?"
 
 mcp_servers:
   aiwg:
     command: "aiwg"
     args: ["mcp", "serve"]
-    tools:
-      include:
-        - workflow-run       # Execute AIWG workflow by name
-        - artifact-read      # Read a specific .aiwg/ artifact
-        - artifact-write     # Write/update a .aiwg/ artifact
-        - template-render    # Render an AIWG template with data
-        - agent-list         # List available AIWG agents
-      prompts: false         # Suppress prompt schemas (saves tokens)
-      resources: false       # Suppress resource schemas (saves tokens)
+
+# Delegation config — route AIWG workflows to a coding-optimized model
+# while the parent stays on hermes3 for conversation.
+delegation:
+  model: "ollama/qwen2.5-coder:14b"   # Best tool call accuracy for structured output
+  max_iterations: 50
 
 # Recommended model strategy — two roles, two models:
 #
@@ -33,21 +31,22 @@ mcp_servers:
 #     mistral:7b       — solid general-purpose alternative
 #     llama3.2:3b      — lightweight, fast on low VRAM
 #
-#   Coding / tool calls (via delegate_task model override):
-#     qwen3.5:9b       — best tool call accuracy of any open-weight model (recommended)
-#     qwen2.5-coder:7b — smaller Qwen variant, still excellent tool calls
-#     phi4-mini        — compact alternative for low VRAM
+#   Coding / tool calls (via delegation.model config):
+#     qwen2.5-coder:14b — best tool call accuracy, recommended for AIWG workflows
+#     qwen2.5-coder:7b  — smaller variant, still excellent tool calls, lower VRAM
+#     qwen3:8b          — strong structured output, good alternative
+#     phi4-mini          — compact alternative for low VRAM
 #
 #   Note: Qwen models have the best tool call accuracy open-weight. Use them
 #   for any AIWG workflow involving structured output or function calling.
 #
-# Pull recommended pair: ollama pull hermes3 && ollama pull qwen3.5:9b
+# Pull recommended pair: ollama pull hermes3 && ollama pull qwen2.5-coder:14b
 
 # Compression settings for local hardware (12GB VRAM)
 compression:
   enabled: true
   threshold: 0.30              # Lower than default 0.50 — avoids abrupt context cliffs
-  summary_model: "ollama/qwen3.5:9b"
+  summary_model: "ollama/qwen2.5-coder:7b"
   summary_provider: "custom"
   summary_base_url: "http://localhost:11434/v1"
 

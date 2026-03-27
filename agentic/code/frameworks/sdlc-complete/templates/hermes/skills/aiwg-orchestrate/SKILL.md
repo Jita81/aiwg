@@ -1,10 +1,12 @@
 ---
 name: aiwg-orchestrate
 description: Route structured artifact work to AIWG workflows via MCP with zero parent context cost
-version: 1.0.0
-platforms: [hermes, openclaw]
+version: 1.1.0
+author: aiwg
+license: MIT
 metadata:
-  tags: [aiwg, sdlc, artifacts, delegation, mcp]
+  hermes:
+    tags: [aiwg, sdlc, artifacts, delegation, mcp]
 ---
 
 ## When to Use
@@ -25,13 +27,14 @@ Do NOT use for one-off questions, short tasks, or conversational replies.
 
 ```
 delegate_task(
-    task="Run AIWG workflow: [workflow-name] for [description]. Save artifact to .aiwg/[category]/[filename].md",
-    context="Project: [project name]. Key constraint: [if any].",
-    skip_context_files=True,
-    skip_memory=True,
-    model="ollama/qwen3.5:9b"  # Coding model for structured output; parent stays on hermes3
+    goal="Run AIWG workflow: [workflow-name] for [description]. Save artifact to .aiwg/[category]/[filename].md",
+    context="Project: [project name]. Key constraint: [if any]."
 )
 ```
+
+Note: Child agents automatically exclude context files (AGENTS.md, SOUL.md) and memory
+(MEMORY.md, USER.md) — this is hardcoded behavior, not configurable per-call.
+The delegation model is set globally in `~/.hermes/config.yaml` under `delegation.model`.
 
 4. When the child returns, extract: artifact path + one-sentence summary
 5. Store in MEMORY.md: `[date] Created [type] at [path]: [summary]`
@@ -59,7 +62,7 @@ Never store artifact body content in memory. The artifact lives in `.aiwg/` — 
 
 - Do NOT load artifact content into parent context after delegation — defeats the purpose
 - Do NOT skip delegation for "quick" AIWG calls — even small tool results accumulate
-- Do NOT use `delegate_task` without `skip_context_files=True` — the child inherits AGENTS.md overhead otherwise
+- Context isolation is automatic in delegate_task — child agents never see AGENTS.md or memory files
 
 ## Verification
 

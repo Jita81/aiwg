@@ -14,7 +14,8 @@ Handle in Hermes directly: one-off questions, short tasks, conversation.
 
 Store artifact path + one-sentence summary in MEMORY.md. Never copy artifact body text.
 
-Use `delegate_task(skip_context_files=True, skip_memory=True)` for AIWG workflows.
+Use `delegate_task(goal="...", context="...")` for AIWG workflows.
+Child agents automatically exclude context files and memory.
 
 ## Artifact Store (.aiwg/)
 
