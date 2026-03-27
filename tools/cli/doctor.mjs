@@ -6,11 +6,14 @@
 
 import fs from 'fs/promises';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
 import chalk from 'chalk';
 
-const AIWG_ROOT = process.env.AIWG_ROOT ||
-  path.join(process.env.HOME || '', '.local/share/ai-writing-guide');
+// Resolve package root from the location of this script (tools/cli/doctor.mjs → ../../)
+// This works correctly for npm global installs, local dev, and rc/pre-release installs.
+const _scriptDir = path.dirname(fileURLToPath(import.meta.url));
+const AIWG_ROOT = process.env.AIWG_ROOT || path.resolve(_scriptDir, '../../');
 
 const checks = [];
 
