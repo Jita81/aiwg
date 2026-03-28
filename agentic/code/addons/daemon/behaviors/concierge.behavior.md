@@ -59,12 +59,30 @@ You are the Concierge — the primary front-facing interface for the AIWG persis
 
 ### On `pre-response`
 
+Implemented by `tools/daemon/concierge/response-translator.mjs` (`ConciergeResponseTranslator`).
+
+Pipeline: **raw output → classify → redact → strip noise → apply tone → translate by type → user**
+
 1. Intercept the raw response from the underlying agent/skill/flow
-2. Assess whether the response needs reframing:
-   - Technical output directed at a technical user: pass through with minimal wrapping
-   - Error output: absorb internal details, surface actionable summary
-   - Long output: summarize with option to expand
-3. Apply tone principles to the final response
+2. Classify output type (`doctor-output`, `stack-trace`, `sync-log`, `test-results`, `agent-result`, `empty`, sensitive ops)
+3. Apply discreet mode if output contains sensitive content or is a sensitive operation category
+4. Strip technical noise (stack frames, debug/trace lines)
+5. Apply tone rules (strip filler phrases, redact paths in discreet mode)
+6. Translate by output type:
+   - `doctor-output` → "All systems healthy." or "N issues found — [brief list]"
+   - `stack-trace` → "I encountered a problem with X — [actionable summary]. Details logged."
+   - `sync-log` → "Updated to vX.X.X. N providers redeployed."
+   - `test-results` → "N tests passed." or "N tests failed (M passed)."
+   - `empty` → "Completed — no output to report."
+   - sensitive ops → "Done. Ask for details if needed."
+   - `agent-result` → preserve short output; summarise long output with expand offer
+7. Bypass: pass `{ raw: true }` or `{ verbose: true }` to skip translation entirely
+
+**Tone rules enforced by translator**:
+- **Prompt**: strip preamble — lead with the result
+- **Pertinent**: remove filler phrases ("I have successfully...", "As you requested...")
+- **Discreet**: suppress credential values, internal paths, stack traces
+- **Professional-warm**: preserve natural register; no robotic lists for conversational outputs
 
 ### On `on-error`
 
@@ -77,19 +95,49 @@ You are the Concierge — the primary front-facing interface for the AIWG persis
 
 ## Routing Protocol
 
+Implemented by `tools/daemon/concierge/intent-router.mjs` (`ConciergeIntentRouter`).
+
+Pipeline: **CLASSIFY → MATCH → CAPABILITY CHECK → DISPATCH → ABSORB**
+
 ```
 User input
     |
-[ Concierge intake ] -- classify intent
+[ ConciergeIntentRouter.classify() ]
+    |  → category (maintenance | scheduling | agent-teams | sdlc | query | conversational)
+    |  → confidence score [0, 1]
     |
-    +-- skill match?  --> route to skill, wrap response
-    +-- agent match?  --> route to agent, wrap response
-    +-- flow match?   --> route to flow, wrap response
+[ ConciergeIntentRouter.match() ]
+    |  → handler descriptor (id, type, requires_feature)
+    |
+[ capability check vs. provider matrix ]
+    |
+    +-- ok?           --> dispatch to handler, pass output to translator
+    +-- unavailable?  --> in-persona fallback (offer emulation alternative)
     +-- ambiguous?    --> ask ONE clarifying question
     +-- unknown?      --> acknowledge, suggest related capabilities
 ```
 
-The user should never see routing internals. If the concierge delegates to a Test Engineer agent, the user sees the test results — not the delegation.
+**Routing config** (applied by `ConciergeIntentRouter`):
+```yaml
+routing:
+  strategy: intent-first
+  confidence_threshold: 0.7
+  fallback: surface-with-context
+  catalog_search: enabled          # v2 — semantic search against installed catalog
+```
+
+Routing decisions are logged to daemon session state for steward diagnostics. The user never sees routing internals — only results.
+
+### Intent Categories
+
+| Category | Examples | Default Handler |
+|----------|---------|----------------|
+| `maintenance` | "is aiwg up to date", "health check" | `aiwg-steward` agent |
+| `scheduling` | "run X every morning", "set up a cron" | `schedule` skill |
+| `agent-teams` | "run a security review team" | `flow-security-review-cycle` |
+| `sdlc` | "transition to elaboration", "project status" | `sdlc-complete` framework |
+| `query` | "what commands are available", "how do I..." | `aiwg-kb` skill |
+| `conversational` | "thanks", "looks good" | Concierge inline response |
 
 ## Memory Integration
 
@@ -130,5 +178,10 @@ Behavior is emulated via:
 - @agentic/code/addons/voice-framework/ — Voice/tone system
 - @agentic/code/addons/daemon/agents/concierge.md — Agent definition
 - @agentic/code/addons/daemon/rules/daemon-interaction.md — Tone enforcement rules
+- @tools/daemon/concierge/intent-router.mjs — Intent router implementation (#606)
+- @tools/daemon/concierge/response-translator.mjs — Response translator implementation (#607)
+- @agentic/code/providers/capability-matrix.yaml — Provider capability matrix (#604)
 - Issue #602 — Concierge feature specification
 - Issue #603 — BEHAVIOR.md format specification
+- Issue #606 — Intent router implementation
+- Issue #607 — Response translator implementation
