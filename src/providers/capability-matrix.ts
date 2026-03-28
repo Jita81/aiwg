@@ -1,0 +1,277 @@
+/**
+ * Provider Capability Matrix Loader
+ *
+ * Loads and queries the authoritative provider capability matrix from
+ * agentic/code/providers/capability-matrix.yaml. Provides typed access
+ * for the scheduler, agent teams, steward, and runtime-info CLI.
+ *
+ * @issue #604
+ * @unblocks #597, #598, #599
+ */
+
+import { readFileSync } from 'fs';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+import { load as loadYaml } from 'js-yaml';
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+export type ProviderStatus = 'stable' | 'experimental' | 'deprecated';
+
+export type FeatureKey =
+  | 'cron'
+  | 'agent_teams'
+  | 'tasks'
+  | 'mcp'
+  | 'behaviors'
+  | 'mission_control';
+
+export type EmulationStrategy =
+  | 'native'
+  | 'hooks'
+  | 'aiwg-mc'
+  | 'aiwg-schedule'
+  | null;
+
+export type DeployTarget = 'project' | 'home' | 'mixed';
+
+export interface ArtifactPaths {
+  agents: string;
+  commands: string;
+  skills: string;
+  rules: string;
+  behaviors: string | null;
+}
+
+export interface HookWiring {
+  at_link_support: boolean;
+  hook_file?: string;
+  hook_directive?: string;
+  fallback?: string;
+  context_file: string;
+}
+
+export interface ProviderCapabilities {
+  display_name: string;
+  aliases?: string[];
+  status: ProviderStatus;
+  artifact_paths: ArtifactPaths;
+  native_features: Record<FeatureKey, boolean>;
+  emulation: Record<FeatureKey, EmulationStrategy>;
+  hook_wiring: HookWiring;
+  deploy_target: DeployTarget;
+  aggregated_output: boolean;
+}
+
+export interface FeatureDefinition {
+  description: string;
+  native_example: string | null;
+  emulation_strategies: Record<string, string>;
+}
+
+export interface CapabilityMatrix {
+  version: string;
+  providers: Record<string, ProviderCapabilities>;
+  features: Record<FeatureKey, FeatureDefinition>;
+}
+
+// ---------------------------------------------------------------------------
+// Loader
+// ---------------------------------------------------------------------------
+
+let _cached: CapabilityMatrix | null = null;
+
+/**
+ * Resolve the path to capability-matrix.yaml relative to the package root.
+ * Works for both compiled (dist/) and source (src/) layouts.
+ */
+function resolveMatrixPath(): string {
+  // Walk up from this file to the package root
+  const thisDir = typeof __dirname !== 'undefined'
+    ? __dirname
+    : dirname(fileURLToPath(import.meta.url));
+
+  // From src/providers/ or dist/providers/ → package root
+  const packageRoot = resolve(thisDir, '..', '..');
+  return resolve(packageRoot, 'agentic', 'code', 'providers', 'capability-matrix.yaml');
+}
+
+/**
+ * Load the capability matrix from disk (cached after first load).
+ */
+export function loadCapabilityMatrix(): CapabilityMatrix {
+  if (_cached) return _cached;
+
+  const matrixPath = resolveMatrixPath();
+  const raw = readFileSync(matrixPath, 'utf-8');
+  _cached = loadYaml(raw) as CapabilityMatrix;
+  return _cached;
+}
+
+/**
+ * Force-reload the matrix (e.g. after edits during validate-metadata).
+ */
+export function reloadCapabilityMatrix(): CapabilityMatrix {
+  _cached = null;
+  return loadCapabilityMatrix();
+}
+
+// ---------------------------------------------------------------------------
+// Query helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Get the full capabilities object for a provider by key or alias.
+ */
+export function getProviderCapabilities(
+  providerKey: string,
+): ProviderCapabilities | undefined {
+  const matrix = loadCapabilityMatrix();
+
+  // Direct match
+  if (matrix.providers[providerKey]) {
+    return matrix.providers[providerKey];
+  }
+
+  // Search aliases
+  for (const [key, caps] of Object.entries(matrix.providers)) {
+    if (caps.aliases?.includes(providerKey)) {
+      return matrix.providers[key];
+    }
+  }
+
+  return undefined;
+}
+
+/**
+ * Check whether a provider supports a feature natively (without emulation).
+ */
+export function supportsNative(
+  caps: ProviderCapabilities,
+  feature: FeatureKey,
+): boolean {
+  return caps.native_features[feature] === true;
+}
+
+/**
+ * Get the emulation strategy for a feature on a provider.
+ * Returns 'native' if the provider supports it natively, or the
+ * emulation strategy string, or null if unsupported entirely.
+ */
+export function getEmulationStrategy(
+  caps: ProviderCapabilities,
+  feature: FeatureKey,
+): EmulationStrategy {
+  return caps.emulation[feature] ?? null;
+}
+
+/**
+ * List all provider keys.
+ */
+export function listProviders(): string[] {
+  return Object.keys(loadCapabilityMatrix().providers);
+}
+
+/**
+ * List all providers that natively support a given feature.
+ */
+export function providersWithNativeSupport(feature: FeatureKey): string[] {
+  const matrix = loadCapabilityMatrix();
+  return Object.entries(matrix.providers)
+    .filter(([, caps]) => caps.native_features[feature])
+    .map(([key]) => key);
+}
+
+/**
+ * Get the feature definition (description, examples, strategies).
+ */
+export function getFeatureDefinition(
+  feature: FeatureKey,
+): FeatureDefinition | undefined {
+  return loadCapabilityMatrix().features[feature];
+}
+
+// ---------------------------------------------------------------------------
+// Display helpers (for CLI output)
+// ---------------------------------------------------------------------------
+
+/**
+ * Format the full capability matrix as a human-readable table string.
+ */
+export function formatCapabilityTable(): string {
+  const matrix = loadCapabilityMatrix();
+  const features: FeatureKey[] = [
+    'cron',
+    'agent_teams',
+    'tasks',
+    'mcp',
+    'behaviors',
+    'mission_control',
+  ];
+
+  const lines: string[] = [];
+  lines.push('Provider Capability Matrix (v' + matrix.version + ')');
+  lines.push('='.repeat(90));
+  lines.push('');
+
+  // Header
+  const hdr = [
+    padRight('Provider', 18),
+    ...features.map((f) => padRight(f, 15)),
+  ].join('| ');
+  lines.push(hdr);
+  lines.push('-'.repeat(hdr.length));
+
+  // Rows
+  for (const [key, caps] of Object.entries(matrix.providers)) {
+    const cells = features.map((f) => {
+      if (caps.native_features[f]) return padRight('NATIVE', 15);
+      const emu = caps.emulation[f];
+      if (emu) return padRight(emu, 15);
+      return padRight('--', 15);
+    });
+    lines.push([padRight(caps.display_name, 18), ...cells].join('| '));
+  }
+
+  lines.push('');
+  lines.push('Legend: NATIVE = built-in support, aiwg-* = AIWG emulation, -- = unsupported');
+
+  return lines.join('\n');
+}
+
+/**
+ * Format a single feature's support across all providers.
+ */
+export function formatFeatureSupport(feature: FeatureKey): string {
+  const matrix = loadCapabilityMatrix();
+  const def = matrix.features[feature];
+  const lines: string[] = [];
+
+  lines.push(`Feature: ${feature}`);
+  if (def) {
+    lines.push(`Description: ${def.description}`);
+    if (def.native_example) {
+      lines.push(`Native example: ${def.native_example}`);
+    }
+  }
+  lines.push('');
+
+  for (const [, caps] of Object.entries(matrix.providers)) {
+    const native = caps.native_features[feature];
+    const strategy = caps.emulation[feature];
+    const status = native
+      ? 'NATIVE'
+      : strategy
+        ? `emulated (${strategy})`
+        : 'unsupported';
+    lines.push(`  ${padRight(caps.display_name, 18)} ${status}`);
+  }
+
+  return lines.join('\n');
+}
+
+function padRight(str: string, len: number): string {
+  return str.length >= len ? str : str + ' '.repeat(len - str.length);
+}

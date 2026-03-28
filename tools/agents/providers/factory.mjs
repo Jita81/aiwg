@@ -59,7 +59,7 @@ export const paths = {
 export const support = {
   agents: 'native',
   commands: 'native',
-  skills: 'conventional',
+  skills: 'native',
   rules: 'conventional'
 };
 

@@ -6,14 +6,11 @@
 
 import fs from 'fs/promises';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
 import chalk from 'chalk';
 
-// Resolve package root from the location of this script (tools/cli/doctor.mjs → ../../)
-// This works correctly for npm global installs, local dev, and rc/pre-release installs.
-const _scriptDir = path.dirname(fileURLToPath(import.meta.url));
-const AIWG_ROOT = process.env.AIWG_ROOT || path.resolve(_scriptDir, '../../');
+const AIWG_ROOT = process.env.AIWG_ROOT ||
+  path.join(process.env.HOME || '', '.local/share/ai-writing-guide');
 
 const checks = [];
 
@@ -116,93 +113,42 @@ async function runDoctor() {
     check('MCP Server', 'warn', 'Not found');
   }
 
-  // 9. Provider capability summary
-  try {
-    const { readFile } = await import('node:fs/promises');
-    const matrixPath = path.join(AIWG_ROOT, 'agentic/code/providers/capability-matrix.yaml');
-    const matrixRaw = await readFile(matrixPath, 'utf-8').catch(() => null);
+  // 9. Check installed addons
+  const addonChecks = [
+    { id: 'daemon', label: 'Daemon Addon', manifest: 'agentic/code/addons/daemon/manifest.json',
+      artifacts: ['behaviors/concierge.behavior.md', 'agents/concierge.md', 'skills/daemon-status/SKILL.md', 'rules/daemon-interaction.md'] },
+    { id: 'ralph', label: 'Ralph Addon', manifest: 'agentic/code/addons/ralph/manifest.json',
+      artifacts: ['commands/ralph.md', 'agents/ralph-loop.md'] },
+    { id: 'rlm', label: 'RLM Addon', manifest: 'agentic/code/addons/rlm/manifest.json',
+      artifacts: [] },
+    { id: 'ring', label: 'Ring Methodology', manifest: 'agentic/code/addons/ring-methodology/manifest.json',
+      artifacts: [] },
+  ];
 
-    if (matrixRaw) {
-      // Detect current provider via environment heuristics
-      let detectedProvider = null;
-      if (process.env.CLAUDE_CODE_VERSION || process.env.ANTHROPIC_API_KEY) detectedProvider = 'claude-code';
-      else if (process.env.CURSOR_TRACE_ID || process.env.CURSOR_VERSION) detectedProvider = 'cursor';
-      else if (process.env.WINDSURF_VERSION) detectedProvider = 'windsurf';
-      else if (process.env.WARP_SESSION_ID || process.env.WARP_TERMINAL) detectedProvider = 'warp';
-      else if (process.env.COPILOT_AGENT || process.env.GITHUB_COPILOT_TOKEN) detectedProvider = 'copilot';
-      else if (process.env.OPENCLAW_VERSION) detectedProvider = 'openclaw';
-      else if (process.env.FACTORY_AGENT_ID) detectedProvider = 'factory';
-      else if (process.env.OPENCODE_VERSION) detectedProvider = 'opencode';
-      else if (process.env.OPENAI_API_KEY) detectedProvider = 'codex';
-
-      if (detectedProvider) {
-        // Parse minimal provider block from YAML (avoid full YAML dep in doctor)
-        // We extract native: true/false counts for the detected provider section
-        const providerSection = matrixRaw.split(/\n  [a-z\-]+:\n/);
-        const providerHeader = `\n  ${detectedProvider}:\n`;
-        const idx = matrixRaw.indexOf(providerHeader);
-
-        let nativeCount = 0;
-        let emulatedCount = 0;
-        let notSupportedCount = 0;
-
-        if (idx >= 0) {
-          // Count native: true vs native: false in this provider's block (heuristic)
-          const nextProviderIdx = matrixRaw.indexOf('\n  ', idx + providerHeader.length + 10);
-          const block = nextProviderIdx > 0
-            ? matrixRaw.slice(idx, nextProviderIdx)
-            : matrixRaw.slice(idx);
-
-          const nativeMatches = block.match(/native: true/g);
-          const emulatedMatches = block.match(/native: false/g);
-          const nullToolMatches = block.match(/native_tool: null/g);
-
-          nativeCount = nativeMatches?.length ?? 0;
-          emulatedCount = (emulatedMatches?.length ?? 0) - (nullToolMatches?.length ?? 0);
-          notSupportedCount = nullToolMatches?.length ?? 0;
+  for (const addon of addonChecks) {
+    const manifestPath = path.join(AIWG_ROOT, addon.manifest);
+    const hasManifest = await fileExists(manifestPath);
+    if (hasManifest) {
+      // Check key artifacts exist
+      const missing = [];
+      for (const artifact of addon.artifacts) {
+        const artifactPath = path.join(path.dirname(manifestPath), artifact);
+        if (!(await fileExists(artifactPath))) {
+          missing.push(artifact);
         }
-
-        const summary = `Provider: ${detectedProvider} — ${nativeCount} native, ${emulatedCount} emulated, ${notSupportedCount} not supported`;
-        check('Provider Capabilities', 'ok', summary);
+      }
+      if (missing.length > 0) {
+        check(addon.label, 'warn', `Installed but missing: ${missing.join(', ')}`);
       } else {
-        check('Provider Capabilities', 'info', 'Provider not detected — run: aiwg steward capabilities');
+        try {
+          const manifest = JSON.parse(await fs.readFile(manifestPath, 'utf-8'));
+          check(addon.label, 'ok', `v${manifest.version || 'unknown'}`);
+        } catch {
+          check(addon.label, 'ok', 'Installed');
+        }
       }
-    } else {
-      check('Provider Capabilities', 'info', 'capability-matrix.yaml not found (run: aiwg sync)');
     }
-  } catch {
-    check('Provider Capabilities', 'info', 'Could not read capability matrix');
-  }
-
-  // 10. Check .gitignore for AIWG runtime patterns (warning if missing)
-  const AIWG_RUNTIME_PATTERNS = ['.aiwg/working/', '.aiwg/ralph/', '.aiwg/ralph-external/'];
-  const gitignorePath = path.join(process.cwd(), '.gitignore');
-  try {
-    const gitignoreContent = await fs.readFile(gitignorePath, 'utf-8');
-    const lines = gitignoreContent.split('\n').map(l => l.trim());
-    const isCovered = (pattern) => {
-      if (lines.includes(pattern)) return true;
-      if (lines.includes(pattern.replace(/\/$/, ''))) return true;
-      const parts = pattern.split('/').filter(Boolean);
-      for (let i = 1; i < parts.length; i++) {
-        const parent = parts.slice(0, i).join('/') + '/';
-        if (lines.includes(parent) || lines.includes(parent.replace(/\/$/, ''))) return true;
-      }
-      return false;
-    };
-    const missing = AIWG_RUNTIME_PATTERNS.filter(p => !isCovered(p));
-    if (missing.length === 0) {
-      check('.gitignore', 'ok', 'AIWG runtime paths covered');
-    } else {
-      check('.gitignore', 'warn', `Missing ${missing.length} AIWG runtime entr${missing.length === 1 ? 'y' : 'ies'} — run: aiwg config gitignore --fix`);
-    }
-  } catch {
-    // No .gitignore — only warn if this looks like an AIWG project
-    if (hasProjectAiwg) {
-      check('.gitignore', 'warn', 'No .gitignore found — run: aiwg config gitignore --fix');
-    } else {
-      check('.gitignore', 'info', 'No .gitignore (not an AIWG project)');
-    }
+    // Skip silently if not installed — addons are optional
   }
 
   // Print results

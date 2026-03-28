@@ -73,22 +73,22 @@ Use `@path/to/file.md` in your message to load specific documentation:
 
 All 9 providers receive all 4 artifact types (agents, commands, skills, rules). OpenClaw additionally receives behaviors. Support level indicates how the platform discovers artifacts: **native** (auto-discovered), **conventional** (AIWG directory), **aggregated** (single-file + discrete).
 
-| Platform | Agents | Skills (primary) | Commands (generated) | Rules | Deploy |
-|----------|--------|-----------------|---------------------|-------|--------|
-| Claude Code | `.claude/agents/` | `.claude/skills/` | `.claude/commands/` | `.claude/rules/` | `aiwg use sdlc` |
-| OpenAI/Codex | `.codex/agents/` | `~/.codex/skills/` | `~/.codex/prompts/` | `.codex/rules/` | `aiwg use sdlc --provider codex` |
-| GitHub Copilot | `.github/agents/` | `.github/skills/` | `.github/prompts/` | `.github/instructions/` | `aiwg use sdlc --provider copilot` |
-| Factory AI | `.factory/droids/` | `.factory/skills/` | `.factory/commands/` | `.factory/rules/` | `aiwg use sdlc --provider factory` |
-| Cursor | `.cursor/agents/` | `.cursor/skills/` | `.cursor/commands/` | `.cursor/rules/` | `aiwg use sdlc --provider cursor` |
-| OpenCode | `.opencode/agent/` | `.opencode/skill/` | `.opencode/commands/` | `.opencode/rule/` | `aiwg use sdlc --provider opencode` |
-| Warp Terminal | `.warp/agents/` + WARP.md | `.warp/skills/` | `.warp/commands/` | `.warp/rules/` | `aiwg use sdlc --provider warp` |
-| Windsurf | AGENTS.md | `.windsurf/skills/` | `.windsurf/workflows/` | `.windsurf/rules/` | `aiwg use sdlc --provider windsurf` |
-| OpenClaw | `~/.openclaw/agents/` | `~/.openclaw/skills/` | `~/.openclaw/commands/` | `~/.openclaw/rules/` | `aiwg use sdlc --provider openclaw` |
+| Platform | Agents | Commands | Skills | Rules | Command |
+|----------|--------|----------|--------|-------|---------|
+| Claude Code | `.claude/agents/` | `.claude/commands/` | `.claude/skills/` | `.claude/rules/` | `aiwg use sdlc` |
+| OpenAI/Codex | `.codex/agents/` | `~/.codex/prompts/` | `~/.codex/skills/` | `.codex/rules/` | `aiwg use sdlc --provider codex` |
+| GitHub Copilot | `.github/agents/` | `.github/prompts/` | `.github/prompts/` | `.github/instructions/` | `aiwg use sdlc --provider copilot` |
+| Factory AI | `.factory/droids/` | `.factory/commands/` | `.factory/skills/` | `.factory/rules/` | `aiwg use sdlc --provider factory` |
+| Cursor | `.cursor/agents/` | `.cursor/commands/` | `.cursor/skills/` | `.cursor/rules/` | `aiwg use sdlc --provider cursor` |
+| OpenCode | `.opencode/agent/` | `.opencode/command/` | `.opencode/skill/` | `.opencode/rule/` | `aiwg use sdlc --provider opencode` |
+| Warp Terminal | `.warp/agents/` + WARP.md | `.warp/commands/` | `.warp/skills/` | `.warp/rules/` | `aiwg use sdlc --provider warp` |
+| Windsurf | AGENTS.md | `.windsurf/workflows/` | `.windsurf/skills/` | `.windsurf/rules/` | `aiwg use sdlc --provider windsurf` |
+| OpenClaw | `~/.openclaw/agents/` | `~/.openclaw/commands/` | `~/.openclaw/skills/` | `~/.openclaw/rules/` | `aiwg use sdlc --provider openclaw` |
 
 **Special cases:**
-- **Codex**: Skills and generated commands deploy to home directory (`~/.codex/skills/`, `~/.codex/prompts/`) for user-level availability across all projects
-- **Copilot**: Agents deploy as `.agent.md` files; commands deploy as `.prompt.md` prompt files in `.github/prompts/`; rules deploy as `.instructions.md` with `applyTo` globs in `.github/instructions/`
-- **Warp**: Agents, skills, and commands are also aggregated into `WARP.md` for single-file context loading
+- **Codex**: Commands and skills deploy to home directory (`~/.codex/prompts/`, `~/.codex/skills/`) for user-level availability across all projects
+- **Copilot**: Agents use `.agent.md` format (Markdown + YAML frontmatter). Commands deploy as prompt files (`.github/prompts/`). Rules deploy as path-scoped instructions (`.github/instructions/`)
+- **Warp**: Agents and commands are also aggregated into `WARP.md` for single-file context loading
 - **Windsurf**: Agents are aggregated into `AGENTS.md` at project root
 - **OpenClaw**: All artifacts deploy to home directory (`~/.openclaw/`). First provider to support behaviors (`~/.openclaw/behaviors/`)
 
@@ -223,6 +223,7 @@ aiwg update                  # Check for updates
 # Framework and addon management
 aiwg use sdlc                # Deploy SDLC framework
 aiwg use rlm                 # Deploy RLM addon
+aiwg use ring                # Deploy Ring Methodology addon
 aiwg use sdlc --provider copilot  # Deploy to GitHub Copilot
 aiwg list                    # List installed frameworks
 aiwg remove sdlc             # Remove framework
@@ -311,6 +312,7 @@ aiwg reproducibility-validate  # Validate workflow reproducibility
 | **Media Curator** | `@agentic/code/frameworks/media-curator/README.md` |
 | **Research Complete** | `@agentic/code/frameworks/research-complete/README.md` |
 | **RLM Addon** | `@agentic/code/addons/rlm/README.md` |
+| **Ring Methodology Addon** | `@agentic/code/addons/ring-methodology/README.md` |
 | **Daemon Mode** | `@docs/daemon-guide.md` |
 | **Messaging Integration** | `@docs/messaging-guide.md` |
 | **Voice Profiles** | `@agentic/code/addons/voice-framework/voices/templates/` |
@@ -319,21 +321,6 @@ aiwg reproducibility-validate  # Validate workflow reproducibility
 | **Templates** | `@agentic/code/frameworks/sdlc-complete/templates/` |
 | **Command Definitions** | `@src/extensions/commands/definitions.ts` |
 | **Extension Types** | `@src/extensions/types.ts` |
-
-## `.claude/` is a Deployment Target (NOT Source)
-
-**CRITICAL**: The `.claude/` directory is **output generated by `aiwg use`**, not framework source code.
-
-- **Source**: `agentic/code/frameworks/*/skills/`, `agentic/code/addons/*/skills/`, `agentic/code/frameworks/*/agents/`
-- **Output**: `.claude/skills/`, `.claude/commands/`, `.claude/agents/`, `.claude/rules/`
-
-`aiwg use sdlc` reads from `agentic/code/` and deploys to `.claude/`. Editing files in `.claude/` directly is valid for local testing, but those changes will be overwritten on the next `aiwg use`. To persist changes, port them back to the framework/addon source in `agentic/code/`.
-
-**Same boundary as `.aiwg/`**: Neither `.claude/` nor `.aiwg/` is framework source. Both are project-local output directories. See the `.aiwg/ Boundary` note in AIWG.md.
-
-## Deprecation: Commands → Skills
-
-**Commands are deprecated.** All new functionality MUST be implemented as skills, not commands. Existing commands should be migrated to skill equivalents when touched. Agents encountering command-based patterns (`.claude/commands/`, `/command-name`) should prefer the equivalent skill if one exists. Skills provide natural language triggers, platform portability, and better integration with the agent-loop detection layer.
 
 ## Core Enforcement Rules
 
@@ -379,6 +366,7 @@ Rules are organized in a two-level hierarchy: each component owns its own `RULES
 - Component indexes:
   - sdlc-complete (33 rules): `agentic/code/frameworks/sdlc-complete/rules/RULES-INDEX.md`
   - aiwg-utils (7 rules): `agentic/code/addons/aiwg-utils/rules/RULES-INDEX.md`
+  - ring-methodology (7 rules): `agentic/code/addons/ring-methodology/rules/RULES-INDEX.md`
 - Architecture decision: `.aiwg/architecture/adr-rules-index-hierarchy.md`
 
 ## Commit and Output Conventions

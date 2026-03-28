@@ -9,7 +9,7 @@ The AIWG SDLC framework supports **Warp Terminal** through native `WARP.md` file
 ### Prerequisites
 
 - **Warp Terminal** installed (https://www.warp.dev/)
-- **AIWG** installed (`aiwg -version` to verify)
+- **AIWG** installed (`aiwg version` to verify)
 - **Node.js 18.20.8+** (for CLI tools)
 
 ### Setup
@@ -19,7 +19,7 @@ The AIWG SDLC framework supports **Warp Terminal** through native `WARP.md` file
 curl -fsSL https://raw.githubusercontent.com/jmagly/ai-writing-guide/refs/heads/main/tools/install/install.sh | bash
 
 # Verify installation
-aiwg -version
+aiwg version
 ```
 
 ---
@@ -33,7 +33,7 @@ aiwg -version
 cd /path/to/your/project
 
 # Setup Warp with AIWG SDLC framework
-aiwg -setup-warp
+aiwg use sdlc --provider warp
 
 # Open in Warp Terminal
 # Warp automatically loads WARP.md
@@ -46,7 +46,7 @@ aiwg -setup-warp
 cd /path/to/existing/project
 
 # Merge AIWG content (preserves your existing rules)
-aiwg -setup-warp
+aiwg use sdlc --provider warp
 ```
 
 ---
@@ -55,62 +55,52 @@ aiwg -setup-warp
 
 ### Command Options
 
-#### `aiwg -setup-warp`
+#### `aiwg use sdlc --provider warp`
 
-Setup Warp Terminal with AIWG SDLC framework (creates or merges WARP.md).
+Deploy the AIWG SDLC framework to Warp Terminal (creates or merges WARP.md).
 
 **Syntax**:
 ```bash
-aiwg -setup-warp [options]
+aiwg use sdlc --provider warp [options]
 ```
 
 **Options**:
-- `--target <path>` - Target directory (default: current directory)
-- `--mode <type>` - Deployment mode: `general`, `sdlc`, or `both` (default: `both`)
-- `--dry-run` - Preview changes without writing
 - `--force` - Overwrite existing WARP.md (discard user content)
+- `--dry-run` - Preview changes without writing
 
 **Examples**:
 ```bash
-# Setup with SDLC agents only
-aiwg -setup-warp --mode sdlc
+# Deploy SDLC framework to Warp
+aiwg use sdlc --provider warp
 
 # Preview what will be created
-aiwg -setup-warp --dry-run
-
-# Setup in specific directory
-aiwg -setup-warp --target /path/to/project
+aiwg use sdlc --provider warp --dry-run
 
 # Force overwrite (use with caution)
-aiwg -setup-warp --force
+aiwg use sdlc --provider warp --force
 ```
 
-#### `aiwg -update-warp`
+#### Updating / Refreshing
 
-Update existing WARP.md with latest AIWG content (fails if no WARP.md exists).
+To update WARP.md with the latest AIWG content after an upgrade:
 
-**Syntax**:
 ```bash
-aiwg -update-warp [options]
-```
+# Update AIWG installation
+aiwg update
 
-**Options**:
-- `--target <path>` - Target directory (default: current directory)
-
-**Examples**:
-```bash
-# Update current project
-aiwg -update-warp
-
-# Update specific project
-aiwg -update-warp --target /path/to/project
+# Refresh WARP.md with latest content
+aiwg use sdlc --provider warp --force
 ```
 
 ---
 
 ## What Gets Created
 
-### WARP.md Structure
+### WARP.md Structure and File Discovery
+
+Warp's Rules system recognizes two file names: `WARP.md` and `AGENTS.md`. When both exist in the same directory, `WARP.md` takes priority. AIWG continues to generate `WARP.md` for backward compatibility, but you may also encounter `AGENTS.md` in projects configured for other platforms.
+
+Warp also natively discovers `.warp/skills/` directories in your project. See the Skills section below for details.
 
 ```markdown
 # Project Context
@@ -196,16 +186,18 @@ Agents are embedded in WARP.md as context. Warp AI automatically uses them when 
 
 ## How It Works
 
-### 1. Warp Loads WARP.md
+### 1. Warp Loads WARP.md via the Rules System
 
-When you open a project in Warp Terminal:
-1. Warp automatically detects `WARP.md` in project root
-2. Loads content as context for AI agents
-3. Makes all AIWG agents and commands available
+`WARP.md` is loaded by Warp's **Rules system** — not by Agent Mode or Codebase Context, which are separate features. When you open a project in Warp Terminal:
+
+1. Warp's Rules system detects `WARP.md` (or `AGENTS.md`) and loads it as persistent context
+2. Rules follow a hierarchical loading order: subdirectory file overrides root directory file, which overrides Global Rules
+3. All AIWG agents and commands defined in the file become available to the AI
+4. Warp also recognizes `.cursorrules` and `.clinerules` files when linked from rules files, enabling cross-tool compatibility
 
 ### 2. Intelligent Merge
 
-`aiwg -setup-warp` intelligently merges content:
+`aiwg use sdlc --provider warp` intelligently merges content:
 
 **User Sections (Preserved)**:
 - Tech Stack
@@ -232,6 +224,44 @@ cp WARP.md.backup-2025-10-17T20-43-24-831Z WARP.md
 
 ---
 
+## Skills
+
+Warp natively discovers skills in the `.warp/skills/` directory of your project. Each skill is its own subdirectory containing a `SKILL.md` file with YAML frontmatter:
+
+```markdown
+---
+name: security-review
+description: Run AIWG security validation workflow for the current project
+---
+
+## Security Review Skill
+
+{skill instructions and workflow steps}
+```
+
+Skills are invoked in two ways:
+
+- **Intent matching** — Warp auto-invokes a skill when your request matches its description
+- **Explicit invocation** — Type `/{skill-name}` in Warp to invoke a skill directly (e.g., `/security-review`)
+
+AIWG deploys a set of `.warp/skills/` entries alongside `WARP.md` when you run `aiwg use sdlc --provider warp`. You can also add custom skills to `.warp/skills/` — they are version-controlled alongside your project and will not be overwritten by AIWG updates.
+
+---
+
+## Agent Profiles
+
+Warp supports Agent Profiles (Settings > AI > Agents > Profiles) for configuring the model, autonomy levels, and command allow/deny lists used by the AI. These are user-local settings; they are not distributable via project files. Teams wanting consistent AI behavior across members should use `WARP.md` rules and `.warp/skills/` rather than relying on Agent Profile configuration.
+
+---
+
+## Warp Drive
+
+Warp Drive is Warp's team sharing feature. Workflows, prompts, notebooks, and environment variables can be shared via Warp Drive and made available to all team members.
+
+Skills and agent definitions (including AIWG content) cannot be shared via Warp Drive — they must be version-controlled in the project repository and cloned alongside the codebase. Commit `WARP.md` and `.warp/skills/` to your repository to ensure all team members receive the same context.
+
+---
+
 ## Deployment Modes
 
 ### Mode: `both` (Default)
@@ -242,7 +272,7 @@ Deploys both general-purpose and SDLC agents:
 - **Total**: All agents + commands
 
 ```bash
-aiwg -setup-warp --mode both
+aiwg use sdlc --provider warp
 ```
 
 ### Mode: `sdlc`
@@ -252,7 +282,7 @@ Deploys only SDLC framework agents:
 - **Full commands**: Full SDLC workflow orchestration
 
 ```bash
-aiwg -setup-warp --mode sdlc
+aiwg use sdlc --provider warp
 ```
 
 ### Mode: `general`
@@ -261,7 +291,7 @@ Deploys only general-purpose agents:
 - **General agents**: Writing quality, prompt optimization, content generation
 
 ```bash
-aiwg -setup-warp --mode general
+aiwg use general --provider warp
 ```
 
 ---
@@ -279,13 +309,13 @@ Update WARP.md when:
 
 ```bash
 # Check current AIWG version
-aiwg -version
+aiwg version
 
 # Update AIWG installation
-aiwg -update
+aiwg update
 
-# Update WARP.md with latest content
-aiwg -update-warp
+# Refresh WARP.md with latest content
+aiwg use sdlc --provider warp --force
 ```
 
 **What happens**:
@@ -313,15 +343,15 @@ aiwg -update-warp
 
 ### Setup Command Not Found
 
-**Symptom**: `aiwg -setup-warp: command not found`
+**Symptom**: `aiwg use: command not found`
 
 **Solution**:
 ```bash
-# Reload shell aliases
+# Reload shell configuration
 source ~/.bash_aliases  # or ~/.zshrc
 
 # Or reinstall AIWG
-aiwg -reinstall
+curl -fsSL https://raw.githubusercontent.com/jmagly/ai-writing-guide/refs/heads/main/tools/install/install.sh | bash
 ```
 
 ### User Content Lost
@@ -334,8 +364,8 @@ aiwg -reinstall
 ls WARP.md.backup-*  # Find latest backup
 cp WARP.md.backup-{timestamp} WARP.md
 
-# Then re-run with merge (not force)
-aiwg -setup-warp  # WITHOUT --force flag
+# Then re-run without --force to merge instead of overwrite
+aiwg use sdlc --provider warp
 ```
 
 ### File Too Large
@@ -345,7 +375,7 @@ aiwg -setup-warp  # WITHOUT --force flag
 **Solution**:
 ```bash
 # Deploy only what you need
-aiwg -setup-warp --mode sdlc  # Skip general agents
+aiwg use sdlc --provider warp  # Skip general agents
 
 # Or use Claude Code for full agent orchestration
 # (Warp is best for terminal-native workflows)
@@ -371,11 +401,11 @@ curl -fsSL https://raw.githubusercontent.com/jmagly/ai-writing-guide/refs/heads/
 | Feature | Warp Terminal | Claude Code |
 |---------|--------------|-------------|
 | **Platform** | Terminal-native | IDE-native |
-| **File Format** | Single `WARP.md` | Multiple `.claude/agents/*.md` |
-| **Orchestration** | Single AI agent | Multi-agent workflows |
+| **File Format** | `WARP.md` (single file) + `.warp/skills/` | Multiple `.claude/agents/*.md` |
+| **Orchestration** | Single agent with `/orchestrate` parallel dispatch | Multi-agent workflows |
 | **Use Case** | Command-line workflows | Full SDLC orchestration |
 | **Artifact Generation** | Limited | Full (SAD, test plans, etc.) |
-| **Natural Language** | Yes ✅ | Yes ✅ |
+| **Natural Language** | Yes | Yes |
 | **SDLC Workflows** | Context only | Full execution |
 
 **Recommendation**:
@@ -409,27 +439,24 @@ Use both platforms simultaneously:
 
 ```bash
 # Deploy to Claude Code
-aiwg -deploy-agents --mode sdlc
-aiwg -deploy-commands --mode sdlc
+aiwg use sdlc
 
 # Deploy to Warp Terminal
-aiwg -setup-warp --mode sdlc
+aiwg use sdlc --provider warp
 
 # Now use:
 # - Claude Code for orchestration, artifact generation
 # - Warp Terminal for command-line workflows
 ```
 
-### Selective Updates
-
-Update only specific modes:
+### Refreshing Specific Frameworks
 
 ```bash
-# Update only SDLC agents (skip general)
-aiwg -setup-warp --mode sdlc --force
+# Refresh SDLC framework in Warp
+aiwg use sdlc --provider warp --force
 
-# Update only general agents (skip SDLC)
-aiwg -setup-warp --mode general --force
+# Deploy general-purpose framework to Warp
+aiwg use general --provider warp --force
 ```
 
 ---
@@ -446,7 +473,7 @@ aiwg -setup-warp --mode general --force
 
 ### Q: How often should I update?
 
-**A**: Update when AIWG releases new versions (`aiwg -update`), then refresh WARP.md (`aiwg -update-warp`).
+**A**: Update when AIWG releases new versions (`aiwg update`), then refresh WARP.md (`aiwg use sdlc --provider warp --force`).
 
 ### Q: Does this work offline?
 
@@ -454,14 +481,14 @@ aiwg -setup-warp --mode general --force
 
 ### Q: Can I use this in CI/CD?
 
-**A**: Yes. Run `aiwg -setup-warp` in your repository setup scripts to auto-configure new clones.
+**A**: Yes. Run `aiwg use sdlc --provider warp` in your repository setup scripts to auto-configure new clones.
 
 ### Q: What if I use both Warp and Cursor?
 
-**A**: AIWG supports both. Warp uses `WARP.md`, Cursor uses `.cursorrules`. Deploy to both:
+**A**: AIWG supports both. Deploy to each provider independently:
 ```bash
-aiwg -setup-warp              # For Warp
-# Create .cursorrules manually  # For Cursor
+aiwg use sdlc --provider warp    # For Warp
+aiwg use sdlc --provider cursor  # For Cursor
 ```
 
 ---
@@ -469,7 +496,9 @@ aiwg -setup-warp              # For Warp
 ## Resources
 
 - **Warp Terminal**: https://www.warp.dev/
-- **Warp Rules Documentation**: https://docs.warp.dev/knowledge-and-collaboration/rules
+- **Warp Rules Documentation**: https://docs.warp.dev/agent-platform/capabilities/rules
+- **Warp Skills Documentation**: https://docs.warp.dev/agent-platform/capabilities/skills
+- **Warp MCP Documentation**: https://docs.warp.dev/agent-platform/capabilities/mcp
 - **AIWG Repository**: https://github.com/jmagly/aiwg
 - **AIWG SDLC Framework**: `~/.local/share/ai-writing-guide/agentic/code/frameworks/sdlc-complete/README.md`
 
@@ -483,6 +512,5 @@ aiwg -setup-warp              # For Warp
 
 ---
 
-**Last Updated**: 2025-10-17
-**AIWG Version**: 1.4.0+
-**Integration Status**: ✅ Production Ready
+**Last Updated**: 2026-03-27
+**Integration Status**: Production Ready

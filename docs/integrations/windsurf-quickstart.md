@@ -32,7 +32,7 @@ code /path/to/your/project  # or use Windsurf launcher
 /aiwg-regenerate-windsurfrules
 ```
 
-This step is critical - it aggregates all agents into `AGENTS.md` and updates `.windsurfrules` for natural language command mapping ("run security review" → workflow). Without it, advanced features won't work correctly. See the [Regenerate Guide](#regenerate-guide) for details.
+This step is critical - it aggregates all agents into `AGENTS.md` and updates `.windsurf/rules/` for natural language command mapping ("run security review" → workflow). Without it, advanced features won't work correctly. See the [Regenerate Guide](#regenerate-guide) for details.
 
 **5. You're ready.** See the [Intake Guide](../intake-guide.md) for starting projects.
 
@@ -42,19 +42,18 @@ This step is critical - it aggregates all agents into `AGENTS.md` and updates `.
 
 ```text
 AGENTS.md                    # Aggregated agent definitions (auto-loaded)
-.windsurfrules               # Windsurf rules file
 .windsurf/
-├── workflows/               # Commands deployed as workflows
-├── skills/                  # Skill directories
-└── rules/                   # Rule files
+├── workflows/               # Commands deployed as native workflows
+├── skills/                  # Skill directories (native since v1.13.6)
+└── rules/                   # Rule files with trigger frontmatter
 .aiwg/                       # SDLC artifacts
 ```
 
 **Key Architecture**:
-- **Agents**: Aggregated into single `AGENTS.md` at project root (Windsurf reads automatically)
-- **Commands**: Deployed as native workflows to `.windsurf/workflows/`
-- **Skills**: Deployed to `.windsurf/skills/`
-- **Rules**: Deployed to `.windsurf/rules/` AND root `.windsurfrules` file
+- **Agents**: Aggregated into single `AGENTS.md` at project root (Windsurf auto-discovers at root and subdirectories)
+- **Commands**: Deployed as native workflows to `.windsurf/workflows/` (manual invocation via `/workflow-name`)
+- **Skills**: Deployed to `.windsurf/skills/` (native platform support — Cascade auto-matches by description)
+- **Rules**: Deployed to `.windsurf/rules/` with YAML frontmatter for trigger control (`always_on`, `model_decision`, `glob`, `manual`)
 
 ---
 
@@ -93,18 +92,18 @@ Commands are deployed as Windsurf workflows:
 
 ## Agent Aggregation
 
-Unlike platforms that support individual agent files, Windsurf uses a single aggregated `AGENTS.md`:
+Windsurf discovers agent definitions exclusively via `AGENTS.md` files (no `.windsurf/agents/` directory support):
 
 **Why Aggregation?**
-- Windsurf reads project context from root files
-- Single file is more performant than multiple scattered files
+- Windsurf's rules engine processes `AGENTS.md` natively — root-level files are always-on
+- Subdirectory `AGENTS.md` files auto-scope via generated globs (`<directory>/**`)
 - All agent definitions remain accessible via @-mentions
 - Regenerate updates aggregation when framework changes
 
 **How It Works**:
 1. Framework defines agents in `agentic/code/frameworks/sdlc-complete/agents/`
 2. Deployment aggregates all agents into root `AGENTS.md`
-3. Windsurf loads `AGENTS.md` automatically on project open
+3. Windsurf's rules engine loads `AGENTS.md` automatically — treated as always-on rules
 4. Regenerate command updates aggregation if needed
 
 ---
@@ -119,7 +118,7 @@ The regenerate command is essential for Windsurf integration:
 
 **What it does**:
 - Aggregates all agent definitions into `AGENTS.md`
-- Updates `.windsurfrules` with latest patterns
+- Updates `.windsurf/rules/` with latest orchestration patterns (with `trigger: always_on` frontmatter)
 - Synchronizes `.windsurf/workflows/` with command definitions
 - Enables natural language → workflow mapping
 
@@ -181,7 +180,7 @@ ls .windsurf/workflows/
 
 ### Commands not found?
 
-Ensure `.windsurfrules` is up to date:
+Ensure rules are up to date:
 
 ```text
 /aiwg-regenerate-windsurfrules
@@ -190,7 +189,8 @@ Ensure `.windsurfrules` is up to date:
 Then verify:
 
 ```bash
-cat .windsurfrules | grep -A 2 "Commands"
+ls .windsurf/rules/
+ls .windsurf/workflows/
 ```
 
 ### Agents not responding correctly?
@@ -230,12 +230,72 @@ aiwg use sdlc --provider windsurf --force
 |---------------|---------|----------|
 | **Agents** | Aggregated | `AGENTS.md` (root) |
 | **Commands** | Native | `.windsurf/workflows/` |
-| **Skills** | Conventional | `.windsurf/skills/` |
-| **Rules** | Conventional | `.windsurf/rules/`, `.windsurfrules` |
+| **Skills** | Native | `.windsurf/skills/` |
+| **Rules** | Native | `.windsurf/rules/` |
 
-**Aggregated**: All agent definitions combined into single file
-**Native**: Deployed to platform-specific location with full support
-**Conventional**: Standard directory-based deployment
+**Aggregated**: All agent definitions combined into single file (auto-discovered by rules engine)
+**Native**: Deployed to platform-specific location with full auto-discovery support
+
+---
+
+## Rules System
+
+Windsurf uses `.windsurf/rules/*.md` files with optional YAML frontmatter for trigger control. AIWG deploys rules with appropriate trigger modes:
+
+### Trigger Modes
+
+| Mode | Behavior | AIWG Usage |
+|------|----------|-----------|
+| `always_on` | Included in system prompt every message | Orchestration rules, core conventions |
+| `model_decision` | Description shown; full content loaded on demand | Optional guidance |
+| `glob` | Activated when matching files are edited | Language-specific rules |
+| `manual` | Activated via `@rule-name` mention | Reference rules |
+
+### Example Rule File
+
+```markdown
+---
+trigger: always_on
+---
+
+Follow AIWG SDLC conventions. Use @-mentions for traceability.
+```
+
+### Character Limits
+
+| Scope | Limit |
+|-------|-------|
+| Workspace rules (per file) | 12,000 chars |
+| Global rules | 6,000 chars |
+
+---
+
+## Skills
+
+Windsurf natively supports skills since v1.13.6 (January 2026). Each skill is a directory with a `SKILL.md` file:
+
+```
+.windsurf/skills/
+  project-awareness/
+    SKILL.md
+```
+
+Skills require `name` and `description` in YAML frontmatter. Cascade auto-matches skills by evaluating user requests against descriptions — only `name` and `description` are in context by default (progressive disclosure).
+
+Skills are also discoverable at `.agents/skills/` (cross-agent compatibility path) and `~/.codeium/windsurf/skills/` (global).
+
+---
+
+## Memories
+
+Windsurf has an automatic memory system (since v1.1.0) that persists context across conversations:
+
+- Cascade auto-generates memories when it encounters reusable context
+- Stored locally at `~/.codeium/windsurf/memories/` (per-machine)
+- Users can explicitly request: "remember that X"
+- Retrieved automatically when relevant to current conversation
+
+**AIWG and Memories**: Memories are local and cannot be committed to version control. For team-shareable context, AIWG uses `.windsurf/rules/` (always-on rules) and `AGENTS.md` instead. There is currently no external API for writing to the memories store.
 
 ---
 
@@ -274,6 +334,6 @@ See the [Windsurf MCP Sidecar Guide](windsurf-mcp-sidecar.md) for complete setup
 
 ## Additional Resources
 
-**Windsurf Documentation**: [windsurf.ai/docs](https://windsurf.ai/docs)
+**Windsurf Documentation**: [docs.windsurf.com](https://docs.windsurf.com)
 **AIWG Repository**: [github.com/jmagly/aiwg](https://github.com/jmagly/aiwg)
 **Support**: [Discord](https://discord.gg/BuAusFMxdA) | [Telegram](https://t.me/+oJg9w2lE6A5lOGFh)

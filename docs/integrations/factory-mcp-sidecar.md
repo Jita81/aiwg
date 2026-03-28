@@ -1,43 +1,19 @@
-# Factory AI MCP Sidecar — Feasibility Assessment
+# Factory AI MCP Integration
 
-Status: **Research Phase** — Factory AI's MCP client support and network topology need investigation.
-
----
-
-## Challenge: Cloud-Based Architecture
-
-Factory AI runs droids in the cloud. Unlike IDE-integrated providers (Cursor, Windsurf) where the MCP server runs on localhost, Factory would need to reach the MCP server over the network.
-
-### Network Topology Options
-
-| Option | Complexity | Security |
-|---|---|---|
-| ngrok tunnel | Low | Moderate (public URL) |
-| Cloudflare Tunnel | Medium | High (authenticated) |
-| Self-hosted MCP server | High | High (your infrastructure) |
+Status: **Supported** — Factory AI natively supports MCP with both stdio and HTTP transport.
 
 ---
 
-## If MCP Is Supported
+## Local Setup (stdio)
 
-### Setup with Tunnel
+The simplest configuration — Factory runs the AIWG MCP server as a local process:
 
 ```bash
-# 1. Start AIWG MCP server with HTTP transport
-aiwg mcp serve --transport http --port 3100
-
-# 2. Expose via tunnel
-ngrok http 3100
-# or
-cloudflared tunnel --url http://localhost:3100
-
-# 3. Configure Factory with the tunnel URL
-# (in Factory AI dashboard or .factory/config)
+# Auto-configure
+aiwg mcp install factory
 ```
 
-### Local Configuration
-
-`aiwg mcp install factory` already generates `~/.factory/mcp.json`:
+This creates `~/.factory/mcp.json`:
 
 ```json
 {
@@ -52,48 +28,158 @@ cloudflared tunnel --url http://localhost:3100
 }
 ```
 
-This works if Factory's droids can execute local commands. If they run in the cloud, the HTTP transport + tunnel approach is needed.
+### Project-Level Configuration
 
----
+For team-shared MCP config, create `.factory/mcp.json` in your project root:
 
-## Current Alternatives
-
-### Option 1: Native AIWG Integration
-
-```bash
-aiwg use sdlc --provider factory
+```json
+{
+  "mcpServers": {
+    "aiwg": {
+      "type": "stdio",
+      "command": "aiwg",
+      "args": ["mcp", "serve"],
+      "disabled": false
+    }
+  }
+}
 ```
 
-Deploys `.factory/droids/` configurations with AIWG agent definitions.
+Project-level config is lower priority than user-level — personal overrides apply.
 
-### Option 2: Use a Spawnable Provider
+---
 
-For workflows requiring full AIWG tool access:
+## Remote Setup (HTTP)
+
+For environments where Factory droids execute remotely (cloud sessions, CI), use HTTP transport with a tunnel:
+
+### With ngrok
 
 ```bash
-aiwg sdlc-accelerate "My project" --provider claude --dangerous
+# 1. Start AIWG MCP server with HTTP transport
+aiwg mcp serve --transport http --port 3100
+
+# 2. Expose via tunnel
+ngrok http 3100
+```
+
+### With Cloudflare Tunnel
+
+```bash
+# 1. Start AIWG MCP server
+aiwg mcp serve --transport http --port 3100
+
+# 2. Expose via Cloudflare
+cloudflared tunnel --url http://localhost:3100
+```
+
+### Configure Factory
+
+```json
+{
+  "mcpServers": {
+    "aiwg": {
+      "type": "http",
+      "url": "https://your-tunnel-url.ngrok.io",
+      "headers": {
+        "Authorization": "Bearer ${AIWG_MCP_TOKEN}"
+      },
+      "disabled": false
+    }
+  }
+}
 ```
 
 ---
 
-## Open Questions
+## Configuration Schema
 
-1. Does Factory AI support MCP tool connections from droids?
-2. Can Factory droids execute local commands (stdio transport) or only HTTP?
-3. Does Factory support authenticated MCP endpoints?
-4. Can MCP tools be registered in `.factory/droids/` config files?
+| Field | Applies To | Description |
+|---|---|---|
+| `type` | Both | `"stdio"` or `"http"` |
+| `disabled` | Both | Boolean toggle (default: `false`) |
+| `disabledTools` | Both | Array of specific tool names to exclude |
+| `command` | stdio | Executable to run |
+| `args` | stdio | Array of arguments |
+| `env` | stdio | Environment variable map (supports `${VAR}` expansion) |
+| `url` | http | Remote endpoint URL |
+| `headers` | http | HTTP headers (e.g., auth tokens) |
 
 ---
 
-## Tracking
+## Config File Locations
 
-This issue will be updated when Factory AI's MCP capabilities are confirmed.
+| Level | Path | Priority |
+|---|---|---|
+| User | `~/.factory/mcp.json` | Higher — personal overrides |
+| Project | `.factory/mcp.json` | Lower — team-shared, commit to git |
 
-See [Factory Quick Start](factory-quickstart.md) for the current integration.
+---
+
+## MCP Registry
+
+Factory includes a built-in registry of 40+ pre-configured MCP servers:
+
+```text
+/mcp
+```
+
+Browse and install servers for:
+
+| Category | Examples |
+|---|---|
+| Dev Tools | Sentry, Playwright, Hugging Face |
+| Project Mgmt | Notion, Linear, ClickUp, Monday |
+| Payments | Stripe, PayPal |
+| Design | Figma, Canva |
+| Infrastructure | Netlify, Vercel |
+| Data | Airtable, HubSpot, MongoDB |
+
+OAuth-based servers use a browser-prompt flow with tokens stored in the system keyring.
+
+---
+
+## AIWG MCP Tools Exposed
+
+When connected, Factory droids gain access to AIWG MCP tools:
+
+| Tool | Purpose |
+|---|---|
+| `workflow-run` | Execute AIWG workflows |
+| `artifact-read` | Read from `.aiwg/` artifact directory |
+| `artifact-write` | Write to `.aiwg/` artifact directory |
+| `template-render` | Render AIWG templates |
+| `agent-list` | List available agents |
+
+---
+
+## Troubleshooting
+
+**MCP not connecting?**
+```text
+/mcp
+# Check AIWG server status — toggle disabled/enabled
+```
+
+**Stdio server not starting?**
+```bash
+# Verify aiwg is in PATH
+which aiwg
+
+# Test server manually
+aiwg mcp serve
+```
+
+**HTTP transport issues?**
+```bash
+# Test tunnel connectivity
+curl https://your-tunnel-url.ngrok.io/health
+```
 
 ---
 
 ## Related Resources
 
-- [Factory Quick Start](factory-quickstart.md) — Current AIWG + Factory integration
-- [Hermes MCP Sidecar](hermes-quickstart.md) — Reference sidecar implementation
+- [Factory Quick Start](factory-quickstart.md) — Full AIWG + Factory integration
+- [Cross-Platform Overview](cross-platform-overview.md) — All provider comparison
+- [Claude MCP Sidecar](claude-mcp-sidecar.md) — Reference sidecar implementation

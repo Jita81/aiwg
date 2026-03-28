@@ -12,7 +12,7 @@ Connect AIWG to Warp Terminal AI as an MCP sidecar for structured workflow acces
 Warp Terminal AI (host)
   ├── AI Command Palette and natural language
   ├── WARP.md (aggregated agents + commands)
-  ├── .warp/ (agents, commands, skills, rules)
+  ├── .warp/skills/ (natively discovered)
   └── MCP connection
         └── AIWG MCP Server (sidecar)
               └── .aiwg/ artifacts, workflows, templates
@@ -43,80 +43,55 @@ If you have not done the base deployment yet, complete the [Warp Terminal Quick 
 
 ## Install MCP Configuration
 
-Run the AIWG install command to write the MCP configuration for Warp:
+Warp does not use a configuration file for MCP servers. Registration is done through the Warp UI or via a slash command inside Warp.
 
-```bash
-aiwg mcp install warp
-```
+### Option A: Slash command (fastest)
 
-This writes (or updates) `~/.warp/mcp.json` with the AIWG server entry.
-
-**Verify the config was written:**
-
-```bash
-cat ~/.warp/mcp.json
-```
-
-You should see:
-
-```json
-{
-  "mcpServers": {
-    "aiwg": {
-      "command": "aiwg",
-      "args": ["mcp", "serve"]
-    }
-  }
-}
-```
-
-After writing the config, restart Warp Terminal to pick up the new MCP server.
-
----
-
-## Configure Tool Whitelist
-
-The default config connects to the full AIWG MCP surface. Restrict to the five core tools to keep Warp AI's context budget manageable:
-
-**Edit `~/.warp/mcp.json`:**
-
-```json
-{
-  "mcpServers": {
-    "aiwg": {
-      "command": "aiwg",
-      "args": ["mcp", "serve"],
-      "tools": {
-        "include": [
-          "workflow-run",
-          "artifact-read",
-          "artifact-write",
-          "template-render",
-          "agent-list"
-        ],
-        "prompts": false,
-        "resources": false
-      }
-    }
-  }
-}
-```
-
-**Why this whitelist:** Each MCP server exposes its tool schemas into the Warp AI context window before any tool is called. The full AIWG surface adds roughly 12,000 tokens of schema overhead. A 5-tool whitelist reduces that to approximately 3,000 tokens — keeping most of the context window available for actual work. See the [Context Budget](#context-budget) section for the full breakdown.
-
-A ready-to-use minimal config template is available at `agentic/code/frameworks/sdlc-complete/templates/warp/warp-mcp-minimal.json`.
-
----
-
-## Verify the Connection
-
-After restarting Warp, ask the Warp AI to confirm the tools are available:
+Open Warp Terminal and run the `/add-mcp` command in the AI input:
 
 ```text
-What AIWG MCP tools are available?
+/add-mcp
 ```
 
-Warp AI should list the five whitelisted tools: `workflow-run`, `artifact-read`, `artifact-write`, `template-render`, `agent-list`.
+When prompted, provide the server details:
+
+- **Name**: `aiwg`
+- **Transport**: `stdio`
+- **Command**: `aiwg`
+- **Args**: `mcp serve`
+
+### Option B: Settings panel
+
+1. Open Warp Terminal
+2. Go to **Settings > AI > MCP Servers**
+3. Click **Add Server**
+4. Fill in the fields:
+   - **Name**: `aiwg`
+   - **Transport**: `stdio`
+   - **Command**: `aiwg`
+   - **Args**: `mcp serve`
+5. Save and confirm
+
+### Transport types
+
+Warp supports two MCP transport types:
+
+| Transport | When to use | Fields required |
+|---|---|---|
+| `stdio` | Local process (recommended for AIWG) | Command, args |
+| Streamable HTTP / SSE | Remote or hosted MCP server | URL, optional headers |
+
+Use `stdio` with `aiwg mcp serve` for the standard local setup.
+
+### Verify the connection
+
+After adding the server, ask Warp AI to confirm the tools are available:
+
+```text
+What AIWG tools are available?
+```
+
+Warp AI should list the available tools. No restart is required — Warp picks up MCP servers without restarting.
 
 **Verify AIWG MCP server runs independently:**
 
@@ -125,7 +100,32 @@ aiwg mcp info    # Show capabilities
 aiwg version     # Confirm CLI is in PATH
 ```
 
-If Warp AI cannot see the tools, check that `aiwg` is accessible from the PATH that Warp uses when launching processes.
+If Warp AI cannot see the tools, confirm that `aiwg` is accessible from the PATH that Warp uses when launching processes.
+
+---
+
+## Configure Tool Permissions
+
+The default connection exposes the full AIWG MCP surface. Restricting to the five core tools keeps Warp AI's context budget manageable and reduces unintended tool calls.
+
+Warp controls MCP tool access through Agent Profile permissions, not a configuration file.
+
+### Setting tool permissions
+
+1. Open **Settings > AI > Agents > Profiles**
+2. Select the profile you use for AIWG work (or create a new one)
+3. Under the `aiwg` MCP server entry, configure an **allow list**:
+   - `workflow-run`
+   - `artifact-read`
+   - `artifact-write`
+   - `template-render`
+   - `agent-list`
+4. Set any other AIWG tools to **deny**
+5. Save the profile
+
+Permissions are set per MCP server within each Agent Profile, so you can have different allow lists for different working contexts.
+
+**Why this allow list:** Each MCP server exposes its tool schemas into the Warp AI context window before any tool is called. The full AIWG surface adds significant schema overhead. A 5-tool allow list reduces that overhead substantially — keeping most of the context window available for actual work. See the [Context Budget](#context-budget) section for detail.
 
 ---
 
@@ -157,29 +157,55 @@ You should see the new ADR file.
 
 ## Context Budget
 
-Understanding the token footprint helps you configure the whitelist for your needs.
+Understanding the token footprint helps you configure tool permissions for your needs.
 
-### With 5-tool whitelist (recommended)
+> **Note:** The token estimates below are approximations. Warp does not publish its context window sizes, and the actual limit depends on the AI model you have selected in Warp settings. The general principle holds regardless of the exact numbers: fewer exposed tools means more context available for actual work.
 
-| Component | Tokens |
+### With 5-tool allow list (recommended)
+
+| Component | Estimated tokens |
 |---|---|
 | Warp AI system context | ~1,500 |
 | WARP.md (aggregated agents + commands) | ~4,000 |
 | AIWG MCP schema (5 tools) | ~3,000 |
 | **Total overhead** | **~8,500** |
-| **Available for work** (32K context) | **~23,500 (73%)** |
+| **Remaining for work** | larger share of available context |
 
-### Without whitelist (full surface)
+### Without allow list (full surface)
 
-| Component | Tokens |
+| Component | Estimated tokens |
 |---|---|
 | Warp AI system context | ~1,500 |
 | WARP.md (aggregated agents + commands) | ~4,000 |
 | AIWG MCP schema (20+ tools) | ~12,000 |
 | **Total overhead** | **~17,500** |
-| **Available for work** (32K context) | **~14,500 (45%)** |
+| **Remaining for work** | smaller share of available context |
 
-Warp's context window is smaller than cloud IDE assistants. The whitelist has a significant impact here: without it, fewer than half the context tokens are available before any conversation begins. With a 5-tool whitelist, you recover roughly 28 percentage points of usable context.
+The allow list has a meaningful impact: the full schema overhead roughly doubles compared to the 5-tool configuration, leaving significantly less context available before any conversation begins.
+
+---
+
+## Session Persistence
+
+MCP servers registered in Warp persist across restarts. If the AIWG MCP server was running when Warp closed, Warp will auto-restart it on the next launch. You do not need to re-register or re-start the server manually between sessions.
+
+---
+
+## MCP Logs
+
+If you need to debug MCP server behavior, log files are written to:
+
+**macOS:**
+```
+~/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/mcp
+```
+
+**Linux:**
+```
+${XDG_STATE_HOME:-$HOME/.local/state}/warp-terminal/mcp
+```
+
+Each MCP server gets its own log file within that directory.
 
 ---
 
@@ -187,33 +213,9 @@ Warp's context window is smaller than cloud IDE assistants. The whitelist has a 
 
 After the basic integration is stable, you can enable AIWG prompt exposure for richer workflow access.
 
-**Update `~/.warp/mcp.json`:**
+In Warp's MCP server configuration (Settings > AI > MCP Servers), look for the option to expose **prompts** from the `aiwg` server and enable it. This adds AIWG workflow prompts as callable templates from within Warp AI.
 
-```json
-{
-  "mcpServers": {
-    "aiwg": {
-      "command": "aiwg",
-      "args": ["mcp", "serve"],
-      "tools": {
-        "include": [
-          "workflow-run",
-          "artifact-read",
-          "artifact-write",
-          "template-render",
-          "agent-list"
-        ],
-        "prompts": true,
-        "resources": false
-      }
-    }
-  }
-}
-```
-
-This adds AIWG workflow prompts as callable templates from within Warp AI. Only enable after the base integration in the previous sections is working reliably.
-
-A ready-to-use full config template is available at `agentic/code/frameworks/sdlc-complete/templates/warp/warp-mcp-full.json`.
+Only enable prompts after the base tool integration in the previous sections is working reliably. Adding prompts increases context overhead — monitor your available context if you enable this.
 
 ---
 
@@ -223,7 +225,7 @@ Run these checks to confirm the integration is working:
 
 | Check | Action | Expected |
 |---|---|---|
-| Connectivity | Ask "What AIWG tools are available?" | 5 tools listed |
+| Connectivity | Ask "What AIWG tools are available?" | Tools listed |
 | Routing (direct) | Ask a one-off terminal question | Warp answers directly (no MCP call) |
 | Routing (artifact) | Ask for a requirements document | Routes to AIWG via MCP |
 | Artifact write | Check `.aiwg/` after workflow | New artifact file exists |
@@ -237,27 +239,21 @@ Run these checks to confirm the integration is working:
 **AIWG tools not visible in Warp AI:**
 
 - Verify `aiwg mcp serve` runs successfully on its own
-- Confirm `~/.warp/mcp.json` is valid JSON (use `jq . ~/.warp/mcp.json`)
 - Ensure `aiwg` is in your PATH (check `which aiwg`)
-- Restart Warp Terminal after any config change
+- Confirm the server is registered in Settings > AI > MCP Servers
+- Check MCP logs for startup errors (see [MCP Logs](#mcp-logs) above)
 
 **Artifacts not appearing in `.aiwg/`:**
 
 - Confirm AIWG is initialized in the project (`aiwg use sdlc --provider warp`)
-- Check that `artifact-write` is in the tool whitelist
+- Check that `artifact-write` is in the tool allow list for your Agent Profile
 - Verify Warp's working directory matches the project root
 
 **Context growing too fast:**
 
-- Confirm `prompts: false` and `resources: false` in the MCP config
+- Keep the allow list to 5 tools unless you have a specific reason to add more
+- Disable prompts and resources in the MCP server settings if enabled
 - Keep WARP.md lean — avoid adding large blocks of project context to the aggregated file
-- Keep the whitelist to 5 tools unless you have a specific reason to add more
-
-**Config location not found:**
-
-- The config path is `~/.warp/mcp.json`
-- Create the directory if it does not exist: `mkdir -p ~/.warp`
-- Re-run `aiwg mcp install warp` after creating the directory
 
 ---
 

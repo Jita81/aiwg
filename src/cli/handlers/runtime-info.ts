@@ -48,14 +48,88 @@ export const runtimeInfoHandler: CommandHandler = {
  * Handle runtime info command logic
  */
 async function handleRuntimeInfo(args: string[]): Promise<void> {
-  const { RuntimeDiscovery } = await import('../../smiths/toolsmith/runtime-discovery.mjs');
-  const discovery = new RuntimeDiscovery();
-
   const hasDiscover = args.includes('--discover');
   const hasVerify = args.includes('--verify');
   const hasJson = args.includes('--json');
   const checkIndex = args.indexOf('--check');
   const hasCheck = checkIndex >= 0;
+  const hasCapabilities = args.includes('--capabilities');
+  const featureIndex = args.indexOf('--feature');
+  const hasFeature = featureIndex >= 0;
+
+  // --- Capability matrix queries (no RuntimeDiscovery needed) ---
+  if (hasCapabilities || hasFeature) {
+    const {
+      loadCapabilityMatrix,
+      formatCapabilityTable,
+      formatFeatureSupport,
+      getProviderCapabilities,
+    } = await import('../../providers/capability-matrix.js');
+
+    if (hasFeature) {
+      const featureName = args[featureIndex + 1];
+      if (!featureName) {
+        throw new Error('Feature name required for --feature (cron, agent_teams, tasks, mcp, behaviors, mission_control)');
+      }
+      if (hasJson) {
+        const matrix = loadCapabilityMatrix();
+        const featureDef = matrix.features[featureName as keyof typeof matrix.features];
+        const support: Record<string, { native: boolean; emulation: string | null }> = {};
+        for (const [key, caps] of Object.entries(matrix.providers)) {
+          support[key] = {
+            native: caps.native_features[featureName as keyof typeof caps.native_features] ?? false,
+            emulation: caps.emulation[featureName as keyof typeof caps.emulation] ?? null,
+          };
+        }
+        console.log(JSON.stringify({ feature: featureName, definition: featureDef, providers: support }, null, 2));
+      } else {
+        console.log('\n' + formatFeatureSupport(featureName as any));
+      }
+      return;
+    }
+
+    // --capabilities: show full matrix or provider-specific
+    const providerIndex = args.indexOf('--provider');
+    if (providerIndex >= 0) {
+      const providerName = args[providerIndex + 1];
+      if (!providerName) {
+        throw new Error('Provider name required for --provider');
+      }
+      const caps = getProviderCapabilities(providerName);
+      if (!caps) {
+        throw new Error(`Unknown provider: ${providerName}. Known: ${Object.keys(loadCapabilityMatrix().providers).join(', ')}`);
+      }
+      if (hasJson) {
+        console.log(JSON.stringify({ provider: providerName, ...caps }, null, 2));
+      } else {
+        console.log(`\nProvider: ${caps.display_name} (${caps.status})`);
+        console.log(`Deploy target: ${caps.deploy_target}`);
+        console.log(`Aggregated output: ${caps.aggregated_output}`);
+        console.log(`\nArtifact paths:`);
+        for (const [type, path] of Object.entries(caps.artifact_paths)) {
+          console.log(`  ${type}: ${path ?? '(none)'}`);
+        }
+        console.log(`\nFeatures:`);
+        for (const [feat, native] of Object.entries(caps.native_features)) {
+          const emu = caps.emulation[feat as keyof typeof caps.emulation];
+          console.log(`  ${feat}: ${native ? 'NATIVE' : emu ? `emulated (${emu})` : '--'}`);
+        }
+      }
+      return;
+    }
+
+    // Full matrix
+    if (hasJson) {
+      console.log(JSON.stringify(loadCapabilityMatrix(), null, 2));
+    } else {
+      console.log('\n' + formatCapabilityTable());
+    }
+    return;
+  }
+
+  // --- Original RuntimeDiscovery logic ---
+  const { RuntimeDiscovery } = await import('../../smiths/toolsmith/runtime-discovery.mjs');
+  const discovery = new RuntimeDiscovery();
 
   if (hasDiscover) {
     // Full discovery

@@ -37,7 +37,7 @@ cursor .
 /aiwg-regenerate-cursorrules
 ```
 
-This step is critical - it enables natural language command mapping ("run security review" → workflow). Without it, advanced features won't work correctly. See the [Regenerate Guide](#regenerate-guide) for details.
+This step is critical - it enables natural language command mapping ("run security review" -> workflow). Without it, advanced features won't work correctly. See the [Regenerate Guide](#regenerate-guide) for details.
 
 **6. You're ready.** See the [Intake Guide](#intake-guide) for starting projects.
 
@@ -49,26 +49,80 @@ This step is critical - it enables natural language command mapping ("run securi
 .cursor/
 ├── agents/      # SDLC agents (Requirements Analyst, Architecture Designer, etc.)
 ├── commands/    # Slash commands (/project-status, /security-gate, etc.)
-├── skills/      # Skill directories (voice profiles, project awareness, etc.)
-├── rules/       # Context rules (token security, citation policy, etc.) — MDC format
+├── skills/      # Skill directories with SKILL.md (voice profiles, project awareness, etc.)
+├── rules/       # Context rules in MDC format (.mdc extension)
 └── mcp.json     # MCP config (if enabled)
 
-AGENTS.md        # Project context
 .aiwg/           # SDLC artifacts
 ```
 
-> **Note:** Cursor uses `.mdc` extension for rules (Cursor's MDC format for context rules).
+---
+
+## Rules System
+
+Cursor uses **MDC format** (`.mdc` extension) for rules with YAML frontmatter:
+
+```yaml
+---
+description: "Enforce token security practices"
+globs: ["src/**/*.ts", "src/**/*.js"]
+alwaysApply: false
+---
+
+# Token Security
+
+Never hard-code tokens...
+```
+
+### Rule Types
+
+| Type | Configuration | When It Activates |
+|------|---------------|-------------------|
+| **Always Apply** | `alwaysApply: true` | Every session |
+| **Apply Intelligently** | `description` set, no `globs` | Agent decides based on description |
+| **File-Scoped** | `globs` set | When referenced files match pattern |
+| **Manual** | No `alwaysApply`, no `globs` | Only when user types `@rule-name` |
+
+### .cursorrules vs .cursor/rules/
+
+`.cursorrules` is a legacy root-level file. Cursor now recommends `.cursor/rules/` with MDC format. AIWG deploys rules to `.cursor/rules/` (native support) and optionally generates `.cursorrules` via the regenerate command for backward compatibility.
 
 ---
 
 ## Using Agents
 
-Invoke via @-mention in Cursor:
+Invoke AIWG agents via @-mention in Cursor chat:
 
 ```text
 @security-architect Review the authentication implementation
 @test-engineer Generate unit tests for the user service
 ```
+
+Cursor 2.0+ supports automatic context gathering — the agent will search your codebase, read files, and run commands without needing explicit @-mentions for context.
+
+---
+
+## Skills
+
+AIWG deploys skills to `.cursor/skills/` in directory format (each skill has a `SKILL.md`). This aligns with Cursor's native skills system (introduced in 2.4). Skills are loaded on-demand when relevant, reducing context overhead.
+
+---
+
+## Cloud Agents
+
+Cursor's Cloud Agents (formerly Background Agents) run in isolated cloud VMs. They fully support MCP servers, making AIWG workflows accessible in cloud agent mode:
+
+1. Configure AIWG MCP server in your Cloud Agent environment
+2. Add AIWG instructions to `AGENTS.md` at repo root
+3. Cloud Agents clone your repo, work on branches, and push changes
+
+Cloud Agents can be triggered from Cursor Desktop, cursor.com/agents, Slack, GitHub, Linear, or API.
+
+---
+
+## Multi-Agent / Worktrees
+
+Cursor 2.0+ supports up to 8 agents running in parallel via Git worktrees. Configure via `Cursor Settings > Worktrees` or `.cursor/worktrees.json`.
 
 ---
 
@@ -91,7 +145,13 @@ See [Ralph Guide](../ralph-guide.md) for full documentation including `--provide
 /aiwg-regenerate-cursorrules
 ```
 
-**Rules not loading?** Check file extension is `.mdc` and restart Cursor.
+**Rules not loading?** Check file extension is `.mdc`, verify frontmatter syntax, and restart Cursor.
+
+**MCP tools not visible?**
+- Verify `aiwg mcp serve` runs successfully standalone
+- Check `.cursor/mcp.json` syntax
+- View MCP logs: `Cmd+Shift+U` > select "MCP Logs"
+- Restart Cursor after config changes
 
 **Redeploy if needed:**
 ```bash
@@ -156,3 +216,12 @@ aiwg mcp install cursor
 ```
 
 See the [Cursor MCP Sidecar Guide](cursor-mcp-sidecar.md) for complete setup including tool whitelisting and context optimization.
+
+---
+
+## Related Resources
+
+- [Cursor MCP Sidecar Guide](cursor-mcp-sidecar.md) - Full MCP integration
+- [Cross-Platform Overview](cross-platform-overview.md) - All provider comparison
+- [Cursor Platform Reference](../../.aiwg/references/platforms/cursor.md) - Detailed capability reference
+- [Cursor Official Docs](https://cursor.com/docs) - Upstream documentation

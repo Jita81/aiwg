@@ -41,17 +41,15 @@ This step is critical - it enables natural language command mapping ("run securi
 ## What Gets Created
 
 ```text
-WARP.md              # Aggregated agents + commands (single context file)
+WARP.md              # Project rules file (auto-loaded by Warp)
 .warp/
-├── agents/          # Discrete SDLC agents (Requirements Analyst, etc.)
-├── commands/        # Discrete workflow commands (/project-status, /security-gate, etc.)
-├── skills/          # Skill directories (voice profiles, project awareness, etc.)
-└── rules/           # Context rules (token security, citation policy, etc.)
+├── skills/          # Skill directories (natively discovered by Warp)
+└── workflows/       # Legacy YAML workflows (natively discovered)
 
 .aiwg/               # SDLC artifacts
 ```
 
-> **Note:** Warp uses both discrete files (in `.warp/`) and an aggregated `WARP.md` that combines agents and commands for platforms that prefer a single context file.
+> **Note:** Warp natively discovers `.warp/skills/` and `.warp/workflows/`. Agents, commands, and rules are aggregated into `WARP.md` for single-file context loading — Warp does not natively discover those directories. Warp also supports `AGENTS.md` as an alternative project rules filename; `WARP.md` takes priority when both files exist. AIWG uses `WARP.md`.
 
 ---
 
@@ -72,7 +70,8 @@ Natural language works directly:
 
 ```bash
 /init              # Re-index project (reload WARP.md)
-/open-project-rules # Open WARP.md in editor
+/compact           # Summarize conversation to free context window space
+/orchestrate       # Dispatch parallel subtasks within a session
 ```
 
 ---
@@ -101,6 +100,8 @@ See [Ralph Guide](../ralph-guide.md) for full documentation including `--provide
 /init
 ```
 
+**Still not loading?** Verify the filename is all caps: `WARP.md`. Lowercase `warp.md` is not recognized by Warp.
+
 **Redeploy if needed:**
 ```bash
 aiwg use sdlc --provider warp --force
@@ -110,10 +111,17 @@ aiwg use sdlc --provider warp --force
 
 ## MCP Sidecar (Unrestricted AIWG Access)
 
-Warp Terminal has no dangerous mode flag. The MCP sidecar is the only path to unrestricted AIWG tool access:
+Warp Terminal has no dangerous mode flag. The MCP sidecar is the only path to unrestricted AIWG tool access.
 
-```bash
-aiwg mcp install warp
+MCP servers in Warp are configured via the UI, not via a file. Add AIWG as an MCP server directly in Warp:
+
+```text
+/add-mcp
+# Then configure:
+#   Command: aiwg
+#   Args: mcp serve
 ```
+
+Alternatively, open Settings and add the MCP server from there.
 
 See the [Warp MCP Sidecar Guide](warp-mcp-sidecar.md) for complete setup including tool whitelisting and context optimization.

@@ -1,379 +1,327 @@
 # Provider Capability Matrix
 #
-# Canonical data source for AIWG steward routing and doctor diagnostics.
-# Defines what each provider supports natively vs. via AIWG emulation for
-# cross-provider features: scheduler, agent-teams, mission-control, behaviors, MCP.
+# Single authoritative source of truth for what each provider supports
+# natively vs. via AIWG emulation. Machine-readable; consumed by:
+#   - src/providers/capability-matrix.ts  (TypeScript loader)
+#   - aiwg runtime-info --capabilities    (CLI display)
+#   - aiwg steward capabilities           (steward awareness)
+#   - Scheduler (#597), Agent Teams (#598), Steward (#599) routing
 #
-# Used by:
-#   - aiwg steward capabilities (routing advice)
-#   - aiwg doctor (capability summary section)
-#   - aiwg-steward agent (command routing intelligence)
-#
-# Related: #597 (scheduler), #598 (agent-teams), #599 (steward capability awareness)
-# Updated: 2026.3
+# @issue #604
+# @unblocks #597, #598, #599
 
-version: "1.0.0"
-updated: "2026.3.27"
+version: "1.0"
 
-# The reference baseline — all gap reporting is relative to this provider
-baseline: claude-code
-
-# Feature catalog
-# Each entry describes a cross-provider feature and its AIWG emulation fallback
-features:
-  scheduler:
-    description: "Create and manage recurring scheduled tasks with cron-like expressions"
-    aiwg_fallback: "aiwg schedule"
-    related_issues: ["#597"]
-
-  agent-teams:
-    description: "Spawn and coordinate multiple agents in parallel within a session"
-    aiwg_fallback: "aiwg mc dispatch"
-    related_issues: ["#598"]
-
-  mission-control:
-    description: "Background task orchestration dashboard with persistence across sessions"
-    aiwg_fallback: "aiwg mc"
-
-  behaviors:
-    description: "Event-driven execution — scripts and hooks triggered by file, time, or API events"
-    aiwg_fallback: "aiwg add-behavior / aiwg behavior run"
-    related_issues: ["#540", "#541", "#542", "#543"]
-
-  mcp:
-    description: "Model Context Protocol server integration for tool extensions"
-    aiwg_fallback: "aiwg mcp serve"
-
-# Per-provider capability definitions
-# native: true  = provider has first-class support for the feature
-# native: false = AIWG emulation is the correct path
 providers:
   claude-code:
-    display_name: "Claude Code"
-    capabilities:
-      scheduler:
-        native: true
-        native_tool: "CronCreate / CronList / CronDelete"
-        aiwg_command: "aiwg schedule"
-        routing: >
-          Inside an agent context, prefer CronCreate for persistent native scheduling.
-          From the CLI (outside agent context), use `aiwg schedule` which uses the AIWG daemon.
-        notes: "CronCreate is only available when running inside a Claude Code agent session, not from the CLI directly."
-
-      agent-teams:
-        native: true
-        native_tool: "Agent tool (Task)"
-        aiwg_command: "aiwg mc dispatch"
-        routing: >
-          Use the Agent tool directly for short-lived focused subagents within the current session.
-          Use `aiwg mc dispatch` for long-running background missions that need to outlast the session.
-
-      mission-control:
-        native: true
-        native_tool: "Agent tool (Task)"
-        aiwg_command: "aiwg mc start / aiwg mc dispatch"
-        routing: >
-          `aiwg mc` wraps the native Task/Agent tool with persistence, state tracking, and a monitoring
-          dashboard. Prefer `aiwg mc` for complex multi-loop orchestrations.
-
-      behaviors:
-        native: false
-        native_tool: null
-        aiwg_command: "aiwg add-behavior / aiwg behavior run"
-        routing: >
-          AIWG emulation via the daemon. Behaviors are defined in `agentic/code/behaviors/` and
-          triggered by the AIWG daemon. Claude Code has hooks (pre-session, post-write) but not
-          full behavior scripts.
-
-      mcp:
-        native: true
-        native_tool: "MCP protocol (built-in)"
-        aiwg_command: "aiwg mcp serve"
-        routing: "Native MCP support. Use `aiwg mcp install claude` to configure the desktop client."
+    display_name: Claude Code
+    status: stable
+    artifact_paths:
+      agents: .claude/agents/
+      commands: .claude/commands/
+      skills: .claude/skills/
+      rules: .claude/rules/
+      behaviors: null
+    native_features:
+      cron: true
+      agent_teams: true
+      tasks: true
+      mcp: true
+      behaviors: false
+      mission_control: false
+    emulation:
+      cron: native
+      agent_teams: native
+      tasks: native
+      mcp: native
+      behaviors: hooks
+      mission_control: aiwg-mc
+    hook_wiring:
+      at_link_support: true
+      hook_file: AIWG.md
+      hook_directive: "@AIWG.md"
+      context_file: CLAUDE.md
+    deploy_target: project
+    aggregated_output: false
 
   codex:
-    display_name: "OpenAI Codex"
-    capabilities:
-      scheduler:
-        native: false
-        native_tool: null
-        aiwg_command: "aiwg schedule"
-        routing: "No native cron in Codex. Use `aiwg schedule` for all recurring task scheduling."
-
-      agent-teams:
-        native: false
-        native_tool: null
-        aiwg_command: "aiwg mc dispatch"
-        routing: "Codex does not support native multi-agent spawning. Use `aiwg mc dispatch` to coordinate parallel work."
-
-      mission-control:
-        native: false
-        native_tool: null
-        aiwg_command: "aiwg mc"
-        routing: "Full AIWG emulation. Use `aiwg mc start` then `aiwg mc dispatch` for background orchestration."
-
-      behaviors:
-        native: false
-        native_tool: null
-        aiwg_command: "aiwg behavior run"
-        routing: "AIWG emulation only. Deploy behaviors with `aiwg add-behavior --provider codex`."
-
-      mcp:
-        native: false
-        native_tool: null
-        aiwg_command: null
-        routing: "Not supported. MCP tools must be accessed through the AIWG CLI layer."
+    display_name: OpenAI Codex
+    aliases:
+      - openai
+    status: stable
+    artifact_paths:
+      agents: .codex/agents/
+      commands: "~/.codex/prompts/"
+      skills: "~/.codex/skills/"
+      rules: .codex/rules/
+      behaviors: null
+    native_features:
+      cron: false
+      agent_teams: false
+      tasks: false
+      mcp: false
+      behaviors: false
+      mission_control: false
+    emulation:
+      cron: aiwg-schedule
+      agent_teams: aiwg-mc
+      tasks: aiwg-mc
+      mcp: null
+      behaviors: aiwg-mc
+      mission_control: aiwg-mc
+    hook_wiring:
+      at_link_support: false
+      hook_file: AIWG-codex.md
+      fallback: full-inject
+      context_file: CODEX.md
+    deploy_target: mixed
+    aggregated_output: true
 
   copilot:
-    display_name: "GitHub Copilot"
-    capabilities:
-      scheduler:
-        native: false
-        native_tool: null
-        aiwg_command: "aiwg schedule"
-        routing: "GitHub Copilot has no cron capability. Use `aiwg schedule` for recurring tasks."
-
-      agent-teams:
-        native: false
-        native_tool: null
-        aiwg_command: "aiwg mc dispatch"
-        routing: >
-          Copilot Workspace has agent concepts but they are not programmatically spawnable from within
-          a session. Use `aiwg mc dispatch` for parallel work coordination.
-
-      mission-control:
-        native: false
-        native_tool: null
-        aiwg_command: "aiwg mc"
-        routing: "Full AIWG emulation. `aiwg mc` provides persistence and dashboard functionality."
-
-      behaviors:
-        native: false
-        native_tool: null
-        aiwg_command: "aiwg behavior run"
-        routing: "AIWG emulation only."
-
-      mcp:
-        native: false
-        native_tool: null
-        aiwg_command: null
-        routing: "Not supported."
-
-  cursor:
-    display_name: "Cursor"
-    capabilities:
-      scheduler:
-        native: false
-        native_tool: null
-        aiwg_command: "aiwg schedule"
-        routing: "No native AI-aware cron in Cursor. Use `aiwg schedule` for recurring agent tasks."
-
-      agent-teams:
-        native: true
-        native_tool: "Background Agents"
-        aiwg_command: "aiwg mc dispatch"
-        routing: >
-          Cursor Background Agents run persistent work in separate containers — use for long-running
-          isolated tasks. Use `aiwg mc dispatch` when you need AIWG-coordinated multi-agent orchestration
-          with shared state and dashboard visibility.
-        notes: "Cursor Background Agents are container-isolated — they do not share session context with the primary agent."
-
-      mission-control:
-        native: false
-        native_tool: null
-        aiwg_command: "aiwg mc"
-        routing: >
-          Cursor Background Agents can handle parallelism but lack AIWG state tracking and the
-          mission dashboard. Use `aiwg mc` for structured multi-loop orchestration.
-
-      behaviors:
-        native: false
-        native_tool: null
-        aiwg_command: "aiwg behavior run"
-        routing: "AIWG emulation only."
-
-      mcp:
-        native: true
-        native_tool: "MCP protocol (built-in)"
-        aiwg_command: "aiwg mcp serve"
-        routing: "Native MCP support. Configure with `aiwg mcp install cursor`."
+    display_name: GitHub Copilot
+    status: stable
+    artifact_paths:
+      agents: .github/agents/
+      commands: .github/agents/
+      skills: .github/skills/
+      rules: .github/copilot-rules/
+      behaviors: null
+    native_features:
+      cron: false
+      agent_teams: false
+      tasks: false
+      mcp: false
+      behaviors: false
+      mission_control: false
+    emulation:
+      cron: aiwg-schedule
+      agent_teams: aiwg-mc
+      tasks: aiwg-mc
+      mcp: null
+      behaviors: aiwg-mc
+      mission_control: aiwg-mc
+    hook_wiring:
+      at_link_support: false
+      hook_file: AIWG-copilot.md
+      fallback: full-inject
+      context_file: .github/copilot-instructions.md
+    deploy_target: project
+    aggregated_output: false
 
   factory:
-    display_name: "Factory AI"
-    capabilities:
-      scheduler:
-        native: false
-        native_tool: null
-        aiwg_command: "aiwg schedule"
-        routing: "No native cron in Factory AI. Use `aiwg schedule` for scheduled agent tasks."
+    display_name: Factory AI
+    status: stable
+    artifact_paths:
+      agents: .factory/droids/
+      commands: .factory/commands/
+      skills: .factory/skills/
+      rules: .factory/rules/
+      behaviors: null
+    native_features:
+      cron: false
+      agent_teams: false
+      tasks: false
+      mcp: false
+      behaviors: false
+      mission_control: false
+    emulation:
+      cron: aiwg-schedule
+      agent_teams: aiwg-mc
+      tasks: aiwg-mc
+      mcp: null
+      behaviors: aiwg-mc
+      mission_control: aiwg-mc
+    hook_wiring:
+      at_link_support: false
+      hook_file: AIWG-factory.md
+      fallback: full-inject
+      context_file: AGENTS.md
+    deploy_target: project
+    aggregated_output: false
 
-      agent-teams:
-        native: true
-        native_tool: "Droids"
-        aiwg_command: "aiwg mc dispatch"
-        routing: >
-          Use Factory Droids for native parallel agent execution within Factory AI.
-          Use `aiwg mc dispatch` when you need AIWG lifecycle tracking across Droids.
-
-      mission-control:
-        native: true
-        native_tool: "Droids"
-        aiwg_command: "aiwg mc"
-        routing: >
-          Factory Droids provide native orchestration. `aiwg mc` adds AIWG-specific state tracking,
-          completion criteria, and cross-provider consistency.
-
-      behaviors:
-        native: false
-        native_tool: null
-        aiwg_command: "aiwg behavior run"
-        routing: "AIWG emulation only."
-
-      mcp:
-        native: false
-        native_tool: null
-        aiwg_command: null
-        routing: "Partial support. Check Factory AI documentation for MCP integration status."
+  cursor:
+    display_name: Cursor IDE
+    status: stable
+    artifact_paths:
+      agents: .cursor/agents/
+      commands: .cursor/commands/
+      skills: .cursor/skills/
+      rules: .cursor/rules/
+      behaviors: null
+    native_features:
+      cron: false
+      agent_teams: false
+      tasks: false
+      mcp: false
+      behaviors: false
+      mission_control: false
+    emulation:
+      cron: aiwg-schedule
+      agent_teams: aiwg-mc
+      tasks: aiwg-mc
+      mcp: null
+      behaviors: aiwg-mc
+      mission_control: aiwg-mc
+    hook_wiring:
+      at_link_support: true
+      hook_file: AIWG-cursor.md
+      hook_directive: "@AIWG-cursor.md"
+      context_file: .cursorrules
+    deploy_target: project
+    aggregated_output: false
 
   opencode:
-    display_name: "OpenCode"
-    capabilities:
-      scheduler:
-        native: false
-        native_tool: null
-        aiwg_command: "aiwg schedule"
-        routing: "No native cron. Use `aiwg schedule` for recurring tasks."
-
-      agent-teams:
-        native: false
-        native_tool: null
-        aiwg_command: "aiwg mc dispatch"
-        routing: "No native multi-agent spawning in OpenCode. Use `aiwg mc dispatch`."
-
-      mission-control:
-        native: false
-        native_tool: null
-        aiwg_command: "aiwg mc"
-        routing: "Full AIWG emulation."
-
-      behaviors:
-        native: false
-        native_tool: null
-        aiwg_command: "aiwg behavior run"
-        routing: "AIWG emulation only."
-
-      mcp:
-        native: true
-        native_tool: "MCP protocol (built-in)"
-        aiwg_command: "aiwg mcp serve"
-        routing: "Native MCP support. Configure with `aiwg mcp install opencode`."
+    display_name: OpenCode
+    status: stable
+    artifact_paths:
+      agents: .opencode/agent/
+      commands: .opencode/command/
+      skills: .opencode/skill/
+      rules: .opencode/rule/
+      behaviors: null
+    native_features:
+      cron: false
+      agent_teams: false
+      tasks: false
+      mcp: false
+      behaviors: false
+      mission_control: false
+    emulation:
+      cron: aiwg-schedule
+      agent_teams: aiwg-mc
+      tasks: aiwg-mc
+      mcp: null
+      behaviors: aiwg-mc
+      mission_control: aiwg-mc
+    hook_wiring:
+      at_link_support: true
+      hook_file: AIWG-opencode.md
+      hook_directive: "@AIWG-opencode.md"
+      context_file: .opencode/context.md
+    deploy_target: project
+    aggregated_output: false
 
   warp:
-    display_name: "Warp Terminal"
-    capabilities:
-      scheduler:
-        native: false
-        native_tool: null
-        aiwg_command: "aiwg schedule"
-        routing: >
-          System cron is available in the underlying OS, but there is no AI-aware agent scheduling.
-          Use `aiwg schedule` for agent-integrated recurring tasks.
-        notes: "For non-AI recurring shell tasks, system cron (crontab) works fine independently of AIWG."
-
-      agent-teams:
-        native: false
-        native_tool: null
-        aiwg_command: "aiwg mc dispatch"
-        routing: "Warp has no native agent spawning. Use `aiwg mc dispatch` for parallel agent work."
-
-      mission-control:
-        native: false
-        native_tool: null
-        aiwg_command: "aiwg mc"
-        routing: "Full AIWG emulation."
-
-      behaviors:
-        native: false
-        native_tool: null
-        aiwg_command: "aiwg behavior run"
-        routing: "AIWG emulation only."
-
-      mcp:
-        native: false
-        native_tool: null
-        aiwg_command: null
-        routing: "Not supported."
+    display_name: Warp Terminal
+    status: stable
+    artifact_paths:
+      agents: .warp/agents/
+      commands: .warp/commands/
+      skills: .warp/skills/
+      rules: .warp/rules/
+      behaviors: null
+    native_features:
+      cron: false
+      agent_teams: false
+      tasks: false
+      mcp: false
+      behaviors: false
+      mission_control: false
+    emulation:
+      cron: aiwg-schedule
+      agent_teams: aiwg-mc
+      tasks: aiwg-mc
+      mcp: null
+      behaviors: aiwg-mc
+      mission_control: aiwg-mc
+    hook_wiring:
+      at_link_support: true
+      hook_file: AIWG-warp.md
+      hook_directive: "@AIWG-warp.md"
+      context_file: WARP.md
+    deploy_target: project
+    aggregated_output: true
 
   windsurf:
-    display_name: "Windsurf"
-    capabilities:
-      scheduler:
-        native: false
-        native_tool: null
-        aiwg_command: "aiwg schedule"
-        routing: "No native cron in Windsurf. Use `aiwg schedule`."
-
-      agent-teams:
-        native: false
-        native_tool: null
-        aiwg_command: "aiwg mc dispatch"
-        routing: >
-          Windsurf Cascade is sequential multi-step, not parallel agent spawning.
-          Use `aiwg mc dispatch` for true parallel agent coordination.
-        notes: "Cascade Flow executes steps in sequence — it is not equivalent to parallel subagent spawning."
-
-      mission-control:
-        native: false
-        native_tool: null
-        aiwg_command: "aiwg mc"
-        routing: "Full AIWG emulation."
-
-      behaviors:
-        native: false
-        native_tool: null
-        aiwg_command: "aiwg behavior run"
-        routing: "AIWG emulation only."
-
-      mcp:
-        native: false
-        native_tool: null
-        aiwg_command: null
-        routing: "Not supported."
+    display_name: Windsurf
+    status: experimental
+    artifact_paths:
+      agents: .windsurf/agents/
+      commands: .windsurf/workflows/
+      skills: .windsurf/skills/
+      rules: .windsurf/rules/
+      behaviors: null
+    native_features:
+      cron: false
+      agent_teams: false
+      tasks: false
+      mcp: false
+      behaviors: false
+      mission_control: false
+    emulation:
+      cron: aiwg-schedule
+      agent_teams: aiwg-mc
+      tasks: aiwg-mc
+      mcp: null
+      behaviors: aiwg-mc
+      mission_control: aiwg-mc
+    hook_wiring:
+      at_link_support: false
+      hook_file: AIWG-windsurf.md
+      fallback: full-inject
+      context_file: AGENTS.md
+    deploy_target: project
+    aggregated_output: true
 
   openclaw:
-    display_name: "OpenClaw"
-    capabilities:
-      scheduler:
-        native: false
-        native_tool: null
-        aiwg_command: "aiwg schedule"
-        routing: "No native cron. Use `aiwg schedule`."
+    display_name: OpenClaw
+    status: stable
+    artifact_paths:
+      agents: "~/.openclaw/agents/"
+      commands: "~/.openclaw/commands/"
+      skills: "~/.openclaw/skills/"
+      rules: "~/.openclaw/rules/"
+      behaviors: "~/.openclaw/behaviors/"
+    native_features:
+      cron: false
+      agent_teams: false
+      tasks: false
+      mcp: true
+      behaviors: true
+      mission_control: false
+    emulation:
+      cron: aiwg-schedule
+      agent_teams: aiwg-mc
+      tasks: aiwg-mc
+      mcp: native
+      behaviors: native
+      mission_control: aiwg-mc
+    hook_wiring:
+      at_link_support: false
+      context_file: "~/.openclaw/config.yaml"
+    deploy_target: home
+    aggregated_output: false
 
-      agent-teams:
-        native: false
-        native_tool: null
-        aiwg_command: "aiwg mc dispatch"
-        routing: "No native multi-agent spawning. Use `aiwg mc dispatch`."
-
-      mission-control:
-        native: false
-        native_tool: null
-        aiwg_command: "aiwg mc"
-        routing: "Full AIWG emulation."
-
-      behaviors:
-        native: true
-        native_tool: "Behaviors (~/.openclaw/behaviors/)"
-        aiwg_command: "aiwg add-behavior --provider openclaw"
-        routing: >
-          OpenClaw is the first provider with native behavior support. Behaviors deploy to
-          `~/.openclaw/behaviors/` and are triggered by file, time, or API events.
-          Use `aiwg add-behavior --provider openclaw` to deploy. The BEHAVIOR.md format defines
-          the cross-platform contract.
-        notes: "OpenClaw behaviors are the reference implementation for the AIWG behaviors spec (#540-#543)."
-
-      mcp:
-        native: false
-        native_tool: null
-        aiwg_command: null
-        routing: "Not supported."
+# Feature definitions — documents what each feature key means and
+# what emulation strategies are available when native support is absent.
+features:
+  cron:
+    description: Scheduled task execution (recurring triggers)
+    native_example: Claude Code CronCreate/CronList/CronDelete tools
+    emulation_strategies:
+      aiwg-schedule: AIWG schedule CLI with remote triggers
+  agent_teams:
+    description: Multi-agent orchestration with team coordination
+    native_example: Claude Code native agent teams
+    emulation_strategies:
+      aiwg-mc: AIWG Mission Control background orchestration
+  tasks:
+    description: Spawn focused sub-tasks or sub-agents
+    native_example: Claude Code Task tool
+    emulation_strategies:
+      aiwg-mc: AIWG Mission Control dispatch
+  mcp:
+    description: Model Context Protocol server integration
+    native_example: Claude Code MCP tool access
+    emulation_strategies: {}
+  behaviors:
+    description: Reactive capabilities triggered by events (hooks/scripts)
+    native_example: OpenClaw behavior directories with BEHAVIOR.md + scripts/
+    emulation_strategies:
+      hooks: Pre/post-tool hooks as behavior emulation
+      aiwg-mc: Background monitoring via Mission Control
+  mission_control:
+    description: Background multi-task orchestration with monitoring
+    native_example: null
+    emulation_strategies:
+      aiwg-mc: AIWG mc start/dispatch/status/watch CLI

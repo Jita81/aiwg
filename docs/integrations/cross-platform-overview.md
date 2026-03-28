@@ -13,45 +13,43 @@ AIWG works across multiple AI platforms. **One command deploys everything.**
 | GitHub Copilot | `aiwg use sdlc --provider copilot` | copilot-instructions.md |
 | Factory AI | `aiwg use sdlc --provider factory` | AGENTS.md |
 | Cursor | `aiwg use sdlc --provider cursor` | .cursor/rules/ (MDC) |
-| OpenCode | `aiwg use sdlc --provider opencode` | OpenCode.md |
+| OpenCode | `aiwg use sdlc --provider opencode` | AGENTS.md |
 | Warp Terminal | `aiwg use sdlc --provider warp` | WARP.md |
-| Windsurf | `aiwg use sdlc --provider windsurf` | .windsurfrules |
-| Hermes Agent | `aiwg mcp serve` (MCP sidecar) | AGENTS.md |
+| Windsurf | `aiwg use sdlc --provider windsurf` | AGENTS.md |
+| OpenClaw | `aiwg use sdlc --provider openclaw` | - |
 
 ---
 
 ## What Gets Deployed
 
-All four artifact types deploy automatically in each platform's native format:
+All artifact types deploy automatically in each platform's native format:
 
 - **Agents** - Specialized AI personas (Architecture Designer, Test Engineer, Security Auditor, etc.)
 - **Commands** - Slash commands and CLI commands (`/mention-wire`, `transition`, `where-are-we`)
 - **Skills** - Natural language workflows (project awareness, handoffs, quality gates)
 - **Rules** - Context rules and coding standards (citation policy, token security, versioning)
+- **Behaviors** - Platform behavior definitions (OpenClaw only)
 
 ---
 
 ## Provider Capability Matrix
 
-| Provider | Agents | Commands | Skills | Rules |
-|----------|--------|----------|--------|-------|
-| Claude Code | native | native | native | native |
-| OpenAI/Codex | native | native | native | conventional |
-| GitHub Copilot | native | conventional | conventional | conventional |
-| Factory AI | native | native | conventional | conventional |
-| Cursor | conventional | conventional | native | native |
-| OpenCode | contextPaths | conventional | none | contextPaths |
-| Warp Terminal | aggregated | aggregated | conventional | conventional |
-| Windsurf | aggregated | native | conventional | conventional |
-| Hermes Agent | MCP | MCP | native | MCP |
+| Provider | Agents | Commands | Skills | Rules | Behaviors |
+|----------|--------|----------|--------|-------|-----------|
+| Claude Code | native | native | native | native | - |
+| OpenAI/Codex | native | native | native | conventional | - |
+| GitHub Copilot | native | native | conventional | native | - |
+| Factory AI | native | native | native | conventional | - |
+| Cursor | conventional | conventional | native | native | - |
+| OpenCode | native | native | conventional | conventional | - |
+| Warp Terminal | aggregated | conventional | native | aggregated | - |
+| Windsurf | aggregated | native | native | native | - |
+| OpenClaw | native | native | native | native | native |
 
 **Legend**:
 - **native** - Platform auto-discovers artifacts in standard directories
 - **conventional** - AIWG directory convention (platform reads on request)
 - **aggregated** - Single-file compilation + discrete files for compatibility
-- **contextPaths** - Injected via explicit `contextPaths` config (user must configure)
-- **none** - Artifact type has no equivalent on this platform
-- **MCP** - Accessed via MCP tool calls (`aiwg mcp serve`), not file deployment
 
 ---
 
@@ -69,23 +67,22 @@ Most providers follow `.<provider>/<type>/`:
 └── rules/           # Context rules
 
 .github/
-├── agents/          # Agent definitions (YAML format)
-├── commands/        # Converted from slash commands
-├── skills/          # Workflow definitions
-└── rules/           # Copilot-specific rules
+├── agents/          # Agent definitions (.agent.md format)
+├── prompts/         # Slash commands (.prompt.md format)
+├── instructions/    # Path-scoped rules (.instructions.md format)
+└── copilot-instructions.md  # Repository-wide instructions
 ```
 
 ### Special Cases
 
 | Provider | Special Convention |
 |----------|--------------------|
-| **OpenAI/Codex** | Commands → `~/.codex/prompts/`<br>Skills → `~/.codex/skills/` (home directory) |
-| **GitHub Copilot** | Commands converted to YAML agents in `.github/agents/` |
-| **Warp Terminal** | Discrete files + aggregated `WARP.md` |
-| **Windsurf** | Agents aggregated to `AGENTS.md`<br>Commands → `.windsurf/workflows/` |
-| **Cursor** | Rules use `.mdc` extension (MDC format) |
-| **OpenCode** | Commands → `.opencode/commands/` (Ctrl+K palette)<br>Agents/Rules → `.opencode/agent/` and `.opencode/rule/` (require `contextPaths` config)<br>Context file → `OpenCode.md` (auto-loaded) |
-| **Hermes Agent** | MCP sidecar model — not `aiwg use --provider`.<br>Skills → `~/.hermes/skills/` (native SKILL.md format)<br>All other artifacts accessed via MCP tool calls |
+| **OpenAI/Codex** | Commands → `~/.codex/prompts/`<br>Skills → `~/.codex/skills/` (home directory)<br>AGENTS.md is free-form Markdown (no YAML frontmatter or structured directives)<br>Rust CLI is current product; TypeScript CLI is legacy<br>Uses Responses API exclusively (`wire_api = "chat"` removed) |
+| **GitHub Copilot** | Agents use `.agent.md` format<br>Commands → `.github/prompts/*.prompt.md`<br>Rules → `.github/instructions/*.instructions.md` (with `applyTo` globs)<br>MCP → `.vscode/mcp.json` |
+| **Warp Terminal** | Skills natively discovered at `.warp/skills/`; agents and rules aggregated into `WARP.md`; `AGENTS.md` also supported (preferred by Warp, but `WARP.md` takes priority); `.warp/workflows/` for legacy YAML workflows |
+| **Windsurf** | Agents aggregated to `AGENTS.md`<br>Commands → `.windsurf/workflows/`<br>Rules → `.windsurf/rules/*.md` (with trigger frontmatter)<br>Skills → `.windsurf/skills/` (native since v1.13.6) |
+| **Cursor** | Rules use `.mdc` extension (MDC format) with frontmatter (`description`, `globs`, `alwaysApply`)<br>Skills use native `.cursor/skills/*/SKILL.md` format (2.4+)<br>Also supports `AGENTS.md` with directory inheritance<br>Legacy `.cursorrules` still generated for backward compatibility<br>Cloud Agents support MCP for remote AIWG access |
+| **OpenClaw** | All artifacts deploy to home directory (`~/.openclaw/`)<br>First provider to support behaviors (`~/.openclaw/behaviors/`) |
 
 ---
 
@@ -139,7 +136,7 @@ See [Ralph Guide](../ralph-guide.md) for full documentation.
 | OpenCode | [Setup Guide](opencode-quickstart.md) |
 | Warp Terminal | [Setup Guide](warp-terminal-quickstart.md) |
 | Windsurf | [Setup Guide](windsurf-quickstart.md) |
-| Hermes Agent | [Setup Guide](hermes-quickstart.md) |
+| OpenClaw | [Setup Guide](openclaw-quickstart.md) |
 
 ---
 

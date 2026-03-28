@@ -66,6 +66,50 @@ enabled_tools = [
 ]
 ```
 
+### Full MCP Server Config Schema
+
+Codex supports a richer MCP configuration than the AIWG default above. The complete field set:
+
+```toml
+[mcp_servers.my_server]
+# Process-based (stdio) servers:
+command = "/path/to/server"                # required for stdio
+args = ["--flag", "value"]                 # optional
+cwd = "/working/dir"                       # optional
+
+# HTTP-based servers (alternative to stdio):
+url = "https://my-mcp-server.example.com"  # required for HTTP
+
+# Authentication:
+bearer_token_env_var = "MY_TOKEN_VAR"      # recommended (load from env)
+http_headers = { "X-Custom" = "val" }      # static headers
+env_http_headers = { "Authorization" = "MY_AUTH_ENV_VAR" }  # env-backed headers
+
+# OAuth (for OAuth-capable MCP servers):
+oauth_resource = "https://resource.example.com"
+scopes = ["read", "write"]
+
+# Environment for the server process:
+env = { KEY = "value" }                    # set environment variables
+env_vars = ["PATH", "HOME"]               # inherit from current env
+
+# Tool filtering:
+enabled_tools = ["search", "fetch"]        # allowlist
+disabled_tools = ["dangerous_op"]          # denylist
+
+# Timing:
+startup_timeout_sec = 5.0
+tool_timeout_sec = 30.0
+
+# Lifecycle:
+enabled = true                             # disable without removing
+required = false                           # if true, Codex fails to start if unavailable
+
+# Per-tool approval overrides:
+[mcp_servers.my_server.tools.search]
+approval_mode = "auto"                     # "auto" | "prompt" | "approve"
+```
+
 ### Step 2: Verify
 
 Start a Codex session and ask: "What AIWG MCP tools are available?"

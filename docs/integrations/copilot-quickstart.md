@@ -33,7 +33,7 @@ git push
 /aiwg-regenerate-copilot
 ```
 
-This step is critical - it enables natural language command mapping ("run security review" → workflow). Without it, advanced features won't work correctly. See the [Regenerate Guide](#regenerate-guide) for details.
+This step is critical - it enables natural language command mapping ("run security review" -> workflow). Without it, advanced features won't work correctly. See the [Regenerate Guide](#regenerate-guide) for details.
 
 **5. You're ready.** See the [Intake Guide](#intake-guide) for starting projects.
 
@@ -43,15 +43,34 @@ This step is critical - it enables natural language command mapping ("run securi
 
 ```text
 .github/
-├── agents/                  # SDLC agents (Requirements Analyst, Architecture Designer, etc.)
-├── skills/                  # Skill directories (voice profiles, project awareness, etc.)
-├── copilot-rules/           # Context rules (token security, citation policy, etc.)
-└── copilot-instructions.md  # Global instructions
+├── agents/                  # Custom agents (.agent.md format)
+│   ├── architecture-designer.agent.md
+│   ├── security-architect.agent.md
+│   └── ...
+├── prompts/                 # Slash commands (.prompt.md format)
+│   ├── security-review.prompt.md
+│   └── ...
+├── instructions/            # Path-scoped rules (.instructions.md format)
+│   ├── token-security.instructions.md
+│   └── ...
+└── copilot-instructions.md  # Repository-wide instructions
+
+.vscode/
+└── mcp.json                 # MCP server configuration (optional)
 
 .aiwg/                       # SDLC artifacts
 ```
 
-> **Note:** GitHub Copilot converts AIWG commands to YAML agent format. Commands appear alongside agents in `.github/agents/` as workflow-triggering agents.
+### Copilot File Formats
+
+GitHub Copilot uses Markdown files with YAML frontmatter:
+
+| Directory | Extension | Purpose |
+|-----------|-----------|---------|
+| `.github/agents/` | `.agent.md` | Custom agent definitions |
+| `.github/prompts/` | `.prompt.md` | Custom slash commands |
+| `.github/instructions/` | `.instructions.md` | Path-scoped conditional rules |
+| `.github/copilot-instructions.md` | (single file) | Repository-wide instructions |
 
 ---
 
@@ -65,15 +84,57 @@ Invoke via @-mention in Copilot Chat:
 @code-reviewer Review this PR for quality issues
 ```
 
+### Custom Slash Commands
+
+AIWG commands deploy as prompt files, invokable via `/name`:
+
+```text
+/security-review Audit the auth module
+/generate-tests Add tests for the API layer
+```
+
 ---
 
 ## Copilot Coding Agent
 
-Assign issues directly to Copilot:
+Assign issues directly to Copilot for autonomous PR creation:
 
 1. Navigate to an issue
 2. In Assignees, select **Copilot**
-3. Copilot analyzes and creates a PR
+3. Copilot analyzes the codebase, implements changes, runs tests
+4. A pull request is created for human review
+
+The coding agent reads `.github/copilot-instructions.md` for project context. It runs in a GitHub Actions sandbox with network access controls.
+
+---
+
+## MCP Integration
+
+GitHub Copilot supports MCP (Model Context Protocol) in two contexts:
+
+### VS Code Agent Mode
+
+MCP is GA in VS Code. Configure servers in `.vscode/mcp.json`:
+
+```json
+{
+  "servers": {
+    "aiwg": {
+      "type": "stdio",
+      "command": "aiwg",
+      "args": ["mcp", "serve"]
+    }
+  }
+}
+```
+
+Once configured, Copilot agent mode can call AIWG MCP tools (`workflow-run`, `artifact-read`, etc.) directly.
+
+### Coding Agent
+
+The coding agent supports MCP servers configured via GitHub.com Settings > Copilot > Coding agent. This is a UI-based JSON configuration, not a committed file.
+
+See [Copilot MCP Integration](copilot-mcp-sidecar.md) for full details.
 
 ---
 
@@ -86,6 +147,56 @@ aiwg ralph "Fix all tests" --completion "npm test passes"
 ```
 
 See [Ralph Guide](../ralph-guide.md) for full documentation including `--provider` options.
+
+---
+
+## Path-Scoped Instructions
+
+Copilot supports conditional rules that apply only when working with specific file types:
+
+```markdown
+---
+name: TypeScript Rules
+description: Style rules for TypeScript files
+applyTo: '**/*.ts,**/*.tsx'
+---
+
+Use strict TypeScript. Prefer interfaces over types.
+Always use explicit return types on public functions.
+```
+
+Place these in `.github/instructions/`. AIWG deploys rules as path-scoped instructions with appropriate `applyTo` patterns.
+
+---
+
+## Agent Definition Format
+
+AIWG agents deploy as `.agent.md` files with YAML frontmatter:
+
+```markdown
+---
+name: architecture-designer
+description: System architecture and technical decisions
+tools: ['search/codebase', 'edit', 'web/fetch', 'agent']
+model: gpt-4o
+---
+
+You are an Architecture Designer specializing in...
+```
+
+### Available Fields
+
+| Field | Purpose |
+|-------|---------|
+| `name` | Agent name shown in dropdown |
+| `description` | Placeholder text in chat |
+| `tools` | Available tools (built-in or MCP) |
+| `model` | Model or prioritized model list |
+| `agents` | Subagent access (`['*']` = all) |
+| `target` | `vscode` or `github-copilot` |
+| `mcp-servers` | Agent-scoped MCP servers |
+| `hooks` | Lifecycle hooks (Preview) |
+| `handoffs` | Next-agent transitions |
 
 ---
 
@@ -107,8 +218,13 @@ git push
 aiwg use sdlc --provider copilot --force
 ```
 
+**MCP tools not available?** Check `.vscode/mcp.json` exists and the server is running:
+```bash
+aiwg mcp serve
+```
+
 ---
 
-## MCP Sidecar (Status: Research)
+## Platform Reference
 
-MCP support for Copilot Chat is not yet confirmed. See the [Copilot MCP Sidecar Feasibility Assessment](copilot-mcp-sidecar.md) for current status and alternatives.
+For the full capability reference including all Copilot features, field schemas, and tool mappings, see the [GitHub Copilot Reference](../../.aiwg/references/platforms/github-copilot.md).

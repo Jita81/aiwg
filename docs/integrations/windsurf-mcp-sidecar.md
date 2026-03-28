@@ -2,7 +2,7 @@
 
 Connect AIWG to Windsurf Cascade AI as an MCP sidecar for structured workflow access.
 
-> **This is not a standard provider deployment.** Windsurf is an IDE-integrated AI assistant that cannot be spawned from the CLI, so it has no dangerous mode flag. The MCP sidecar is the only viable path to unrestricted AIWG tool access from within Windsurf. The architecture is `Windsurf Cascade AI → MCP → AIWG Server`.
+> **This is not a standard provider deployment.** Windsurf is an IDE-integrated AI assistant that cannot be spawned from the CLI. The MCP sidecar provides structured AIWG tool access from within Windsurf's Cascade agent. The architecture is `Windsurf Cascade AI → MCP → AIWG Server`. Windsurf supports stdio, Streamable HTTP, and SSE transports for MCP connections, with a 100-tool limit across all connected servers.
 
 ---
 

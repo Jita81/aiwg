@@ -104,7 +104,7 @@ export class MetadataValidator {
   /**
    * Validate a manifest file from the filesystem
    *
-   * @param manifestPath - Absolute path to manifest.md file
+   * @param manifestPath - Absolute path to manifest.md or BEHAVIOR.md file
    * @returns Validation result with errors and warnings
    */
   async validateFile(manifestPath: string): Promise<ValidationResult> {
@@ -130,7 +130,7 @@ export class MetadataValidator {
       const content = await fs.readFile(manifestPath, 'utf-8');
 
       // Validate content
-      const contentResult = await this.validateManifest(content, path.dirname(manifestPath));
+      const contentResult = await this.validateManifest(content, path.dirname(manifestPath), path.basename(manifestPath));
 
       // Merge results
       result.errors = contentResult.errors;
@@ -162,9 +162,10 @@ export class MetadataValidator {
    *
    * @param content - Manifest file content
    * @param basePath - Optional base path for file reference validation
+   * @param filename - Optional filename to infer type (e.g., 'BEHAVIOR.md')
    * @returns Validation result
    */
-  async validateManifest(content: string, basePath?: string): Promise<ValidationResult> {
+  async validateManifest(content: string, basePath?: string, filename?: string): Promise<ValidationResult> {
     const result: ValidationResult = {
       valid: false,
       errors: [],
@@ -177,8 +178,18 @@ export class MetadataValidator {
       return result;
     }
 
-    // Schema validation
-    const schemaResult = this.validateSchema(manifest);
+    // Infer type from filename for BEHAVIOR.md files that omit `type`
+    const isBehaviorFile = filename === 'BEHAVIOR.md' ||
+      (basePath && !('type' in (manifest as Record<string, unknown>)) &&
+       ('triggers' in (manifest as Record<string, unknown>) || 'hooks' in (manifest as Record<string, unknown>)));
+    if (isBehaviorFile && !('type' in (manifest as Record<string, unknown>))) {
+      (manifest as Record<string, unknown>).type = 'behavior';
+    }
+
+    // Schema validation — use behavior-specific validation for behavior files
+    const schemaResult = isBehaviorFile
+      ? this.validateBehaviorSchema(manifest)
+      : this.validateSchema(manifest);
     result.errors.push(...schemaResult.errors);
     result.warnings.push(...schemaResult.warnings);
 
@@ -274,7 +285,7 @@ export class MetadataValidator {
     }
 
     if ('type' in obj) {
-      const validTypes = ['agent', 'command', 'template', 'flow'];
+      const validTypes = ['agent', 'command', 'template', 'flow', 'behavior'];
       if (typeof obj.type !== 'string' || !validTypes.includes(obj.type)) {
         result.valid = false;
         result.errors.push({
@@ -332,6 +343,156 @@ export class MetadataValidator {
           severity: 'error'
         });
       }
+    }
+
+    return result;
+  }
+
+  /**
+   * Validate BEHAVIOR.md schema structure
+   *
+   * BEHAVIOR.md files use a different schema than manifest.md:
+   * - Required: name, version, description, platforms
+   * - Optional: triggers, inputs, hooks, scripts, manifest, scope, tone, routing, memory
+   *
+   * @param manifest - Parsed frontmatter object
+   * @returns Validation result
+   */
+  validateBehaviorSchema(manifest: unknown): ValidationResult {
+    const result: ValidationResult = {
+      valid: true,
+      errors: [],
+      warnings: []
+    };
+
+    if (!manifest || typeof manifest !== 'object') {
+      result.valid = false;
+      result.errors.push({
+        message: 'Behavior manifest must be an object',
+        severity: 'error'
+      });
+      return result;
+    }
+
+    const obj = manifest as Record<string, unknown>;
+
+    // Required fields for BEHAVIOR.md
+    const requiredFields = ['name', 'version', 'description', 'platforms'];
+    for (const field of requiredFields) {
+      if (!(field in obj)) {
+        result.valid = false;
+        result.errors.push({
+          field,
+          message: `Missing required field: ${field}`,
+          severity: 'error'
+        });
+      }
+    }
+
+    // Type validations
+    if ('name' in obj && typeof obj.name !== 'string') {
+      result.valid = false;
+      result.errors.push({
+        field: 'name',
+        message: 'Field "name" must be a string',
+        severity: 'error'
+      });
+    }
+
+    if ('version' in obj) {
+      const version = obj.version;
+      if (typeof version !== 'string' && typeof version !== 'number') {
+        result.valid = false;
+        result.errors.push({
+          field: 'version',
+          message: 'Field "version" must be a string or number',
+          severity: 'error'
+        });
+      }
+    }
+
+    if ('description' in obj && typeof obj.description !== 'string') {
+      result.valid = false;
+      result.errors.push({
+        field: 'description',
+        message: 'Field "description" must be a string',
+        severity: 'error'
+      });
+    }
+
+    if ('platforms' in obj && !Array.isArray(obj.platforms)) {
+      result.valid = false;
+      result.errors.push({
+        field: 'platforms',
+        message: 'Field "platforms" must be an array',
+        severity: 'error'
+      });
+    }
+
+    // Optional field type checks
+    if ('triggers' in obj && !Array.isArray(obj.triggers)) {
+      result.valid = false;
+      result.errors.push({
+        field: 'triggers',
+        message: 'Field "triggers" must be an array of strings',
+        severity: 'error'
+      });
+    }
+
+    if ('inputs' in obj && !Array.isArray(obj.inputs)) {
+      result.valid = false;
+      result.errors.push({
+        field: 'inputs',
+        message: 'Field "inputs" must be an array',
+        severity: 'error'
+      });
+    }
+
+    if ('hooks' in obj && (typeof obj.hooks !== 'object' || Array.isArray(obj.hooks))) {
+      result.valid = false;
+      result.errors.push({
+        field: 'hooks',
+        message: 'Field "hooks" must be an object mapping event names to action arrays',
+        severity: 'error'
+      });
+    }
+
+    if ('scripts' in obj && (typeof obj.scripts !== 'object' || Array.isArray(obj.scripts))) {
+      result.valid = false;
+      result.errors.push({
+        field: 'scripts',
+        message: 'Field "scripts" must be an object mapping names to paths',
+        severity: 'error'
+      });
+    }
+
+    if ('scope' in obj) {
+      const validScopes = ['daemon', 'interactive', 'both'];
+      if (typeof obj.scope !== 'string' || !validScopes.includes(obj.scope)) {
+        result.valid = false;
+        result.errors.push({
+          field: 'scope',
+          message: `Field "scope" must be one of: ${validScopes.join(', ')}`,
+          severity: 'error'
+        });
+      }
+    }
+
+    // Completeness warnings
+    if (!('triggers' in obj) && !('hooks' in obj)) {
+      result.warnings.push({
+        field: 'triggers/hooks',
+        message: 'Behavior has neither triggers nor hooks — it cannot be activated',
+        severity: 'warning'
+      });
+    }
+
+    if ('hooks' in obj && !('scripts' in obj)) {
+      result.warnings.push({
+        field: 'scripts',
+        message: 'Behavior has hooks but no scripts — hooks will have no effect',
+        severity: 'warning'
+      });
     }
 
     return result;
@@ -638,11 +799,11 @@ export class MetadataValidator {
   }
 
   /**
-   * Find all manifest.md files in a directory
+   * Find all manifest.md and BEHAVIOR.md files in a directory
    *
    * @param dirPath - Directory to search
    * @param recursive - Whether to search subdirectories
-   * @returns Array of absolute manifest file paths
+   * @returns Array of absolute manifest/behavior file paths
    */
   private async findManifestFiles(dirPath: string, recursive: boolean): Promise<string[]> {
     const manifestFiles: string[] = [];
@@ -655,7 +816,7 @@ export class MetadataValidator {
       if (entry.isDirectory() && recursive) {
         const subManifests = await this.findManifestFiles(fullPath, recursive);
         manifestFiles.push(...subManifests);
-      } else if (entry.isFile() && entry.name === 'manifest.md') {
+      } else if (entry.isFile() && (entry.name === 'manifest.md' || entry.name === 'BEHAVIOR.md')) {
         manifestFiles.push(fullPath);
       }
     }

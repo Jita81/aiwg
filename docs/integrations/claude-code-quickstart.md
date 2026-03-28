@@ -89,7 +89,8 @@ Claude Code deploys all 4 artifact types natively: agents, commands, skills, and
 /plugin marketplace list
 
 # Re-add if missing
-/plugin marketplace add jmagly/ai-writing-guide ```
+/plugin marketplace add jmagly/ai-writing-guide
+```
 
 **Plugin installation fails?**
 
@@ -143,7 +144,7 @@ aiwg use sdlc
 **Check installation:**
 
 ```bash
-aiwg -version
+aiwg version
 ```
 
 ---

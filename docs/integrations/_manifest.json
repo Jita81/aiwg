@@ -11,6 +11,7 @@
     "codex-quickstart",
     "opencode-quickstart",
     "warp-terminal-quickstart",
+    "openclaw-quickstart",
     "cross-platform-config"
   ],
   "exclude": ["warp-terminal"]

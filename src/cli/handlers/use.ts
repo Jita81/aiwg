@@ -5,7 +5,7 @@
  * After deployment, registers deployed extensions in the extension registry.
  *
  * @implements @.aiwg/architecture/decisions/ADR-001-unified-extension-system.md
- * @implements #56, #57, #557, #621
+ * @implements #56, #57
  * @source @src/cli/router.ts
  * @issue #33
  */
@@ -19,13 +19,6 @@ import { getFrameworkRoot } from '../../channel/manager.mjs';
 import { getRegistry } from '../../extensions/registry.js';
 import { registerDeployedExtensions } from '../../extensions/deployment-registration.js';
 import { registerCliCommands, registerHooks } from '../cli-extension-loader.js';
-import { resolveInstalledPackage } from '../../packages/registry.js';
-import {
-  readAiwgConfig,
-  writeAiwgConfig,
-  updateInstalled,
-  hashManifest,
-} from '../../config/aiwg-config.js';
 import * as ui from '../ui.js';
 
 /**
@@ -50,7 +43,7 @@ const MODE_MAP: Record<Framework, string> = {
 /**
  * Valid addon identifiers (deployed independently via `aiwg use <addon>`)
  */
-const VALID_ADDONS = ['rlm'] as const;
+const VALID_ADDONS = ['rlm', 'ring', 'daemon'] as const;
 type Addon = typeof VALID_ADDONS[number];
 
 /**
@@ -58,19 +51,8 @@ type Addon = typeof VALID_ADDONS[number];
  */
 const ADDON_PATHS: Record<Addon, string> = {
   rlm: 'agentic/code/addons/rlm',
-};
-
-/**
- * Framework name to manifest.json path mapping (relative to framework root)
- * Used for manifestHash computation in the config deployment record.
- *
- * @implements #621
- */
-const FRAMEWORK_MANIFEST_PATHS: Partial<Record<Framework, string>> = {
-  sdlc: 'agentic/code/frameworks/sdlc-complete/manifest.json',
-  marketing: 'agentic/code/frameworks/media-marketing-kit/manifest.json',
-  'media-curator': 'agentic/code/frameworks/media-curator/manifest.json',
-  research: 'agentic/code/frameworks/research-complete/manifest.json',
+  ring: 'agentic/code/addons/ring-methodology',
+  daemon: 'agentic/code/addons/daemon',
 };
 
 /**
@@ -98,7 +80,7 @@ const PROVIDER_PATHS: Record<string, { agents: string; skills: string; commands:
   opencode: {
     agents: '.opencode/agent',
     skills: '.opencode/skill',
-    commands: '.opencode/commands',
+    commands: '.opencode/command',
     rules: '.opencode/rule',
   },
   copilot: {
@@ -289,50 +271,6 @@ async function countDeployedArtifacts(
 }
 
 /**
- * Deploy a package that was installed via `aiwg install` from the local cache.
- * Used when `aiwg use <name>` matches an entry in ~/.aiwg/packages.yaml.
- *
- * @implements #557
- */
-async function deployFromLocalCache(
-  name: string,
-  cachePath: string,
-  remainingArgs: string[],
-  frameworkRoot: string
-): Promise<HandlerResult> {
-  const providerIdx = remainingArgs.findIndex(a => a === '--provider' || a === '--platform');
-  const provider = providerIdx >= 0 && remainingArgs[providerIdx + 1] ? remainingArgs[providerIdx + 1] : 'claude';
-  const targetIdx = remainingArgs.findIndex(a => a === '--target');
-  const target = targetIdx >= 0 && remainingArgs[targetIdx + 1] ? remainingArgs[targetIdx + 1] : process.cwd();
-
-  const runner = createScriptRunner(frameworkRoot);
-
-  ui.blank();
-  console.log(`  ${ui.brandMark()} ${ui.bold(`Installing ${name}`)}`);
-  ui.blank();
-
-  const deployResult = await runner.run('tools/agents/deploy-agents.mjs', [
-    '--quiet',
-    '--source', cachePath,
-    '--deploy-commands',
-    '--deploy-skills',
-    '--deploy-rules',
-    '--provider', provider,
-    '--target', target,
-  ], { capture: true });
-
-  if (deployResult.exitCode !== 0) {
-    return deployResult;
-  }
-
-  ui.success(`${name} deployed from local package cache`);
-  ui.dim(`  Source: ${cachePath}`);
-  ui.blank();
-
-  return { exitCode: 0 };
-}
-
-/**
  * Use command handler
  *
  * Deploys framework agents, commands, and skills to the current project,
@@ -349,67 +287,28 @@ export class UseHandler implements CommandHandler {
     const framework = ctx.args[0];
     const remainingArgs = ctx.args.slice(1);
 
-    // Load project-level config (may be null if not yet initialised)
-    // @implements #621
-    const config = await readAiwgConfig(ctx.cwd);
-
-    // Zero-arg form: redeploy everything recorded in config
+    // Validate target argument (framework or addon)
     if (!framework) {
-      if (!config || Object.keys(config.installed).length === 0) {
-        return {
-          exitCode: 1,
-          message: [
-            'Error: No framework specified.',
-            '',
-            'Options:',
-            '  aiwg use sdlc              Deploy the SDLC framework',
-            '  aiwg use all               Deploy all frameworks',
-            '  aiwg init && aiwg use      Set up project config, then redeploy everything',
-            '',
-            'Frameworks: sdlc, marketing, media-curator, research, writing, all',
-            'Addons: rlm',
-          ].join('\n'),
-        };
-      }
-      // Redeploy each installed framework/addon sequentially
-      for (const name of Object.keys(config.installed)) {
-        const result = await this.execute({ ...ctx, args: [name] });
-        if (result.exitCode !== 0) return result;
-      }
-      return { exitCode: 0 };
+      return {
+        exitCode: 1,
+        message: 'Error: Framework or addon name required\nFrameworks: sdlc, marketing, media-curator, research, writing, all\nAddons: rlm, ring, daemon',
+      };
     }
 
     const isFramework = VALID_FRAMEWORKS.includes(framework as Framework);
     const isAddon = VALID_ADDONS.includes(framework as Addon);
 
     if (!isFramework && !isAddon) {
-      // Check local package registry before emitting an error (#557)
-      const localCachePath = await resolveInstalledPackage(framework);
-      if (localCachePath) {
-        return deployFromLocalCache(framework, localCachePath, ctx.args.slice(1), ctx.frameworkRoot);
-      }
-
       return {
         exitCode: 1,
-        message: [
-          `Error: Unknown target '${framework}'`,
-          `Frameworks: ${VALID_FRAMEWORKS.join(', ')}`,
-          `Addons: ${VALID_ADDONS.join(', ')}`,
-          '',
-          `If '${framework}' is a remote package, install it first:`,
-          `  aiwg install owner/${framework}       # Gitea shorthand`,
-          `  aiwg install github:owner/${framework} # GitHub shorthand`,
-          '',
-          `Run 'aiwg help' for usage information.`,
-        ].join('\n'),
+        message: `Error: Unknown target '${framework}'\nFrameworks: ${VALID_FRAMEWORKS.join(', ')}\nAddons: ${VALID_ADDONS.join(', ')}\n\nRun 'aiwg help' for usage information.`,
       };
     }
 
     // Handle addon-only deployment
     if (isAddon) {
       const providerIdx = remainingArgs.findIndex(a => a === '--provider' || a === '--platform');
-      const explicitProvider = providerIdx >= 0 && remainingArgs[providerIdx + 1] ? remainingArgs[providerIdx + 1] : undefined;
-      const provider = explicitProvider ?? config?.providers?.[0] ?? 'claude';
+      const provider = providerIdx >= 0 && remainingArgs[providerIdx + 1] ? remainingArgs[providerIdx + 1] : 'claude';
       const targetIdx = remainingArgs.findIndex(a => a === '--target');
       const target = targetIdx >= 0 && remainingArgs[targetIdx + 1] ? remainingArgs[targetIdx + 1] : process.cwd();
 
@@ -480,26 +379,6 @@ export class UseHandler implements CommandHandler {
 
       ui.blank();
       ui.success(`${framework} addon deployed`);
-
-      // Update project config deployment record (#621)
-      try {
-        const liveConfig = await readAiwgConfig(ctx.cwd);
-        if (liveConfig) {
-          const frameworkRoot = await getFrameworkRoot();
-          const addonManifestPath = path.join(frameworkRoot, ADDON_PATHS[framework as Addon], 'manifest.json');
-          const mHash = await hashManifest(addonManifestPath);
-          const paths = PROVIDER_PATHS[provider] || PROVIDER_PATHS.claude;
-          const counts = await countDeployedArtifacts(target, paths);
-          const { getVersionInfo } = await import('../../channel/manager.mjs');
-          const vInfo = await getVersionInfo().catch(() => ({ version: 'unknown' }));
-          const version = vInfo?.version ?? 'unknown';
-          updateInstalled(liveConfig, framework, provider, counts, { version: String(version ?? 'unknown'), source: 'bundled', manifestHash: mHash });
-          await writeAiwgConfig(ctx.cwd, liveConfig);
-        }
-      } catch {
-        // Non-critical: config update failure should not block deployment
-      }
-
       return {
         exitCode: 0,
       };
@@ -519,150 +398,101 @@ export class UseHandler implements CommandHandler {
     // Dry-run must not capture output — its purpose is to show what would happen
     if (!verbose && !dryRun) filteredArgs.push('--quiet');
 
-    // Config-first provider resolution (#621)
-    // --provider flag takes precedence; otherwise use configured providers.
+    // Extract provider and target from remainingArgs to pass to addon deployments
     const providerIdx = remainingArgs.findIndex(a => a === '--provider' || a === '--platform');
-    const explicitProvider = providerIdx >= 0 && remainingArgs[providerIdx + 1]
-      ? remainingArgs[providerIdx + 1]
-      : undefined;
-    const providers = explicitProvider ? [explicitProvider] : (config?.providers ?? ['claude']);
-
-    if (!explicitProvider && !config) {
-      ui.warn("No .aiwg/aiwg.config found — run 'aiwg init' to configure providers for this project");
-    }
-
+    const provider = providerIdx >= 0 && remainingArgs[providerIdx + 1] ? remainingArgs[providerIdx + 1] : 'claude';
     const targetIdx = remainingArgs.findIndex(a => a === '--target');
     const target = targetIdx >= 0 && remainingArgs[targetIdx + 1] ? remainingArgs[targetIdx + 1] : process.cwd();
 
+    // Deploy main framework
     const quiet = !verbose && !dryRun;
     const captureOpts = quiet ? { capture: true } : {};
+    if (quiet) {
+      ui.blank();
+      console.log(`  ${ui.brandMark()} ${ui.bold(`Installing ${framework} framework`)}  ${ui.dimText(`for ${provider === 'claude' ? 'Claude Code' : provider}`)}`);
+      ui.blank();
+    }
     const runner = createScriptRunner(ctx.frameworkRoot);
+    const mainResult = await runner.run('tools/agents/deploy-agents.mjs', filteredArgs, captureOpts);
 
-    // Strip --provider/--platform and its value from filteredArgs so we can inject per-provider below
-    const baseFilteredArgs: string[] = [];
-    for (let i = 0; i < filteredArgs.length; i++) {
-      if (filteredArgs[i] === '--provider' || filteredArgs[i] === '--platform') {
-        i++; // skip the value too
-        continue;
-      }
-      baseFilteredArgs.push(filteredArgs[i]);
+    if (mainResult.exitCode !== 0) {
+      return mainResult;
     }
 
-    // Deploy to each configured provider sequentially
-    for (const provider of providers) {
-      const providerFilteredArgs = [...baseFilteredArgs, '--provider', provider];
+    // Build common args for addon deployments (inherit provider and target)
+    const addonBaseArgs = ['--deploy-commands', '--deploy-skills', '--deploy-rules'];
+    if (provider) addonBaseArgs.push('--provider', provider);
+    if (target) addonBaseArgs.push('--target', target);
+    if (verbose) addonBaseArgs.push('--verbose');
 
-      if (quiet) {
-        ui.blank();
-        const providerLabel = provider === 'claude' ? 'Claude Code' : provider;
-        console.log(`  ${ui.brandMark()} ${ui.bold(`Installing ${framework} framework`)}  ${ui.dimText(`for ${providerLabel}`)}`);
-        ui.blank();
+    // Deploy aiwg-utils unless --no-utils
+    if (!skipUtils) {
+      if (verbose) {
+        console.log('');
+        console.log('Deploying aiwg-utils addon...');
       }
+      const frameworkRoot = await getFrameworkRoot();
+      const utilsSource = path.join(frameworkRoot, 'agentic/code/addons/aiwg-utils');
+      const addonArgs = quiet ? ['--quiet', '--source', utilsSource, ...addonBaseArgs] : ['--source', utilsSource, ...addonBaseArgs];
+      const utilsResult = await runner.run('tools/agents/deploy-agents.mjs', addonArgs, captureOpts);
 
-      // Deploy main framework
-      const mainResult = await runner.run('tools/agents/deploy-agents.mjs', providerFilteredArgs, captureOpts);
-      if (mainResult.exitCode !== 0) {
-        return mainResult;
+      if (utilsResult.exitCode !== 0) {
+        return utilsResult;
       }
+    }
 
-      // Build common args for addon deployments
-      const addonBaseArgs = ['--deploy-commands', '--deploy-skills', '--deploy-rules',
-        '--provider', provider, '--target', target];
-      if (verbose) addonBaseArgs.push('--verbose');
-
-      // Deploy aiwg-utils unless --no-utils
-      if (!skipUtils) {
-        if (verbose) { console.log(''); console.log('Deploying aiwg-utils addon...'); }
-        const frameworkRoot = await getFrameworkRoot();
-        const utilsSource = path.join(frameworkRoot, 'agentic/code/addons/aiwg-utils');
-        const addonArgs = quiet
-          ? ['--quiet', '--source', utilsSource, ...addonBaseArgs]
-          : ['--source', utilsSource, ...addonBaseArgs];
-        const utilsResult = await runner.run('tools/agents/deploy-agents.mjs', addonArgs, captureOpts);
-        if (utilsResult.exitCode !== 0) return utilsResult;
+    // Deploy ralph addon (iterative execution loops)
+    if (!skipUtils) {
+      if (verbose) {
+        console.log('');
+        console.log('Deploying ralph addon...');
       }
+      const frameworkRoot = await getFrameworkRoot();
+      const ralphSource = path.join(frameworkRoot, 'agentic/code/addons/ralph');
+      const ralphArgs = quiet ? ['--quiet', '--source', ralphSource, ...addonBaseArgs] : ['--source', ralphSource, ...addonBaseArgs];
+      const ralphResult = await runner.run('tools/agents/deploy-agents.mjs', ralphArgs, captureOpts);
 
-      // Deploy ralph addon
-      if (!skipUtils) {
-        if (verbose) { console.log(''); console.log('Deploying ralph addon...'); }
-        const frameworkRoot = await getFrameworkRoot();
-        const ralphSource = path.join(frameworkRoot, 'agentic/code/addons/ralph');
-        const ralphArgs = quiet
-          ? ['--quiet', '--source', ralphSource, ...addonBaseArgs]
-          : ['--source', ralphSource, ...addonBaseArgs];
-        const ralphResult = await runner.run('tools/agents/deploy-agents.mjs', ralphArgs, captureOpts);
-        if (ralphResult.exitCode !== 0) return ralphResult;
+      if (ralphResult.exitCode !== 0) {
+        return ralphResult;
       }
+    }
 
-      // Register deployed extensions
-      if (verbose) { console.log(''); console.log('Registering deployed extensions...'); }
-      try {
-        const registry = getRegistry();
-        const paths = PROVIDER_PATHS[provider] || PROVIDER_PATHS.claude;
-        await registerDeployedExtensions(registry, {
-          agentsPath: paths.agents,
-          skillsPath: paths.skills,
-          commandsPath: paths.commands,
-          rulesPath: paths.rules,
-          provider,
-          cwd: target,
-        });
-        if (verbose) console.log('Extension registration complete');
-      } catch (error) {
-        console.error('Warning: Failed to register extensions:', error instanceof Error ? error.message : String(error));
-      }
+    // Register deployed extensions in the registry
+    if (verbose) {
+      console.log('');
+      console.log('Registering deployed extensions...');
+    }
+    try {
+      const registry = getRegistry();
+      const paths = PROVIDER_PATHS[provider] || PROVIDER_PATHS.claude;
 
-      // Completion summary and next steps
-      if (quiet) {
-        const paths = PROVIDER_PATHS[provider] || PROVIDER_PATHS.claude;
-        const counts = await countDeployedArtifacts(target, paths);
-        if (counts.agents > 0) ui.deployCount('Agents', counts.agents);
-        if (counts.commands > 0) ui.deployCount('Commands', counts.commands);
-        if (counts.skills > 0) ui.deployCount('Skills', counts.skills);
-        if (counts.rules > 0) ui.deployCount('Rules', counts.rules);
-        ui.blank();
-        // Only print next steps for the last provider to avoid repetition
-        if (provider === providers[providers.length - 1]) {
-          printNextSteps(framework as Framework, provider);
-        }
+      await registerDeployedExtensions(registry, {
+        agentsPath: paths.agents,
+        skillsPath: paths.skills,
+        commandsPath: paths.commands,
+        rulesPath: paths.rules,
+        provider,
+        cwd: target,
+      });
 
-        // Advisory: check .gitignore for AIWG runtime patterns
-        try {
-          const { checkGitignore } = await import('../../config/gitignore.js');
-          const result = await checkGitignore(target);
-          if (result.missingRuntime.length > 0) {
-            ui.warn('Run "aiwg config gitignore --fix" to add recommended .gitignore entries');
-          }
-        } catch {
-          // Non-critical
-        }
-      }
+      if (verbose) console.log('Extension registration complete');
+    } catch (error) {
+      console.error('Warning: Failed to register extensions:', error instanceof Error ? error.message : String(error));
+      // Don't fail the deployment if registration fails
+    }
 
-      // Update project config deployment record (#621)
-      try {
-        const liveConfig = await readAiwgConfig(ctx.cwd);
-        if (liveConfig) {
-          const frameworkRoot = await getFrameworkRoot();
-          const manifestRelPath = FRAMEWORK_MANIFEST_PATHS[framework as Framework];
-          const mHash = manifestRelPath
-            ? await hashManifest(path.join(frameworkRoot, manifestRelPath))
-            : undefined;
-          const paths = PROVIDER_PATHS[provider] || PROVIDER_PATHS.claude;
-          const counts = await countDeployedArtifacts(target, paths);
-          const { getVersionInfo } = await import('../../channel/manager.mjs');
-          const vInfo = await getVersionInfo().catch(() => ({ version: 'unknown' }));
-          const version = vInfo?.version ?? 'unknown';
-          updateInstalled(liveConfig, framework, provider, counts, {
-            version: String(version ?? 'unknown'),
-            source: 'bundled',
-            manifestHash: mHash,
-          });
-          await writeAiwgConfig(ctx.cwd, liveConfig);
-        }
-      } catch {
-        // Non-critical: config update failure should not block deployment
-      }
-    } // end provider loop
+    // Show completion summary and next steps (default mode only)
+    if (quiet) {
+      // Count deployed artifacts
+      const paths = PROVIDER_PATHS[provider] || PROVIDER_PATHS.claude;
+      const counts = await countDeployedArtifacts(target, paths);
+      if (counts.agents > 0) ui.deployCount('Agents', counts.agents);
+      if (counts.commands > 0) ui.deployCount('Commands', counts.commands);
+      if (counts.skills > 0) ui.deployCount('Skills', counts.skills);
+      if (counts.rules > 0) ui.deployCount('Rules', counts.rules);
+      ui.blank();
+      printNextSteps(framework as Framework, provider);
+    }
 
     return {
       exitCode: 0,

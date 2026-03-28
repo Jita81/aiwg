@@ -3,8 +3,8 @@
 > **AIWG Primary Platform** - Authoritative reference for Claude Code features, configuration, and integration patterns.
 
 **Last Updated**: 2026-03-27
-**Claude Code Version**: v2.1.33
-**Coverage**: v2.0.73 through v2.1.33
+**Claude Code Version**: Current (post v2.1.33)
+**Coverage**: v2.0.73 through current
 **Maintainer**: AIWG Team
 
 ---
@@ -51,10 +51,13 @@ Claude Code provides built-in tools for development operations:
 | **AskUserQuestion** | Prompt user for input | Clarify requirements |
 | **EnterPlanMode** | Start planning workflow | Architecture planning |
 | **ExitPlanMode** | Complete planning | Submit plan for approval |
-| **CronCreate** | Schedule recurring/one-shot prompts | Periodic health checks, reminders |
-| **CronDelete** | Cancel a scheduled cron job | Remove scheduled task |
-| **CronList** | List active cron jobs | View all scheduled tasks |
-| **RemoteTrigger** | Manage cloud-hosted scheduled agents | Persistent triggers via claude.ai API |
+| **EnterWorktree** | Create isolated git worktree | Parallel work without conflicts |
+| **ExitWorktree** | Leave and cleanup worktree | Return to main working tree |
+| **RemoteTrigger** | Trigger scheduled remote agents | Invoke cron-scheduled tasks |
+| **CronCreate** | Create scheduled agent triggers | Set up recurring automated tasks |
+| **CronDelete** | Remove scheduled triggers | Clean up cron jobs |
+| **CronList** | List active scheduled triggers | View recurring task schedule |
+| **SendMessage** | Send message to running agent | Continue or coordinate with spawned agents |
 
 **Read Tool Enhancements** (v2.1.30):
 - `pages` parameter for PDFs: `Read doc.pdf pages: "1-5"` (max 20 pages per request)
@@ -72,9 +75,12 @@ Claude Code provides built-in tools for development operations:
 
 | Model | ID | Best For | Context | Notes |
 |-------|-----|----------|---------|-------|
-| **Opus 4.6** | `claude-opus-4-6` | Complex reasoning, architecture | 200K | Most capable (v2.1.32+) |
-| **Sonnet 4.5** | `claude-sonnet-4-5-20250929` | Daily coding, implementation | 200K | Fast, cost-effective |
+| **Opus 4.6** | `claude-opus-4-6` | Complex reasoning, architecture | 200K | Most capable |
+| **Opus 4.6 (1M)** | `claude-opus-4-6[1m]` | Large codebase analysis, deep research | 1M | Extended context variant |
+| **Sonnet 4.6** | `claude-sonnet-4-6` | Daily coding, implementation | 200K | Latest Sonnet family |
 | **Haiku 4.5** | `claude-haiku-4-5-20251001` | Quick tasks, simple queries | 200K | Fastest, cheapest |
+
+**Note**: The Claude 4.5/4.6 model family is the most recent. Sonnet 4.5 (`claude-sonnet-4-5-20250929`) remains available but Sonnet 4.6 is the current recommended default.
 
 **Model Switching**:
 ```bash
@@ -84,12 +90,17 @@ claude --model opus-4-6
 # During session
 /model opus-4-6
 
+# Fast mode toggle (same model, faster output)
+/fast
+
 # Environment variable
 export ANTHROPIC_MODEL=opus-4-6
 
 # In settings
 { "model": "opus-4-6" }
 ```
+
+**Fast Mode**: `/fast` toggles faster output using the same Claude Opus 4.6 model — it does NOT switch to a different model. It trades some reasoning depth for speed.
 
 ### 1.3 Built-in Commands
 
@@ -116,6 +127,7 @@ export ANTHROPIC_MODEL=opus-4-6
 | `/feedback` | Submit feedback (opens GitHub issue) | - |
 | `/mcp` | MCP server management | - |
 | `/skills` | Browse available skills (shows plugin name) | Enhanced v2.1.33 |
+| `/fast` | Toggle fast output mode (same model, faster output) | - |
 
 ---
 
@@ -297,149 +309,16 @@ memory: local      # Scoped to local machine
 
 ### 3.3 Agent Teams (Experimental, v2.1.32)
 
-Multi-agent collaboration where multiple Claude Code instances coordinate as a team. **Research preview** — requires opt-in and is token-intensive.
+Multi-agent collaboration for complex workflows. Requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`.
 
-#### 3.3.1 Enabling Agent Teams
+- Agents can send and receive messages via tmux sessions
+- TeammateIdle and TaskCompleted hook events for coordination
+- Token-intensive feature (research preview)
 
 ```bash
-# Environment variable (required)
+# Enable agent teams
 export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
-
-# Then start Claude Code normally
-claude --agent team-lead
 ```
-
-#### 3.3.2 Architecture
-
-Agent Teams uses **tmux sessions** as the coordination layer:
-
-```
-┌─────────────────────────────────────────────┐
-│                  tmux session                │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  │
-│  │ Agent A   │  │ Agent B   │  │ Agent C   │  │
-│  │ (Lead)    │  │ (Impl)    │  │ (Review)  │  │
-│  │           │  │           │  │           │  │
-│  │ SendMsg ──┼──┼→ receives │  │           │  │
-│  │           │  │ SendMsg ──┼──┼→ receives │  │
-│  └──────────┘  └──────────┘  └──────────┘  │
-│          ↕ TeammateIdle / TaskCompleted      │
-└─────────────────────────────────────────────┘
-```
-
-- Each agent runs in its own tmux pane with full Claude Code capabilities
-- Agents communicate via **SendMessage** — addressing each other by agent ID or name
-- The orchestrating agent can spawn teammates and assign them tasks
-- All agents share the same filesystem (working directory)
-
-#### 3.3.3 Hook Events for Coordination
-
-Two hook events enable reactive multi-agent workflows:
-
-| Event | Fires When | Use Case |
-|-------|-----------|----------|
-| `TeammateIdle` | A team member finishes work and has no pending tasks | Assign next task, check if all work complete |
-| `TaskCompleted` | A background task completes | Trigger dependent tasks, aggregate results |
-
-**Hook Configuration Example**:
-```json
-{
-  "hooks": {
-    "TeammateIdle": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "echo 'Agent idle — check task queue'"
-          }
-        ]
-      }
-    ],
-    "TaskCompleted": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "echo 'Task done — notify orchestrator'"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-#### 3.3.4 Token Cost Implications
-
-Agent Teams is **significantly more expensive** than single-agent workflows:
-
-| Factor | Impact |
-|--------|--------|
-| Multiple context windows | Each agent maintains its own context (200K per agent) |
-| Message passing overhead | SendMessage contents consume tokens in both sender and receiver |
-| Coordination overhead | Orchestrator tracks all agents' state |
-| Parallel execution | Multiple agents running simultaneously = multiplicative cost |
-
-**When to use Agent Teams**:
-- Complex multi-file refactoring where agents work on different modules simultaneously
-- Review workflows where implementation and review happen in parallel
-- Long-running tasks where one agent monitors while another implements
-
-**When NOT to use Agent Teams**:
-- Sequential tasks (use regular Task tool instead — one agent at a time)
-- Simple code changes (single agent is sufficient)
-- Cost-sensitive workflows (use subagents via Task tool which share the parent's billing)
-
-#### 3.3.5 AIWG Integration Patterns
-
-AIWG's SDLC framework relies heavily on multi-agent team processes (Primary Author → Parallel Reviewers → Synthesizer → Archive). Agent Teams enables these as true concurrent workflows on Claude Code:
-
-**Pattern: SDLC Document Generation Team**
-```
-Lead Agent (orchestrator)
-  ├── Spawn: architecture-designer (Primary Author → draft SAD)
-  ├── Wait: TeammateIdle
-  ├── Spawn: security-architect (Reviewer 1)
-  ├── Spawn: test-architect (Reviewer 2)
-  ├── Spawn: requirements-analyst (Reviewer 3)
-  ├── Wait: All TeammateIdle
-  └── Spawn: documentation-synthesizer (Merge reviews → final)
-```
-
-**Pattern: Parallel Issue Processing**
-```
-Lead Agent (address-issues orchestrator)
-  ├── Spawn: Agent A → work on issue #17
-  ├── Spawn: Agent B → work on issue #18
-  ├── Spawn: Agent C → work on issue #19
-  └── Coordinate via TeammateIdle events
-```
-
-**Team Cache Pattern**: Agent Teams shares the filesystem, so AIWG's `.aiwg/working/` directory serves as a **team-visible scratchpad**:
-- Primary author writes draft to `.aiwg/working/architecture/sad/drafts/v0.1.md`
-- Reviewers read from the same path and write reviews to `.aiwg/working/architecture/sad/reviews/`
-- Synthesizer reads all reviews and produces final output
-
-#### 3.3.6 Cross-Platform Considerations
-
-Agent Teams is Claude Code-specific. For other platforms, AIWG provides equivalent patterns:
-
-| Platform | Coordination Mechanism | Shared State |
-|----------|----------------------|--------------|
-| **Claude Code** | Agent Teams (tmux + SendMessage) | Filesystem (`.aiwg/working/`) |
-| **Other platforms** | Sequential Task tool calls | `.aiwg/working/` directory |
-| **External orchestration** | Ralph-external loop | `.aiwg/ralph-external/` state files |
-
-The `.aiwg/working/` directory is the **platform-agnostic team cache** — all agents write intermediate artifacts there regardless of whether they run in parallel (Agent Teams) or sequentially (Task tool). This ensures AIWG workflows produce identical results across platforms, even when the coordination mechanism differs.
-
-#### 3.3.7 Limitations
-
-- **Experimental**: API and behavior may change without notice
-- **tmux dependency**: Requires tmux installed on the host system
-- **No Windows support**: tmux is Linux/macOS only
-- **Context isolation**: Each agent has its own context window — no shared memory beyond the filesystem
-- **No direct tool sharing**: Agents cannot share MCP connections or tool state
-- **Cost**: Significantly higher than single-agent or sequential Task tool patterns
 
 ### 3.4 Invoking Agents
 
@@ -454,147 +333,42 @@ claude --resume  # Re-uses previous --agent
 # Claude automatically routes to appropriate agents
 ```
 
-### 3.5 Built-in Agent Types (via Task tool)
+### 3.5 Built-in Agent Types (via Agent/Task tool)
 
-Claude Code ships 5 built-in subagent types, always available regardless of project configuration. AIWG-deployed agents from `.claude/agents/` are loaded alongside these and appear in the same `subagent_type` list.
+Claude Code provides a large catalog of specialized `subagent_type` values. Key categories:
 
-| Agent Type | Purpose | Tools | Notes |
-|------------|---------|-------|-------|
-| `general-purpose` | Flexible multi-step tasks | All tools (including Agent) | Most capable, most expensive. Can spawn sub-subagents. |
-| `Explore` | Fast codebase exploration | Read, Glob, Grep | No Edit/Write/Agent. Supports thoroughness: "quick", "medium", "very thorough". |
-| `Plan` | Implementation planning | Read, Glob, Grep | No Edit/Write/Agent. Returns step-by-step plans with trade-offs. |
-| `claude-code-guide` | Claude Code, Agent SDK, and API help | Glob, Grep, Read, WebFetch, WebSearch | Answers "How do I...", "Does Claude support..." questions. Has web access. |
-| `statusline-setup` | Status line configuration | Read, Edit | Niche — only for configuring the status line display. |
+| Category | Agent Types | Purpose |
+|----------|------------|---------|
+| **Core** | `general-purpose`, `Explore`, `Plan` | General task execution, codebase search, planning |
+| **Development** | `Software Implementer`, `Debugger`, `Code Reviewer`, `Test Engineer` | Code writing, debugging, review, testing |
+| **Architecture** | `Architecture Designer`, `API Designer`, `Database Optimizer` | System design, API contracts, schema optimization |
+| **Security** | `Security Auditor`, `Security Architect`, `Security Gatekeeper` | Security review, threat modeling, gate enforcement |
+| **Infrastructure** | `DevOps Engineer`, `Cloud Architect`, `Kubernetes Expert`, `AWS Specialist`, `GCP Specialist`, `Azure Specialist` | CI/CD, cloud infra, container orchestration |
+| **Frontend** | `Frontend Specialist`, `React Expert`, `Accessibility Specialist` | UI architecture, framework expertise, WCAG compliance |
+| **Backend** | `Django Expert`, `Spring Boot Expert`, `Performance Engineer` | Framework-specific optimization |
+| **Data** | `Data Engineer`, `Data Analyst`, `AI/ML Engineer` | Pipelines, analytics, ML integration |
+| **Documentation** | `Technical Writer`, `API Documenter`, `Documentation Agent` | Docs, API specs, technical writing |
+| **Project** | `Requirements Analyst`, `Product Strategist`, `Business Process Analyst` | Requirements, strategy, process modeling |
+| **Quality** | `Test Architect`, `Regression Analyst`, `Mutation Analyst`, `Dead Code Analyzer` | Test strategy, regression detection, code quality |
+| **Forensics** | `Forensics Orchestrator`, `Memory Analyst`, `Log Analyst`, `IOC Analyst`, `Timeline Builder` | Digital forensics, incident response |
+| **Orchestration** | `Ralph Loop Orchestrator`, `Workflow Agent`, `Recovery Orchestrator` | Task loops, pipeline management, failure recovery |
 
-**Resolution**: Claude Code resolves AIWG agents by both filename (`architecture-designer`) and display name (`Architecture Designer`). Both forms work as `subagent_type` values.
+**Full catalog**: 200+ specialized agent types available. Use `subagent_type` parameter when spawning agents.
 
-**Audit**: See `.aiwg/references/platforms/claude-code-subagent-audit.md` for the full catalog of built-in vs. AIWG-deployed types (#572).
+### 3.6 Agent Tool Parameters
 
-### 3.6 Worktree Isolation for Parallel Agent Work
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `prompt` | string | Task description for the agent |
+| `description` | string | Short 3-5 word summary |
+| `subagent_type` | string | Specialized agent type (see catalog above) |
+| `model` | enum | Model override: `sonnet`, `opus`, `haiku` |
+| `isolation` | enum | `"worktree"` — runs agent in isolated git worktree copy |
+| `run_in_background` | boolean | Run agent asynchronously, get notified on completion |
 
-The Agent tool supports `isolation: "worktree"` which creates a **temporary git worktree** so the agent works on an isolated copy of the repository. This prevents file conflicts when multiple agents work in parallel.
+**Worktree Isolation**: Setting `isolation: "worktree"` creates a temporary git worktree so the agent works on an isolated copy of the repo. The worktree is auto-cleaned if no changes are made; if changes exist, the worktree path and branch are returned.
 
-#### 3.6.1 How It Works
-
-```
-Main working tree (shared)
-  │
-  ├── Agent A (default, no isolation)
-  │   └── Edits files directly in main tree
-  │
-  ├── Agent B (isolation: "worktree")
-  │   └── Gets own copy at /tmp/.worktrees/branch-abc/
-  │       ├── Full repo copy (git worktree)
-  │       ├── Own branch (auto-created)
-  │       └── Changes isolated from main tree
-  │
-  └── Agent C (isolation: "worktree")
-      └── Gets own copy at /tmp/.worktrees/branch-def/
-```
-
-**Invocation**:
-```python
-Agent(
-    subagent_type="software-implementer",
-    description="Fix authentication bug",
-    prompt="Fix the token refresh issue in src/auth/token.ts",
-    isolation="worktree"
-)
-```
-
-#### 3.6.2 Return Values
-
-When a worktree agent completes, its result includes:
-- **Worktree path**: The filesystem path where changes were made
-- **Branch name**: The git branch containing the changes
-
-If the agent made **no changes**, the worktree is automatically cleaned up (deleted). If changes were made, the worktree and branch are **preserved** so the caller can review and merge.
-
-#### 3.6.3 When to Use Worktree Isolation
-
-| Scenario | Use Worktree? | Reason |
-|----------|--------------|--------|
-| Single agent editing files | No | No conflict risk |
-| Multiple agents editing **different** files | Maybe | Safe without isolation if files don't overlap |
-| Multiple agents editing **same** files | **Yes** | Prevents write conflicts and race conditions |
-| Branch-per-issue workflows | **Yes** | Each issue gets its own clean branch |
-| Exploratory/experimental changes | **Yes** | Easy to discard if approach doesn't work |
-| Read-only research agents | No | No file changes to conflict |
-
-#### 3.6.4 AIWG Integration Patterns
-
-**Pattern: Branch-Per-Issue with `/address-issues`**
-
-The `--branch-per-issue` flag in `/address-issues` maps directly to worktree isolation:
-
-```python
-# For each issue, spawn an isolated agent
-for issue in issues:
-    Agent(
-        subagent_type="software-implementer",
-        description=f"Fix issue #{issue.number}",
-        prompt=f"Read issue #{issue.number} and implement the fix...",
-        isolation="worktree"  # Each issue gets its own branch
-    )
-```
-
-Each agent works in its own worktree, creates commits on its own branch, and the orchestrator can then create PRs from each branch.
-
-**Pattern: Parallel Ralph Loop Processing**
-
-When processing multiple independent issues in parallel via Ralph loops:
-
-```
-Orchestrator
-  ├── Agent (worktree) → Issue #17 → branch: fix/issue-17
-  ├── Agent (worktree) → Issue #18 → branch: fix/issue-18
-  └── Agent (worktree) → Issue #19 → branch: fix/issue-19
-
-After completion:
-  git merge fix/issue-17  (or create PR)
-  git merge fix/issue-18
-  git merge fix/issue-19
-```
-
-**Pattern: Safe Exploration**
-
-For experimental approaches where the agent might need to be rolled back:
-
-```python
-result = Agent(
-    subagent_type="architecture-designer",
-    description="Prototype new auth approach",
-    prompt="Try implementing OAuth2 PKCE flow...",
-    isolation="worktree"
-)
-# If result looks good, merge the worktree branch
-# If not, the worktree is just abandoned
-```
-
-#### 3.6.5 Conflict Resolution
-
-When merging worktree branches back to main:
-
-1. **No conflicts**: Fast-forward or clean merge — automatic
-2. **Merge conflicts**: Resolve manually or spawn a dedicated agent:
-   ```python
-   Agent(
-       subagent_type="debugger",
-       description="Resolve merge conflicts",
-       prompt="Merge branch fix/issue-17 into main, resolving conflicts..."
-   )
-   ```
-3. **Semantic conflicts**: Changes compile but break tests — run test suite after merge
-
-**Best practice**: Run worktree agents on truly independent code areas to minimize conflict risk. Use the issue's scope (module, file paths) to determine if worktree isolation is necessary.
-
-#### 3.6.6 Limitations
-
-- **Disk space**: Each worktree is a full copy of the repo (hard-linked, but still)
-- **Build state**: Worktrees don't share `node_modules/`, build caches, or `.aiwg/working/` — agents may need to rebuild
-- **No shared state**: Worktree agents can't see each other's in-progress changes
-- **Git requirement**: Only works in git repositories
-- **Merge overhead**: Multiple worktree branches need manual or automated merging
+**SendMessage**: Use `SendMessage` with the agent's ID to continue a previously spawned agent with its full context preserved.
 
 ---
 
@@ -712,144 +486,22 @@ Built-in task tracking with dependency management for complex workflows.
 
 Task tool results include token count, tool uses, and duration metrics for cost tracking.
 
-### 6.5 Scheduled Agents and Remote Triggers
+### 6.5 Scheduled Agents (Remote Triggers)
 
-Claude Code supports two mechanisms for automated, time-based agent execution: **session-local cron jobs** (CronCreate) and **cloud-hosted remote triggers** (RemoteTrigger).
+Claude Code supports scheduled agent execution via cron-like triggers:
 
-#### 6.5.1 Session-Local Cron Jobs (CronCreate/CronDelete/CronList)
+| Tool | Purpose |
+|------|---------|
+| `CronCreate` | Create a scheduled trigger with cron expression |
+| `CronDelete` | Remove a scheduled trigger |
+| `CronList` | List all active scheduled triggers |
+| `RemoteTrigger` | Manually invoke a scheduled remote agent |
 
-Schedule prompts to execute on a cron schedule within the current Claude Code session.
-
-**CronCreate** — Schedule a recurring or one-shot task:
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `cron` | string | Yes | Standard 5-field cron expression (minute hour day-of-month month day-of-week) in **local timezone** |
-| `prompt` | string | Yes | The prompt to execute at each fire time |
-| `recurring` | boolean | No | `true` (default) = fire on every match until deleted. `false` = fire once then auto-delete. |
-| `durable` | boolean | No | `true` = persist to `.claude/scheduled_tasks.json` and survive restarts. `false` (default) = in-memory only. |
-
-**Cron Expression Format** (5-field, local timezone):
-```
-┌───────────── minute (0-59)
-│ ┌───────────── hour (0-23)
-│ │ ┌───────────── day of month (1-31)
-│ │ │ ┌───────────── month (1-12)
-│ │ │ │ ┌───────────── day of week (0-7, 0 and 7 = Sunday)
-│ │ │ │ │
-* * * * *
-```
-
-**Examples**:
-```
-*/5 * * * *      Every 5 minutes
-7 * * * *        Every hour at :07 (avoid :00 mark)
-57 8 * * *       Daily at ~9am (avoid :00 mark)
-3 9 * * 1-5      Weekdays at ~9am
-0 12 1 * *       1st of each month at noon
-```
-
-**Best Practice**: Avoid minute 0 and 30 to reduce API load spikes. Pick an off-minute (e.g., `57 8` instead of `0 9`) unless the user specifies an exact time.
-
-**Runtime Behavior**:
-- Jobs only fire while the REPL is **idle** (not mid-query)
-- Small deterministic jitter is added automatically (up to 10% of period, max 15 min)
-- Recurring tasks **auto-expire after 7 days** — they fire one final time, then are deleted
-- Non-durable jobs are lost when the Claude session ends
-
-**CronDelete** — Cancel a scheduled job:
-```
-CronDelete(id: "job-id-from-create")
-```
-
-**CronList** — List all active cron jobs:
-```
-CronList()  # No parameters — returns all jobs in current session
-```
-
-#### 6.5.2 Remote Triggers (RemoteTrigger)
-
-Cloud-hosted scheduled agents that run independently of any local Claude session. Managed via the claude.ai remote trigger API.
-
-| Action | HTTP | Description |
-|--------|------|-------------|
-| `list` | GET /v1/code/triggers | List all configured triggers |
-| `get` | GET /v1/code/triggers/{id} | Get trigger details |
-| `create` | POST /v1/code/triggers | Create a new trigger (requires body) |
-| `update` | POST /v1/code/triggers/{id} | Update trigger (partial update) |
-| `run` | POST /v1/code/triggers/{id}/run | Manually fire a trigger |
-
-**Key Differences from CronCreate**:
-
-| Feature | CronCreate (Session) | RemoteTrigger (Cloud) |
-|---------|---------------------|----------------------|
-| Lifetime | Session-bound (7-day max) | Persistent until deleted |
-| Execution | Local REPL | Cloud-hosted |
-| Auth | Automatic (session) | OAuth token (automatic via tool) |
-| State | In-memory or `.claude/scheduled_tasks.json` | Cloud API |
-| Cost | Uses session tokens | Uses cloud credits |
-| Offline | No — requires running session | Yes — runs independently |
-
-**Usage**: The RemoteTrigger tool handles OAuth automatically — never use curl directly for these endpoints.
-
-#### 6.5.3 Use Cases
-
-| Use Case | Mechanism | Cron Example |
-|----------|-----------|-------------|
-| Periodic health checks | CronCreate (session) | `*/30 * * * *` — every 30 min |
-| Daily dependency audit | RemoteTrigger (cloud) | `23 8 * * 1-5` — weekday mornings |
-| Weekly report generation | RemoteTrigger (cloud) | `47 16 * * 5` — Friday afternoons |
-| Reminder to check deploy | CronCreate (one-shot) | Pin to specific time, `recurring: false` |
-| Continuous test monitoring | CronCreate (session) | `*/10 * * * *` — every 10 min |
-| Nightly backup verification | RemoteTrigger (cloud) | `13 2 * * *` — 2:13am daily |
-
-#### 6.5.4 AIWG Integration
-
-AIWG's `/schedule` skill wraps these tools with a higher-level interface:
-
-```bash
-# Create a recurring health check via /schedule skill
-/schedule create --name "workspace-health" \
-  --cron "47 8 * * 1-5" \
-  --prompt "/workspace-health" \
-  --type remote
-
-# List scheduled agents
-/schedule list
-
-# Run a trigger manually
-/schedule run workspace-health
-```
-
-**Integration patterns**:
-
-| AIWG Workflow | Scheduling Mechanism | Example |
-|---------------|---------------------|---------|
-| Ralph loop monitoring | CronCreate (session) | Check Ralph status every 5 min |
-| Issue sync | RemoteTrigger (cloud) | Scan commits for issue refs daily |
-| Project health | RemoteTrigger (cloud) | Weekly `aiwg doctor` + report |
-| Cost tracking | CronCreate (session) | Hourly token spend check |
-| Doc sync | RemoteTrigger (cloud) | Daily drift detection |
-
-#### 6.5.5 Limitations and Cost Considerations
-
-**Session-local (CronCreate)**:
-- Jobs only fire while REPL is idle — long-running tasks delay scheduled execution
-- 7-day auto-expiry for recurring jobs
-- Non-durable jobs lost on session end
-- Each execution consumes tokens from the active session
-
-**Remote triggers (RemoteTrigger)**:
-- Requires OAuth authentication via claude.ai
-- Each execution incurs cloud API costs
-- No access to local filesystem (runs in cloud sandbox)
-- Rate limits apply (check API documentation)
-
-**Cost guidance**:
-- Frequent schedules (< 30 min) are token-intensive — use sparingly
-- Prefer session-local for short-lived monitoring during active work
-- Prefer remote triggers for persistent scheduled tasks that should survive session end
-- Each trigger execution is a full Claude session — cost scales with prompt complexity
+Scheduled agents run in the background on a recurring schedule, useful for:
+- Periodic code quality checks
+- Scheduled dependency updates
+- Recurring report generation
+- Automated monitoring tasks
 
 ---
 
@@ -1044,7 +696,8 @@ claude mcp serve             # Start as MCP server
 | Model | Context Window |
 |-------|---------------|
 | Opus 4.6 | 200,000 tokens |
-| Sonnet 4.5 | 200,000 tokens |
+| Opus 4.6 (1M) | 1,000,000 tokens |
+| Sonnet 4.6 | 200,000 tokens |
 | Haiku 4.5 | 200,000 tokens |
 
 ### 10.2 Context Commands
@@ -1204,7 +857,7 @@ import { Agent } from "@anthropic-ai/claude-agent-sdk";
 
 const agent = new Agent({
   name: "code_analyzer",
-  model: "claude-sonnet-4-5-20250929",
+  model: "claude-sonnet-4-6",
   instructions: `You are a code analysis expert.
     Analyze code for quality, security, and performance.`,
   tools: ["Read", "Grep", "Glob"],
@@ -1244,7 +897,19 @@ console.log(result);
 
 ## 16. Installation
 
-### 16.1 Recommended Installation
+### 16.1 Availability
+
+Claude Code is available across multiple form factors:
+
+| Form Factor | Access |
+|-------------|--------|
+| **CLI** | Terminal-based interface (primary) |
+| **Desktop App** | Native app for Mac and Windows |
+| **Web App** | [claude.ai/code](https://claude.ai/code) |
+| **VS Code Extension** | VS Code Marketplace → "Claude Code" |
+| **JetBrains Extension** | JetBrains Plugin Marketplace → "Claude" |
+
+### 16.2 Recommended Installation
 
 ```bash
 # Direct install (recommended)
@@ -1258,11 +923,11 @@ brew install claude-code
 winget install claude-code
 ```
 
-### 16.2 npm Deprecation Notice (v2.1.15)
+### 16.3 npm Deprecation Notice (v2.1.15)
 
 npm installation is deprecated. Run `claude install` or visit https://docs.anthropic.com/en/docs/claude-code/getting-started for alternatives.
 
-### 16.3 Auto-Updates
+### 16.4 Auto-Updates
 
 - `/config` includes release channel toggle (stable or latest) (v2.1.3)
 - `/doctor` shows auto-update channel and available versions (v2.1.6)

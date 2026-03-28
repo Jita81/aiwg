@@ -47,10 +47,14 @@ This creates or merges into `.cursor/mcp.json`:
   "mcpServers": {
     "aiwg": {
       "command": "aiwg",
-      "args": ["mcp", "serve"]
+      "args": ["mcp", "serve"],
+      "env": {}
     }
   }
 }
+```
+
+> **Note:** Cursor supports both project-level (`.cursor/mcp.json`) and global (`~/.cursor/mcp.json`) MCP configuration. The project-level config is recommended for AIWG so it's version-controlled with your project. Cursor also supports `${env:NAME}`, `${workspaceFolder}`, and `${userHome}` variable interpolation in config values.
 ```
 
 ---
@@ -82,6 +86,8 @@ For optimal context usage, limit the exposed tools. Edit `.cursor/mcp.json`:
 ```
 
 **Why whitelist?** Each MCP tool adds schema overhead to the context window. The 5-tool whitelist keeps AIWG's footprint to ~3,000 tokens (vs. ~12,000+ with full surface).
+
+> **Cursor 2.4+**: Agents now discover and load MCPs only when needed, reducing token usage automatically. The whitelist is still recommended for explicit control.
 
 A pre-configured template is available at `agentic/code/frameworks/sdlc-complete/templates/cursor/cursor-mcp-minimal.json`.
 
@@ -207,8 +213,32 @@ Only enable prompts after Part 4 is working reliably.
 
 ---
 
+## Cloud Agent MCP Support
+
+Cursor Cloud Agents (formerly Background Agents) **fully support MCP servers**. This means AIWG workflows can run in cloud agent mode:
+
+1. Configure your MCP server in the Cloud Agent environment at cursor.com/dashboard/cloud-agents
+2. Both HTTP and stdio transports work in Cloud Agent VMs
+3. OAuth is supported for authenticated MCP servers
+
+This enables asynchronous AIWG workflow execution without needing a local terminal session.
+
+---
+
+## MCP Debugging
+
+If MCP tools aren't working:
+
+1. Open Output panel: `Cmd+Shift+U` (Mac) / `Ctrl+Shift+U` (Windows/Linux)
+2. Select "MCP Logs" from the dropdown
+3. Check for connection errors or tool registration issues
+4. Servers can be toggled on/off through Settings without removal
+
+---
+
 ## Related Resources
 
 - [Cursor Quick Start](cursor-quickstart.md) — Basic AIWG + Cursor integration
+- [Cursor Platform Reference](../../.aiwg/references/platforms/cursor.md) — Detailed capability reference
 - [Hermes MCP Sidecar](hermes-quickstart.md) — Reference sidecar implementation
 - [AIWG MCP server reference](../cli-reference.md#mcp)

@@ -20,7 +20,8 @@ type ExtensionType =
   | 'addon'        // Feature extension packs
   | 'template'     // Document templates
   | 'prompt'       // Reusable prompts
-  | 'team';        // Multi-agent team compositions
+  | 'soul'         // Agent identity and character
+  | 'behavior';    // Reactive capabilities with hooks
 ```
 
 ---
@@ -123,8 +124,6 @@ interface AgentMetadata {
 ---
 
 ## Command Extensions
-
-> **Deployment artifact.** Commands are typically generated from `skill` source files during `aiwg use` deployment. Directly authoring a command extension is an advanced pattern — prefer `aiwg add-skill` for new workflows.
 
 CLI and slash commands with argument parsing and execution logic.
 
@@ -242,24 +241,7 @@ interface CommandOption {
 
 ## Skill Extensions
 
-**Primary workflow extension type.** Skills are the canonical source for all agentic workflows. During `aiwg use` deployment, AIWG deploys skills natively for platforms that support them (Claude Code, OpenCode, etc.) and generates a corresponding command file for platforms that need it (legacy or generated-command providers).
-
-Use `aiwg add-skill` to create new skills. The `description:` frontmatter field is the primary natural-language signal Claude uses to autonomously decide when to invoke a skill — write it to describe intent, not implementation.
-
-### SKILL.md Frontmatter Reference
-
-| Field | Source | Purpose |
-|-------|--------|---------|
-| `name:` | Official | Skill name (also controls slash-command path when a command is generated) |
-| `description:` | Official | **Primary NL signal** — Claude reads this at session start and matches user intent against it for autonomous invocation. Write it well. |
-| `effort:` | Official | Model effort override: `1` (low), `2` (medium), `3` (high) |
-| `user-invocable:` | Official | `false` = background-only; skill does not appear in `/` autocomplete |
-| `disable-model-invocation:` | Official | `true` = explicit user-only; prevents autonomous invocation by the model |
-| `context:` | Official | Execution isolation: `fork` (isolated context) or `inherit` (shared context) |
-| `allowed-tools:` | Official | Restrict which tools the skill may use |
-| `platforms:` | AIWG-internal | Multi-provider deployment targets (e.g., `claude`, `codex`, `all`) |
-| `autoTrigger:` | AIWG-internal | AIWG-level auto-trigger annotation; supplements `description:` matching |
-| `commandHint:` | AIWG-internal | Override the generated command's `argument-hint` frontmatter when a command is synthesized from this skill |
+Natural language workflows triggered by phrases or conditions.
 
 ### SkillMetadata
 
@@ -625,6 +607,308 @@ interface PromptMetadata {
 
 ---
 
+## Soul Extensions
+
+Agent identity and character definitions based on the soul.md specification.
+
+### SoulMetadata
+
+```typescript
+interface SoulMetadata {
+  type: 'soul';
+
+  scope: 'project' | 'agent';      // Project-wide or agent-specific
+  targetAgent?: string;              // Required when scope is 'agent'
+
+  sections: string[];               // Sections present (who-i-am, worldview, etc.)
+
+  companions?: {
+    style?: string;                  // STYLE.md path
+    memory?: string;                 // MEMORY.md path
+    examples?: string;               // Examples directory path
+  };
+
+  estimatedTokens?: number;          // Context budget estimate
+}
+```
+
+### Soul Sections
+
+| Section | Purpose |
+|---------|---------|
+| `who-i-am` | Core identity statement |
+| `worldview` | Perspective and philosophy |
+| `opinions` | Held positions and stances |
+| `vocabulary` | Preferred and avoided language |
+| `boundaries` | What this agent will/won't do |
+
+### Example
+
+```typescript
+{
+  id: 'project-soul',
+  type: 'soul',
+  name: 'Project Soul',
+  description: 'Project-wide AI identity and character definition',
+  version: '1.0.0',
+  capabilities: ['identity', 'character', 'voice'],
+  keywords: ['soul', 'identity', 'character', 'personality'],
+  category: 'identity',
+  platforms: {
+    claude: 'full',
+    cursor: 'full',
+    generic: 'full'
+  },
+  deployment: {
+    pathTemplate: '.{platform}/SOUL.md',
+    core: false
+  },
+  metadata: {
+    type: 'soul',
+    scope: 'project',
+    sections: ['who-i-am', 'worldview', 'opinions', 'vocabulary', 'boundaries'],
+    companions: {
+      style: 'STYLE.md',
+      memory: 'MEMORY.md'
+    },
+    estimatedTokens: 2000
+  }
+}
+```
+
+---
+
+## Behavior Extensions
+
+Reactive capabilities with scripts, event hooks, and structured inputs. Behaviors extend beyond skills by subscribing to system events and reacting automatically. On platforms without hook support, behaviors degrade gracefully to skills (NLP triggers only).
+
+### BehaviorMetadata
+
+```typescript
+interface BehaviorMetadata {
+  type: 'behavior';
+
+  triggerPhrases?: string[];         // NLP invocation triggers (same as skills)
+
+  inputs?: BehaviorInput[];          // Structured, typed input parameters
+
+  hooks?: Partial<Record<BehaviorHookEvent, BehaviorHookAction[]>>;
+
+  scripts?: Record<string, string>;  // Logical name → relative script path
+
+  manifest?: {
+    category?: string;               // Discovery category
+    requires?: {
+      bins?: string[];               // Required binaries
+      env?: string[];                // Required environment variables
+    };
+    outputs?: Array<{
+      type: string;
+      path: string;
+    }>;
+    composable_with?: string[];      // Compatible behaviors
+  };
+}
+
+interface BehaviorInput {
+  name: string;
+  type: 'string' | 'number' | 'boolean' | 'enum' | 'path';
+  required?: boolean;
+  description?: string;
+  default?: string | number | boolean;
+  values?: string[];                 // Allowed values (for enum type)
+}
+
+interface BehaviorHookAction {
+  filter?: string;                   // Glob filter for file-based events
+  tool?: string;                     // Tool name filter for on_tool_complete
+  cron?: string;                     // Cron expression for on_schedule
+  action: 'run_script' | 'notify' | 'log';
+  script?: string;                   // Script path (relative to behavior dir)
+}
+
+type BehaviorHookEvent =
+  | 'on_file_write'
+  | 'on_tool_complete'
+  | 'on_schedule'
+  | 'on_commit'
+  | 'on_pr_open'
+  | 'on_deploy'
+  | 'on_session_start'
+  | 'on_session_end';
+```
+
+### BEHAVIOR.md File Format
+
+Behaviors are defined as directories containing a `BEHAVIOR.md` file and an optional `scripts/` subdirectory:
+
+```
+my-behavior/
+  BEHAVIOR.md          # Behavior definition (YAML frontmatter + markdown body)
+  scripts/
+    main.sh            # Primary script
+    on-write.sh        # Hook-specific scripts
+```
+
+The `BEHAVIOR.md` file uses YAML frontmatter for structured metadata and a markdown body for LLM instructions:
+
+```yaml
+---
+name: security-sentinel
+version: 1.0.0
+description: Continuous security monitoring with reactive scanning.
+platforms: [openclaw, claude-code]
+
+triggers:
+  - "run security scan"
+  - "check for vulnerabilities"
+
+inputs:
+  - name: target
+    type: string
+    required: true
+    description: File or directory to scan
+  - name: severity
+    type: enum
+    values: [low, medium, high, critical]
+    default: medium
+
+hooks:
+  on_file_write:
+    - filter: "**/*.ts"
+      action: run_script
+      script: scripts/lint-on-write.sh
+  on_schedule:
+    - cron: "*/30 * * * *"
+      action: run_script
+      script: scripts/periodic-audit.sh
+
+scripts:
+  main: scripts/main.sh
+  lint-on-write: scripts/lint-on-write.sh
+  periodic-audit: scripts/periodic-audit.sh
+
+manifest:
+  category: security
+  requires:
+    bins: [npm, node]
+  outputs:
+    - type: report
+      path: .aiwg/reports/security/
+  composable_with: [code-review, test-runner]
+---
+
+# Security Sentinel
+
+When triggered via NLP, run the main security scan against the specified target.
+When triggered via hooks, run the event-appropriate script automatically.
+```
+
+### Behavior Lifecycle
+
+| Phase | Description | Trigger |
+|-------|-------------|---------|
+| **Deploy** | Behavior directory copied to provider target | `aiwg use` |
+| **Activate** | Hooks registered with platform event system | Session/daemon start |
+| **Execute** | Script runs on event match or NLP invocation | Runtime trigger |
+| **Deactivate** | Hooks unregistered, resources released | Session end / `aiwg remove` |
+
+### Provider Support Matrix
+
+| Provider | Support | Mechanism | Hooks | NLP Triggers |
+|----------|---------|-----------|-------|-------------|
+| OpenClaw | Native | `~/.openclaw/behaviors/` | Full | Full |
+| Claude Code | Emulated | Pre/post-tool hooks in settings | Partial | Full |
+| Warp | Emulated | WARP.md behavior section | None | Full |
+| Cursor | Emulated | Rules-based activation | None | Full |
+| Copilot | Emulated | Instructions-based activation | None | Full |
+| Windsurf | Emulated | Rules-based activation | None | Full |
+| Factory AI | Emulated | Rules-based activation | None | Full |
+| Codex | Emulated | Rules-based activation | None | Full |
+| OpenCode | Emulated | Rules-based activation | None | Full |
+
+On platforms without hook support, behaviors degrade to skills — only the `triggers` and markdown body are used. The `hooks` section is ignored.
+
+### Hook Events
+
+| Event | Fires When | Common Uses |
+|-------|-----------|-------------|
+| `on_file_write` | A file is written/modified | Linting, format checking |
+| `on_tool_complete` | A tool finishes execution | Post-build verification |
+| `on_schedule` | Cron schedule matches | Periodic audits, health checks |
+| `on_commit` | A git commit is created | Pre-commit validation |
+| `on_pr_open` | A pull request is opened | Code review automation |
+| `on_deploy` | A deployment is triggered | Pre/post-deploy checks |
+| `on_session_start` | A session begins | Context loading, greeting |
+| `on_session_end` | A session ends | Cleanup, state persistence |
+
+### Graceful Degradation
+
+Behaviors are designed for cross-platform portability:
+
+1. **Full support** (OpenClaw): All hooks fire, scripts execute, structured inputs work
+2. **Partial support** (Claude Code): File-write and tool hooks via settings.json hook system
+3. **NLP-only** (all others): Behavior degrades to a skill — triggers and markdown body only
+
+This ensures the same `BEHAVIOR.md` file works everywhere, at the highest capability level each platform supports.
+
+### Example
+
+```typescript
+{
+  id: 'build-monitor',
+  type: 'behavior',
+  name: 'Build Monitor',
+  description: 'Track build health with reactive monitoring',
+  version: '1.0.0',
+  capabilities: ['build-monitoring', 'ci', 'health-check'],
+  keywords: ['build', 'monitor', 'ci', 'health'],
+  category: 'build',
+  platforms: {
+    openclaw: 'full',
+    claude: 'partial',
+    generic: 'partial'
+  },
+  deployment: {
+    pathTemplate: '.{platform}/behaviors/{id}/BEHAVIOR.md',
+    additionalFiles: ['scripts/main.sh', 'scripts/post-build-check.sh']
+  },
+  metadata: {
+    type: 'behavior',
+    triggerPhrases: ['monitor build', 'check build health', 'build status'],
+    inputs: [
+      {
+        name: 'command',
+        type: 'string',
+        required: false,
+        description: 'Build command to run',
+        default: 'npm run build'
+      }
+    ],
+    hooks: {
+      on_tool_complete: [
+        { tool: 'build', action: 'run_script', script: 'scripts/post-build-check.sh' }
+      ],
+      on_schedule: [
+        { cron: '0 */4 * * *', action: 'run_script', script: 'scripts/scheduled-build.sh' }
+      ]
+    },
+    scripts: {
+      main: 'scripts/main.sh',
+      'post-build-check': 'scripts/post-build-check.sh'
+    },
+    manifest: {
+      category: 'build',
+      requires: { bins: ['node'] },
+      outputs: [{ type: 'report', path: '.aiwg/reports/build/' }],
+      composable_with: ['test-watcher']
+    }
+  }
+}
+```
+
+---
+
 ## Platform Compatibility
 
 All extensions declare platform support:
@@ -639,6 +923,7 @@ interface PlatformCompatibility {
   codex?: PlatformSupport;
   opencode?: PlatformSupport;
   generic?: PlatformSupport;
+  openclaw?: PlatformSupport;
 }
 
 type PlatformSupport =
@@ -700,69 +985,6 @@ interface ValidationRules {
 - `platforms` - At least one platform
 - `deployment` - Deployment configuration
 - `metadata` - Type-specific metadata
-
----
-
-## Team Extensions
-
-Multi-agent team compositions that work across all AIWG providers. On Claude Code, teams invoke agents natively. On all other providers, teams are emulated via `aiwg mc` (Mission Control) orchestration.
-
-**Source format:** JSON files in `agentic/code/frameworks/*/teams/`
-**Schema:** `agentic/code/frameworks/sdlc-complete/teams/schema.json`
-**CLI:** `aiwg team run|list|info`
-
-### TeamDefinition
-
-```typescript
-interface TeamDefinition {
-  name: string;                             // Human-readable team name
-  slug: string;                             // CLI identifier (kebab-case)
-  description: string;                      // One-line purpose
-  dispatch?: 'parallel' | 'sequential' | 'consensus';  // Execution mode
-  agents: TeamMember[];                     // 2-8 agents
-  use_cases?: string[];                     // Scenarios where team excels
-  handoffs?: TeamHandoff[];                 // Inter-agent artifact passing
-  sdlc_phases?: string[];                   // Active SDLC phases
-  max_context_agents?: number;              // Context budget limit (2-4)
-  overlap_resolution?: Record<string, string>;  // Capability conflict resolution
-}
-
-interface TeamMember {
-  agent: string;                            // Agent filename without .md
-  role: 'lead' | 'contributor' | 'reviewer' | 'advisor';
-  responsibilities?: string[];
-}
-
-interface TeamHandoff {
-  from: string;                             // Source agent
-  to: string;                               // Target agent
-  artifact: string;                         // What gets passed
-  gate: string;                             // Quality check before handoff
-}
-```
-
-### Provider Routing
-
-| Provider | Native Teams | Fallback |
-|----------|-------------|---------|
-| Claude Code | Native agent dispatch | — |
-| Warp, Copilot, Cursor, Windsurf, OpenCode, Factory, Codex, OpenClaw | — | `aiwg mc` orchestration |
-
-### Built-in Teams
-
-| Slug | Agents | Dispatch | Purpose |
-|------|--------|----------|---------|
-| `api-development` | 4 | sequential | API design and implementation |
-| `full-stack` | 4 | sequential | Full-stack feature delivery |
-| `greenfield` | 4 | sequential | New project kickoff |
-| `maintenance` | 4 | sequential | Code review and bug fixing |
-| `migration` | 4 | sequential | Technology migrations |
-| `sdlc-review` | 4 | parallel | Phase gate validation |
-| `security-review` | 3 | sequential | Security audits |
-
-### Deployment
-
-Teams are deployed as part of `aiwg use <framework>`. Project-local teams can be placed in `.aiwg/teams/<slug>.json` and take precedence over framework teams.
 
 ---
 

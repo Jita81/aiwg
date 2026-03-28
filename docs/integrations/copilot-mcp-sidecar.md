@@ -1,45 +1,31 @@
-# GitHub Copilot MCP Sidecar — Feasibility Assessment
+# GitHub Copilot MCP Integration
 
-Status: **Research Phase** — MCP support for Copilot Chat is not yet confirmed.
-
----
-
-## Current State
-
-GitHub Copilot integrates via:
-- `.github/agents/` — YAML agent definitions (fully supported by AIWG)
-- `.github/copilot-instructions.md` — workspace-level instructions
-- VS Code extensions — VS Code has native MCP client support as of 2025
-
-### What Works Today
-
-| Feature | Status |
-|---|---|
-| AIWG agents via `.github/agents/` | Supported |
-| AIWG rules via `.github/copilot-rules/` | Supported |
-| MCP tools in Copilot Chat | **Unconfirmed** |
-
-### Open Questions
-
-1. Does VS Code's MCP extension support allow Copilot Chat to call MCP tools?
-2. What is the config format? (`settings.json`? `.vscode/mcp.json`?)
-3. Does Copilot Chat surface MCP tools to the user?
-4. Is there a tool whitelist mechanism?
+Status: **Supported** — MCP is GA in both VS Code agent mode and the Copilot coding agent.
 
 ---
 
-## If MCP Is Viable
+## Overview
 
-When Copilot Chat gains MCP tool support, setup would look like:
+GitHub Copilot supports MCP (Model Context Protocol) in two distinct contexts:
 
-### VS Code MCP Configuration
+| Context | Configuration | Capabilities |
+|---------|--------------|-------------|
+| VS Code (Agent Mode + Chat) | `.vscode/mcp.json` | Tools, prompts, resources |
+| Coding Agent (GitHub.com) | GitHub.com Settings UI | Tools only |
 
-Add to `.vscode/settings.json` or `.vscode/mcp.json`:
+---
+
+## VS Code MCP Configuration
+
+### Setup
+
+Add AIWG as an MCP server in `.vscode/mcp.json`:
 
 ```json
 {
-  "mcpServers": {
+  "servers": {
     "aiwg": {
+      "type": "stdio",
       "command": "aiwg",
       "args": ["mcp", "serve"]
     }
@@ -47,66 +33,178 @@ Add to `.vscode/settings.json` or `.vscode/mcp.json`:
 }
 ```
 
-### Expected Workflow
+### Server Types
 
-1. Start the sidecar: `aiwg mcp serve`
-2. VS Code connects to the MCP server
-3. Copilot Chat can call AIWG tools: `workflow-run`, `artifact-read`, etc.
-4. Artifacts appear in `.aiwg/`
+| Type | Use Case | Example |
+|------|----------|---------|
+| `stdio` | Local process (recommended for AIWG) | `"command": "aiwg", "args": ["mcp", "serve"]` |
+| `http` | Remote server with streamable HTTP | `"url": "https://mcp.example.com/mcp"` |
+| `sse` | Server-Sent Events (legacy) | `"url": "https://mcp.example.com/sse"` |
+
+### Authentication
+
+For servers requiring authentication, use input variables:
+
+```json
+{
+  "servers": {
+    "authenticated-server": {
+      "type": "http",
+      "url": "https://api.example.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${input:api-key}"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "api-key",
+      "description": "Your API Key",
+      "password": true
+    }
+  ]
+}
+```
+
+### What MCP Enables
+
+Once configured, Copilot agent mode can:
+- Call AIWG tools (`workflow-run`, `artifact-read`, `project-status`, etc.)
+- Use MCP prompts (invokable as `/mcp.aiwg.promptname`)
+- Access MCP resources for context
+- Chain multiple MCP servers together
+
+Tools are auto-invoked based on prompt intent. Non-read-only tools show confirmation dialogs.
+
+### User-Level Configuration
+
+For personal MCP servers across all projects, use the VS Code command:
+`MCP: Open User Configuration`
+
+### Agent-Scoped MCP
+
+Custom agents (`.github/agents/*.agent.md`) can declare their own MCP servers:
+
+```yaml
+---
+name: data-analyst
+mcp-servers:
+  - type: stdio
+    command: npx
+    args: ['-y', '@company/data-mcp']
+---
+```
+
+### Sandbox
+
+On macOS/Linux, MCP servers run with configurable filesystem and network access rules for security isolation.
 
 ---
 
-## Current Alternatives
+## Coding Agent MCP Configuration
 
-Until MCP support is confirmed for Copilot Chat, use these approaches:
+### Setup
 
-### Option 1: Native AIWG Integration (Recommended)
+Configure via GitHub.com > Settings > Copilot > Coding agent:
 
-```bash
-# Deploy AIWG agents and rules to Copilot format
-aiwg use sdlc --provider copilot
+```json
+{
+  "mcpServers": {
+    "sentry": {
+      "type": "http",
+      "url": "https://mcp.sentry.io",
+      "tools": ["get_issue_details", "get_issue_summary"]
+    },
+    "local-tool": {
+      "type": "local",
+      "command": "npx",
+      "args": ["-y", "@company/tool"],
+      "tools": "*"
+    }
+  }
+}
 ```
 
-This gives Copilot access to AIWG agents and rules, but NOT the MCP tool surface.
+### Key Differences from VS Code
 
-### Option 2: Use a Spawnable Provider for AIWG Workflows
+| Aspect | VS Code MCP | Coding Agent MCP |
+|--------|-------------|-----------------|
+| Configuration | `.vscode/mcp.json` (committed) | GitHub.com Settings UI |
+| Capabilities | Tools + prompts + resources | Tools only |
+| Approval | User confirms non-read-only tools | Autonomous (no approval) |
+| Scope | Workspace or user-level | Repository or org-level |
 
-For workflows requiring full AIWG tool access, use Claude Code or Codex:
+### Required Fields
 
-```bash
-# Claude Code with full access
-aiwg sdlc-accelerate "My project" --provider claude --dangerous
-
-# Codex with full access
-aiwg sdlc-accelerate "My project" --provider codex --dangerous
-```
-
-### Option 3: VS Code Terminal + Claude Code
-
-Run Claude Code in the VS Code terminal alongside Copilot:
-
-```bash
-# In VS Code terminal
-claude --dangerously-skip-permissions
-```
-
-Both Copilot (IDE) and Claude Code (terminal) can edit the same project simultaneously.
+- `type`: `http` or `local`
+- `tools`: Array of tool names or `"*"` for all tools from server
 
 ---
 
-## Tracking
+## AIWG MCP Server
 
-This issue will be updated when:
-- VS Code MCP support is confirmed for Copilot Chat
-- A viable configuration format is identified
-- Testing confirms tool calls work end-to-end
+AIWG provides a built-in MCP server exposing SDLC workflow tools:
 
-See [Copilot Quick Start](copilot-quickstart.md) for the current (non-MCP) integration.
+```bash
+# Start the AIWG MCP server
+aiwg mcp serve
+
+# Install to Claude Desktop (also works for VS Code via .vscode/mcp.json)
+aiwg mcp install claude
+aiwg mcp install vscode
+
+# Show capabilities
+aiwg mcp info
+```
+
+### Exposed Tools
+
+The AIWG MCP server exposes tools for:
+- Workflow execution (`workflow-run`, `workflow-status`)
+- Artifact management (`artifact-read`, `artifact-write`, `artifact-list`)
+- Project status (`project-status`, `phase-info`)
+- Issue management (via configured provider)
+
+---
+
+## Recommended Setup
+
+### For Teams Using VS Code + Copilot
+
+1. Deploy AIWG agents and prompts:
+   ```bash
+   aiwg use sdlc --provider copilot
+   ```
+
+2. Add MCP configuration:
+   ```bash
+   aiwg mcp install vscode
+   ```
+
+3. Commit both `.github/` and `.vscode/mcp.json`
+
+4. Team members get full AIWG integration:
+   - Custom agents via @-mention
+   - Custom slash commands via /name
+   - MCP tools via agent mode
+
+### For Teams Using Copilot Coding Agent
+
+1. Deploy AIWG agents:
+   ```bash
+   aiwg use sdlc --provider copilot
+   ```
+
+2. Configure MCP in GitHub.com Settings (if using external tools)
+
+3. The coding agent reads `.github/copilot-instructions.md` for project context
 
 ---
 
 ## Related Resources
 
-- [Copilot Quick Start](copilot-quickstart.md) — Current AIWG + Copilot integration
-- [Hermes MCP Sidecar](hermes-quickstart.md) — Reference sidecar implementation
+- [Copilot Quick Start](copilot-quickstart.md) — Full AIWG + Copilot integration
+- [GitHub Copilot Reference](../../.aiwg/references/platforms/github-copilot.md) — Complete capability reference
+- [Cross-Platform Overview](cross-platform-overview.md) — All supported providers
 - [Claude MCP Sidecar](claude-mcp-sidecar.md) — Alternative with full MCP support
