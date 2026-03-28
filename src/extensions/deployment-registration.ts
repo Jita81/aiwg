@@ -11,7 +11,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import type { Extension, AgentMetadata, SkillMetadata, PlatformSupport } from './types.js';
+import type { Extension, AgentMetadata, SkillMetadata, BehaviorMetadata, PlatformSupport } from './types.js';
 import type { ExtensionRegistry } from './registry.js';
 
 /**
@@ -26,6 +26,15 @@ export interface RegistrationOptions {
   commandsPath?: string;
   /** Path to deployed rules directory */
   rulesPath?: string;
+  /**
+   * Path to deployed behaviors directory.
+   * For OpenClaw: ~/.openclaw/behaviors/ (native).
+   * For Claude Code: .claude/hooks/ (emulated).
+   * Empty string means behaviors are aggregated (e.g., Warp's WARP.md) or not supported.
+   *
+   * @implements #609
+   */
+  behaviorsPath?: string;
   /** Provider platform name */
   provider: string;
   /** Working directory for relative path resolution */
@@ -359,10 +368,93 @@ export async function scanDeployedSkills(
 }
 
 /**
+ * Scan deployed behaviors directory
+ *
+ * Reads behavior directories from the deployed path and creates Extension objects
+ * with metadata extracted from BEHAVIOR.md frontmatter.
+ *
+ * Behaviors are directories containing a BEHAVIOR.md file and optionally a scripts/
+ * subdirectory. On OpenClaw this is the native format; on other providers behaviors
+ * are emulated via hook wrappers or session injection.
+ *
+ * @param behaviorsPath - Path to deployed behaviors directory
+ * @param provider - Provider platform name
+ * @param cwd - Working directory for relative path resolution
+ * @returns Array of behavior extensions
+ *
+ * @implements #609
+ */
+export async function scanDeployedBehaviors(
+  behaviorsPath: string,
+  provider: string,
+  cwd: string = process.cwd()
+): Promise<Extension[]> {
+  if (!behaviorsPath) return [];
+
+  const absolutePath = path.isAbsolute(behaviorsPath) ? behaviorsPath : path.join(cwd, behaviorsPath);
+
+  if (!fs.existsSync(absolutePath) || !fs.statSync(absolutePath).isDirectory()) {
+    return [];
+  }
+
+  const behaviors: Extension[] = [];
+  const entries = fs.readdirSync(absolutePath, { withFileTypes: true });
+
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+
+    const behaviorDir = path.join(absolutePath, entry.name);
+    const behaviorFile = path.join(behaviorDir, 'BEHAVIOR.md');
+
+    if (!fs.existsSync(behaviorFile)) continue;
+
+    const content = fs.readFileSync(behaviorFile, 'utf8');
+    const { frontmatter, content: bodyContent } = parseFrontmatter(content);
+
+    const id = entry.name;
+    const name = String(frontmatter.name ||
+      id.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '));
+    const description = String(frontmatter.description || extractDescription(bodyContent));
+    const keywords = extractKeywords(bodyContent, name);
+
+    const behavior: Extension = {
+      id,
+      type: 'behavior',
+      name,
+      description,
+      version: String(frontmatter.version || '1.0.0'),
+      capabilities: [],
+      keywords,
+      category: String(frontmatter.category || 'behavior'),
+      platforms: {
+        [provider]: 'full' as PlatformSupport,
+      },
+      deployment: {
+        pathTemplate: `${behaviorsPath}/{id}/BEHAVIOR.md`,
+        core: false,
+      },
+      metadata: {
+        type: 'behavior',
+      } satisfies BehaviorMetadata,
+      installation: {
+        installedAt: new Date().toISOString(),
+        installedFrom: 'local',
+        installedPath: behaviorDir,
+        enabled: true,
+      },
+    };
+
+    behaviors.push(behavior);
+  }
+
+  return behaviors;
+}
+
+/**
  * Register deployed extensions in the registry
  *
- * Scans deployed agent and skill directories, creates Extension objects, and
- * registers them in the provided registry.
+ * Scans deployed agent, skill, and behavior directories, creates Extension objects,
+ * and registers them in the provided registry.
  *
  * @param registry - Extension registry to populate
  * @param options - Registration options
@@ -388,7 +480,7 @@ export async function registerDeployedExtensions(
   registry: ExtensionRegistry,
   options: RegistrationOptions
 ): Promise<void> {
-  const { agentsPath, skillsPath, provider, cwd } = options;
+  const { agentsPath, skillsPath, behaviorsPath, provider, cwd } = options;
 
   // Scan and register agents
   if (agentsPath) {
@@ -406,6 +498,17 @@ export async function registerDeployedExtensions(
       registry.register(skill);
     }
     console.log(`Registered ${skills.length} skills from ${skillsPath}`);
+  }
+
+  // Scan and register behaviors (#609)
+  if (behaviorsPath) {
+    const behaviors = await scanDeployedBehaviors(behaviorsPath, provider, cwd);
+    for (const behavior of behaviors) {
+      registry.register(behavior);
+    }
+    if (behaviors.length > 0) {
+      console.log(`Registered ${behaviors.length} behaviors from ${behaviorsPath}`);
+    }
   }
 
   // Commands are already registered via command definitions, so we skip scanning

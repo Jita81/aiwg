@@ -57,67 +57,85 @@ const ADDON_PATHS: Record<Addon, string> = {
 
 /**
  * Provider to deployment paths mapping
+ *
+ * The `behaviors` field tracks where behavior artifacts are deployed per provider.
+ * OpenClaw is the first platform with native behavior support (~/.openclaw/behaviors/).
+ * Other providers receive behaviors via emulation: Claude Code via .claude/hooks/,
+ * Warp via aggregation into WARP.md (empty string = aggregated, not file-per-behavior),
+ * all others via the provider rules directory.
+ *
+ * @implements #609
  */
-const PROVIDER_PATHS: Record<string, { agents: string; skills: string; commands: string; rules: string }> = {
+const PROVIDER_PATHS: Record<string, { agents: string; skills: string; commands: string; rules: string; behaviors: string }> = {
   claude: {
     agents: '.claude/agents',
     skills: '.claude/skills',
     commands: '.claude/commands',
     rules: '.claude/rules',
+    behaviors: '.claude/hooks',  // Emulated via hook wrapper
   },
   factory: {
     agents: '.factory/droids',
     skills: '.factory/skills',
     commands: '.factory/commands',
     rules: '.factory/rules',
+    behaviors: '.factory/rules', // Emulated via session wrapper in rules dir
   },
   codex: {
     agents: '.codex/agents',
     skills: '.codex/skills',
     commands: '.codex/commands',
     rules: '.codex/rules',
+    behaviors: '.codex/rules',   // Emulated via session wrapper
   },
   opencode: {
     agents: '.opencode/agent',
     skills: '.opencode/skill',
     commands: '.opencode/command',
     rules: '.opencode/rule',
+    behaviors: '.opencode/rule', // Emulated via session wrapper
   },
   copilot: {
     agents: '.github/agents',
     skills: '.github/skills',
     commands: '.github/commands',
     rules: '.github/copilot-rules',
+    behaviors: '.github/copilot-rules', // Emulated via session wrapper
   },
   cursor: {
     agents: '.cursor/agents',
     skills: '.cursor/skills',
     commands: '.cursor/commands',
     rules: '.cursor/rules',
+    behaviors: '.cursor/rules',  // Emulated via session wrapper
   },
   warp: {
     agents: '.warp/agents',
     skills: '.warp/skills',
     commands: '.warp/commands',
     rules: '.warp/rules',
+    behaviors: '',               // Aggregated into WARP.md behaviors section
   },
   windsurf: {
     agents: '.windsurf/agents',
     skills: '.windsurf/skills',
     commands: '.windsurf/workflows',
     rules: '.windsurf/rules',
+    behaviors: '.windsurf/rules', // Emulated via session wrapper
   },
   hermes: {
     agents: '',                                            // Aggregated into AGENTS.md at project root
     skills: path.join(os.homedir(), '.hermes', 'skills'), // User-global skills
     commands: '',                                          // Served via MCP, not file-deployed
     rules: '',                                             // Not applicable — Hermes uses AGENTS.md
+    behaviors: '',                                         // Not yet supported
   },
   openclaw: {
     agents: path.join(os.homedir(), '.openclaw', 'agents'),
     skills: path.join(os.homedir(), '.openclaw', 'skills'),
     commands: path.join(os.homedir(), '.openclaw', 'commands'),
     rules: path.join(os.homedir(), '.openclaw', 'rules'),
+    behaviors: path.join(os.homedir(), '.openclaw', 'behaviors'), // Native behavior support
   },
 };
 
@@ -244,19 +262,23 @@ function printNextSteps(framework: Framework, provider: string = 'claude'): void
  */
 async function countDeployedArtifacts(
   target: string,
-  paths: { agents: string; skills: string; commands: string; rules: string }
-): Promise<{ agents: number; commands: number; skills: number; rules: number }> {
+  paths: { agents: string; skills: string; commands: string; rules: string; behaviors: string }
+): Promise<{ agents: number; commands: number; skills: number; rules: number; behaviors: number }> {
   const countMd = async (dir: string): Promise<number> => {
+    if (!dir) return 0;
     try {
-      const entries = await fs.readdir(path.join(target, dir));
+      const resolvedDir = path.isAbsolute(dir) ? dir : path.join(target, dir);
+      const entries = await fs.readdir(resolvedDir);
       return entries.filter(f => f.endsWith('.md')).length;
     } catch {
       return 0;
     }
   };
   const countDirs = async (dir: string): Promise<number> => {
+    if (!dir) return 0;
     try {
-      const entries = await fs.readdir(path.join(target, dir), { withFileTypes: true });
+      const resolvedDir = path.isAbsolute(dir) ? dir : path.join(target, dir);
+      const entries = await fs.readdir(resolvedDir, { withFileTypes: true });
       return entries.filter(e => e.isDirectory()).length;
     } catch {
       return 0;
@@ -267,6 +289,7 @@ async function countDeployedArtifacts(
     commands: await countMd(paths.commands),
     skills: await countDirs(paths.skills),
     rules: await countMd(paths.rules),
+    behaviors: await countDirs(paths.behaviors),
   };
 }
 
@@ -339,6 +362,7 @@ export class UseHandler implements CommandHandler {
           skillsPath: paths.skills,
           commandsPath: paths.commands,
           rulesPath: paths.rules,
+          behaviorsPath: paths.behaviors,
           provider,
           cwd: target,
         });
@@ -490,6 +514,7 @@ export class UseHandler implements CommandHandler {
       if (counts.commands > 0) ui.deployCount('Commands', counts.commands);
       if (counts.skills > 0) ui.deployCount('Skills', counts.skills);
       if (counts.rules > 0) ui.deployCount('Rules', counts.rules);
+      if (counts.behaviors > 0) ui.deployCount('Behaviors', counts.behaviors);
       ui.blank();
       printNextSteps(framework as Framework, provider);
     }

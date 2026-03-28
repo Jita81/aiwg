@@ -103,7 +103,8 @@ function parseArgs() {
     saveUser: false,        // Save model config to ~/.config/aiwg/models.json
     verbose: false,         // Show per-file deployment details
     quiet: false,           // Suppress all non-error output (for embedding in use.ts)
-    asPlugin: false         // Generate .factory-plugin/ bundle (Factory provider only)
+    asPlugin: false,        // Generate .factory-plugin/ bundle (Factory provider only)
+    deployBehaviors: false  // Deploy behaviors in addition to agents
   };
   for (let i = 0; i < args.length; i++) {
     const a = args[i];
@@ -125,6 +126,7 @@ function parseArgs() {
     else if (a === '--commands-only') cfg.commandsOnly = true;
     else if (a === '--skills-only') cfg.skillsOnly = true;
     else if (a === '--rules-only') cfg.rulesOnly = true;
+    else if (a === '--deploy-behaviors') cfg.deployBehaviors = true;
     else if (a === '--filter' && args[i + 1]) cfg.filter = args[++i];
     else if (a === '--filter-role' && args[i + 1]) cfg.filterRole = args[++i];
     else if (a === '--save') cfg.save = true;
@@ -487,7 +489,8 @@ function deepMerge(target, source) {
     save: cfg.save,
     saveUser: cfg.saveUser,
     verbose: cfg.verbose,
-    asPlugin: cfg.asPlugin
+    asPlugin: cfg.asPlugin,
+    deployBehaviors: cfg.deployBehaviors
   };
 
   // Delegate to provider

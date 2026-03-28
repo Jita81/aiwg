@@ -5,6 +5,7 @@
  */
 
 import fs from 'fs/promises';
+import os from 'os';
 import path from 'path';
 import { execSync } from 'child_process';
 import chalk from 'chalk';
@@ -149,6 +150,31 @@ async function runDoctor() {
       }
     }
     // Skip silently if not installed — addons are optional
+  }
+
+  // 10. Check behaviors (OpenClaw native or Claude emulated)
+  const openclawBehaviors = path.join(os.homedir(), '.openclaw', 'behaviors');
+  const claudeHooks = path.join(process.cwd(), '.claude', 'hooks');
+  const hasOpenclawBehaviors = await fileExists(openclawBehaviors);
+  const hasClaudeHooks = await fileExists(claudeHooks);
+  if (hasOpenclawBehaviors) {
+    const entries = await fs.readdir(openclawBehaviors, { withFileTypes: true });
+    const behaviorCount = entries.filter(e => e.isDirectory()).length;
+    if (behaviorCount > 0) {
+      check('OpenClaw Behaviors', 'ok', `${behaviorCount} behaviors deployed (native)`);
+    } else {
+      check('OpenClaw Behaviors', 'info', 'Behaviors directory exists but empty (run: aiwg use daemon)');
+    }
+  } else if (hasClaudeHooks) {
+    const entries = await fs.readdir(claudeHooks);
+    const hookCount = entries.filter(f => f.endsWith('.md') || f.endsWith('.json')).length;
+    if (hookCount > 0) {
+      check('Behaviors (Claude)', 'ok', `${hookCount} behavior hooks deployed (emulated)`);
+    } else {
+      check('Behaviors (Claude)', 'info', 'Hooks directory exists but empty');
+    }
+  } else {
+    check('Behaviors', 'info', 'No behaviors deployed (run: aiwg use daemon)');
   }
 
   // Print results

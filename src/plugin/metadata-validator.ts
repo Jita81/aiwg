@@ -44,7 +44,7 @@ export interface ValidationWarning {
 export interface PluginManifest {
   name: string;
   version: string;
-  type: 'agent' | 'command' | 'template' | 'flow';
+  type: 'agent' | 'command' | 'template' | 'flow' | 'behavior';
   description: string;
   files: string[];
   dependencies?: Record<string, string>;
@@ -179,11 +179,12 @@ export class MetadataValidator {
     }
 
     // Infer type from filename for BEHAVIOR.md files that omit `type`
+    const manifestRec = manifest as unknown as Record<string, unknown>;
     const isBehaviorFile = filename === 'BEHAVIOR.md' ||
-      (basePath && !('type' in (manifest as Record<string, unknown>)) &&
-       ('triggers' in (manifest as Record<string, unknown>) || 'hooks' in (manifest as Record<string, unknown>)));
-    if (isBehaviorFile && !('type' in (manifest as Record<string, unknown>))) {
-      (manifest as Record<string, unknown>).type = 'behavior';
+      (basePath && !('type' in manifestRec) &&
+       ('triggers' in manifestRec || 'hooks' in manifestRec));
+    if (isBehaviorFile && !('type' in manifestRec)) {
+      manifestRec.type = 'behavior';
     }
 
     // Schema validation — use behavior-specific validation for behavior files
@@ -483,7 +484,6 @@ export class MetadataValidator {
       result.warnings.push({
         field: 'triggers/hooks',
         message: 'Behavior has neither triggers nor hooks — it cannot be activated',
-        severity: 'warning'
       });
     }
 
@@ -491,7 +491,6 @@ export class MetadataValidator {
       result.warnings.push({
         field: 'scripts',
         message: 'Behavior has hooks but no scripts — hooks will have no effect',
-        severity: 'warning'
       });
     }
 
@@ -531,6 +530,18 @@ export class MetadataValidator {
         errors.push({
           field: 'files',
           message: `Field "files" is required for type "${manifest.type}"`,
+          severity: 'error'
+        });
+      }
+    }
+
+    // Behavior-specific: must declare triggers or trigger in metadata
+    if (manifest.type === 'behavior') {
+      const meta = manifest.metadata as Record<string, unknown> | undefined;
+      if (!meta || (!('trigger' in meta) && !('triggers' in meta))) {
+        errors.push({
+          field: 'metadata.trigger',
+          message: 'Behavior must declare at least one trigger or triggers array in metadata',
           severity: 'error'
         });
       }

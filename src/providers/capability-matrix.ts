@@ -225,7 +225,7 @@ export function formatCapabilityTable(): string {
   lines.push('-'.repeat(hdr.length));
 
   // Rows
-  for (const [key, caps] of Object.entries(matrix.providers)) {
+  for (const [, caps] of Object.entries(matrix.providers)) {
     const cells = features.map((f) => {
       if (caps.native_features[f]) return padRight('NATIVE', 15);
       const emu = caps.emulation[f];
