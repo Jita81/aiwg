@@ -188,6 +188,119 @@ The supervisor configuration lives under the `supervisor` key in `.aiwg/daemon.j
 | `interface.web.port` | number | 7474 | Web UI port |
 | `interface.web.host` | string | `"127.0.0.1"` | Bind address (localhost by default) |
 
+## Concierge
+
+The **Concierge** is the front-facing interaction layer for the daemon — the first point of contact for users interacting with a live daemon session. It presents a consistently composed, professional interface regardless of what complexity is executing behind it.
+
+Think of it as the reception desk: the guest (user) speaks to the concierge; the concierge routes, delegates, and translates without ever exposing the kitchen.
+
+### Architecture
+
+```
+User input
+    ↓
+[ Concierge ]  ← session context, memory, tone rules
+    ↓
+[ Router ]  → skill / agent / flow / task
+    ↓
+[ Concierge ]  ← wraps and composes response
+    ↓
+User output
+```
+
+The concierge intercepts at both ends of each interaction — intake and output. On intake it identifies intent and routes silently. On output it translates raw technical results into composed, appropriately registered responses.
+
+### Enabling the Concierge
+
+Add to `.aiwg/daemon.json`:
+
+```json
+{
+  "supervisor": {
+    "behaviors": ["concierge"]
+  },
+  "behaviors": {
+    "concierge": {
+      "enabled": true,
+      "memory": {
+        "cross_session": true,
+        "store": ".aiwg/daemon/concierge-memory.json"
+      }
+    }
+  }
+}
+```
+
+Or deploy via CLI:
+
+```bash
+aiwg add-behavior concierge
+```
+
+### Session Start
+
+When the daemon session opens, the concierge reads persisted memory and greets with relevant context:
+
+```
+Welcome back. The overnight security scan completed clean. Two automation rules are
+active — build-monitor and test-watcher — and the ralph loop from yesterday is still
+queued.
+```
+
+If no prior context exists:
+
+```
+Good morning. The daemon is running. What would you like to address?
+```
+
+### Tone Register
+
+The concierge operates on five tone principles — the five Ps:
+
+| Principle | Description |
+|-----------|-------------|
+| **Prompt** | Answers first; never hedges or over-qualifies |
+| **Pertinent** | Every word earns its place; no filler |
+| **Pleasant** | Warmth without informality |
+| **Professional** | Consistent register regardless of topic sensitivity |
+| **Discreet** | Sensitive operations handled without amplification |
+
+### Routing
+
+The concierge classifies user intent and routes to the appropriate daemon primitive without exposing the routing decision:
+
+| Intent | Examples | Routes To |
+|--------|---------|-----------|
+| Status | "How's the build?" | Reads daemon state, summarizes |
+| Task | "Fix the failing tests" | `aiwg task submit` |
+| Schedule | "Run the audit tonight" | `/schedule` skill or `CronCreate` |
+| Behavior | "Start watching tests" | `aiwg behavior run` |
+| Information | "What's in the queue?" | Reads state files |
+| Meta | "What can you do?" | Answers directly |
+| Escalation | "Why is this failing?" | Diagnoses and surfaces cleanly |
+
+### Memory
+
+The concierge persists session context to `.aiwg/daemon/concierge-memory.json`:
+
+- Last 5 completed tasks (type, outcome, timestamp)
+- Active automation rules
+- User preferences stated during sessions
+- Unresolved items from prior sessions
+
+This means the concierge never asks about context it has already been given. On each new session start, relevant prior context is surfaced in the greeting.
+
+### Implementation Reference
+
+The concierge is defined in `agentic/code/behaviors/concierge/BEHAVIOR.md` and is the **reference implementation** for agent-based AIWG behaviors. It introduces:
+
+- `mode: agent` — distinguishes AI-instruction behaviors from shell-script behaviors
+- `on_session_start` hook — new hook type for persistent daemon session boundaries
+- `memory.cross_session` — explicit opt-in to persistent cross-session memory
+- `expose_internals: false` — canonical pattern for user-facing routing
+
+See `docs/behaviors-guide.md` for the full behaviors format specification.
+
 ## Operator Web UI
 
 When `interface.web.enabled` is `true`, the daemon serves an operator interface at `http://localhost:7474`.
@@ -857,6 +970,7 @@ aiwg daemon status
 - [Messaging Guide](messaging-guide.md) — Platform integration
 - [Ralph Guide](ralph-guide.md) — Iterative task loops via daemon
 - [Behaviors Guide](behaviors-guide.md) — Attaching capabilities to daemon and long-running agents
+- `agentic/code/behaviors/concierge/BEHAVIOR.md` — Concierge behavior definition (reference implementation for agent-based behaviors)
 - `.aiwg/architecture/adrs/ADR-daemon-mode.md` — Original daemon architecture decision
 - `.aiwg/architecture/adrs/ADR-ipc-protocol.md` — IPC protocol specification
 - `.aiwg/architecture/adr-daemon-as-headend.md` — DaemonSupervisor headend architecture
