@@ -71,6 +71,9 @@ class DaemonCLI {
       case 'schedule':
         await this.schedule();
         break;
+      case 'memory':
+        await this.memory();
+        break;
       default:
         this.usage();
         process.exit(1);
@@ -525,6 +528,109 @@ class DaemonCLI {
     }
   }
 
+  async memory() {
+    const subcommand = process.argv[3];
+
+    switch (subcommand) {
+      case 'show': {
+        const scope = this.flags.scope;
+
+        if (this.isDaemonRunning()) {
+          try {
+            const client = await createClient(SOCKET_PATH);
+            const result = await client.request('memory.show', scope ? { scope } : {});
+            client.disconnect();
+            this._printMemoryShow(result);
+            return;
+          } catch {
+            // Fallback to offline read below
+          }
+        }
+
+        // Offline: read files directly
+        const { MemoryManager } = await import('./memory-manager.mjs');
+        const mgr = new MemoryManager();
+        this._printMemoryShow(mgr.show(scope));
+        break;
+      }
+
+      case 'clear': {
+        const scope = this.flags.scope;
+        if (!scope) {
+          console.error('Usage: aiwg daemon memory clear --scope <session|project|user>');
+          process.exit(1);
+        }
+
+        if (this.isDaemonRunning()) {
+          try {
+            const client = await createClient(SOCKET_PATH);
+            const result = await client.request('memory.clear', { scope });
+            client.disconnect();
+            console.log(`Cleared ${result.cleared} entry/entries from ${scope} scope`);
+            return;
+          } catch (error) {
+            console.error(`IPC failed, attempting offline clear: ${error.message}`);
+          }
+        }
+
+        const { MemoryManager } = await import('./memory-manager.mjs');
+        const mgr = new MemoryManager();
+        try {
+          const result = mgr.clear(scope);
+          console.log(`Cleared ${result.cleared} entry/entries from ${scope} scope`);
+        } catch (error) {
+          console.error(`Failed to clear memory: ${error.message}`);
+          process.exit(1);
+        }
+        break;
+      }
+
+      default:
+        console.log(`
+Usage: aiwg daemon memory <subcommand> [options]
+
+Subcommands:
+  show              Show memory contents (all scopes or filtered by --scope)
+  clear             Clear memory entries (requires --scope)
+
+Options:
+  --scope <scope>   Memory scope: session | project | user
+
+Examples:
+  aiwg daemon memory show
+  aiwg daemon memory show --scope user
+  aiwg daemon memory clear --scope session
+  aiwg daemon memory clear --scope project
+        `.trim());
+        if (subcommand) process.exit(1);
+    }
+  }
+
+  _printMemoryShow(result) {
+    const scopes = ['session', 'project', 'user'];
+    let any = false;
+
+    for (const scope of scopes) {
+      const info = result[scope];
+      if (!info) continue;
+
+      console.log(`\n${scope.toUpperCase()} MEMORY`);
+      if (info.path) console.log(`  Path: ${info.path}`);
+      console.log(`  Entries: ${info.count}`);
+
+      if (info.entries && info.entries.length > 0) {
+        for (const e of info.entries) {
+          const name = e.name || e.key || '(unnamed)';
+          const desc = e.description ? ` — ${e.description}` : '';
+          console.log(`    • ${name}${desc}`);
+        }
+        any = true;
+      }
+    }
+
+    if (!any) console.log('\n(no memory entries)');
+  }
+
   async task() {
     const subcommand = process.argv[3];
     const args = process.argv.slice(4);
@@ -745,6 +851,7 @@ Commands:
   rooms             List connected messaging rooms
   autonomous <sub>  Manage autonomous mode (status, enable, disable)
   schedule          Show scheduled task status and history
+  memory <sub>      Manage cross-session memory (show, clear)
 
 Options:
   --foreground      Run in foreground (for Docker/systemd)
@@ -772,6 +879,8 @@ Examples:
   aiwg daemon task list
   aiwg daemon logs --follow
   aiwg daemon restart
+  aiwg daemon memory show
+  aiwg daemon memory clear --scope session
     `.trim());
   }
 }

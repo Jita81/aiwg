@@ -18,6 +18,7 @@ import { WebServer } from './web-server.mjs';
 import { MessageRouter } from './message-router.mjs';
 import { ScheduledTaskRunner } from './scheduled-task-runner.mjs';
 import { AutonomousEngine } from './autonomous-engine.mjs';
+import { MemoryManager } from './memory-manager.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -40,6 +41,7 @@ class DaemonMain {
     this.scheduledTaskRunner = null;
     this.autonomousEngine = null;
     this.roomManager = null;
+    this.memoryManager = null;
     this.shutdownInProgress = false;
     this.isRotating = false;
     this.startTime = Date.now();
@@ -74,7 +76,8 @@ class DaemonMain {
     const dirs = [
       '.aiwg/daemon',
       '.aiwg/daemon/actions',
-      '.aiwg/daemon/events'
+      '.aiwg/daemon/events',
+      '.aiwg/daemon/memory',
     ];
 
     for (const dir of dirs) {
@@ -179,6 +182,12 @@ class DaemonMain {
   }
 
   async initializeSubsystems() {
+    // Initialize memory manager (cross-session context for concierge)
+    this.memoryManager = new MemoryManager({ projectRoot: process.cwd() });
+    const memorySnapshot = this.memoryManager.load();
+    const totalEntries = memorySnapshot.project.length + memorySnapshot.user.length;
+    this.log(`Memory manager initialized (${totalEntries} persistent entries loaded)`);
+
     this.eventRouter = new EventRouter();
 
     // Initialize task store (persistent task tracking)
@@ -471,6 +480,39 @@ class DaemonMain {
       // Ping for health checks
       'ping': () => ({ pong: true, timestamp: new Date().toISOString() }),
 
+      // Memory management (cross-session context)
+      'memory.show': (params) => {
+        if (!this.memoryManager) return { error: 'Memory manager not initialized', available: false };
+        return this.memoryManager.show(params?.scope);
+      },
+
+      'memory.clear': (params) => {
+        if (!this.memoryManager) return { error: 'Memory manager not initialized', available: false };
+        const scope = params?.scope;
+        if (!scope) {
+          const err = new Error('Missing required parameter: scope');
+          err.code = 'INVALID_PARAMS';
+          throw err;
+        }
+        return this.memoryManager.clear(scope);
+      },
+
+      'memory.write': (params) => {
+        if (!this.memoryManager) return { error: 'Memory manager not initialized', available: false };
+        const { scope, key, content, name, description, type } = params || {};
+        if (!scope || !key || !content) {
+          const err = new Error('Missing required parameters: scope, key, content');
+          err.code = 'INVALID_PARAMS';
+          throw err;
+        }
+        return this.memoryManager.write(scope, key, content, { name, description, type });
+      },
+
+      'memory.context': () => {
+        if (!this.memoryManager) return { context: '', available: false };
+        return { context: this.memoryManager.getContext(), available: true };
+      },
+
       // Autonomous mode management
       'autonomous.status': () => {
         return this.autonomousEngine ? this.autonomousEngine.getStatus() : { enabled: false };
@@ -685,6 +727,17 @@ class DaemonMain {
         this.log('Messaging hub shut down');
       } catch (error) {
         this.log(`Error shutting down messaging: ${error.message}`);
+      }
+    }
+
+    // Flush session memory to project scope before exit
+    if (this.memoryManager) {
+      try {
+        const uptime = Math.floor((Date.now() - this.startTime) / 1000);
+        this.memoryManager.flushSession({ duration: `${uptime}s` });
+        this.log('Session memory flushed to project scope');
+      } catch (error) {
+        this.log(`Memory flush failed (non-fatal): ${error.message}`);
       }
     }
 
