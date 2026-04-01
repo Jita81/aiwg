@@ -72,6 +72,11 @@
       "name": "soul-blend",
       "description": "Merge multiple SOUL.md files into a composite persona with configurable conflict resolution",
       "triggers": ["blend these souls", "merge soul files", "combine personas", "create a composite soul", "soul blend", "mix these identities"]
+    },
+    {
+      "name": "aiwg-guide",
+      "description": "Contextual AIWG help — explains current version features, answers how-to questions, routes live queries to the steward",
+      "triggers": ["what's new", "what changed", "how do I", "help with aiwg", "explain feature", "what is", "aiwg guide"]
     }
   ],
   "usage": "These skills are consumed by framework-specific skills and can be invoked directly for utility operations."

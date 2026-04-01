@@ -97,7 +97,8 @@
     "soul-enhance",
     "soul-apply",
     "soul-blend",
-    "aiwg-sync"
+    "aiwg-sync",
+    "aiwg-guide"
   ],
   "rules": [
     "agent-deployment",
