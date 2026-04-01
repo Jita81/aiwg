@@ -217,8 +217,8 @@ describe('Consolidated Rules Functions', () => {
 
     it('content includes @-links to full rule files', () => {
       const content = base.generateConsolidatedRulesContent(REPO_ROOT, 'claude');
-      expect(content).toContain('@agentic/code/frameworks/sdlc-complete/rules/no-attribution.md');
-      expect(content).toContain('@agentic/code/frameworks/sdlc-complete/rules/anti-laziness.md');
+      expect(content).toContain('@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/no-attribution.md');
+      expect(content).toContain('@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/anti-laziness.md');
     });
 
     it('content includes Quick Reference table', () => {

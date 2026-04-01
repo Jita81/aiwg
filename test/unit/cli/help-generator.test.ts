@@ -88,7 +88,7 @@ describe('generateHelp', () => {
       const help = generateHelp(registry);
 
       // Should not show categories with no commands
-      expect(help).not.toContain('Ralph Loop (Iterative Execution):');
+      expect(help).not.toContain('Agent Loop (Iterative Execution):');
       expect(help).not.toContain('Channel Management:');
     });
 
@@ -245,7 +245,7 @@ describe('generateHelp', () => {
 
       const help = generateHelp(registry);
 
-      expect(help).toContain('Ralph Loop (Iterative Execution):');
+      expect(help).toContain('Agent Loop (Iterative Execution):');
       expect(help).toContain('ralph');
       expect(help).toContain('ralph-status');
       expect(help).toContain('ralph-abort');

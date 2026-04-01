@@ -88,7 +88,7 @@ describe('Ralph Command Handlers', () => {
       const { ralphHandler } = await import('../../../../src/cli/handlers/ralph.js');
 
       expect(ralphHandler.id).toBe('ralph');
-      expect(ralphHandler.name).toBe('Ralph Loop');
+      expect(ralphHandler.name).toBe('Agent Loop');
       expect(ralphHandler.description.toLowerCase()).toContain('iterative task loop');
       expect(ralphHandler.category).toBe('ralph');
       expect(ralphHandler.aliases).toEqual(['ralph', '-ralph', '--ralph']);
@@ -102,7 +102,7 @@ describe('Ralph Command Handlers', () => {
       const result = await ralphHandler.execute(mockContext);
 
       expect(result.exitCode).toBe(0);
-      expect(result.message).toContain('Ralph Loop');
+      expect(result.message).toContain('Agent Loop');
       expect(result.message).toContain('USAGE');
     });
 
@@ -245,7 +245,7 @@ describe('Ralph Command Handlers', () => {
       const result = await ralphStatusHandler.execute(mockContext);
 
       expect(result.exitCode).toBe(0);
-      expect(result.message).toContain('No Ralph loops found');
+      expect(result.message).toContain('No Agent loops found');
     });
 
     it('should display running loops by default', async () => {

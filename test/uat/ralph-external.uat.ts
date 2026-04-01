@@ -112,8 +112,7 @@ describe('UAT: Orchestrator — basic loop', () => {
       maxIterations: 2,
     });
 
-    const sm = new StateManager(testDir);
-    const state = sm.load();
+    const state = orc.stateManager.load();
     expect(state).not.toBeNull();
     expect(state.status).toBe('completed');
     expect(state.objective).toBe('State persistence test');
@@ -130,8 +129,8 @@ describe('UAT: Orchestrator — basic loop', () => {
       maxIterations: 1,
     });
 
-    // State manager writes outputs to .aiwg/ralph-external/outputs/
-    const outputsDir = join(testDir, '.aiwg', 'ralph-external', 'outputs');
+    // State manager writes outputs to per-loop dir (scoped since #586)
+    const outputsDir = join(orc.stateManager.getStateDir(), 'outputs');
     expect(existsSync(outputsDir)).toBe(true);
     // Stdout log for iteration 1
     expect(existsSync(join(outputsDir, '001-stdout.log'))).toBe(true);
