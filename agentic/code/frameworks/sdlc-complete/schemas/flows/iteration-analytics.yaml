@@ -163,7 +163,7 @@ $defs:
 
   RalphIntegration:
     type: object
-    description: "Integration with Ralph loop"
+    description: "Integration with agent loop"
     properties:
       enabled:
         type: boolean

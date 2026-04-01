@@ -206,7 +206,7 @@ Your project directory mounts at `/workspace` inside the container. The web UI i
 ```bash
 aiwg mc status          # All active tasks
 aiwg mc watch           # Live stream of activity
-aiwg ralph-status       # Current Ralph loop status
+aiwg ralph-status       # Current agent loop status
 ```
 
 Or open the web dashboard at `localhost:7474` for a visual view.

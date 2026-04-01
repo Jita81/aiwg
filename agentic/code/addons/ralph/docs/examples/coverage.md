@@ -75,7 +75,7 @@ Your code coverage is below target and you want Ralph to keep adding tests until
 
 ```
 ═══════════════════════════════════════════
-Ralph Loop: SUCCESS
+Agent Loop: SUCCESS
 ═══════════════════════════════════════════
 
 Task: Add tests to reach 80% code coverage

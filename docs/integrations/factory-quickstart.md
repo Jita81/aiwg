@@ -276,7 +276,7 @@ droid exec --auto medium -o json "run full test suite and fix failures"
 
 ## Ralph Iterative Loops
 
-Ralph loops support multi-provider execution. While Factory droids are deployed via AIWG, Ralph task loops run through the CLI:
+Agent loops support multi-provider execution. While Factory droids are deployed via AIWG, agent task loops run through the CLI:
 
 ```bash
 aiwg ralph "Fix all tests" --completion "npm test passes"

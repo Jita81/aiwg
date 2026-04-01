@@ -378,8 +378,8 @@ This is the **artifact directory** - the heart of AIWG's project management:
 ├── deployment/       # Deployment plans, runbooks
 ├── working/          # Temporary files (safe to delete)
 ├── reports/          # Generated status reports
-├── ralph/            # Internal Ralph loop state
-├── ralph-external/   # External Ralph loop state
+├── ralph/            # Internal agent loop state
+├── ralph-external/   # External agent loop state
 └── frameworks/       # Installed framework registry
     ├── registry.json
     ├── sdlc-complete/

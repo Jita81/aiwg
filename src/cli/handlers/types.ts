@@ -82,7 +82,7 @@ export type CommandCategory =
   | 'scaffolding'   // Scaffolding (add-agent, scaffold-addon, etc.)
   | 'channel'       // Channel management
   | 'maintenance'   // Maintenance (doctor, version, update, help)
-  | 'ralph'         // Ralph loop
+  | 'ralph'         // Agent loop
   | 'index'         // Artifact index
   | 'orchestration' // Mission Control
   | 'daemon'        // Daemon and behavior management

@@ -1,5 +1,5 @@
 ---
-description: Attach to a running Ralph loop's live output stream
+description: Attach to a running agent loop's live output stream
 commandHint:
   argumentHint: "[--loop-id <id>]"
   allowedTools: Read
@@ -10,7 +10,7 @@ commandHint:
 
 # Ralph Attach
 
-Attach to a running external Ralph loop and tail its output log in real time. Press Ctrl+C to detach without interrupting the loop.
+Attach to a running external agent loop and tail its output log in real time. Press Ctrl+C to detach without interrupting the loop.
 
 ## Natural Language Triggers
 
@@ -19,7 +19,7 @@ Users may say:
 - "attach to ralph"
 - "follow ralph"
 - "watch ralph output"
-- "tail the ralph loop"
+- "tail the agent loop"
 - "stream ralph progress"
 
 ## Parameters
@@ -49,18 +49,18 @@ When triggered:
 
 **Output format while tailing**:
 ```
-[10:42:01] Ralph loop abc123 — ACTIVE (iteration 3/10)
+[10:42:01] Agent loop abc123 — ACTIVE (iteration 3/10)
 [10:42:01] Running verification: npm test
 [10:42:03] PASS src/auth/auth.test.ts
 [10:42:03] Tests: 12 passed, 0 failed
 [10:42:04] Iteration 3: VERIFIED — criteria met
-[10:42:04] Ralph loop: SUCCESS
+[10:42:04] Agent loop: SUCCESS
 ```
 
 **On loop completion**:
 ```
 ═══════════════════════════════════════════
-Ralph Loop Completed: SUCCESS
+Agent Loop Completed: SUCCESS
 Loop ID: abc123
 Iterations: 3
 Duration: 4m 12s
@@ -74,7 +74,7 @@ Detached from loop abc123.
 
 **No active loops**:
 ```
-No active Ralph loops found.
+No active agent loops found.
 
 Start one with:
   aiwg ralph "your task" --completion "criteria"
@@ -104,7 +104,7 @@ Check that the loop process is still running and has write access to the log dir
 
 **Multiple loops active (no --loop-id)**:
 ```
-Multiple active Ralph loops. Specify which to attach to:
+Multiple active agent loops. Specify which to attach to:
 
   abc123 — Fix auth tests (running, iteration 2/10, started 10:38)
   def456 — Migrate to ESM (running, iteration 5/20, started 09:15)
@@ -124,7 +124,7 @@ Usage: /ralph-attach --loop-id <id>
 ```
 /ralph-attach
 ```
-**Response**: Streams live output from the single running Ralph loop.
+**Response**: Streams live output from the single running agent loop.
 
 ### Example 2: Attach to a specific loop by ID
 ```
@@ -134,7 +134,7 @@ Usage: /ralph-attach --loop-id <id>
 
 ### Example 3: Detach without stopping
 Press `Ctrl+C` while attached.
-**Response**: Returns to normal prompt; the Ralph loop continues running unaffected.
+**Response**: Returns to normal prompt; the agent loop continues running unaffected.
 
 ## Related
 

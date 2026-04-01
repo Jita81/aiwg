@@ -307,9 +307,9 @@ pre_generation_query:
       - "Add edge case tests for empty string and whitespace"
 ```
 
-## Integration with Ralph Loop
+## Integration with Agent Loop
 
-When the executable feedback loop runs inside a Ralph loop:
+When the executable feedback loop runs inside an agent loop:
 
 ```yaml
 ralph_integration:

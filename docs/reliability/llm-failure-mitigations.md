@@ -84,7 +84,7 @@ input_validation:
 **Symptom**: Agent fails on multi-step reasoning tasks
 
 **Mitigation**:
-- Break tasks into atomic subtasks (Ralph loop decomposition)
+- Break tasks into atomic subtasks (agent loop decomposition)
 - Use chain-of-thought prompting
 - Implement task-level checkpoints
 
@@ -161,7 +161,7 @@ planning:
 **Symptom**: Agent performance degrades with large context windows
 
 **Mitigation**:
-- Summarize historical context in Ralph loop
+- Summarize historical context in agent loop
 - Use semantic chunking for large artifacts
 - Reference artifacts via @-mentions instead of inline content
 

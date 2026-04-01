@@ -56,7 +56,7 @@ When AI generates broken code or flawed designs, you manually intervene, explain
 
 **Without AIWG**: Research shows 47% of AI workflows produce inconsistent outputs without reproducibility constraints (R-LAM, Sureshkumar et al. 2026). Debugging is trial-and-error.
 
-**With AIWG**: The Ralph loop implements closed-loop self-correction — execute, verify, learn from failure, adapt strategy, retry. External Ralph survives crashes and runs for 6-8+ hours autonomously. Debug memory accumulates failure patterns so the agent doesn't repeat mistakes.
+**With AIWG**: The agent loop implements closed-loop self-correction — execute, verify, learn from failure, adapt strategy, retry. External Ralph survives crashes and runs for 6-8+ hours autonomously. Debug memory accumulates failure patterns so the agent doesn't repeat mistakes.
 
 ### 3. No Quality Gates
 
@@ -286,7 +286,7 @@ The orchestration pattern: **Primary Author → Parallel Reviewers → Synthesiz
 - **8 platform support** — deploy to Claude Code, Copilot, Cursor, Warp, Factory AI, OpenCode, Codex, and Windsurf
 - **6 complete frameworks** — SDLC, Digital Forensics, Marketing Operations, Research Management, Media Curation, Ops Infrastructure
 - **21 addons** — RLM recursive decomposition, voice profiles, testing quality, mutation testing, UAT automation, and more
-- **Ralph Loop** — iterative task execution with automatic error recovery and crash resilience (6-8 hour sessions)
+- **Agent Loop** — iterative task execution with automatic error recovery and crash resilience (6-8 hour sessions)
 - **RLM addon** — recursive context decomposition for processing 10M+ tokens via sub-agent delegation
 - **YAML metalanguage** — declarative schema-validated workflow definitions (JSON Schema 2020-12)
 - **MCP server** — Model Context Protocol integration for tool-based AI workflows
@@ -824,7 +824,7 @@ your-project/
 │   ├── security/             # Threat models, security gates
 │   ├── deployment/           # Deployment plans, runbooks
 │   ├── reports/              # Generated status reports
-│   ├── ralph/                # In-session Ralph loop state
+│   ├── ralph/                # In-session agent loop state
 │   ├── ralph-external/       # External Ralph crash-resilient state
 │   ├── research/             # Research corpus and findings
 │   ├── forensics/            # Investigation artifacts
@@ -927,7 +927,7 @@ AIWG integrates with issue trackers for 2-way human-AI collaboration:
 # List and filter issues
 /issue-list --state open --labels "priority:high"
 
-# Drive an issue with Ralph loop — posts status to issue thread
+# Drive an issue with agent loop — posts status to issue thread
 /issue-driven-ralph 42
 
 # Auto-sync issues from commits and artifacts
@@ -937,7 +937,7 @@ AIWG integrates with issue trackers for 2-way human-AI collaboration:
 /issue-close 42
 ```
 
-The `/address-issues` command orchestrates issue-thread-driven Ralph loops with automatic progress posting and human feedback incorporation at each cycle.
+The `/address-issues` command orchestrates issue-thread-driven agent loops with automatic progress posting and human feedback incorporation at each cycle.
 
 ---
 
@@ -1066,7 +1066,7 @@ aiwg new my-project              # Scaffold new project
 aiwg status                      # Workspace health
 aiwg doctor                      # Installation diagnostics
 
-# Iterative execution (Ralph Loop)
+# Iterative execution (Agent Loop)
 aiwg ralph "Fix all tests" --completion "npm test passes"
 aiwg ralph-status                # Check loop progress
 aiwg ralph-abort                 # Cancel running loop
@@ -1188,15 +1188,15 @@ All SDLC artifacts persist in `.aiwg/` — structured project memory that surviv
 ├── security/         # Threat models, security gates
 ├── deployment/       # Deployment plans, runbooks
 ├── reports/          # Generated status reports
-├── ralph/            # Ralph loop state and history
+├── ralph/            # Agent loop state and history
 └── frameworks/       # Installed framework registry
 ```
 
 ---
 
-## Ralph Loop — Autonomous Long-Running Agent Orchestration
+## Agent Loop — Autonomous Long-Running Agent Orchestration
 
-The Ralph Loop is the core execution philosophy: **iteration beats perfection**. Instead of getting everything right on the first attempt, the agent executes in a retry loop where errors become learning data. Ralph supports both in-session loops and **crash-resilient external loops that run indefinitely** — surviving process crashes, terminal disconnects, and system reboots.
+The Agent Loop is the core execution philosophy: **iteration beats perfection**. Instead of getting everything right on the first attempt, the agent executes in a retry loop where errors become learning data. Ralph supports both in-session loops and **crash-resilient external loops that run indefinitely** — surviving process crashes, terminal disconnects, and system reboots.
 
 ### In-Session Ralph (Minutes to Hours)
 
@@ -1466,7 +1466,7 @@ Full research background, citations, and methodology: [docs/research/](docs/rese
 
 ### For Individual Developers
 
-**Turn your AI coding assistant from a stateless autocomplete into a project-aware development partner.** Without AIWG, every time your AI assistant restarts you lose all context. With AIWG, the `.aiwg/` directory maintains requirements, architecture decisions, test strategies, and project history across sessions. The Ralph loop means you can hand off complex multi-step tasks ("migrate this module to TypeScript") and walk away — the agent iterates until completion or escalates when stuck.
+**Turn your AI coding assistant from a stateless autocomplete into a project-aware development partner.** Without AIWG, every time your AI assistant restarts you lose all context. With AIWG, the `.aiwg/` directory maintains requirements, architecture decisions, test strategies, and project history across sessions. The agent loop means you can hand off complex multi-step tasks ("migrate this module to TypeScript") and walk away — the agent iterates until completion or escalates when stuck.
 
 ### For Engineering Teams
 
@@ -1493,8 +1493,8 @@ Full research background, citations, and methodology: [docs/research/](docs/rese
 | **Context persistence** | Lost on every restart | `.aiwg/` survives across sessions |
 | **Multi-agent coordination** | Manual prompt switching | Orchestrated parallel reviews with synthesis |
 | **Quality enforcement** | Hope for the best | 35 rules auto-enforced (anti-laziness, token security, citation integrity) |
-| **Error recovery** | Start over | Ralph loop iterates with learned debug memory |
-| **Long-running tasks** | Babysit the terminal | External Ralph runs 6-8+ hours crash-resilient |
+| **Error recovery** | Start over | Agent loop iterates with learned debug memory |
+| **Long-running tasks** | Babysit the terminal | External agent loop runs 6-8+ hours crash-resilient |
 | **Traceability** | Grep and hope | @-mention system with bidirectional linking |
 | **Reproducibility** | Non-deterministic | Strict mode (temperature=0), checkpoints, validation |
 | **Platform switching** | Rewrite all prompts | `--provider copilot` deploys identical workflows |
@@ -1533,7 +1533,7 @@ Full research background, citations, and methodology: [docs/research/](docs/rese
 
 **Practitioners:**
 - [Quick Start Guide](docs/quickstart.md) — Hands-on workflows
-- [Ralph Loop Guide](docs/ralph-guide.md) — Iterative execution with crash recovery
+- [Agent Loop Guide](docs/ralph-guide.md) — Iterative execution with crash recovery
 - [Platform Guides](docs/integrations/) — 5-10 minute setup per platform
 
 **Technical Leaders:**
@@ -1572,7 +1572,7 @@ AIWG's unified extension system enables dynamic discovery, semantic search, and 
 
 ### Advanced Topics
 
-- **[Ralph Loop](docs/ralph-guide.md)** — Iterative task execution with crash recovery
+- **[Agent Loop](docs/ralph-guide.md)** — Iterative task execution with crash recovery
 - **[RLM Addon](agentic/code/addons/rlm/README.md)** — Recursive context decomposition for 10M+ token processing
 - **[Daemon Mode](docs/daemon-guide.md)** — Background file watching, cron scheduling, IPC
 - **[Messaging Integration](docs/messaging-guide.md)** — Bidirectional Slack, Discord, and Telegram bots

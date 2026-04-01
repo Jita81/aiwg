@@ -565,7 +565,7 @@ ACTION: Write
 
     ## Recommendations for AIWG
 
-    1. **Ralph loops**: Episodic memory (Reflexion pattern) - already implemented
+    1. **Agent loops**: Episodic memory (Reflexion pattern) - already implemented
     2. **Long sessions**: Working memory (MemGPT-style paging) - planned
     3. **Cross-session**: Semantic memory (embeddings) - future work
     4. **Large corpora**: Hybrid (RLM pattern) - this agent!
@@ -642,10 +642,10 @@ advanced_rlm_config:
 
 ## Integration with AIWG Components
 
-### With Ralph Loops
+### With Agent Loops
 
 RLM agents can operate within Ralph iterations:
-- Ralph loop calls RLM agent for complex sub-tasks
+- Agent loop calls RLM agent for complex sub-tasks
 - RLM agent maintains state in `.aiwg/rlm/tasks/{task-id}/`
 - Ralph verifies completion via existence of `final-result.md`
 

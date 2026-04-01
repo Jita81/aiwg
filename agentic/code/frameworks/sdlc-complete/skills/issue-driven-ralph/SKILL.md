@@ -1,10 +1,10 @@
 ---
 name: issue-driven-ralph
-description: Orchestrates issue-driven Ralph loops that post cycle status to issue threads and incorporate human feedback in each cycle.
+description: Orchestrates issue-driven agent loops that post cycle status to issue threads and incorporate human feedback in each cycle.
 platforms: [claude-code, openclaw]
 ---
 
-# Issue-Driven Ralph Loop Skill
+# Issue-Driven Agent Loop Skill
 
 ## Triggers
 
@@ -52,7 +52,7 @@ This skill supports the standard AIWG `--interactive` and `--guidance` parameter
 
 ### The 3-Step Cycle Protocol
 
-Each cycle of the ralph loop follows this protocol:
+Each cycle of the agent loop follows this protocol:
 
 **Step 1: Work** — Read issue context, implement fix/feature, run tests
 
@@ -181,6 +181,6 @@ User: "address issues 17, 18, 19 — they're all related to the auth refactor"
 
 - @.aiwg/planning/issue-driven-ralph-loop-design.md - Design document
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/address-issues/SKILL.md - Command definition
-- @$AIWG_ROOT/agentic/code/addons/ralph/skills/ralph/SKILL.md - Ralph loop command
+- @$AIWG_ROOT/agentic/code/addons/ralph/skills/ralph/SKILL.md - Agent loop command
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/issue-auto-sync/SKILL.md - Issue sync skill
 - @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/context-budget.md - Parallel subagent limits

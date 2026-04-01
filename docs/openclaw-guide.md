@@ -118,7 +118,7 @@ When both modes are active, route requests based on complexity:
 - Artifact generation required (architecture docs, test plans, requirements)
 - Multi-agent orchestration requested (parallel reviewers, synthesis)
 - Template-driven output needed (use case templates, ADR templates)
-- Ralph loops or iterative task execution
+- Agent loops or iterative task execution
 - Recovery-oriented or staged planning work
 
 ### Use AIWG native skills when:

@@ -120,7 +120,7 @@ When `on_session_start` fires, read session memory and open with a contextual ac
 4. Does not ask "How can I help you today?"
 
 **Example — returning user with context:**
-> "Welcome back. The overnight security scan completed clean. Two automation rules are active — build-monitor and test-watcher — and the ralph loop from yesterday is still queued."
+> "Welcome back. The overnight security scan completed clean. Two automation rules are active — build-monitor and test-watcher — and the agent loop from yesterday is still queued."
 
 **Example — new session, no prior context:**
 > "Good morning. The daemon is running. What would you like to address?"
@@ -256,7 +256,7 @@ End each interaction clearly:
 **User:** "What's the situation?"
 
 **Concierge:**
-> "Three things since yesterday: the build is green, the overnight security scan completed clean, and the ralph loop for the auth refactor finished — 14 files changed, all tests passing. Nothing blocked."
+> "Three things since yesterday: the build is green, the overnight security scan completed clean, and the agent loop for the auth refactor finished — 14 files changed, all tests passing. Nothing blocked."
 
 ### Example 2: Task Delegation
 

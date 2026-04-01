@@ -25,7 +25,7 @@ Defined as `BEHAVIOR.md` files with scripts and event hooks. Deployed to platfor
 
 ### Runtime Behaviors (YAML)
 
-Defined as YAML files with directives and tools. Attached to daemons and Ralph loops at construction time. Never deployed to external platforms — they operate inside the AIWG runtime.
+Defined as YAML files with directives and tools. Attached to daemons and agent loops at construction time. Never deployed to external platforms — they operate inside the AIWG runtime.
 
 **Use when:** You need unconditional constraints on a long-running agent — budget limits, concurrency caps, process governance — that the LLM cannot choose to ignore.
 
@@ -256,7 +256,7 @@ aiwg add-behavior --interactive
 
 ## Runtime Behaviors
 
-Runtime behaviors are a separate but related concept: named, versioned capability bundles that attach to long-running agents (daemons, Ralph loops) at initialization and remain active for the agent's entire lifetime.
+Runtime behaviors are a separate but related concept: named, versioned capability bundles that attach to long-running agents (daemons, agent loops) at initialization and remain active for the agent's entire lifetime.
 
 ### What Are Runtime Behaviors
 
@@ -292,7 +292,7 @@ description: >
 # The runtime will warn (but not block) if attached to an unlisted type.
 agentTypes:
   - daemon
-  - ralph-loop
+  - agent-loop
   - long-running-agent
 
 directives:
@@ -366,7 +366,7 @@ The runtime loads the project version. The framework version is ignored for this
 
 **Path:** `agentic/code/behaviors/ops-toolset.yaml`
 **Version:** 1.0.0
-**Agent types:** `daemon`, `ralph-loop`, `long-running-agent`
+**Agent types:** `daemon`, `agent-loop`, `long-running-agent`
 
 The default behavior for operational agents. It is included automatically when a daemon is configured with `"behaviors": ["ops-toolset"]`.
 
@@ -417,7 +417,7 @@ description: >
 
 agentTypes:
   - daemon
-  - ralph-loop
+  - agent-loop
 
 directives:
   - id: emit-cost-on-complete
@@ -503,8 +503,8 @@ aiwg behavior remove <name>
 
 ```
 NAME              VERSION  TIER       AGENT TYPES                  DIRECTIVES  TOOLS
-ops-toolset       1.0.0    framework  daemon, ralph-loop, ...      5           7
-cost-reporter     1.0.0    project    daemon, ralph-loop           2           1
+ops-toolset       1.0.0    framework  daemon, agent-loop, ...      5           7
+cost-reporter     1.0.0    project    daemon, agent-loop           2           1
 ```
 
 The `TIER` column shows where the behavior was loaded from. When a name is overridden by a higher-precedence tier, the lower-tier entry is not shown.

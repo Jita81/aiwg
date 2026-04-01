@@ -1,12 +1,12 @@
 ---
-description: View and manage Ralph loop reflections and episodic memory
+description: View and manage agent loop reflections and episodic memory
 commandHint:
   category: ralph
 ---
 
 # Ralph Reflect Command
 
-View, search, and manage reflections from Ralph loop iterations.
+View, search, and manage reflections from agent loop iterations.
 
 ## Instructions
 

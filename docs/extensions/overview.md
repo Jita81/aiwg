@@ -16,7 +16,7 @@ Extensions are the building blocks of AIWG frameworks and addons. They include:
 | Type | Purpose | Examples |
 |------|---------|----------|
 | **agent** | Specialized AI personas | API Designer, Test Engineer |
-| **skill** | Primary workflow extension — NL-triggered, deployed natively | Project awareness, voice application, ralph loop |
+| **skill** | Primary workflow extension — NL-triggered, deployed natively | Project awareness, voice application, agent loop |
 | **command** | Deployment artifact generated from skill sources; also CLI entry points | `/mention-wire`, `aiwg use sdlc` |
 | **hook** | Lifecycle event handlers | Pre-session setup, post-write validation |
 | **tool** | External utilities | git, jq, npm |

@@ -64,7 +64,7 @@ activation:
 
 This skill uses:
 - `project-awareness`: Context for relevance filtering
-- Ralph Loop Orchestrator: Provides iteration state
+- Agent Loop Orchestrator: Provides iteration state
 - Reflection memory at `.aiwg/ralph/reflections/`
 
 ## References

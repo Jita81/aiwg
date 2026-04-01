@@ -314,7 +314,7 @@ flow_integration:
 
 # Ralph integration
 ralph_integration:
-  description: "Error handling in Ralph loops"
+  description: "Error handling in agent loops"
 
   on_iteration_failure:
     - increment_failure_count: true

@@ -1,16 +1,16 @@
 ---
-description: Show analytics and metrics from Ralph loop execution history
+description: Show analytics and metrics from agent loop execution history
 commandHint:
   category: ralph
 ---
 
 # Ralph Analytics Command
 
-Display aggregate analytics and metrics from Ralph loop execution history.
+Display aggregate analytics and metrics from agent loop execution history.
 
 ## Instructions
 
-When invoked, analyze Ralph loop data and present metrics:
+When invoked, analyze agent loop data and present metrics:
 
 1. **Scan Loop History**
    - Load all loop records from `.aiwg/ralph/`

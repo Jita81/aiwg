@@ -1,4 +1,4 @@
-# External Ralph Loop
+# External Agent Loop
 
 Crash-resilient iterative task execution with comprehensive state capture for long-running Claude sessions (6-8 hours).
 
@@ -37,7 +37,7 @@ External Ralph wraps Claude Code sessions with an external supervisor that provi
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                       External Ralph Loop                                │
+│                       External Agent Loop                                │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                         │
 │  ┌─────────────┐    ┌──────────────┐    ┌───────────────┐              │

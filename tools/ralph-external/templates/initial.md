@@ -1,4 +1,4 @@
-# External Ralph Loop - Iteration {{iteration}}/{{maxIterations}}
+# External Agent Loop - Iteration {{iteration}}/{{maxIterations}}
 
 ## Task Objective
 {{objective}}
@@ -8,11 +8,11 @@
 
 ## Instructions
 
-You are executing an **External Ralph Loop**. Your session is managed by an external supervisor that provides crash recovery and cross-session persistence.
+You are executing an **External Agent Loop**. Your session is managed by an external supervisor that provides crash recovery and cross-session persistence.
 
 ### Use Internal Ralph for Iterative Work
 
-For the actual implementation work, use the internal Ralph loop:
+For the actual implementation work, use the internal agent loop:
 
 ```
 /ralph "{{objective}}" --completion "{{completionCriteria}}" --max-iterations 10

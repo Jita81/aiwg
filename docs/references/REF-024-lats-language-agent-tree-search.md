@@ -32,7 +32,7 @@ Zhou, A., Yan, K., Shlapentokh-Rothman, M., Wang, H., & Wang, Y.-X. (2024). Lang
 
 **What Makes It Work**: A novel hybrid value function combines LM-generated scores with self-consistency voting to guide tree search. External environment feedback (test execution, web responses, answer verification) enables backtracking from failed paths. Self-reflection generates verbal critiques that improve subsequent exploration.
 
-**Impact for AIWG**: Provides theoretical foundation for Ralph loop's iterative error recovery and validates backtracking patterns in SDLC flow commands. LATS demonstrates that deliberate search over action spaces (not just thought spaces) yields superior performance compared to single-path execution (ReAct) or pure reasoning search (ToT).
+**Impact for AIWG**: Provides theoretical foundation for agent loop's iterative error recovery and validates backtracking patterns in SDLC flow commands. LATS demonstrates that deliberate search over action spaces (not just thought spaces) yields superior performance compared to single-path execution (ReAct) or pure reasoning search (ToT).
 
 ---
 
@@ -399,11 +399,11 @@ Legend:
 
 ## AIWG Implementation Mapping
 
-### Direct Parallel: Ralph Loop as MCTS
+### Direct Parallel: Agent Loop as MCTS
 
-The Ralph loop implements LATS-style deliberate search through iterative error recovery:
+The agent loop implements LATS-style deliberate search through iterative error recovery:
 
-| LATS Component | Ralph Loop Implementation | Code Location |
+| LATS Component | Agent Loop Implementation | Code Location |
 |----------------|---------------------------|---------------|
 | **Selection** | Choose next approach based on past failures | `tools/ralph-external/core/selector.ts` |
 | **Expansion** | Generate fix attempt with context | `tools/ralph-external/core/executor.ts` |
@@ -415,7 +415,7 @@ The Ralph loop implements LATS-style deliberate search through iterative error r
 ### TypeScript Implementation Pattern
 
 ```typescript
-// LATS-inspired Ralph loop with tree search
+// LATS-inspired agent loop with tree search
 
 interface RalphNode {
   state: ProjectState;           // Current code state
@@ -672,7 +672,7 @@ Update strategy knowledge:
 
 ### Why LATS Matters for AIWG
 
-1. **Theoretical Validation**: LATS demonstrates that deliberate search (Ralph loop) outperforms single-path execution (basic ReAct agents)
+1. **Theoretical Validation**: LATS demonstrates that deliberate search (agent loop) outperforms single-path execution (basic ReAct agents)
 
 2. **Hybrid Evaluation**: Combining LM self-assessment with external verification (tests, lint) yields better value estimates than either alone
 
@@ -705,7 +705,7 @@ Update strategy knowledge:
 
 ### Related AIWG Documentation
 
-- `@tools/ralph-external/README.md` - Ralph loop implementation
+- `@tools/ralph-external/README.md` - Agent loop implementation
 - `@.aiwg/architecture/software-architecture-doc.md` - Architecture decision patterns
 - `@docs/ralph-guide.md` - Iterative error recovery guide
 - `@agentic/code/frameworks/sdlc-complete/docs/orchestrator-architecture.md` - Flow command orchestration
@@ -768,4 +768,4 @@ Update strategy knowledge:
 | Date | Author | Changes |
 |------|--------|---------|
 | 2026-01-24 | Research Acquisition (#74) | Initial reference entry |
-| 2026-01-24 | Claude (Comprehensive Documentation) | Complete rewrite with all benchmark results, full MCTS algorithm (6 operations), hybrid value function details, key quotes with page numbers, comprehensive AIWG mapping (Ralph loop as MCTS, flow command integration patterns), comparison tables vs ToT/ReAct/Reflexion/RAP, TypeScript implementation examples, state management patterns, implementation roadmap, cross-references to AIWG codebase |
+| 2026-01-24 | Claude (Comprehensive Documentation) | Complete rewrite with all benchmark results, full MCTS algorithm (6 operations), hybrid value function details, key quotes with page numbers, comprehensive AIWG mapping (agent loop as MCTS, flow command integration patterns), comparison tables vs ToT/ReAct/Reflexion/RAP, TypeScript implementation examples, state management patterns, implementation roadmap, cross-references to AIWG codebase |

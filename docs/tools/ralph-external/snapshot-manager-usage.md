@@ -1,6 +1,6 @@
 # Snapshot Manager Usage Guide
 
-The Snapshot Manager captures comprehensive state before and after long-running Claude sessions, enabling detailed analysis of what changed during 6-8 hour external Ralph loops.
+The Snapshot Manager captures comprehensive state before and after long-running Claude sessions, enabling detailed analysis of what changed during 6-8 hour external agent loops.
 
 ## Overview
 
@@ -182,7 +182,7 @@ The diff calculation provides a structured summary of all changes:
 
 ## Integration with Orchestrator
 
-The Snapshot Manager is designed to integrate with the External Ralph Loop orchestrator:
+The Snapshot Manager is designed to integrate with the External Agent Loop orchestrator:
 
 ```javascript
 // In orchestrator's iteration loop
@@ -365,6 +365,6 @@ If snapshots exceed 100KB:
 
 ## References
 
-- @.aiwg/requirements/design-ralph-external.md - External Ralph Loop design
+- @.aiwg/requirements/design-ralph-external.md - External Agent Loop design
 - @tools/ralph-external/state-manager.mjs - Session state management
 - @tools/ralph-external/output-analyzer.mjs - Output analysis patterns

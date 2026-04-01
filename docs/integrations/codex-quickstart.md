@@ -502,7 +502,7 @@ Codex is available as a coding agent for GitHub Copilot Pro+ and Enterprise cust
 
 ## Ralph Iterative Loops
 
-Ralph loops can target Codex directly via `--provider codex`:
+Agent loops can target Codex directly via `--provider codex`:
 
 ```bash
 # Run Ralph with Codex as the execution provider

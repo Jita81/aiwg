@@ -156,7 +156,7 @@ Architecture Review Panel:
 - **Phase gates**: Decision points with explicit option evaluation
 - **ADRs**: Document alternatives, criteria, selection rationale
 - **Architecture selection**: Generate k options, evaluate trade-offs, select best
-- **Ralph loop recovery**: Try strategy A, evaluate, backtrack if failing, try strategy B
+- **Agent loop recovery**: Try strategy A, evaluate, backtrack if failing, try strategy B
 
 **Implementation Pattern**:
 ```markdown
@@ -390,7 +390,7 @@ quality_assessment:
 - **Tools** (actions): `workflow_run`, `artifact_read`, `template_render`
 - **Resources** (read-only): Agents catalog, templates, voice profiles
 - **Prompts** (templates): Reusable prompt templates
-- **Tasks** (async): Ralph loops as MCP Tasks
+- **Tasks** (async): Agent loops as MCP Tasks
 
 **Server Design Principle**: Single-responsibility (0-3 tools per server) for composability.
 
@@ -451,7 +451,7 @@ AIWG makes specific, falsifiable claims backed by peer-reviewed research:
 | **SDLC phases** | ✓ Requirements → Code → Test | ✓ Full 4-phase RUP alignment |
 | **Human-in-the-loop** | ✓ Validation gates | ✓ Phase gates with explicit approval |
 | **Structured memory** | ✗ Context-based only | ✓ Persistent .aiwg/ artifacts |
-| **Closed-loop recovery** | ✗ Linear workflows | ✓ Ralph loop with failure analysis |
+| **Closed-loop recovery** | ✗ Linear workflows | ✓ Agent loop with failure analysis |
 | **Cross-platform deployment** | ✗ Single environment | ✓ Claude, Cursor, Copilot, etc. |
 | **Standards alignment** | ✗ Ad-hoc patterns | ✓ FAIR, OAIS, PROV, GRADE, MCP |
 | **Research framework** | ✗ Not addressed | ✓ Full research management lifecycle |
@@ -482,7 +482,7 @@ AIWG makes specific, falsifiable claims backed by peer-reviewed research:
 | **Memory across sessions** | None | Persistent .aiwg/ artifacts |
 | **Specialized agents** | General assistant | 53 role-specific agents |
 | **Quality gates** | Ad-hoc validation | Phase gates with explicit criteria |
-| **Recovery patterns** | Manual retry | Ralph loop with strategy adaptation |
+| **Recovery patterns** | Manual retry | Agent loop with strategy adaptation |
 | **Citation integrity** | Parametric (can hallucinate) | Retrieval-first (REF-XXX whitelist) |
 | **Standards alignment** | None | FAIR, OAIS, PROV, GRADE, MCP |
 | **Template library** | User-provided | Built-in SDLC/research templates |

@@ -54,7 +54,7 @@ framework: research-complete
 <!-- EXAMPLE:
 ReAct is critical for AIWG because it provides the foundational pattern for agent reasoning loops (Thought→Action→Observation). This directly impacts:
 - All SDLC agents that use tools (Read, Write, Bash, etc.)
-- Ralph loop implementation (iteration structure)
+- agent loop implementation (iteration structure)
 - Agent debugging and transparency
 
 Priority: HIGH - Core pattern used throughout framework
@@ -75,7 +75,7 @@ Priority: HIGH - Core pattern used throughout framework
 <!-- EXAMPLE:
 - Standardize all agents to use TAO loop (@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md)
 - Add thought protocol with 6 thought types (@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md)
-- Implement tool grounding in Ralph loop
+- Implement tool grounding in agent loop
 - Add TAO logging for agent debugging
 -->
 
@@ -93,7 +93,7 @@ Priority: HIGH - Core pattern used throughout framework
    > [Questions this paper leaves unanswered that we should investigate]
 
 <!-- EXAMPLE:
-- How does ReAct scale to long-running agent sessions? (Ralph loops run 10+ iterations)
+- How does ReAct scale to long-running agent sessions? (agent loops run 10+ iterations)
 - Can reasoning quality be measured automatically?
 - How do multiple agents coordinate with ReAct patterns?
 -->
@@ -207,7 +207,7 @@ How can we improve LLM reasoning on tasks requiring both internal knowledge and 
 <!-- EXAMPLE:
 - Task focus: QA and simple interactive tasks, not complex SDLC workflows
 - Single-agent: No multi-agent coordination patterns
-- Context length: Not tested on long-running sessions (Ralph loops run 10+ iterations)
+- Context length: Not tested on long-running sessions (agent loops run 10+ iterations)
 - Human oversight: Doesn't address HITL gate patterns
 -->
 

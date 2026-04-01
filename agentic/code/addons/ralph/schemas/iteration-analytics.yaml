@@ -272,7 +272,7 @@ loop_analytics:
 # Report template
 report_template:
   markdown: |
-    # Ralph Loop Analytics: {loop_id}
+    # Agent Loop Analytics: {loop_id}
 
     **Task:** {task_description}
     **Duration:** {start_time} → {end_time}

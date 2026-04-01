@@ -258,7 +258,7 @@ Confidence: HIGH - Multiple replications, consistent findings across domains
 [Repeat structure from Path 1]
 
 <!-- EXAMPLE:
-**Path 2: Self-Refine → Best-Output-Selection → Ralph Loop**
+**Path 2: Self-Refine → Best-Output-Selection → Agent Loop**
 
 1. REF-015: Self-Refine (2023)
 2. AIWG Implementation: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/best-output-selection.md (2026)
@@ -270,7 +270,7 @@ AIWG applies: Track all iteration outputs, select highest quality
 
 Key Innovation: Instead of accepting final iteration, Ralph preserves all outputs and selects best.
 
-AIWG Dependency: HIGH - Ralph loop success depends on non-monotonic quality handling.
+AIWG Dependency: HIGH - Agent loop success depends on non-monotonic quality handling.
 Confidence: HIGH - Self-Refine provided clear quantitative evidence.
 -->
 
@@ -435,7 +435,7 @@ CoT → ReAct → AIWG TAO Loop
 
 **Path 2 (High Priority):**
 Self-Refine → AIWG Best-Output-Selection
-- **Criticality:** HIGH - Ralph loop quality optimization
+- **Criticality:** HIGH - Agent loop quality optimization
 - **Confidence:** HIGH - Clear quantitative evidence
 
 **Path 3 (High Priority):**
@@ -464,7 +464,7 @@ Implication: AIWG's TAO loop approach is well-validated by community consensus.
 
 Evidence: Only 3 papers focus on iteration (Self-Refine, Agent Laboratory, AutoGen), yet all show significant gains.
 
-Implication: AIWG's Ralph loop is at frontier of research; should contribute findings back to community.
+Implication: AIWG's agent loop is at frontier of research; should contribute findings back to community.
 -->
 
 3. **Finding 3:** [Insight from network analysis]
@@ -541,7 +541,7 @@ Implication: Gap in multi-agent coordination + iterative refinement. AIWG combin
    - Real-world production data
 
 2. **Long-iteration agent loops**
-   - Ralph loops provide data on 10+ iteration performance
+   - Agent loops provide data on 10+ iteration performance
    - Can validate/extend Self-Refine findings
 
 3. **Tool failure handling**

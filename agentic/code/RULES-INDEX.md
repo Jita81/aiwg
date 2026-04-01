@@ -26,7 +26,7 @@ Combined context table across all components. Use to identify which component in
 | **Running tests** | sdlc-complete | executable-feedback, anti-laziness, reproducibility |
 | **Creating artifacts** | sdlc-complete | mention-wiring, provenance-tracking, qualified-references, artifact-discovery |
 | **Phase transitions** | sdlc-complete | hitl-gates, sdlc-orchestration, human-gate-display |
-| **Ralph loops** | sdlc-complete | tao-loop, actionable-feedback, best-output-selection |
+| **Agent loops** | sdlc-complete | tao-loop, actionable-feedback, best-output-selection |
 | **Agent design** | sdlc-complete | few-shot-examples, conversable-agent-interface, agent-fallback |
 | **Documentation** | sdlc-complete | citation-policy, reasoning-sections, research-metadata |
 | **Security review** | sdlc-complete | token-security, failure-mitigation |

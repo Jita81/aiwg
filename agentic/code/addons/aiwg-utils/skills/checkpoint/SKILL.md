@@ -63,10 +63,10 @@ When triggered:
    |---|---|---|
    | **Purpose** | Crash recovery | Reproducibility |
    | **Size** | Small (phase + step + artifact refs) | Full (versions + checksums) |
-   | **Created by** | Manual or Ralph loop (auto) | Manual only |
+   | **Created by** | Manual or agent loop (auto) | Manual only |
    | **Use for** | Resume interrupted run | Replay from known state |
 
-4. **Automatic creation**: Ralph loops create checkpoints automatically between iterations. Manual `create` supplements this for critical workflow milestones.
+4. **Automatic creation**: Agent loops create checkpoints automatically between iterations. Manual `create` supplements this for critical workflow milestones.
 
 5. **Storage**: Checkpoints are stored in `.aiwg/checkpoints/` as lightweight JSON files.
 

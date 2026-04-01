@@ -467,7 +467,7 @@ When avoidance is detected, initiate structured recovery:
 
 ## Integration Patterns
 
-### With Ralph Loops
+### With Agent Loops
 
 **Iteration Boundary Checks**:
 
@@ -492,7 +492,7 @@ ralph_integration:
 **Example Ralph Integration**:
 
 ```bash
-# Ralph loop with anti-laziness enforcement
+# Agent loop with anti-laziness enforcement
 ralph "Fix authentication bug" --completion "tests pass" <<'EOF'
 {
   "max_iterations": 10,

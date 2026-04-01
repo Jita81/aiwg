@@ -268,7 +268,7 @@ Based on evaluation scores: Select Option A
 If gate fails, return to Step 1 with new constraints
 ```
 
-### Ralph Loop Connection
+### Agent Loop Connection
 
 ToT's deliberate search complements Ralph's iterative execution:
 

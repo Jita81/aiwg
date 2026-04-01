@@ -523,7 +523,7 @@ aiwg rlm-batch --tasks batch-config.yaml
 aiwg rlm-status --tree
 ```
 
-### With Ralph Loops
+### With Agent Loops
 
 ```bash
 # Ralph can use RLM for sub-tasks

@@ -14,7 +14,7 @@ Sureshkumar, V., et al. (2026). R-LAM: Towards Reproducibility in Large Action M
 | Year | 2026 |
 | Type | Research Paper (Agentic AI) |
 | Focus | Reproducibility in LLM agent workflows |
-| AIWG Relevance | **Critical** - Directly informs Ralph loop design, provenance tracking, and workflow reproducibility |
+| AIWG Relevance | **Critical** - Directly informs agent loop design, provenance tracking, and workflow reproducibility |
 
 ## Executive Summary
 
@@ -24,7 +24,7 @@ R-LAM addresses the reproducibility crisis in Large Action Model workflows by in
 
 > "Without explicit reproducibility constraints, LAM workflows exhibit significant variance across runs, making debugging, auditing, and scientific validation nearly impossible."
 
-**AIWG Implication**: AIWG's Ralph loops and agent workflows must incorporate R-LAM's five components or face the same reproducibility challenges.
+**AIWG Implication**: AIWG's agent loops and agent workflows must incorporate R-LAM's five components or face the same reproducibility challenges.
 
 ---
 
@@ -80,7 +80,7 @@ Support for checkpoints, branching, comparison, and merge of execution paths.
 | **Debug time (median)** | 45 min | 14 min |
 | **Audit completeness** | 34% | 100% |
 
-**AIWG Implication**: Without provenance tracking, nearly half of Ralph loops may produce different results on re-run.
+**AIWG Implication**: Without provenance tracking, nearly half of agent loops may produce different results on re-run.
 
 ### 2. Acceptable Overhead
 
@@ -103,16 +103,16 @@ Support for checkpoints, branching, comparison, and merge of execution paths.
 | **Action Schemas** | Command/skill definitions with explicit inputs/outputs/tools | Each command declares what it needs and produces |
 | **Determinism Modes** | Agent configuration (`temperature: 0` for strict; logging for exploratory) | Different modes for different use cases |
 | **Provenance Tracking** | `.aiwg/research/provenance/` directory with PROV-compliant records | Complete audit trail of all research operations |
-| **Failure Handling** | Ralph loop recovery patterns; checkpoint/resume capability | Graceful handling of failures without losing progress |
+| **Failure Handling** | Agent loop recovery patterns; checkpoint/resume capability | Graceful handling of failures without losing progress |
 | **Workflow Forking** | Git branching for experiment variations; checkpoint files for Ralph | Multiple execution paths can be compared |
 
 ---
 
 ## Specific AIWG Design Decisions Informed by R-LAM
 
-### 1. Ralph Loop Checkpointing
+### 1. Agent Loop Checkpointing
 
-**Decision**: Ralph loops save state after each successful iteration to `.aiwg/ralph/checkpoints/`.
+**Decision**: Agent loops save state after each successful iteration to `.aiwg/ralph/checkpoints/`.
 
 **R-LAM Justification**: Workflow Forking component. If a loop fails or is interrupted, it can resume from the last checkpoint rather than starting over.
 

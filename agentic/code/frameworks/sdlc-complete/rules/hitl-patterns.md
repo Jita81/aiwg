@@ -1,7 +1,7 @@
 # Human-in-the-Loop (HITL) Patterns Rules
 
 **Enforcement Level**: MEDIUM
-**Scope**: Agent workflows, Ralph loops, artifact reviews
+**Scope**: Agent workflows, agent loops, artifact reviews
 **Research Basis**: REF-057 Agent Laboratory
 **Issues**: #199, #200
 
@@ -31,7 +31,7 @@ From REF-057 Agent Laboratory (Schmidgall et al., 2024):
 
 ### Gate Display Format
 
-**REQUIRED** gate display in Ralph loops:
+**REQUIRED** gate display in agent loops:
 
 ```
 ================================================================================
@@ -389,7 +389,7 @@ gates:
 
 ## Integration with Ralph
 
-### External Ralph Loop
+### External Agent Loop
 
 ```bash
 # Ralph with HITL gates

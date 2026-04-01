@@ -7,7 +7,7 @@
 
 ## Overview
 
-This document describes how the RLM (Recursive Language Models) addon integrates with Ralph loops as a processing strategy for long-context tasks. Ralph provides the outer TAO (Thought→Action→Observation) iteration loop, while RLM handles recursive decomposition of large-context tasks into manageable sub-problems.
+This document describes how the RLM (Recursive Language Models) addon integrates with agent loops as a processing strategy for long-context tasks. Ralph provides the outer TAO (Thought→Action→Observation) iteration loop, while RLM handles recursive decomposition of large-context tasks into manageable sub-problems.
 
 ## Quick Reference
 
@@ -250,7 +250,7 @@ $ ralph "Analyze security of all 500 source files" --completion "report ready"
 → Auto-activating RLM strategy for optimal performance
 → Override with --no-rlm if you prefer standard processing
 
-[Ralph loop begins with RLM agent]
+[Agent loop begins with RLM agent]
 ```
 
 **Suggestion (0.5 ≤ confidence < 0.8)**:
@@ -299,7 +299,7 @@ ralph_checkpoint:
         snapshot_path: ".aiwg/rlm/checkpoints/ckpt-a1b2c3d4.json"
 ```
 
-### On Ralph Loop Crash
+### On Agent Loop Crash
 
 Ralph's crash recovery protocol with RLM:
 
@@ -720,7 +720,7 @@ completion: "report saved" → MATCHES
 User Task
     ↓
 ┌───────────────────┐
-│  Ralph Loop       │
+│  Agent Loop       │
 │                   │
 │  Iteration 1-N:   │
 │  - Think          │
@@ -762,7 +762,7 @@ Output
 User Task
     ↓
 ┌──────────────────────────────────────────────────────────┐
-│  Ralph Loop (Outer)                                      │
+│  Agent Loop (Outer)                                      │
 │                                                          │
 │  Iteration 1:                                            │
 │  - Thought: "This needs RLM strategy"                    │
@@ -997,7 +997,7 @@ ralph "task" --strategy rlm --completion "Final set AND output exists"
 - @$AIWG_ROOT/agentic/code/addons/rlm/agents/rlm-agent.md - RLM agent definition
 - @$AIWG_ROOT/agentic/code/addons/rlm/schemas/rlm-task-tree.yaml - Task tree structure
 - @$AIWG_ROOT/agentic/code/addons/rlm/schemas/rlm-state.yaml - State management
-- @$AIWG_ROOT/agentic/code/addons/ralph/agents/ralph-loop.md - Ralph loop implementation
+- @$AIWG_ROOT/agentic/code/addons/ralph/agents/ralph-loop.md - Agent loop implementation
 - @.aiwg/research/findings/REF-089-recursive-language-models.md - Research foundation
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md - TAO loop standardization
 - @$AIWG_ROOT/tools/daemon/agent-supervisor.mjs - Task routing

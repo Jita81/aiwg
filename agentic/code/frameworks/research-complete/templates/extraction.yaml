@@ -371,7 +371,7 @@ synthesis:
     - "[Unanswered question 1]"
     - "[Unanswered question 2]"
     # EXAMPLE:
-    # - "How does TAO loop scale to 10+ iteration sessions (Ralph loops)?"
+    # - "How does TAO loop scale to 10+ iteration sessions (agent loops)?"
     # - "Can reasoning quality be measured automatically?"
     # - "How do multiple agents coordinate with ReAct patterns?"
 

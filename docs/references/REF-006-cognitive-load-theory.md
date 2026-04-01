@@ -177,7 +177,7 @@ Both reach same answer; means-ends requires 67% more cycles and 4x more producti
 | **Worked Example Effect** | Extensive template library providing scaffolded structures rather than blank documents; SDLC framework provides 50+ worked example templates |
 | **Split-Attention Effect** | Integrated documentation keeping context together; single-file agent definitions with capabilities, tools, and examples co-located; @-mention system for inline cross-references |
 | **Redundancy Effect** | Agent personas avoid redundant explanations; templates include only essential sections; phase gate checklists focus on must-have criteria |
-| **Goal-Free Effect** | Ralph loop uses completion criteria (state-based) rather than procedural goals; agents given exploration permission before converging on solution |
+| **Goal-Free Effect** | Agent loop uses completion criteria (state-based) rather than procedural goals; agents given exploration permission before converging on solution |
 | **Modality Principle** | Multi-format documentation (markdown, diagrams, code examples); visual workflow diagrams complement textual descriptions |
 | **Element Interactivity** | Complex SDLC decomposed into phases (Inception→Elaboration→Construction→Transition→Production); each phase has isolated concerns |
 | **Expertise Reversal** | Multi-tier documentation: Quick Start (novices) → Developer Guide (intermediates) → Reference (experts); progressive disclosure of complexity |
@@ -217,7 +217,7 @@ Both reach same answer; means-ends requires 67% more cycles and 4x more producti
 - Hierarchical grouping prevents cognitive overload from long flat lists
 - Example: Test Strategy template has 6 top-level sections, each with ≤7 subsections
 
-**7. Ralph Loop Design**:
+**7. Agent Loop Design**:
 - **Completion criteria** (state: "npm test passes") rather than procedural goals (steps: "fix Test 1, then Test 2...")
 - Reduces cognitive load by eliminating need for subgoal management
 - Allows agent to explore solution space without means-ends analysis overhead

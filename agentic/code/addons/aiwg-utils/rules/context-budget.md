@@ -130,9 +130,9 @@ These rules operate at the prompt/convention level. There is no runtime system t
 
 This rule extends `@$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md` Rule 7 (Context Budget Estimation). When `AIWG_CONTEXT_WINDOW` is set, the context budget formula uses the declared value instead of assuming a default window size.
 
-### With Ralph Loops
+### With Agent Loops
 
-Ralph loops that spawn parallel subagents (e.g., via `rlm-batch` or `parallel-dispatch`) should batch subagent waves according to the context budget table. A Ralph loop on a 100k system should run 2-3 subagents per wave, not 10.
+Agent loops that spawn parallel subagents (e.g., via `rlm-batch` or `parallel-dispatch`) should batch subagent waves according to the context budget table. An agent loop on a 100k system should run 2-3 subagents per wave, not 10.
 
 ### With Orchestrator Fan-Out
 

@@ -60,7 +60,7 @@ properties:
         description: "Associated task ID"
       ralph_iteration:
         type: integer
-        description: "Ralph loop iteration if applicable"
+        description: "Agent loop iteration if applicable"
 
 $defs:
   Execution:

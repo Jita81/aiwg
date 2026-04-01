@@ -1,5 +1,5 @@
 ---
-description: Check status of current or previous Ralph loop
+description: Check status of current or previous agent loop
 commandHint:
   argumentHint: [--verbose] [--latest] [--all --interactive --guidance "text"]
   allowedTools: Read, Glob, Bash
@@ -9,7 +9,7 @@ commandHint:
 
 # Ralph Status
 
-Check the status of Ralph loops.
+Check the status of agent loops.
 
 ## Usage
 
@@ -29,7 +29,7 @@ Check the status of Ralph loops.
 
 **If active loop exists**:
 ```
-Ralph Loop: ACTIVE
+Agent Loop: ACTIVE
 
 Task: {task}
 Completion: {completion}
@@ -46,7 +46,7 @@ Use /ralph-resume to continue or /ralph-abort to stop.
 
 **If no active loop**:
 ```
-No active Ralph loop.
+No active agent loop.
 
 Use /ralph "task" --completion "criteria" to start one.
 ```
@@ -56,7 +56,7 @@ Use /ralph "task" --completion "criteria" to start one.
 Include full iteration history:
 
 ```
-Ralph Loop: ACTIVE
+Agent Loop: ACTIVE
 
 Task: {task}
 Completion: {completion}
@@ -82,7 +82,7 @@ Read and display most recent completion report:
 List all completion reports:
 
 ```
-Ralph Loop History
+Agent Loop History
 
 | Date | Task | Status | Iterations |
 |------|------|--------|------------|

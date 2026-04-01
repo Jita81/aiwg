@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * Ralph Loop Hook
+ * Agent Loop Hook
  *
- * Manages Ralph loop state and provides iteration tracking.
+ * Manages Agent loop state and provides iteration tracking.
  * This hook captures loop state changes for observability and resume support.
  *
  * The actual re-injection logic is handled by the ralph-loop agent/command,
@@ -78,7 +78,7 @@ function writeLoopState(state) {
 }
 
 /**
- * Initialize a new Ralph loop
+ * Initialize a new Agent loop
  */
 function initializeLoop(config) {
   const state = {
@@ -119,7 +119,7 @@ function initializeLoop(config) {
 function recordIteration(iteration) {
   const state = readLoopState();
   if (!state) {
-    throw new Error('No active Ralph loop');
+    throw new Error('No active Agent loop');
   }
 
   state.currentIteration++;
@@ -180,7 +180,7 @@ function shouldContinue() {
 function completeLoop(result) {
   const state = readLoopState();
   if (!state) {
-    throw new Error('No active Ralph loop');
+    throw new Error('No active Agent loop');
   }
 
   state.active = false;
@@ -218,7 +218,7 @@ function generateCompletionReport(state) {
     `| ${i.number} | ${i.action.slice(0, 40)} | ${i.verified ? 'PASS' : 'FAIL'} | ${i.learnings?.slice(0, 30) || '-'} |`
   ).join('\n');
 
-  const report = `# Ralph Loop Completion Report
+  const report = `# Agent Loop Completion Report
 
 **Generated**: ${new Date().toISOString()}
 
@@ -358,14 +358,14 @@ async function main() {
       if (state) {
         console.log(JSON.stringify(state, null, 2));
       } else {
-        console.log('{"active": false, "message": "No active Ralph loop"}');
+        console.log('{"active": false, "message": "No active Agent loop"}');
         process.exit(1);
       }
       break;
 
     default:
       console.error(`
-Ralph Loop Hook
+Agent Loop Hook
 
 Usage:
   ralph-loop.js init "<task>" "<completion>" [maxIterations] [timeoutMinutes]

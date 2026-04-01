@@ -149,7 +149,7 @@ const report = tracker.generateSelectionReport(selection);
 
 ## Integration Points
 
-### With Ralph Loop
+### With Agent Loop
 - Call `recordIteration()` after each external iteration
 - Use `detectDiminishingReturns()` for early stopping
 - Call `selectOutput()` on loop completion

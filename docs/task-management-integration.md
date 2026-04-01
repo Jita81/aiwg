@@ -341,11 +341,11 @@ Agent updates tasks:
 User notification: "Construction phase unblocked. Ready to implement."
 ```
 
-## Ralph Loop Integration
+## Agent Loop Integration
 
-### Task Status Mirrors Ralph Iteration State
+### Task Status Mirrors Agent Iteration State
 
-**Ralph loop structure:**
+**Agent loop structure:**
 
 ```typescript
 interface RalphLoopState {
@@ -393,7 +393,7 @@ function mapStatus(ralphStatus: string): TaskStatus {
 ```bash
 $ aiwg ralph "Fix all failing tests" --completion "npm test passes"
 
-Ralph Loop Started
+Agent Loop Started
 Loop ID: ralph-001
 Task: Fix all failing tests
 
@@ -414,7 +414,7 @@ Loop completed in 5 iterations
 ```bash
 $ aiwg ralph "Fix all failing tests" --completion "npm test passes"
 
-Ralph Loop Started
+Agent Loop Started
 Loop ID: ralph-001
 Task created: "Fix all failing tests"
 
@@ -463,9 +463,9 @@ Task marked complete
 }
 ```
 
-### Ralph Loop as Subtask
+### Agent Loop as Subtask
 
-Ralph loops can create subtasks for granular progress:
+Agent loops can create subtasks for granular progress:
 
 ```typescript
 // Main task: "Fix all tests"
@@ -607,7 +607,7 @@ Check status: aiwg status
 - Completion validation
 - Phase transitions
 - Deliverable dependencies
-- Ralph loop execution
+- Agent loop execution
 
 ## Example: Phase Transition With and Without Tasks
 

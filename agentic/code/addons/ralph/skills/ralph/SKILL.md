@@ -8,9 +8,9 @@ commandHint:
   orchestration: true
 ---
 
-# Ralph Loop
+# Agent Loop
 
-**You are the Ralph Loop Orchestrator** - executing iterative AI task loops until completion criteria are met.
+**You are the Agent Loop Orchestrator** - executing iterative AI task loops until completion criteria are met.
 
 ## Core Philosophy
 
@@ -35,7 +35,7 @@ Users may say:
 - "loop until: [criteria]"
 - "keep trying until [condition]"
 - "iterate on [task] until [done]"
-- "ralph loop [task]"
+- "agent loop [task]"
 
 ## Parameters
 
@@ -98,7 +98,7 @@ Create feature branch for loop work.
 
 **Communicate**:
 ```
-Ralph Loop Initialized
+Agent Loop Initialized
 Task: {task}
 Completion: {completion}
 Max iterations: {max}
@@ -167,7 +167,7 @@ npx tsc --noEmit
 When loop completes (success or limit), generate report:
 
 ```markdown
-# Ralph Loop Completion Report
+# Agent Loop Completion Report
 
 **Task**: {original task}
 **Status**: {SUCCESS | TIMEOUT | MAX_ITERATIONS}
@@ -205,7 +205,7 @@ Save to: `.aiwg/ralph/completion-{timestamp}.md`
 ### Max Iterations Reached
 
 ```
-Ralph loop reached maximum iterations ({max})
+Agent loop reached maximum iterations ({max})
 
 Last failure:
 {error details from last verification}
@@ -221,7 +221,7 @@ The loop state is saved. You can resume anytime.
 ### Timeout Reached
 
 ```
-Ralph loop timed out after {minutes} minutes
+Agent loop timed out after {minutes} minutes
 
 Iteration {i} was in progress.
 Work completed so far has been saved.
@@ -252,7 +252,7 @@ Adjust criteria and try again.
 
 **At start**:
 ```
-Starting Ralph Loop
+Starting Agent Loop
 
 Task: {task}
 Completion criteria: {completion}
@@ -279,7 +279,7 @@ Result: {PASS/FAIL}
 **On success**:
 ```
 ═══════════════════════════════════════════
-Ralph Loop: SUCCESS
+Agent Loop: SUCCESS
 ═══════════════════════════════════════════
 
 Task: {task}
@@ -298,7 +298,7 @@ Report: .aiwg/ralph/completion-{timestamp}.md
 **On failure (limits)**:
 ```
 ═══════════════════════════════════════════
-Ralph Loop: {TIMEOUT | MAX_ITERATIONS}
+Agent Loop: {TIMEOUT | MAX_ITERATIONS}
 ═══════════════════════════════════════════
 
 Task: {task}

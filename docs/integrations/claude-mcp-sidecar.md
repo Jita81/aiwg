@@ -105,13 +105,13 @@ aiwg sdlc-accelerate "E-commerce platform" --provider claude --dangerous
 
 Claude Code runs with full filesystem access and can call AIWG MCP tools for structured artifact management.
 
-### Ralph Loop with Sidecar
+### Agent Loop with Sidecar
 
 ```bash
 aiwg ralph "Fix all auth tests" --completion "npm test passes" --provider claude --dangerous
 ```
 
-The Ralph loop agent can use `artifact-read` to check existing requirements and `artifact-write` to update test documentation alongside its direct file edits.
+The agent loop agent can use `artifact-read` to check existing requirements and `artifact-write` to update test documentation alongside its direct file edits.
 
 ### Artifact-Driven Workflow
 

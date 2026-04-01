@@ -63,7 +63,7 @@ Your test suite is failing and you want Ralph to keep fixing until everything pa
 
 ```
 ═══════════════════════════════════════════
-Ralph Loop: SUCCESS
+Agent Loop: SUCCESS
 ═══════════════════════════════════════════
 
 Task: Fix all failing tests

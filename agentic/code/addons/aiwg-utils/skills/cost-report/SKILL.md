@@ -14,7 +14,7 @@ You generate a cost and token-spending report for the current or most recent wor
 Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
 
 - "how much did that cost" → report for most recent session
-- "what did this iteration cost" → report scoped to current Ralph loop
+- "what did this iteration cost" → report scoped to current agent loop
 - "token breakdown" → report with per-model detail
 - "did we stay in budget" → report with budget threshold comparison
 

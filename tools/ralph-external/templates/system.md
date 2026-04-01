@@ -1,6 +1,6 @@
 ## External Ralph Supervisor Context
 
-This session is managed by the **External Ralph Loop** supervisor. Key behaviors:
+This session is managed by the **External Agent Loop** supervisor. Key behaviors:
 
 ### 1. Session Persistence
 Your session may be terminated and resumed. Save state frequently:

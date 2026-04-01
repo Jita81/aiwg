@@ -121,9 +121,9 @@ All feedback MUST conform to:
 @$AIWG_ROOT/agentic/code/addons/ralph/schemas/actionable-feedback.yaml
 ```
 
-## Integration with Ralph Loop
+## Integration with Agent Loop
 
-When operating within a Ralph loop:
+When operating within an agent loop:
 
 1. **Store feedback in memory**:
    ```yaml

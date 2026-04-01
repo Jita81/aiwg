@@ -35,7 +35,7 @@ These terms describe AIWG's fundamental cognitive architecture for AI-augmented 
 | Extended memory | Persistent Knowledge Store | Lewis et al. (2020) RAG REF-008 |
 | `.aiwg/` directory | Artifact Repository | Software Engineering, Configuration Management |
 | Multi-agent review | Ensemble Validation | Jacobs et al. (1991) Mixture of Experts REF-007 |
-| Ralph loop | Closed-Loop Self-Correction | Control Theory, Roig (2025) REF-002 |
+| Agent loop | Closed-Loop Self-Correction | Control Theory, Roig (2025) REF-002 |
 | Doc-code validation | Dual-Representation Consistency | Formal Verification Methods |
 | 7±2 decomposition | Cognitive Load Optimization | Miller (1956) REF-005, Sweller (1988) REF-006 |
 | Voice profiles | Continuous Style Representation | Neural Style Transfer Literature |
@@ -265,7 +265,7 @@ AIWG exposes functionality via MCP (Model Context Protocol), a Linux Foundation 
 
 | Term | Professional | Citation |
 |------|--------------|----------|
-| Ralph loop | Closed-Loop Self-Correction | REF-015 Madaan et al., REF-002 Roig |
+| Agent loop | Closed-Loop Self-Correction | REF-015 Madaan et al., REF-002 Roig |
 | Recovery-first design | Fault-Tolerant Systems | REF-002 Roig |
 | Workflow consistency | Reproducibility Constraints | REF-058 R-LAM |
 

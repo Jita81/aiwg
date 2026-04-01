@@ -1,4 +1,4 @@
-# External Ralph Loop - Continuation (Iteration {{iteration}}/{{maxIterations}})
+# External Agent Loop - Continuation (Iteration {{iteration}}/{{maxIterations}})
 
 ## Task Objective
 {{objective}}

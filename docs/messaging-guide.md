@@ -182,7 +182,7 @@ All platforms support the same command set. Prefix commands with `/` in chat:
 |---------|-----------|-------------|
 | `/help` | read | List available commands |
 | `/status` | read | Show project status and daemon health |
-| `/ralph-status` | read | Show active Ralph loop status |
+| `/ralph-status` | read | Show active agent loop status |
 | `/health` | read | Run health check on all subsystems |
 | `/ask <question>` | read | Ask the AI a question about your project |
 | `/approve <gate-id>` | write | Approve a pending HITL gate |
@@ -290,7 +290,7 @@ The messaging system forwards events from the internal event bus to all connecte
 
 | Category | Topics | Description |
 |----------|--------|-------------|
-| **Ralph** | `ralph.started`, `ralph.iteration`, `ralph.completed`, `ralph.failed`, `ralph.aborted` | Ralph loop lifecycle events |
+| **Ralph** | `ralph.started`, `ralph.iteration`, `ralph.completed`, `ralph.failed`, `ralph.aborted` | Agent loop lifecycle events |
 | **HITL Gates** | `gate.pending`, `gate.approved`, `gate.rejected`, `gate.timeout` | Human-in-the-loop gate events |
 | **Security** | `security.critical`, `security.warning`, `security.scan_done` | Security scan results |
 | **Health** | `health.check`, `health.degraded`, `health.recovered` | System health transitions |
@@ -463,7 +463,7 @@ If a platform rate-limits the bot, errors appear in daemon logs. The adapters ha
 ## Cross-References
 
 - [Daemon Guide](daemon-guide.md) — Daemon setup and management
-- [Ralph Guide](ralph-guide.md) — Ralph loops with messaging notifications
+- [Ralph Guide](ralph-guide.md) — Agent loops with messaging notifications
 - `.aiwg/architecture/adrs/ADR-messaging-bot-mode.md` — Architecture decision
 - `.aiwg/architecture/adrs/ADR-2way-chat.md` — Chat architecture
 - `tools/messaging/README.md` — Developer documentation

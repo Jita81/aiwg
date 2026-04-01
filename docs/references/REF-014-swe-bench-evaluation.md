@@ -319,7 +319,7 @@ SWE-bench empirically demonstrates that raw LLMs fail at real-world coding tasks
 | **Multi-file reasoning** | Multi-agent specialization (Test Engineer, API Designer) | Median 1.7 files edited; single-function view insufficient |
 | **Tool use** | Bash, Read, Write, search tools | Agentic scaffolding: 1.96% → 49% (25x improvement) |
 | **Test validation** | `/generate-tests`, test-driven workflows | 120.8 avg pass-to-pass tests; must maintain existing behavior |
-| **Iterative refinement** | Ralph loop, recovery patterns | Oracle-collapsed +23% performance; iteration helps |
+| **Iterative refinement** | Agent loop, recovery patterns | Oracle-collapsed +23% performance; iteration helps |
 | **Long context processing** | Context loading via @-mentions, retrieval | Performance degrades with context length; need smart loading |
 
 ### Specific AIWG Features That Address SWE-bench Challenges
@@ -365,7 +365,7 @@ SWE-bench empirically demonstrates that raw LLMs fail at real-world coding tasks
 
 **SWE-bench Evidence**: Agentic scaffolding improves performance 25x.
 
-#### 4. Ralph Loop for Iterative Refinement
+#### 4. Agent Loop for Iterative Refinement
 
 **Problem**: One-shot generation fails; models need feedback.
 
@@ -438,7 +438,7 @@ aiwg swebench analyze \
 **SWE-bench lesson**: Oracle-collapsed (focused context) improves performance 23%.
 
 **AIWG application**:
-- Ralph loop for multi-iteration refinement
+- Agent loop for multi-iteration refinement
 - Recovery patterns for failed attempts
 - Incremental improvement over perfect first try
 
@@ -500,7 +500,7 @@ aiwg swebench analyze \
 - **REF-012**: ChatDev multi-agent (alternative approach to software development)
 - **REF-013**: MetaGPT multi-agent (comparison of agent architectures)
 - **Generate Tests**: `.claude/commands/generate-tests.md` (test-driven workflow)
-- **Ralph Loop**: `docs/ralph-guide.md` (iterative refinement implementation)
+- **Agent Loop**: `docs/ralph-guide.md` (iterative refinement implementation)
 - **Code Archaeologist**: `.claude/agents/code-archaeologist.md` (localization agent)
 
 ### Related Research
@@ -604,7 +604,7 @@ aiwg swebench analyze \
 2. **Track performance by component**:
    - Code Archaeologist: Retrieval accuracy vs BM25
    - Test Engineer: F2P and P2P test pass rates
-   - Ralph loop: Improvement per iteration
+   - Agent loop: Improvement per iteration
 
 3. **Validate design decisions**:
    - Does `.aiwg/` structure improve retrieval?
@@ -620,7 +620,7 @@ aiwg swebench analyze \
 
 1. **Investigate retrieval improvements**: Can semantic search + BM25 hybrid beat oracle?
 2. **Explore agent architectures**: Which specializations matter most?
-3. **Optimize iteration strategies**: When to stop Ralph loop?
+3. **Optimize iteration strategies**: When to stop agent loop?
 4. **Study failure modes**: What patterns cause regressions?
 
 ## References

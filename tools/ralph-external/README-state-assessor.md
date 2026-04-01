@@ -1,6 +1,6 @@
 # State Assessor
 
-Two-phase assessment for External Ralph Loop sessions, enabling intelligent continuation after long-running sessions (6-8 hours) that exhaust context memory.
+Two-phase assessment for External Agent Loop sessions, enabling intelligent continuation after long-running sessions (6-8 hours) that exhaust context memory.
 
 ## Overview
 
@@ -9,7 +9,7 @@ The State Assessor implements a two-phase approach:
 1. **Orient Phase**: Understand what happened in the previous session
 2. **Prompt Phase**: Generate an intelligent continuation prompt
 
-This enables the External Ralph Loop to resume work with context awareness even when the previous session's conversation memory is unavailable.
+This enables the External Agent Loop to resume work with context awareness even when the previous session's conversation memory is unavailable.
 
 ## Architecture
 

@@ -1,6 +1,6 @@
 # Daemon Mode Guide
 
-AIWG daemon mode runs a persistent background process that monitors your project, executes automated tasks, and bridges messaging platforms. It extends the Ralph loop pattern into always-on project supervision.
+AIWG daemon mode runs a persistent background process that monitors your project, executes automated tasks, and bridges messaging platforms. It extends the agent loop pattern into always-on project supervision.
 
 ## Overview
 
@@ -124,7 +124,7 @@ Configuration is stored in `.aiwg/daemon.json`. Create this file in your project
 
 ## Headend Architecture
 
-The daemon acts as the headend supervisor for all External Ralph Loop lifecycles. A `DaemonSupervisor` component wraps the existing `AgentSupervisor`, adding process governance without breaking backward compatibility.
+The daemon acts as the headend supervisor for all External Agent Loop lifecycles. A `DaemonSupervisor` component wraps the existing `AgentSupervisor`, adding process governance without breaking backward compatibility.
 
 ### What DaemonSupervisor adds
 
@@ -243,7 +243,7 @@ When the daemon session opens, the concierge reads persisted memory and greets w
 
 ```
 Welcome back. The overnight security scan completed clean. Two automation rules are
-active — build-monitor and test-watcher — and the ralph loop from yesterday is still
+active — build-monitor and test-watcher — and the agent loop from yesterday is still
 queued.
 ```
 

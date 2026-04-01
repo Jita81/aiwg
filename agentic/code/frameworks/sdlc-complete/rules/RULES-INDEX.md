@@ -59,7 +59,7 @@ SDLC rules enforce workflow quality when the SDLC framework is deployed via `aiw
 
 #### actionable-feedback
 **Summary**: Structured, actionable feedback following Self-Refine principles. 94% of iteration failures stem from vague feedback. Every feedback item must include specific location, concrete action, and rationale.
-**When to apply**: Ralph loops, iteration feedback cycles, code review, improvement tracking
+**When to apply**: Agent loops, iteration feedback cycles, code review, improvement tracking
 **Full rule**: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/actionable-feedback.md
 
 #### mention-wiring
@@ -84,7 +84,7 @@ SDLC rules enforce workflow quality when the SDLC framework is deployed via `aiw
 
 #### tao-loop
 **Summary**: Standardizes Thought > Action > Observation loop across all iterative execution. ReAct pattern improves performance 34% and reduces hallucinations to 0% with tool grounding. Complete triplets required.
-**When to apply**: Iterative agent execution, Ralph loops, tool-using agents, reasoning traces
+**When to apply**: Iterative agent execution, agent loops, tool-using agents, reasoning traces
 **Full rule**: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md
 
 #### reproducibility-validation
@@ -121,7 +121,7 @@ SDLC rules enforce workflow quality when the SDLC framework is deployed via `aiw
 
 #### hitl-patterns
 **Summary**: Human-in-the-loop patterns for agent-human collaboration including draft-then-edit workflow. Clear handoff points reduce errors; iterative refinement produces higher quality output.
-**When to apply**: Ralph loops, draft review cycles, feedback incorporation, artifact finalization
+**When to apply**: Agent loops, draft review cycles, feedback incorporation, artifact finalization
 **Full rule**: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/hitl-patterns.md
 
 #### human-gate-display
@@ -146,7 +146,7 @@ SDLC rules enforce workflow quality when the SDLC framework is deployed via `aiw
 
 #### best-output-selection
 **Summary**: Non-monotonic output selection — track highest quality across iterations rather than accepting final result. Quality often peaks early then degrades. Select best, not last.
-**When to apply**: Ralph loops, iteration completion, quality scoring, degradation detection
+**When to apply**: Agent loops, iteration completion, quality scoring, degradation detection
 **Full rule**: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/best-output-selection.md
 
 #### reproducibility
@@ -221,7 +221,7 @@ Rules contributed by installed addons. Load the component index for full rule su
 | **Running tests** | executable-feedback, anti-laziness, reproducibility, reproducibility-validation |
 | **Creating artifacts** | mention-wiring, provenance-tracking, qualified-references, progressive-disclosure, artifact-discovery |
 | **Phase transitions** | hitl-gates, sdlc-orchestration, human-gate-display |
-| **Ralph loops** | tao-loop, actionable-feedback, best-output-selection, anti-laziness |
+| **Agent loops** | tao-loop, actionable-feedback, best-output-selection, anti-laziness |
 | **Agent design** | few-shot-examples, conversable-agent-interface, agent-fallback, thought-protocol |
 | **Documentation** | citation-policy, no-attribution, reasoning-sections, research-metadata |
 | **Security review** | token-security, failure-mitigation |

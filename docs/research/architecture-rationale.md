@@ -265,7 +265,7 @@ Roig's research on agentic AI failures provides additional justification for che
 
 ### The Decision
 
-AIWG implements **Ralph loops**---iterative task execution with explicit completion criteria, automatic failure detection, and strategy adaptation---rather than single-shot task execution.
+AIWG implements **agent loops**---iterative task execution with explicit completion criteria, automatic failure detection, and strategy adaptation---rather than single-shot task execution.
 
 ### Research Backing
 
@@ -289,7 +289,7 @@ Roig's central finding directly motivates closed-loop execution:
 
 #### REF-058: R-LAM Reproducibility (Sureshkumar et al., 2026)
 
-R-LAM provides the reproducibility framework that makes Ralph loops debuggable:
+R-LAM provides the reproducibility framework that makes agent loops debuggable:
 
 **Five Reproducibility Components**:
 1. **Structured Action Schemas**: I/O specifications for all operations
@@ -312,7 +312,7 @@ Agent Laboratory validates the draft-then-edit pattern that Ralph implements:
 
 **Pattern**: Agent Draft -> Human Review -> Human Edit -> Agent Polish -> Human Approve
 
-Ralph loops implement iteration between agent execution and validation (either automated or human), preventing single-shot failures from propagating.
+Agent loops implement iteration between agent execution and validation (either automated or human), preventing single-shot failures from propagating.
 
 ### Alternatives Considered
 
@@ -634,7 +634,7 @@ MCP has achieved rapid industry adoption:
 **MCP Tasks for Async Operations**:
 > "Tasks provide a new abstraction in MCP for tracking the work being performed by an MCP server." (MCP Specification, 2025)
 
-Ralph loops map naturally to MCP Tasks---long-running, stateful operations with progress tracking.
+Agent loops map naturally to MCP Tasks---long-running, stateful operations with progress tracking.
 
 ### Alternatives Considered
 

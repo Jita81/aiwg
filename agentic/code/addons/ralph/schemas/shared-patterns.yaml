@@ -7,7 +7,7 @@ $schema: "https://json-schema.org/draft/2020-12/schema"
 $id: "https://aiwg.io/schemas/ralph-shared-patterns/v1"
 title: "Ralph Shared Patterns Schema"
 description: |
-  Schema for shared learning patterns across multiple Ralph loops.
+  Schema for shared learning patterns across multiple agent loops.
   Enables cross-loop knowledge transfer through error patterns,
   success patterns, and anti-patterns based on MetaGPT's publish-subscribe
   pattern for shared state.

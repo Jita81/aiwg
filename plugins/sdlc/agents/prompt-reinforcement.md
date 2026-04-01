@@ -101,7 +101,7 @@ Deploy reinforcement at six strategic decision points:
 
 ### 1. Session Initialization
 
-**Trigger**: Ralph loop or workflow start
+**Trigger**: Agent loop or workflow start
 **Purpose**: Set correct mindset before task begins
 **Intensity**: MINIMAL to STANDARD
 
@@ -680,7 +680,7 @@ Track these metrics to validate reinforcement effectiveness:
 | Task success rate | >80% | Unknown | Ralph completion metrics |
 | Mean iterations to success | <4 | Unknown | Ralph iteration analytics |
 
-## Integration with Ralph Loop
+## Integration with Agent Loop
 
 ### Ralph Protocol Integration
 

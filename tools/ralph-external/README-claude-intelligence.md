@@ -175,7 +175,7 @@ If Claude invocation fails (timeout, API error, rate limit):
 ```javascript
 // Generator automatically falls back to template-based prompt
 const fallback = {
-  prompt: `# Continue External Ralph Loop
+  prompt: `# Continue External Agent Loop
 
 **Objective**: ${objective}
 **Completion Criteria**: ${completionCriteria}

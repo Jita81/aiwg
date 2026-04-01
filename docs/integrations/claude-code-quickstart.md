@@ -151,7 +151,7 @@ aiwg version
 
 ## Ralph Iterative Loops
 
-Ralph loops support multi-provider execution via `--provider`:
+Agent loops support multi-provider execution via `--provider`:
 
 ```bash
 aiwg ralph "Fix all tests" --completion "npm test passes"

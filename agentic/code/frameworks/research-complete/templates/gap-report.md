@@ -307,13 +307,13 @@ HIGH (not CRITICAL) because workaround functional but improvable.
 |-----------|-----------|------------------|
 | Orchestrator | X | [Features blocked by gaps] |
 | Agent X | X | [Features blocked by gaps] |
-| Ralph Loop | X | [Features blocked by gaps] |
+| Agent Loop | X | [Features blocked by gaps] |
 
 <!-- EXAMPLE:
 | Component | Gap Count | Blocked Features |
 | Orchestrator | 4 | Multi-agent conflict resolution, task decomposition optimization, parallel workflow management |
 | Requirements Analyst | 1 | Automated elicitation strategy |
-| Ralph Loop | 2 | Multi-loop coordination, quality-based early stopping |
+| Agent Loop | 2 | Multi-loop coordination, quality-based early stopping |
 | Test Engineer | 1 | Coverage optimization strategies |
 -->
 

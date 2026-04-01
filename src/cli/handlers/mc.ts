@@ -2,7 +2,7 @@
  * Mission Control Command Handler
  *
  * Multi-loop background orchestration dashboard. Lets an orchestrator
- * spawn multiple long-running Ralph loops, monitor all simultaneously,
+ * spawn multiple long-running agent loops, monitor all simultaneously,
  * and react to completions or failures without blocking the primary session.
  *
  * Subcommands: start, dispatch, status, watch, abort, pause, resume, stop, list

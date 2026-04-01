@@ -476,10 +476,10 @@ Caveats:
 <!-- EXAMPLE:
 **Gap 1:** Long-running agent sessions (10+ iterations)
 Paper tests: 3-5 TAO iterations per task
-AIWG needs: Ralph loops run 10+ iterations on complex tasks
+AIWG needs: agent loops run 10+ iterations on complex tasks
 Gap: Unknown if reasoning quality degrades, if observation grounding remains effective
 
-Action: Monitor Ralph loop quality metrics; conduct pilot study if degradation observed
+Action: Monitor agent loop quality metrics; conduct pilot study if degradation observed
 -->
 
 **Gap 2:** [Another AIWG-specific gap]
@@ -501,7 +501,7 @@ Action: Implement with monitoring; collect quality data from AIWG dogfooding
 1. IMPLEMENT: TAO loop structure in all tool-using agents (HIGH confidence)
 2. IMPLEMENT: Tool observation grounding for all factual claims (HIGH confidence)
 3. PILOT: Thought type taxonomy (MODERATE confidence; adapt based on AIWG needs)
-4. MONITOR: Quality in 10+ iteration Ralph loops (MODERATE confidence; watch for degradation)
+4. MONITOR: Quality in 10+ iteration agent loops (MODERATE confidence; watch for degradation)
 5. DEFER: Multi-agent TAO coordination (LOW confidence; needs separate research)
 -->
 
@@ -511,7 +511,7 @@ Action: Implement with monitoring; collect quality data from AIWG dogfooding
 Track these metrics to validate applicability:
 - Agent success rate on SDLC tasks (does TAO loop improve performance?)
 - Hallucination rate (does observation grounding reduce fabrications?)
-- Iteration efficiency (do longer Ralph loops maintain quality?)
+- Iteration efficiency (do longer agent loops maintain quality?)
 - Human escalation rate (are agents self-sufficient with TAO loop?)
 
 Revalidation trigger: If any metric degrades >20% from baseline, investigate and potentially revise approach.

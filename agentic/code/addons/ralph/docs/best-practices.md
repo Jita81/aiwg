@@ -1,4 +1,4 @@
-# Ralph Loop Best Practices
+# Agent Loop Best Practices
 
 Master iterative AI task execution with these guidelines.
 

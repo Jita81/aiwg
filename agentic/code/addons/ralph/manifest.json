@@ -1,7 +1,7 @@
 {
   "id": "ralph",
   "type": "addon",
-  "name": "Ralph Loop",
+  "name": "Agent Loop",
   "version": "1.0.0",
   "description": "Iterative AI coding loops with automatic recovery - iteration beats perfection",
   "core": false,

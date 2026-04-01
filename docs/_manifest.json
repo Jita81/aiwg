@@ -470,7 +470,7 @@
     },
     {
       "id": "ralph-guide",
-      "title": "Ralph Loop Guide",
+      "title": "Agent Loop Guide",
       "summary": "Iterative AI task execution with automatic recovery",
       "file": "ralph-guide.md",
       "parent": "reference"
@@ -1218,7 +1218,7 @@
     {
       "id": "addons/ralph/cross-loop-learning",
       "title": "Cross-Loop Learning",
-      "summary": "Pattern sharing and knowledge transfer across multiple Ralph loops.",
+      "summary": "Pattern sharing and knowledge transfer across multiple agent loops.",
       "file": "addons/ralph/cross-loop-learning.md",
       "parent": "addons/ralph"
     },

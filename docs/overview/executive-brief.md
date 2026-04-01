@@ -16,7 +16,7 @@ AIWG is a cognitive architecture for AI-augmented software development that prov
 
 **47% of AI workflows produce inconsistent results** without reproducibility constraints. AIWG implements workflow checkpointing, environment versioning, and execution provenance tracking to ensure repeatable outcomes. Every operation is logged, every decision is traceable, and every artifact can be reproduced from its source inputs.
 
-**Recovery capability—not initial correctness—predicts task success.** AIWG's Ralph loop system implements structured recovery protocols (PAUSE → DIAGNOSE → ADAPT → RETRY → ESCALATE) that achieve 80%+ recovery success rates. This resilience-first design means failures become learning opportunities rather than project blockers.
+**Recovery capability—not initial correctness—predicts task success.** AIWG's agent loop system implements structured recovery protocols (PAUSE → DIAGNOSE → ADAPT → RETRY → ESCALATE) that achieve 80%+ recovery success rates. This resilience-first design means failures become learning opportunities rather than project blockers.
 
 ### Auditability and Compliance
 
@@ -60,7 +60,7 @@ AIWG is a cognitive architecture for AI-augmented software development that prov
 
 **Simple tools fail silently.** When tests fail or requirements aren't met, you debug manually.
 
-**AIWG recovers automatically.** Ralph loops execute → verify → learn → iterate until completion criteria are met or iteration limits trigger escalation. Recovery capability—not initial correctness—is the dominant predictor of success.
+**AIWG recovers automatically.** Agent loops execute → verify → learn → iterate until completion criteria are met or iteration limits trigger escalation. Recovery capability—not initial correctness—is the dominant predictor of success.
 
 ### 4. Standards Alignment
 

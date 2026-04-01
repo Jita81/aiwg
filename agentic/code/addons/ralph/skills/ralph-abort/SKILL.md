@@ -1,5 +1,5 @@
 ---
-description: Abort a running Ralph loop and optionally revert changes
+description: Abort a running agent loop and optionally revert changes
 commandHint:
   argumentHint: [--keep-changes] [--revert] [--force --interactive --guidance "text"]
   allowedTools: Read, Write, Bash
@@ -9,7 +9,7 @@ commandHint:
 
 # Ralph Abort
 
-Abort a running or paused Ralph loop.
+Abort a running or paused agent loop.
 
 ## Usage
 
@@ -25,7 +25,7 @@ Abort a running or paused Ralph loop.
 Stop the loop but keep all file changes made during iterations.
 
 ### --revert
-Revert all changes made during the Ralph loop using git:
+Revert all changes made during the agent loop using git:
 - Identify commits made during loop (prefix: `ralph: iteration`)
 - Reset to commit before loop started
 - **Warning**: This discards work
@@ -45,7 +45,7 @@ Abort even if state indicates no active loop (for cleanup).
 
 **Output**:
 ```
-Ralph Loop: ABORTED
+Agent Loop: ABORTED
 
 Task: {task}
 Iterations completed: {N}
@@ -81,7 +81,7 @@ Type 'yes' to confirm revert:
 
 **After revert**:
 ```
-Ralph Loop: ABORTED + REVERTED
+Agent Loop: ABORTED + REVERTED
 
 Reverted {N} commits.
 Working directory restored to pre-loop state.
@@ -93,7 +93,7 @@ State cleaned: .aiwg/ralph/current-loop.json archived
 
 **No active loop**:
 ```
-No active Ralph loop to abort.
+No active agent loop to abort.
 
 Use --force to clean up stale state files if needed.
 ```

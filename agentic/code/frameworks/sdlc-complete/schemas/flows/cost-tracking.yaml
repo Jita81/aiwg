@@ -34,7 +34,7 @@ properties:
         description: "Current SDLC phase"
       iteration:
         type: integer
-        description: "Iteration number if Ralph loop"
+        description: "Iteration number if agent loop"
 
   started_at:
     type: string

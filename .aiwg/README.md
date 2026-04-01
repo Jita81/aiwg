@@ -37,7 +37,7 @@ This directory is **project-local extended memory** — it stores SDLC artifacts
 | `management/` | Strategic docs | Business case, vision, roadmap |
 | `config/` | Configuration | Plugin registry, system config |
 | `smiths/` | Agent tooling | AgentSmith, SkillSmith, CommandSmith definitions |
-| `ralph/` | Ralph Loop state | Iteration state, completion reports |
+| `ralph/` | Agent Loop state | Iteration state, completion reports |
 | `archive/` | Historical artifacts | Completed phases, deprecated content |
 | `transition/` | Release preparation | UAT framework, release checklist |
 
@@ -103,7 +103,7 @@ Run periodically:
 3. Update reports with release notes
 4. Verify traceability coverage
 
-### Ralph Loop Integration
+### Agent Loop Integration
 
 Ralph operations create:
 - `.aiwg/ralph/current-loop.json` - Active loop state

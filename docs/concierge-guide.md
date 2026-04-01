@@ -158,7 +158,7 @@ The Concierge incorporates relevant prior context into the session-start greetin
 **Example — returning session with context:**
 ```
 Welcome back. The overnight security scan completed clean. Two automation rules are
-active — build-monitor and test-watcher — and the ralph loop from yesterday is still
+active — build-monitor and test-watcher — and the agent loop from yesterday is still
 queued.
 ```
 

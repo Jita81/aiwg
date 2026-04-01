@@ -183,7 +183,7 @@ The implementation plan is:
 
 ### Thought Type Logging
 
-Ralph loops SHOULD log thought types for analysis:
+Agent loops SHOULD log thought types for analysis:
 
 ```yaml
 thought_log:

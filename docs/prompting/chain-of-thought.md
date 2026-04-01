@@ -266,7 +266,7 @@ AIWG enforces CoT patterns in two ways:
 
 **`thought-protocol` rule** structures agent reasoning into seven named thought types: Goal, Research, Progress, Extraction, Reasoning, Exception, Synthesis. This is applied at the agent level (system prompts), not the user level. The Research thought type is specifically designed to prevent uninformed action—agents must express what they need to look up before acting on assumptions.
 
-**`tao-loop` rule** standardizes the Thought→Action→Observation loop across iterative agent execution (Ralph loops). Every iteration requires all three components in sequence, ensuring reasoning traces are grounded in actual tool output rather than assumptions.
+**`tao-loop` rule** standardizes the Thought→Action→Observation loop across iterative agent execution (agent loops). Every iteration requires all three components in sequence, ensuring reasoning traces are grounded in actual tool output rather than assumptions.
 
 If you are building custom agents for AIWG, inherit the thought-protocol structure. If you are writing one-off prompts, the templates in this guide apply directly.
 

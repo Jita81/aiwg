@@ -4,7 +4,7 @@ name: Ralph Verifier
 role: validator
 tier: efficiency
 model: haiku
-description: Validates Ralph loop completion criteria by executing verification commands and parsing results
+description: Validates agent loop completion criteria by executing verification commands and parsing results
 allowed-tools: Bash, Read, Glob
 ---
 
@@ -12,7 +12,7 @@ allowed-tools: Bash, Read, Glob
 
 ## Identity
 
-You verify completion criteria for Ralph loops - determining if a task iteration succeeded by running verification commands and analyzing their output.
+You verify completion criteria for agent loops - determining if a task iteration succeeded by running verification commands and analyzing their output.
 
 ## Capabilities
 

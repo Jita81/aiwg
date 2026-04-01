@@ -72,7 +72,7 @@ You need to migrate code from one format to another (CommonJS to ESM, JavaScript
 
 ```
 ═══════════════════════════════════════════
-Ralph Loop: SUCCESS
+Agent Loop: SUCCESS
 ═══════════════════════════════════════════
 
 Task: Migrate src/lib/ from CommonJS to ESM

@@ -52,7 +52,7 @@ Summarize conversation history at these strategic points:
 - After resolving a complex debugging session
 
 **DO NOT summarize**:
-- In the middle of active iteration (Ralph loops)
+- In the middle of active iteration (agent loops)
 - While debugging an active issue
 - During rapid back-and-forth refinement
 - Before capturing artifacts (summarize AFTER writing to `.aiwg/`)
@@ -352,7 +352,7 @@ AIWG's `.aiwg/` directory provides **consistent state persistence across all pla
 .aiwg/
   ├── requirements/           # Requirements artifacts
   ├── architecture/           # Architecture docs
-  ├── ralph/                  # Ralph loop state
+  ├── ralph/                  # Agent loop state
   │   ├── current-loop.json
   │   └── iteration-001/
   └── planning/               # Phase tracking
@@ -368,7 +368,7 @@ AIWG's `.aiwg/` directory provides **consistent state persistence across all pla
 - All artifacts in `.aiwg/`
 - Git commits and history
 - Phase progression state
-- Ralph loop checkpoints
+- Agent loop checkpoints
 
 ### Cross-Platform Best Practices
 
@@ -587,7 +587,7 @@ claude --add-dir ~/.aiwg-global
 
 - @.aiwg/ - AIWG state directory structure
 - @docs/cli-reference.md - CLI commands and flags
-- @docs/ralph-guide.md - Ralph loop persistence patterns
+- @docs/ralph-guide.md - Agent loop persistence patterns
 - @CLAUDE.md - Multi-platform instructions
 - @agentic/code/frameworks/sdlc-complete/docs/orchestrator-architecture.md - Phase progression
 

@@ -1,6 +1,6 @@
 # Cross-Loop Learning Guide
 
-Pattern sharing and knowledge transfer across multiple Ralph loops.
+Pattern sharing and knowledge transfer across multiple agent loops.
 
 **Research Foundation**: REF-013 MetaGPT - 159% improvement with shared state
 
@@ -10,7 +10,7 @@ Pattern sharing and knowledge transfer across multiple Ralph loops.
 
 ## Overview
 
-Cross-loop learning enables Ralph loops to learn from each other by sharing patterns discovered during task execution. When a loop encounters an error and finds a successful fix, that error→fix pattern is stored in a shared registry. Future loops encountering similar errors can automatically apply proven fixes, dramatically reducing iteration counts.
+Cross-loop learning enables agent loops to learn from each other by sharing patterns discovered during task execution. When a loop encounters an error and finds a successful fix, that error→fix pattern is stored in a shared registry. Future loops encountering similar errors can automatically apply proven fixes, dramatically reducing iteration counts.
 
 ### Key Benefits
 
@@ -121,7 +121,7 @@ usage_count: 18
 
 ### 1. Pattern Extraction
 
-**Trigger**: Ralph loop completion
+**Trigger**: Agent loop completion
 
 **Process**:
 1. **Analyze loop history** - Review all iterations
@@ -158,7 +158,7 @@ Result: Tests passed
 
 ### 2. Pattern Injection
 
-**Trigger**: Ralph loop start
+**Trigger**: Agent loop start
 
 **Process**:
 1. **Analyze task description** - Extract key terms
@@ -743,7 +743,7 @@ Result: Success, 2 iterations (anti-pattern prevented scope creep)
 
 ## Related Documentation
 
-- `/ralph` - Main Ralph loop command
+- `/ralph` - Main agent loop command
 - `@$AIWG_ROOT/agentic/code/addons/ralph/schemas/shared-patterns.yaml` - Pattern schema
 - `@$AIWG_ROOT/agentic/code/addons/ralph/schemas/cross-task-memory.yaml` - Cross-task memory
 - `@$AIWG_ROOT/agentic/code/addons/ralph/docs/best-practices.md` - General Ralph best practices

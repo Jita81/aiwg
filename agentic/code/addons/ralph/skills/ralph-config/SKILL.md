@@ -1,5 +1,5 @@
 ---
-description: View and configure Ralph loop settings — show, set, reset, and apply named presets
+description: View and configure agent loop settings — show, set, reset, and apply named presets
 commandHint:
   argumentHint: "<show|set|reset|preset> [key] [value]"
   allowedTools: Read, Write

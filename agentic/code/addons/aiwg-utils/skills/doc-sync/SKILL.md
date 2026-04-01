@@ -230,7 +230,7 @@ Apply fixes for all HIGH confidence findings. MEDIUM and LOW findings are report
 For complex documentation stubs (undocumented features), use a Ralph refinement loop (max 3 iterations) to ensure the generated docs pass a quality check:
 
 ```
-Ralph loop (max 3 iterations):
+Agent loop (max 3 iterations):
   Task: "Generate documentation for {feature} at {source}"
   Completion: "Generated doc passes markdownlint and includes: description, parameters, at least one example"
 ```
@@ -377,4 +377,4 @@ Reads `.aiwg/reports/doc-sync-last-run.json`, determines 12 files changed since 
 - @$AIWG_ROOT/src/cli/handlers/utilities.ts — Doc sync command handler
 - @$AIWG_ROOT/docs/cli-reference.md — CLI reference (primary doc target)
 - @$AIWG_ROOT/docs/extensions/overview.md — Extension system docs (audited by extension auditor)
-- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/skills/ralph/SKILL.md — Ralph loop pattern used in Phase 5
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/skills/ralph/SKILL.md — Agent loop pattern used in Phase 5

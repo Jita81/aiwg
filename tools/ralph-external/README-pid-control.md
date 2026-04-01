@@ -4,7 +4,7 @@
 
 The PID Control layer provides adaptive loop management for External Ralph through a control theory-inspired feedback system. It continuously monitors loop progress and dynamically adjusts execution parameters to optimize convergence, prevent stuck states, and maintain system stability.
 
-### Why PID Control for Ralph Loops?
+### Why PID Control for Agent Loops?
 
 Traditional software loops execute with fixed parameters regardless of runtime conditions. The PID Control layer brings adaptive intelligence by:
 
@@ -165,7 +165,7 @@ controller.importState(savedState);
 
 ## Component 2: MetricsCollector
 
-**Purpose**: Extracts Proportional, Integral, and Derivative metrics from Ralph loop iteration data.
+**Purpose**: Extracts Proportional, Integral, and Derivative metrics from agent loop iteration data.
 
 ### Metric Definitions
 

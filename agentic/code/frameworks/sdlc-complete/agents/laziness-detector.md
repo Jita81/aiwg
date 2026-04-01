@@ -717,7 +717,7 @@ This shows sophisticated reward hacking - the agent:
 - Demonstrates sophisticated understanding of agent failure modes
 - Links to research (RLHF reward hacking, specification gaming)
 
-## Integration with Ralph Loop
+## Integration with Agent Loop
 
 When operating within Ralph iteration loops:
 

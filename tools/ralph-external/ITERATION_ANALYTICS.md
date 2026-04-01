@@ -4,7 +4,7 @@ Tracks quality metrics, detects diminishing returns, and selects best output per
 
 ## Overview
 
-The `IterationAnalytics` class implements iteration improvement tracking for Ralph loops following the Self-Refine research pattern. It addresses the key finding that quality is non-monotonic during iterative refinement - the best output may occur at iteration 2-3 rather than the final iteration.
+The `IterationAnalytics` class implements iteration improvement tracking for agent loops following the Self-Refine research pattern. It addresses the key finding that quality is non-monotonic during iterative refinement - the best output may occur at iteration 2-3 rather than the final iteration.
 
 ## Key Features
 
@@ -244,7 +244,7 @@ Saved to `{storagePath}/{loopId}.json`:
 Saved to `{storagePath}/{loopId}-report.md`:
 
 ```markdown
-# Ralph Loop Analytics: loop-001
+# Agent Loop Analytics: loop-001
 
 **Task:** Fix authentication tests
 **Duration:** 2026-01-28T10:00:00Z → 2026-01-28T10:30:00Z
@@ -295,9 +295,9 @@ Saved to `{storagePath}/{loopId}-report.md`:
 - Consider stopping at iteration 3 to save tokens/cost
 ```
 
-## Integration with Ralph Loop
+## Integration with Agent Loop
 
-The IterationAnalytics class is designed to integrate with Ralph external loop:
+The IterationAnalytics class is designed to integrate with the external agent loop:
 
 ```javascript
 import { IterationAnalytics } from './iteration-analytics.mjs';

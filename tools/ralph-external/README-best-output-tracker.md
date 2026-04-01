@@ -6,7 +6,7 @@ Tracks quality scores across iterations and selects best output (not just final 
 
 ## Purpose
 
-The BestOutputTracker implements non-monotonic quality handling for Ralph loops, ensuring the highest quality output is selected regardless of when it occurred during iteration.
+The BestOutputTracker implements non-monotonic quality handling for agent loops, ensuring the highest quality output is selected regardless of when it occurred during iteration.
 
 ### Key Insight from REF-015
 
@@ -345,7 +345,7 @@ const selection = tracker.selectOutput();
 //         reason = "Highest quality (no verified iterations): XX%"
 ```
 
-## Integration with Ralph Loop
+## Integration with Agent Loop
 
 ```javascript
 import { BestOutputTracker } from './best-output-tracker.mjs';

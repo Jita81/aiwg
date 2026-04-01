@@ -70,7 +70,7 @@
 
 | ID | Title | Authors | Year | AIWG Relevance |
 |----|-------|---------|------|----------------|
-| REF-015 | [Self-Refine](REF-015-self-refine-iterative-refinement.md) | Madaan et al. | 2023 | Ralph loop foundation |
+| REF-015 | [Self-Refine](REF-015-self-refine-iterative-refinement.md) | Madaan et al. | 2023 | Agent loop foundation |
 | REF-021 | [Reflexion](REF-021-reflexion-verbal-reinforcement.md) | Shinn et al. | 2023 | Verbal reinforcement learning |
 | REF-024 | [LATS: Language Agent Tree Search](REF-024-lats-language-agent-tree-search.md) | Zhou et al. | 2024 | MCTS for agent planning |
 | REF-025 | [Constitutional AI](REF-025-constitutional-ai-harmlessness.md) | Bai et al. | 2022 | Principle-based review |

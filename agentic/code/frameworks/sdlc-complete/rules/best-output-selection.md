@@ -1,7 +1,7 @@
 # Best Output Selection Rules
 
 **Enforcement Level**: MEDIUM
-**Scope**: Ralph loops and iterative refinement
+**Scope**: Agent loops and iterative refinement
 **Research Basis**: REF-015 Self-Refine
 **Issue**: #168
 
@@ -280,7 +280,7 @@ degradation_detection:
 
 ## Validation Checklist
 
-Before completing a Ralph loop:
+Before completing an agent loop:
 
 - [ ] All iteration outputs preserved
 - [ ] Quality score calculated for each iteration

@@ -18,7 +18,7 @@ Self-Refine demonstrates that large language models can iteratively improve thei
 
 **Critical Finding**: Performance gains are consistent but diminish after 2-3 iterations, and self-critique has blind spots that external validation can address.
 
-**AIWG Impact**: Direct foundation for Ralph loop architecture, validating refinement approach while motivating external verification enhancements.
+**AIWG Impact**: Direct foundation for agent loop architecture, validating refinement approach while motivating external verification enhancements.
 
 ## The SELF-REFINE Algorithm
 
@@ -465,11 +465,11 @@ Two approaches:
 
 > "The main limitation of our approach is that the base models need to have sufficient few-shot modeling or instruction-following abilities, in order to learn to provide feedback and to refine in an in-context fashion, without having to train supervised models and rely on supervised data." (page 9)
 
-## AIWG Ralph Loop Mapping
+## AIWG Agent Loop Mapping
 
 ### Direct Parallel
 
-| SELF-REFINE Component | Ralph Loop Component |
+| SELF-REFINE Component | Agent Loop Component |
 |----------------------|---------------------|
 | GENERATE | Execute task |
 | FEEDBACK (self-critique) | External verification (tests, linters, type check) |
@@ -484,7 +484,7 @@ Two approaches:
 Generate → Self-Critique → Refine → (repeat)
 ```
 
-**Ralph Loop Pattern**:
+**Agent Loop Pattern**:
 ```
 Execute → External Verify → Analyze Error → Adapt Strategy → (repeat)
              ↑
@@ -504,7 +504,7 @@ Execute → External Verify → Analyze Error → Adapt Strategy → (repeat)
 - Archetype 3 (Context pollution): Models can't recognize when they've lost the thread
 - **External verification catches what self-critique misses**
 
-### Ralph Loop Implementation
+### Agent Loop Implementation
 
 ```typescript
 // Ralph implements externally-verified Self-Refine
@@ -838,7 +838,7 @@ Synthesizer (Refine based on all feedback)
 
 | Category | Relevance | Why |
 |----------|-----------|-----|
-| **Ralph Loop** | **Critical** | Theoretical foundation for iterative refinement without training |
+| **Agent Loop** | **Critical** | Theoretical foundation for iterative refinement without training |
 | **Recovery Patterns** | **Critical** | Validates feedback-driven improvement approach |
 | **External Verification** | **Critical** | Math results prove necessity of external validation |
 | **Multi-Agent Review** | **High** | Self-Refine + multi-perspective = stronger refinement |
@@ -850,7 +850,7 @@ Synthesizer (Refine based on all feedback)
 
 ### AIWG Internal
 
-- **Ralph Loop**: `@tools/ralph-external/loop-executor.ts` - implements externally-verified SELF-REFINE
+- **Agent Loop**: `@tools/ralph-external/loop-executor.ts` - implements externally-verified SELF-REFINE
 - **Ralph Guide**: `@docs/ralph-guide.md` - user documentation
 - **Flow Commands**: Self-healing patterns in orchestration
 - **Quality Framework**: `@agentic/code/addons/quality/metrics.ts` - multi-dimensional assessment inspired by SELF-REFINE
@@ -872,7 +872,7 @@ Synthesizer (Refine based on all feedback)
 
 ### Immediate Applications
 
-1. **Validate Ralph Loop Design**: SELF-REFINE confirms iterative refinement works, Ralph's external verification addresses blind spots
+1. **Validate Agent Loop Design**: SELF-REFINE confirms iterative refinement works, Ralph's external verification addresses blind spots
 
 2. **Set Iteration Limits**: Data supports max 5 iterations (diminishing returns after 2-3)
 
@@ -942,7 +942,7 @@ interface OutputQuality {
 
 ## Conclusion
 
-Self-Refine validates the core assumption behind AIWG's Ralph loop: **iterative refinement with feedback improves LLM outputs without training**. The ~20% average improvement across diverse tasks proves the approach works. However, the Math Reasoning results reveal critical limitations - self-critique has blind spots that external verification addresses.
+Self-Refine validates the core assumption behind AIWG's agent loop: **iterative refinement with feedback improves LLM outputs without training**. The ~20% average improvement across diverse tasks proves the approach works. However, the Math Reasoning results reveal critical limitations - self-critique has blind spots that external verification addresses.
 
 **Key Takeaway for AIWG**: Ralph's combination of SELF-REFINE's iterative refinement pattern with external verification (tests, linters, validators) represents the best of both worlds - the flexibility of self-improvement plus the objectivity of external checks.
 
@@ -954,14 +954,14 @@ Self-Refine validates the core assumption behind AIWG's Ralph loop: **iterative 
 
 | Date | Author | Changes |
 |------|--------|---------|
-| 2026-01-24 | Research Analysis | Comprehensive documentation created from PDF with full algorithm details, benchmark results, ablation studies, Ralph loop mapping, and AIWG integration guidance |
+| 2026-01-24 | Research Analysis | Comprehensive documentation created from PDF with full algorithm details, benchmark results, ablation studies, agent loop mapping, and AIWG integration guidance |
 
 ## References
 
 **Primary Source**: Madaan et al. (2023) - Self-Refine paper
 
 **AIWG Cross-References**:
-- `@tools/ralph-external/` - Ralph loop implementation
+- `@tools/ralph-external/` - Agent loop implementation
 - `@docs/ralph-guide.md` - Ralph user documentation
 - `@docs/references/REF-002-roig-failure-modes.md` - Why external verification needed
 

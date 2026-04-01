@@ -1,6 +1,6 @@
 # Snapshot Manager
 
-Captures comprehensive pre-session and post-session state for External Ralph Loop iterations, enabling detailed analysis of long-running Claude sessions (6-8 hours).
+Captures comprehensive pre-session and post-session state for External Agent Loop iterations, enabling detailed analysis of long-running Claude sessions (6-8 hours).
 
 ## Quick Start
 
@@ -226,7 +226,7 @@ await giteaTracker.addProgressComment(iteration, {
 
 ## References
 
-- @.aiwg/requirements/design-ralph-external.md - External Ralph Loop design
+- @.aiwg/requirements/design-ralph-external.md - External Agent Loop design
 - @tools/ralph-external/state-manager.mjs - Session state management
 - @tools/ralph-external/output-analyzer.mjs - Output analysis
 - @tools/ralph-external/orchestrator.mjs - Loop orchestration

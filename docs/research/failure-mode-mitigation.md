@@ -151,7 +151,7 @@ Models stop before completing tasks, either by:
 
 ### AIWG Mitigations
 
-#### 2.1 Explicit Completion Criteria (Ralph Loop)
+#### 2.1 Explicit Completion Criteria (Agent Loop)
 
 The Ralph iterative execution loop requires explicit success criteria before starting:
 
@@ -175,7 +175,7 @@ aiwg ralph "Fix all failing tests" --completion "npm test passes"
 Ralph implements structured verification after each action:
 
 ```yaml
-# Ralph loop configuration
+# Agent loop configuration
 ralph_loop:
   task: "Implement user authentication"
   completion_criteria: "Auth tests pass"
@@ -265,7 +265,7 @@ task:
 - Completion criteria validation rate: 100%
 - Premature termination rate: <10%
 
-**Measurement**: Track Ralph loop outcomes
+**Measurement**: Track agent loop outcomes
 
 ```bash
 # Check Ralph completion statistics
@@ -617,7 +617,7 @@ task:
 - Coherence collapse rate: <2%
 - Checkpoint restore success: >99%
 
-**Measurement**: Track Ralph loop execution patterns
+**Measurement**: Track agent loop execution patterns
 
 ```bash
 # Check recovery statistics
@@ -710,7 +710,7 @@ Example:
 | Context curator | Proposed | Planned addon |
 | 7±2 decomposition | Implemented | SDLC structure |
 | Checkpoint/resume | Implemented | `.aiwg/ralph/` |
-| Coherence monitoring | Partial | Ralph loop |
+| Coherence monitoring | Partial | Agent loop |
 | R-LAM execution modes | Partial | Temperature settings |
 
 ---

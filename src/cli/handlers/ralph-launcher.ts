@@ -32,7 +32,7 @@ import {
 import { getProviderConfig } from '../agent-spawn.js';
 
 /**
- * Options for launching an external Ralph loop
+ * Options for launching an external agent loop
  */
 export interface RalphLaunchOptions {
   objective: string;
@@ -62,7 +62,7 @@ export interface RalphLaunchOptions {
 }
 
 /**
- * Result from launching a Ralph loop
+ * Result from launching a agent loop
  */
 export interface RalphLaunchResult {
   success: boolean;
@@ -262,7 +262,7 @@ export async function launchExternalRalph(
     success: true,
     loopId,
     pid,
-    message: `Ralph loop started (${loopId}). Check status: aiwg ralph-status`,
+    message: `agent loop started (${loopId}). Check status: aiwg ralph-status`,
     registryPath: getRegistryPath(projectRoot),
   };
 }
@@ -326,7 +326,7 @@ export function isProcessAlive(pid: number): boolean {
 }
 
 /**
- * Get status of all Ralph loops.
+ * Get status of all agent loops.
  * Detects stale entries (>24h without heartbeat) and auto-cleans completed entries.
  */
 export function getLoopStatuses(
@@ -381,7 +381,7 @@ export function getLoopStatuses(
 }
 
 /**
- * Abort a running Ralph loop by killing its process
+ * Abort a running agent loop by killing its process
  */
 export function abortLoop(projectRoot: string, loopId?: string): { success: boolean; message: string } {
   const registry = loadLauncherRegistry(projectRoot);
@@ -393,7 +393,7 @@ export function abortLoop(projectRoot: string, loopId?: string): { success: bool
       .sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime());
 
     if (runningLoops.length === 0) {
-      return { success: false, message: 'No running Ralph loops found' };
+      return { success: false, message: 'No running agent loops found' };
     }
     loopId = runningLoops[0].loopId;
   }
@@ -424,7 +424,7 @@ export function abortLoop(projectRoot: string, loopId?: string): { success: bool
 }
 
 /**
- * Resume an interrupted Ralph loop
+ * Resume an interrupted agent loop
  */
 export async function resumeLoop(
   frameworkRoot: string,
@@ -508,7 +508,7 @@ export async function resumeLoop(
     success: true,
     loopId: targetLoopId,
     pid,
-    message: `Resumed Ralph loop (${targetLoopId}). Check status: aiwg ralph-status`,
+    message: `Resumed agent loop (${targetLoopId}). Check status: aiwg ralph-status`,
     registryPath: getRegistryPath(projectRoot),
   };
 }
@@ -678,7 +678,7 @@ export function cleanupRegistry(projectRoot: string, keepDays: number = 7): numb
 }
 
 /**
- * Attach to a running Ralph loop's output stream.
+ * Attach to a running agent loop's output stream.
  *
  * Tails the loop's daemon-output.log to stdout in real-time.
  * Ctrl+C detaches (the background loop keeps running).

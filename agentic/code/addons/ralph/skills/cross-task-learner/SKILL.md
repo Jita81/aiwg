@@ -1,6 +1,6 @@
 ---
 name: cross-task-learner
-description: Enable Ralph loops to learn from similar past tasks and share patterns across loops
+description: Enable agent loops to learn from similar past tasks and share patterns across loops
 version: 2.0.0
 capabilities:
   - semantic_task_matching
@@ -12,7 +12,7 @@ platforms: [claude-code, hermes, openclaw]
 
 # Cross-Task Learner Skill
 
-Enable Ralph loops to learn from similar past tasks and share discovered patterns across multiple concurrent or sequential loops.
+Enable agent loops to learn from similar past tasks and share discovered patterns across multiple concurrent or sequential loops.
 
 **Research Foundation**: REF-013 MetaGPT - 159% improvement with shared state
 
@@ -50,7 +50,7 @@ From REF-013 MetaGPT:
 
 ### Trigger
 
-- Ralph loop completion (success, partial, or failure)
+- Agent loop completion (success, partial, or failure)
 - Manual extraction request via `aiwg ralph-extract-patterns {loop_id}`
 
 ### Process
@@ -178,7 +178,7 @@ ralph:
 
 ### Trigger
 
-- Ralph loop start
+- Agent loop start
 - Manual injection request via `aiwg ralph-inject-patterns {loop_id}`
 
 ### Process
@@ -624,9 +624,9 @@ Patterns inform test execution:
 - Success patterns guide test-driven approaches
 - Code templates provide test setup patterns
 
-### With Ralph Loop Skill
+### With Agent Loop Skill
 
-Ralph loop skill triggers pattern extraction/injection:
+Agent loop skill triggers pattern extraction/injection:
 - On loop start: Inject relevant patterns
 - On loop completion: Extract new patterns
 - On iteration: Update pattern usage tracking

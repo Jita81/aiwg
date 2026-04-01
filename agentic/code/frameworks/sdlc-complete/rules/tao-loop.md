@@ -1,7 +1,7 @@
 # TAO Loop Standardization Rules
 
 **Enforcement Level**: HIGH
-**Scope**: All iterative agent execution (Ralph loops, agent tasks)
+**Scope**: All iterative agent execution (agent loops, agent tasks)
 **Research Basis**: REF-018 ReAct Methodology
 **Issue**: #162
 
@@ -181,7 +181,7 @@ THOUGHT [Iteration 2]: I'll update the TTL to some larger value.
 
 ### Ralph TAO Logging
 
-Ralph loops MUST log all TAO iterations:
+Agent loops MUST log all TAO iterations:
 
 ```yaml
 ralph_tao_log:

@@ -1,4 +1,4 @@
-# Ralph Loop Troubleshooting
+# Agent Loop Troubleshooting
 
 Solutions for common Ralph issues.
 

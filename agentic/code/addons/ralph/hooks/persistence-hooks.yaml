@@ -1,12 +1,12 @@
 # Agent Persistence Hooks Configuration
-# Integration layer for Agent Persistence Framework with Ralph loops
+# Integration layer for Agent Persistence Framework with agent loops
 # Issue: #261
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
 $id: "https://aiwg.io/schemas/ralph-persistence-hooks/v1"
 title: "Ralph Persistence Hooks"
 description: |
-  Event hooks for Agent Persistence Framework integration with Ralph loops.
+  Event hooks for Agent Persistence Framework integration with agent loops.
   Enables laziness detection, regression monitoring, and recovery enforcement
   at strategic execution points.
 
@@ -17,8 +17,8 @@ hooks:
   # ============================================================================
 
   loop_start:
-    description: "Invoked when Ralph loop begins execution"
-    trigger: "Ralph loop initialization"
+    description: "Invoked when agent loop begins execution"
+    trigger: "Agent loop initialization"
     timing: before_first_iteration
     agents_to_invoke:
       - agent: progress-tracker
@@ -51,7 +51,7 @@ hooks:
         value: "MINIMAL"
 
   loop_complete:
-    description: "Invoked when Ralph loop completes (success or failure)"
+    description: "Invoked when agent loop completes (success or failure)"
     trigger: "Loop reaches terminal state"
     timing: after_final_iteration
     agents_to_invoke:

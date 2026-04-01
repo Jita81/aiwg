@@ -167,7 +167,7 @@ const giteaTracker = new GiteaTracker(/* ... */);
 
 // After selection
 const comment = `
-## Ralph Loop Complete
+## Agent Loop Complete
 
 **Selected Output**: Iteration ${selection.selected_iteration}
 **Quality Score**: ${selection.quality_score}%
@@ -197,7 +197,7 @@ Add to ralph-status command:
 case 'status':
   const state = stateManager.load();
   if (!state) {
-    console.log('No active Ralph loop');
+    console.log('No active agent loop');
     break;
   }
 

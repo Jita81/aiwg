@@ -169,7 +169,7 @@ When these patterns are detected, the corresponding rules are activated in the a
 - @agentic/code/addons/aiwg-utils/rules/research-before-decision.md - Research rule
 - @agentic/code/addons/aiwg-utils/rules/instruction-comprehension.md - Instruction rule
 - @agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md - Thought types
-- @.claude/commands/address-issues.md - Issue-driven ralph loop command
+- @.claude/commands/address-issues.md - Issue-driven agent loop command
 - @.claude/skills/issue-driven-ralph/SKILL.md - Issue-driven ralph skill
 - @agentic/code/frameworks/sdlc-complete/rules/self-maintenance.md - Self-maintenance rule
 - @agentic/code/agents/aiwg-steward.md - AIWG Steward agent

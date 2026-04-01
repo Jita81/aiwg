@@ -121,7 +121,7 @@ Discovery Track          Delivery Track
 **RUP-Inspired Patterns**:
 - Milestones at phase boundaries → gate checks
 - Architecture-centric approach → Elaboration focus
-- Iterative development → Ralph loops
+- Iterative development → agent loops
 - Risk-driven planning → Risk register integration
 
 **SAFe-Inspired Patterns**:

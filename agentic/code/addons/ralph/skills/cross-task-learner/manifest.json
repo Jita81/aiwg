@@ -2,7 +2,7 @@
   "name": "cross-task-learner",
   "version": "2.0.0",
   "type": "skill",
-  "description": "Enable Ralph loops to learn from similar past tasks and share patterns across loops",
+  "description": "Enable agent loops to learn from similar past tasks and share patterns across loops",
   "provider": "aiwg",
   "capabilities": [
     "semantic_task_matching",

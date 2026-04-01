@@ -6,7 +6,7 @@
 
 ## Overview
 
-Claude Code v2.1.2 changed large tool outputs to be saved to disk instead of truncated at 30,000 characters. This guide documents how AIWG patterns (executable feedback, debug memory, Ralph loops) should handle disk-based output references.
+Claude Code v2.1.2 changed large tool outputs to be saved to disk instead of truncated at 30,000 characters. This guide documents how AIWG patterns (executable feedback, debug memory, agent loops) should handle disk-based output references.
 
 ## What Changed
 
@@ -54,9 +54,9 @@ debug_memory:
           full_output_line: 847  # Line in output file
 ```
 
-### Ralph Loop Analysis
+### Agent Loop Analysis
 
-Ralph loops analyzing iteration progress should:
+Agent loops analyzing iteration progress should:
 
 1. **Preserve output paths** across iterations for diff comparison
 2. **Extract key metrics** from full output rather than relying on truncated summaries

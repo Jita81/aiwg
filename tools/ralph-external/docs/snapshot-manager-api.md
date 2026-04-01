@@ -4,7 +4,7 @@ Complete API documentation for the Snapshot Manager module.
 
 ## Class: SnapshotManager
 
-Manages pre-session and post-session state snapshots for External Ralph Loop iterations.
+Manages pre-session and post-session state snapshots for External Agent Loop iterations.
 
 ### Constructor
 

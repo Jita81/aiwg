@@ -220,7 +220,7 @@ code_reviewer_protocol:
   require_execution_proof: true
 ```
 
-### With Ralph Loop
+### With Agent Loop
 
 ```yaml
 ralph_integration:

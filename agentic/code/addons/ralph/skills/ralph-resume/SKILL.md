@@ -1,5 +1,5 @@
 ---
-description: Resume an interrupted Ralph loop from last checkpoint
+description: Resume an interrupted agent loop from last checkpoint
 commandHint:
   argumentHint: [--max-iterations N] [--timeout M --interactive --guidance "text"]
   allowedTools: Task, Read, Write, Bash, Glob, Grep, TodoWrite, Edit
@@ -10,7 +10,7 @@ commandHint:
 
 # Ralph Resume
 
-Resume a paused or interrupted Ralph loop.
+Resume a paused or interrupted agent loop.
 
 ## Usage
 
@@ -38,7 +38,7 @@ Override the timeout in minutes. Useful when loop timed out but task is close to
 
 **If no resumable loop**:
 ```
-No Ralph loop to resume.
+No agent loop to resume.
 
 Status: {status}
 
@@ -56,11 +56,11 @@ Apply any parameter overrides:
 
 ### Step 3: Resume Execution
 
-Continue the Ralph loop pattern:
+Continue the agent loop pattern:
 
 1. Display resume status:
 ```
-Resuming Ralph Loop
+Resuming Agent Loop
 
 Task: {task}
 Completion: {completion}
@@ -74,7 +74,7 @@ Continuing from iteration {N+1}...
 ```
 
 2. Execute next iteration with accumulated learnings
-3. Follow standard Ralph loop verification
+3. Follow standard agent loop verification
 4. Continue until success or new limits reached
 
 ### Step 4: Handle Completion
@@ -86,7 +86,7 @@ Same as `/ralph` - generate completion report on success or limit.
 When resuming, include in the task context:
 
 ```
-## Ralph Loop Resume Context
+## Agent Loop Resume Context
 
 **Original Task**: {task}
 **Completion Criteria**: {completion}
@@ -111,7 +111,7 @@ Verify against completion criteria after each attempt.
 
 **Loop completed successfully**:
 ```
-This Ralph loop already completed successfully.
+This agent loop already completed successfully.
 
 Final status: SUCCESS
 Iterations: {N}
@@ -123,7 +123,7 @@ To run again, start a new loop:
 
 **Loop was aborted**:
 ```
-This Ralph loop was aborted and cannot be resumed.
+This agent loop was aborted and cannot be resumed.
 
 To start fresh with the same task:
   /ralph "{original task}" --completion "{original completion}"
@@ -131,7 +131,7 @@ To start fresh with the same task:
 
 **State corrupted**:
 ```
-Ralph loop state is corrupted or incomplete.
+Agent loop state is corrupted or incomplete.
 
 Options:
 1. Start fresh: /ralph "task" --completion "criteria"

@@ -42,7 +42,7 @@ When triggered:
    aiwg help
    ```
 
-   The help command is built into the CLI registry and requires no external tools. It renders command groups (Framework, Project, Workspace, MCP Server, Toolsmith, Scaffolding, Ralph Loop, Maintenance) with aligned descriptions.
+   The help command is built into the CLI registry and requires no external tools. It renders command groups (Framework, Project, Workspace, MCP Server, Toolsmith, Scaffolding, Agent Loop, Maintenance) with aligned descriptions.
 
 3. **Report the result** inline — present the command groups and highlight the most relevant section if the user expressed a specific area of interest.
 
@@ -63,16 +63,16 @@ aiwg help
 
 ### Example 2: Category-specific help
 
-**User**: "How do I use the Ralph loop commands?"
+**User**: "How do I use the agent loop commands?"
 
-**Extraction**: User wants help scoped to the Ralph Loop category
+**Extraction**: User wants help scoped to the Agent Loop category
 
 **Action**:
 ```bash
 aiwg help
 ```
 
-**Response**: "The Ralph Loop commands are: `aiwg ralph \"<task>\"` to start an iterative loop, `aiwg ralph-status` to check progress, `aiwg ralph-abort` to stop, and `aiwg ralph-resume` to continue an interrupted loop. Pass `--completion \"<criteria>\"` to define when the loop should stop."
+**Response**: "The Agent Loop commands are: `aiwg ralph \"<task>\"` to start an iterative loop, `aiwg ralph-status` to check progress, `aiwg ralph-abort` to stop, and `aiwg ralph-resume` to continue an interrupted loop. Pass `--completion \"<criteria>\"` to define when the loop should stop."
 
 ### Example 3: Quick usage check
 

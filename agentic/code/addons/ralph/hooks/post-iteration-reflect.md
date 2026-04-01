@@ -1,11 +1,11 @@
 # post-iteration-reflect
 
-Generate and store a reflection after each Ralph loop iteration.
+Generate and store a reflection after each agent loop iteration.
 
 ## Trigger
 
-- Ralph loop completes an iteration (success or failure)
-- External Ralph loop completes a cycle
+- Agent loop completes an iteration (success or failure)
+- External agent loop completes a cycle
 
 ## Enforcement Level
 

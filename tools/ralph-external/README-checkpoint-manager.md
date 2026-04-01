@@ -1,6 +1,6 @@
 # Checkpoint Manager
 
-Periodic state capture for External Ralph Loop sessions, enabling crash recovery and progress tracking during long-running Claude sessions (6-8 hours).
+Periodic state capture for External Agent Loop sessions, enabling crash recovery and progress tracking during long-running Claude sessions (6-8 hours).
 
 ## Overview
 

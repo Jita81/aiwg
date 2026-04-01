@@ -1,10 +1,10 @@
-# Ralph Loop State Schema
+# Agent Loop State Schema
 # Per-loop state tracking for multi-loop support
 # Issue: #268
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
 $id: "https://aiwg.io/schemas/ralph-loop-state/v2"
-title: "Ralph Loop State Schema"
+title: "Agent Loop State Schema"
 description: |
   Schema for per-loop state.json file. Each active loop has its own
   state file in .aiwg/ralph/loops/{loop_id}/state.json

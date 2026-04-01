@@ -27,7 +27,7 @@ Run AIWG with your model and report what works:
 For more thorough validation:
 
 6. **SDLC workflows** — Phase transitions, artifact generation
-7. **Multi-step reasoning** — Ralph loops, implementation planning
+7. **Multi-step reasoning** — Agent loops, implementation planning
 8. **Context handling** — Quality at different session lengths
 9. **Code generation** — TypeScript/JavaScript quality, test writing
 

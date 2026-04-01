@@ -2,7 +2,7 @@
 # Based on REF-086 Coordination Tax, REF-088 Multi-Agent Guide
 # Issue: #266
 #
-# Tracks all active Ralph loops in a repository to enable:
+# Tracks all active agent loops in a repository to enable:
 # - Concurrent loop execution without state conflicts
 # - MAX_CONCURRENT_LOOPS enforcement (research-backed limit)
 # - Cross-loop coordination and learning
@@ -12,7 +12,7 @@ $schema: "https://json-schema.org/draft/2020-12/schema"
 $id: "https://aiwg.io/schemas/multi-loop-registry/v1"
 title: "Multi-Loop Registry Schema"
 description: |
-  Central registry for tracking multiple concurrent Ralph loops.
+  Central registry for tracking multiple concurrent agent loops.
   Enforces MAX_CONCURRENT_LOOPS=4 based on coordination tax research.
 
 type: object

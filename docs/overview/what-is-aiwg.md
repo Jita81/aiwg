@@ -119,7 +119,7 @@ Architecture Document Creation:
 
 **How It Works**:
 ```
-Ralph Loop (TAO: Thought → Action → Observation):
+Agent Loop (TAO: Thought → Action → Observation):
   1. Execute task with current strategy
   2. Verify results (test pass, lint pass, format valid)
   3. If failure:
@@ -646,7 +646,7 @@ AIWG uses dual terminology (informal + professional) for accessibility and credi
 |----------|--------------|---------|
 | Context stacks | Structured Semantic Memory | Working memory extended with external storage |
 | Multi-agent review | Ensemble Validation | Multiple specialized agents critique artifacts |
-| Ralph loop | Closed-Loop Self-Correction | Iterative execution with failure learning |
+| Agent loop | Closed-Loop Self-Correction | Iterative execution with failure learning |
 | External Ralph | Crash-Resilient Autonomous Execution | Long-running agents with PID tracking and checkpoint recovery |
 | .aiwg/ directory | Artifact Repository | Persistent storage for project knowledge |
 | @-mentions | Traceability Links | References enabling provenance tracking |

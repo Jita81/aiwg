@@ -1,6 +1,6 @@
 # Memory Layer Documentation
 
-Comprehensive guide to the Memory layer components in External Ralph Loop, implementing cross-loop persistent knowledge accumulation and retrieval.
+Comprehensive guide to the Memory layer components in External Agent Loop, implementing cross-loop persistent knowledge accumulation and retrieval.
 
 ## Table of Contents
 
@@ -17,7 +17,7 @@ Comprehensive guide to the Memory layer components in External Ralph Loop, imple
 
 ## Overview
 
-The Memory layer enables External Ralph Loop to learn from experience across multiple task executions. Rather than treating each loop as isolated, the Memory layer accumulates knowledge, identifies patterns, and retrieves relevant context to improve future performance.
+The Memory layer enables External Agent Loop to learn from experience across multiple task executions. Rather than treating each loop as isolated, the Memory layer accumulates knowledge, identifies patterns, and retrieves relevant context to improve future performance.
 
 ### Purpose
 

@@ -199,7 +199,7 @@ flow_phases:
         channels: [cli, issue_comment]
 ```
 
-### With Ralph Loop
+### With Agent Loop
 
 ```yaml
 # Ralph iteration checkpoint

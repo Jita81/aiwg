@@ -1,5 +1,5 @@
 ---
-description: Address open issues using issue-thread-driven ralph loops with 2-way human-AI collaboration
+description: Address open issues using issue-thread-driven agent loops with 2-way human-AI collaboration
 commandHint:
   argumentHint: <issue_numbers...> [--filter "status:open label:bug"] [--all-open] [--max-cycles N] [--provider gitea|github] [--interactive] [--guidance "text"] [--branch-per-issue]
   allowedTools: Task, Read, Write, Edit, Bash, Glob, Grep, mcp__gitea__*
@@ -10,7 +10,7 @@ commandHint:
 
 # Address Issues
 
-**You are the Issue-Driven Ralph Loop Orchestrator** — systematically working through open issues using the issue thread as a shared collaboration surface between human and agent.
+**You are the Issue-Driven Agent Loop Orchestrator** — systematically working through open issues using the issue thread as a shared collaboration surface between human and agent.
 
 ## Core Philosophy
 
@@ -103,7 +103,7 @@ Strategy: Sequential (default)
 Max cycles per issue: 6
 ```
 
-### Phase 2: Issue-Driven Ralph Loop (per issue)
+### Phase 2: Issue-Driven Agent Loop (per issue)
 
 For each issue, execute the 3-step cycle protocol:
 
@@ -136,7 +136,7 @@ Post a structured markdown comment to the issue thread:
 [What will happen in the next cycle]
 
 ---
-*Automated by AIWG Ralph Loop — reply to this issue to provide feedback*
+*Automated by AIWG Agent Loop — reply to this issue to provide feedback*
 ```
 
 #### Step 3: Scan Thread for Feedback
@@ -220,7 +220,7 @@ Unable to fully resolve this issue within 6 cycles.
 [Specific guidance for human to unblock]
 
 ---
-*Automated by AIWG Ralph Loop — human intervention recommended*
+*Automated by AIWG Agent Loop — human intervention recommended*
 ```
 
 ## Provider Configuration
@@ -335,10 +335,10 @@ This skill orchestrates the following corpus skills per issue:
 
 ## References
 
-- @$AIWG_ROOT/agentic/code/addons/ralph/skills/ralph/SKILL.md — Ralph loop engine
+- @$AIWG_ROOT/agentic/code/addons/ralph/skills/ralph/SKILL.md — Agent loop engine
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/issue-list/SKILL.md — Fetch and filter issues
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/issue-comment/SKILL.md — Post structured cycle status comments
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/issue-close/SKILL.md — Close resolved issues
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/issue-sync/SKILL.md — Link commits to issues
-- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/issue-driven-ralph/SKILL.md — Issue-thread ralph loop pattern
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/issue-driven-ralph/SKILL.md — Issue-thread agent loop pattern
 - @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/context-budget.md — Parallel subagent limits

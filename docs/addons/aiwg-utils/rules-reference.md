@@ -146,7 +146,7 @@ Compaction guidance scales with tier: aggressive compaction at 32-64k, relaxed a
 
 ### When It Applies
 
-Parallel subagent spawning, task scheduling, Ralph loop batching, orchestrator fan-out on constrained systems. Not active unless `AIWG_CONTEXT_WINDOW` is explicitly set.
+Parallel subagent spawning, task scheduling, agent loop batching, orchestrator fan-out on constrained systems. Not active unless `AIWG_CONTEXT_WINDOW` is explicitly set.
 
 ---
 

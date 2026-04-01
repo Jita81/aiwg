@@ -239,7 +239,7 @@ This demonstrates that with learned recoding schemes, span can be dramatically i
 | **Recoding Information** | Complex technical concepts represented as higher-level abstractions; domain-specific terminology serves as information-rich chunks | Leverages learned patterns to pack more meaning into each chunk |
 | **Multidimensional Stimuli** | Multiple orthogonal attributes (priority, status, type, owner) allow richer categorization without exceeding per-dimension limits | Exploits ability to make crude simultaneous judgments across dimensions |
 | **Sequential Organization** | Multi-stage processes (Inception→Elaboration→Construction→Transition→Production) chunk project lifecycle into manageable phases | Sequential chunking extends capacity beyond single-step limits |
-| **Working Memory Management** | Context windows chunked into discrete sections; Ralph loop iteration state tracked as discrete items; status displays highlight ≤7 key metrics | Prevents exceeding immediate memory span during active processing |
+| **Working Memory Management** | Context windows chunked into discrete sections; agent loop iteration state tracked as discrete items; status displays highlight ≤7 key metrics | Prevents exceeding immediate memory span during active processing |
 | **Bits vs. Chunks Distinction** | Templates provide high-information chunks (each section = 1 chunk with rich structure); agent prompts package complex instructions as single directive | Recognizes that chunk count matters more than raw information when designing for human comprehension |
 
 **Specific AIWG Design Decisions Informed by Miller's Law:**
@@ -251,7 +251,7 @@ This demonstrates that with learned recoding schemes, span can be dramatically i
 5. **Checklist Design**: Sub-checklists capped at 7 items each, with hierarchical grouping for larger sets
 6. **Navigation Breadth**: No more than 7 peer items at any level of hierarchical navigation
 7. **Agent Role Definitions**: Each agent's tools/capabilities limited to 5-7 primary functions
-8. **Iteration Summaries**: Ralph loop reports limited to 7 key accomplishments per iteration
+8. **Iteration Summaries**: Agent loop reports limited to 7 key accomplishments per iteration
 9. **Risk Categories**: Risk register uses 5-7 risk categories (technical, schedule, resource, etc.)
 10. **Acceptance Criteria**: User stories limited to 5-7 acceptance criteria each
 

@@ -340,11 +340,11 @@ return final trajectory
 
 ## AIWG Implementation Mapping
 
-### Direct Parallel: Ralph Loop Recovery
+### Direct Parallel: Agent Loop Recovery
 
-Reflexion is the **theoretical foundation** for AIWG's Ralph loop pattern:
+Reflexion is the **theoretical foundation** for AIWG's agent loop pattern:
 
-| Reflexion Component | Ralph Loop Implementation |
+| Reflexion Component | Agent Loop Implementation |
 |---------------------|---------------------------|
 | **Verbal reflection** | Error analysis with context |
 | **Episodic memory** | `.aiwg/ralph/` state directory |
@@ -531,7 +531,7 @@ Write your reflection in first person, focusing on lessons learned.
 - Accurate credit assignment
 - Actionable natural language generation
 
-**Implication for AIWG**: Recommend GPT-4 class models for Ralph loop
+**Implication for AIWG**: Recommend GPT-4 class models for agent loop
 
 ## Cross-References
 
@@ -545,10 +545,10 @@ Write your reflection in first person, focusing on lessons learned.
 
 ### AIWG Documentation
 
-- **@docs/ralph-guide.md**: Ralph loop implementation and patterns
+- **@docs/ralph-guide.md**: Agent loop implementation and patterns
 - **@.aiwg/ralph/**: State directory for iterative execution
 - **@.claude/commands/flow-*.md**: Phase transition workflows with reflection
-- **@agentic/code/frameworks/sdlc-complete/docs/ralph-external.md**: External Ralph loop architecture
+- **@agentic/code/frameworks/sdlc-complete/docs/ralph-external.md**: External agent loop architecture
 
 ### Related Research
 
@@ -591,4 +591,4 @@ Write your reflection in first person, focusing on lessons learned.
 | Date | Author | Changes |
 |------|--------|---------|
 | 2026-01-24 | Research Acquisition (#74) | Initial reference entry |
-| 2026-01-24 | Technical Research | Comprehensive documentation with full benchmark results, three-model architecture, detailed ablations, AIWG Ralph loop mapping, and programming test generation analysis |
+| 2026-01-24 | Technical Research | Comprehensive documentation with full benchmark results, three-model architecture, detailed ablations, AIWG agent loop mapping, and programming test generation analysis |

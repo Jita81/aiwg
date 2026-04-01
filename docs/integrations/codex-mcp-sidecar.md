@@ -163,13 +163,13 @@ codex --full-auto "Create an ADR for our database choice and save it to .aiwg/ar
 
 Codex calls `template-render` and `artifact-write` via MCP to produce a schema-validated artifact without prompting.
 
-### Ralph Loop with Sidecar
+### Agent Loop with Sidecar
 
 ```bash
 aiwg ralph "Fix all failing tests" --completion "npm test passes" --provider codex --dangerous
 ```
 
-The Ralph loop agent can use `artifact-read` to check existing requirements and `artifact-write` to update test documentation alongside its direct file edits.
+The agent loop agent can use `artifact-read` to check existing requirements and `artifact-write` to update test documentation alongside its direct file edits.
 
 ### Artifact-Driven Workflow (Standard Approval Mode)
 

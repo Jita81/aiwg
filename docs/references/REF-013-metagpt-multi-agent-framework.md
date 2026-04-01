@@ -711,7 +711,7 @@ validation:
 - Capture error messages and use for debugging context
 - Limit iterations (MetaGPT uses max 3) to prevent infinite loops
 
-**Ralph Loop Enhancement**:
+**Agent Loop Enhancement**:
 ```typescript
 // Enhanced Ralph with executable feedback
 interface RalphIteration {

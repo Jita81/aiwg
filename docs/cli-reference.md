@@ -1558,7 +1558,7 @@ aiwg ralph "Fix all integration tests" \
 
 ### ralph-status
 
-Show Ralph loop status.
+Show agent loop status.
 
 ```bash
 aiwg ralph-status
@@ -1582,7 +1582,7 @@ aiwg ralph-status
 
 **Example output:**
 ```
-Ralph Loop Status: Active
+Agent Loop Status: Active
 
 Task: Fix all failing tests
 Iterations: 3/10
@@ -1621,7 +1621,7 @@ Next: Resume with '/ralph-resume'
 
 ### ralph-abort
 
-Abort running Ralph loop.
+Abort running agent loop.
 
 ```bash
 aiwg ralph-abort
@@ -1642,7 +1642,7 @@ aiwg ralph-abort
 
 ### ralph-resume
 
-Resume paused Ralph loop.
+Resume paused agent loop.
 
 ```bash
 aiwg ralph-resume
@@ -1664,7 +1664,7 @@ aiwg ralph-resume
 
 ### ralph-attach
 
-Attach to a running Ralph loop's live output stream.
+Attach to a running agent loop's live output stream.
 
 ```bash
 aiwg ralph-attach
@@ -1675,7 +1675,7 @@ aiwg ralph-attach
 **Tools:** Read
 
 **Actions:**
-- Attaches to a running external Ralph loop
+- Attaches to a running external agent loop
 - Streams live output (press Ctrl+C to detach)
 - Shows current iteration progress in real time
 - Does not affect the running loop
@@ -1684,7 +1684,7 @@ aiwg ralph-attach
 
 ### ralph-external
 
-Start external Ralph loop with full crash recovery.
+Start external agent loop with full crash recovery.
 
 ```bash
 aiwg ralph-external "<task-description>"
@@ -2641,7 +2641,7 @@ aiwg mcp install claude --force
 aiwg mcp serve
 ```
 
-### Ralph Loop Issues (Epic #26)
+### Agent Loop Issues (Epic #26)
 
 ```bash
 # Check current status

@@ -16,7 +16,7 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 | **aiwg-dev addon** | `link-check`, `validate-component`, `dev-doctor` section 4, and `devkit-*` scaffolding skills. |
 | **Skills as canonical type** | SKILL.md is the source. Commands generated at deploy time. `aiwg add-command` deprecated. |
 | **Daemon — fully operational** | Web UI, YAML profiles, scheduled tasks, Telegram multi-room, autonomous engine, cross-session memory, Docker. |
-| **Mission Control** | Parallel Ralph loops as background missions with live dashboard. |
+| **Mission Control** | Parallel agent loops as background missions with live dashboard. |
 | **Behaviors — 5th artifact type** | Subscribe to system events, react automatically. Deployed to OpenClaw. |
 | **Provider-watcher** | Scheduled provider update detection with automatic PR creation. |
 | **SOUL.md agent identity** | Persistent character for agents: worldview, opinions, reasoning traits. |
@@ -35,7 +35,7 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 | **CLI UI modernization** | Shared display module, brand mark `◆`, quiet/JSON mode. Consistent across all 53 commands. |
 | **Quality & metrics modules** | Token tracking, budget management, quality scoring, A/B feedback testing — 4 modules, full unit test coverage. |
 | **Model evaluation suite** | Evaluate local/cloud models across 6 dimensions. Backed by `@matric/eval-client`. |
-| **`aiwg ralph --attach` / `ralph-attach`** | Stay attached to or re-attach to any running Ralph loop's output from any terminal. |
+| **`aiwg ralph --attach` / `ralph-attach`** | Stay attached to or re-attach to any running agent loop's output from any terminal. |
 | **MCP sidecar docs (all 8 providers)** | Full integration guides, minimal + full config templates, quickstart sections for every provider. |
 
 ### Added
@@ -94,8 +94,8 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 - **Claude Code `@`-link best practices** (#427) — guidance for `@`-link usage in agent memory contexts
 - **MCP sidecar integration docs for all 8 providers** (#503–#510) — full integration guides at `docs/integrations/{provider}-mcp-sidecar.md`; minimal + full config templates for cursor, opencode, warp, windsurf; sidecar section appended to all 8 provider quickstart guides
 - **`aiwg mcp install windsurf` and `aiwg mcp install warp`** — two install targets added; generate `~/.codeium/windsurf/mcp_config.json` and `~/.warp/mcp.json`
-- **`aiwg ralph --attach`** — stay attached to a Ralph loop's output after launch; streams live to stdout; Ctrl+C detaches without stopping the loop
-- **`aiwg ralph-attach [--loop-id <id>]`** — re-attach to any running Ralph loop's output stream from any terminal session
+- **`aiwg ralph --attach`** — stay attached to an agent loop's output after launch; streams live to stdout; Ctrl+C detaches without stopping the loop
+- **`aiwg ralph-attach [--loop-id <id>]`** — re-attach to any running agent loop's output stream from any terminal session
 - **`.gitignore` advisory** (#553) — `aiwg use` and `aiwg new` advise `.gitignore` patterns for AIWG runtime directories (`.aiwg/working/`, `.aiwg/ralph/`, `.claude/`, etc.)
 - **MCP config injection** (#554) — `aiwg config` can inject MCP server configurations into supported providers
 - **Claude Code reference expansion** (#570–#573) — Agent Teams, scheduled agents, remote triggers, and worktree isolation documented in depth; `subagent_type` catalog audited against Claude Code built-in types
@@ -104,7 +104,7 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 ### Fixed
 
 - **`sdlc-accelerate` handler** — "No handler found" error; `SdlcAccelerateHandler` implemented
-- **External Ralph loop startup crash** — `SemanticMemory` constructors received objects instead of path strings; loops always dead on arrival
+- **External agent loop startup crash** — `SemanticMemory` constructors received objects instead of path strings; loops always dead on arrival
 - **`--dangerous` flag position** — was appended after prompt; moved before so it is treated as CLI flag
 - **Codex model IDs** — `gpt-5.3-codex` aliases now map to gpt-5.4 canonical IDs (#590)
 - **OpenCode 1.0.x adapter** — event-stream parsing updated; silent output drop fixed
@@ -207,7 +207,7 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 
 - **`platform-paths.ts`** — Copilot commands path `.github/commands` → `.github/agents` to match JS provider behavior
 - **Ralph external SnapshotManager** — API mismatch causing fatal path error during loop execution
-- **Ralph loop state cleanup** — completed loops now clean up state files automatically
+- **Agent loop state cleanup** — completed loops now clean up state files automatically
 - **Unused `basename` import** in ralph-launcher removed
 - **CI `.aiwg/` exclusion** — added gates to build-plugins, ci, and npm-publish workflows
 
@@ -248,7 +248,7 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 
 - **`docsite-build.yml` workflow** — validates doc site builds on push/PR to main/develop when `docs/**` changes; uses dbbuilder publisher with `strictLinks: true` for broken link detection
 - **`docsite-deploy.yml` workflow** — builds and deploys doc site to docs.aiwg.io on `v*` tag push via SSH/rsync to integro-dev-004; includes build verification, SSH key management, and post-deploy checks
-- **Reliability Patterns section** on welcome page — Ralph Loop, Ensemble Validation, @-Mention Traceability
+- **Reliability Patterns section** on welcome page — Agent Loop, Ensemble Validation, @-Mention Traceability
 - **CLI Reference** quick link on welcome page
 
 ### Changed
@@ -517,13 +517,13 @@ Closes #75, #76, #77, #78, #79, #80, #81, #82, #83, #253
 
 | What changed | Why you care |
 |--------------|--------------|
-| **`/address-issues` command** | Issue-thread-driven ralph loops with 2-way human-AI collaboration via issue comments |
+| **`/address-issues` command** | Issue-thread-driven agent loops with 2-way human-AI collaboration via issue comments |
 | **Context window budget** | Configure `AIWG_CONTEXT_WINDOW` to control parallel subagent limits on local/GPU systems |
 | **`--interactive` and `--guidance`** | Standard AIWG parameters for discovery prompts and upfront direction |
 
 ### Added
 
-**Issue-Driven Ralph Loop** (#333):
+**Issue-Driven Agent Loop** (#333):
 
 - New `/address-issues` command for systematically working through open issues using issue threads as the collaboration surface
 - 3-step cycle protocol per issue: work → post structured status comment → scan thread for human feedback
@@ -622,7 +622,7 @@ Closes #75, #76, #77, #78, #79, #80, #81, #82, #83, #253
 | What changed | Why you care |
 |--------------|--------------|
 | **Universal deployment** | All 8 providers now receive all 4 artifact types (agents, commands, skills, rules) |
-| **External Ralph loop** | Crash-resilient iterative task execution across sessions (6-8 hours) |
+| **External agent loop** | Crash-resilient iterative task execution across sessions (6-8 hours) |
 | **Research framework** | 8 specialized research agents, 10 commands, 8 templates |
 | **Rules as artifact type** | Deployable enforcement rules propagate to all platforms |
 | **Agent persistence** | Anti-laziness detection, HITL gates, cross-loop learning |
@@ -669,7 +669,7 @@ Closes #75, #76, #77, #78, #79, #80, #81, #82, #83, #253
 - NL router updated with research, planning, and clarification routing patterns
 - Simple language translations document at `docs/simple-language-translations.md`
 
-**External Ralph Loop - Crash-Resilient Task Execution**:
+**External Agent Loop - Crash-Resilient Task Execution**:
 
 - **`/ralph-external` command** - External supervisor for long-running sessions (6-8 hours)
   - Wraps Claude Code sessions with crash recovery and cross-session persistence
@@ -852,7 +852,7 @@ Closes #75, #76, #77, #78, #79, #80, #81, #82, #83, #253
 |--------------|--------------|
 | **Dynamic addon discovery** | All providers now automatically pick up new addons like Ralph |
 | **No more hardcoded paths** | New addons work across all 8 providers without code changes |
-| **Ralph addon support** | Ralph loop agents, commands, and skills now deploy everywhere |
+| **Ralph addon support** | Agent loop agents, commands, and skills now deploy everywhere |
 
 ### Fixed
 
@@ -949,11 +949,11 @@ All addons in `agentic/code/addons/` are now automatically deployed:
 
 ---
 
-## [2026.01.3] - 2026-01-13 – "Ralph Loop & Issue Management" Release
+## [2026.01.3] - 2026-01-13 – "Agent Loop & Issue Management" Release
 
 | What changed | Why you care |
 |--------------|--------------|
-| **Ralph Loop** | Iterative AI task execution - "iteration beats perfection" methodology |
+| **Agent Loop** | Iterative AI task execution - "iteration beats perfection" methodology |
 | **--interactive & --guidance** | All commands now support interactive mode and custom guidance |
 | Unified issue management | Create, update, list, sync issues across Gitea/GitHub/Jira/Linear or local files |
 | Issue auto-sync | Commits with "Fixes #X" automatically update and close issues |
@@ -963,14 +963,14 @@ All addons in `agentic/code/addons/` are now automatically deployed:
 
 ### Added
 
-**Ralph Loop - Iterative AI Task Execution**:
+**Agent Loop - Iterative AI Task Execution**:
 
 - **`/ralph` command** - Execute tasks iteratively until completion criteria met
   - Parse task definition and verification criteria
   - Execute → Verify → Learn → Iterate cycle
   - Errors become learning data, not session-ending failures
   - Configurable max iterations and timeout
-- **`/ralph-status`** - Check status of current or previous Ralph loop
+- **`/ralph-status`** - Check status of current or previous agent loop
 - **`/ralph-resume`** - Resume interrupted loop from last checkpoint
 - **`/ralph-abort`** - Abort running loop and optionally revert changes
 - **Ralph addon** (`agentic/code/addons/ralph/`):

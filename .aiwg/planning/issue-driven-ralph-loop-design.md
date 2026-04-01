@@ -1,4 +1,4 @@
-# Issue-Driven Ralph Loop Design
+# Issue-Driven Agent Loop Design
 
 ## Problem Statement
 

@@ -32,7 +32,7 @@ Core meta-utility rules for agent coordination, context management, and platform
 
 #### context-budget
 **Summary**: When `AIWG_CONTEXT_WINDOW` is set in project context, agents must respect the declared context budget for parallel subagent spawning. Opt-in directive with lookup tables: max parallel count scales from 1 (32k) to 20 (512k+). Formula: `max(1, floor(context_window / 50000))`. Includes compaction guidance per tier (aggressive, moderate, standard, relaxed) and per-subagent output size targets.
-**When to apply**: Parallel subagent spawning, task scheduling, Ralph loop batching, orchestrator fan-out on constrained systems
+**When to apply**: Parallel subagent spawning, task scheduling, agent loop batching, orchestrator fan-out on constrained systems
 **Full rule**: @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/context-budget.md
 
 #### diagram-generation

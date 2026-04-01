@@ -176,7 +176,7 @@ A command or feature exists in code but has no documentation section at all.
 **Approach**:
 1. Extract metadata from code (description, arguments, tools, category)
 2. Generate section using cli-reference format template
-3. Ralph loop: validate → fix → validate until section is complete
+3. Agent loop: validate → fix → validate until section is complete
 
 ### Outdated Description
 
@@ -185,7 +185,7 @@ A section exists but its description is substantially wrong (not just a count).
 **Approach**:
 1. Read current code behavior
 2. Draft updated description
-3. Ralph loop: validate consistency → fix → validate
+3. Agent loop: validate consistency → fix → validate
 
 ### Missing Examples
 

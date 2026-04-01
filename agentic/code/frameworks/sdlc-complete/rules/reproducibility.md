@@ -46,7 +46,7 @@ Workflows MUST checkpoint at:
 1. Phase start (Concept, Inception, Elaboration, Construction, Transition)
 2. Artifact completion
 3. Before external calls
-4. On iteration boundaries (Ralph loops)
+4. On iteration boundaries (agent loops)
 
 ```yaml
 checkpoint:

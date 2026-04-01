@@ -1,11 +1,11 @@
 # Oversight Layer
 
 **Status**: Implemented (Issue #25)
-**Purpose**: Autonomous health monitoring and intervention for long-running Ralph loops
+**Purpose**: Autonomous health monitoring and intervention for long-running agent loops
 
 ## Overview
 
-The Oversight layer provides autonomous health monitoring and intervention capabilities that prevent pathological loop behaviors without requiring human oversight for every iteration. This is critical for long-running Ralph loops that may execute overnight or in unattended environments.
+The Oversight layer provides autonomous health monitoring and intervention capabilities that prevent pathological loop behaviors without requiring human oversight for every iteration. This is critical for long-running agent loops that may execute overnight or in unattended environments.
 
 ### Why Oversight Matters
 
@@ -650,7 +650,7 @@ urgency = {
 Creates a Gitea issue with full context:
 
 ```markdown
-## Ralph Loop Overseer Alert
+## Agent Loop Overseer Alert
 
 **Loop ID:** ralph-ext-001
 **Task:** Fix authentication tests

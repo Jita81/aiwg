@@ -78,7 +78,7 @@ Natural language works directly:
 
 ## Ralph Iterative Loops
 
-Ralph loops support multi-provider execution. While Warp context is deployed via AIWG, Ralph task loops run through the CLI:
+Agent loops support multi-provider execution. While Warp context is deployed via AIWG, agent task loops run through the CLI:
 
 ```bash
 aiwg ralph "Fix all tests" --completion "npm test passes"

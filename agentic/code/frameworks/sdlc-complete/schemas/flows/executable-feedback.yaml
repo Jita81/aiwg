@@ -81,7 +81,7 @@ properties:
 
   ralph_integration:
     $ref: "#/$defs/RalphIntegration"
-    description: "Integration with Ralph loop if running within one"
+    description: "Integration with agent loop if running within one"
 
   timestamps:
     type: object
@@ -429,11 +429,11 @@ $defs:
 
   RalphIntegration:
     type: object
-    description: "Integration with Ralph loop when running within one"
+    description: "Integration with agent loop when running within one"
     properties:
       loop_id:
         type: string
-        description: "Ralph loop ID if applicable"
+        description: "Agent loop ID if applicable"
       iteration:
         type: integer
         description: "Current Ralph iteration"

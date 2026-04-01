@@ -246,7 +246,7 @@ export const allHandlers: CommandHandler[] = [
   // Scaffolding
   ...scaffoldingHandlers,
 
-  // Ralph loop
+  // Agent loop
   ...ralphHandlers,
 
   // Mission Control

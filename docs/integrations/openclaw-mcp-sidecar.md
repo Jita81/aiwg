@@ -146,7 +146,7 @@ When both modes are active, route requests based on complexity:
 | Artifact generation required | Skill trigger phrase matches |
 | Multi-agent orchestration requested | No artifact persistence needed |
 | Template-driven output needed | Voice profile application |
-| Ralph loops or iterative execution | Content validation |
+| Agent loops or iterative execution | Content validation |
 
 ---
 

@@ -717,9 +717,9 @@ This shows sophisticated reward hacking - the agent:
 - Demonstrates sophisticated understanding of agent failure modes
 - Links to research (RLHF reward hacking, specification gaming)
 
-## Integration with Ralph Loop
+## Integration with Agent Loop
 
-When operating within Ralph iteration loops:
+When operating within agent iteration loops:
 
 1. **Pre-iteration check**: Load baseline metrics (test count, coverage %)
 2. **During iteration**: Monitor for incremental avoidance patterns

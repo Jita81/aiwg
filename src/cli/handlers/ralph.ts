@@ -111,7 +111,7 @@ function parseRalphArgs(args: string[]): {
 }
 
 /**
- * Ralph Loop Handler
+ * Agent Loop Handler
  *
  * Executes iterative task loops with automatic completion detection.
  * By default, launches as a detached background process that survives terminal closure.
@@ -119,7 +119,7 @@ function parseRalphArgs(args: string[]): {
  */
 export class RalphHandler implements CommandHandler {
   id = 'ralph';
-  name = 'Ralph Loop';
+  name = 'Agent Loop';
   description = 'Execute iterative task loop with automatic completion detection';
   category = 'ralph' as const;
   aliases = ['ralph', '-ralph', '--ralph'];
@@ -206,7 +206,7 @@ export class RalphHandler implements CommandHandler {
 
   private getHelpText(): string {
     return `
-Ralph Loop - Crash-resilient iterative task execution
+Agent Loop - Crash-resilient iterative task execution
 
 USAGE:
   aiwg ralph "<objective>" --completion "<criteria>" [options]
@@ -271,13 +271,13 @@ EXAMPLES:
 /**
  * Ralph Status Handler
  *
- * Shows current Ralph loop status and iteration history.
+ * Shows current Agent loop status and iteration history.
  * Works across terminal sessions by reading from the loop registry.
  */
 export class RalphStatusHandler implements CommandHandler {
   id = 'ralph-status';
   name = 'Ralph Status';
-  description = 'Show Ralph loop status and iteration history';
+  description = 'Show Agent loop status and iteration history';
   category = 'ralph' as const;
   aliases = ['ralph-status'];
 
@@ -288,7 +288,7 @@ export class RalphStatusHandler implements CommandHandler {
     if (statuses.length === 0) {
       return {
         exitCode: 0,
-        message: 'No Ralph loops found.',
+        message: 'No Agent loops found.',
       };
     }
 
@@ -301,11 +301,11 @@ export class RalphStatusHandler implements CommandHandler {
     if (displayed.length === 0) {
       return {
         exitCode: 0,
-        message: 'No running Ralph loops. Use --all to see completed/failed loops.',
+        message: 'No running Agent loops. Use --all to see completed/failed loops.',
       };
     }
 
-    const lines: string[] = ['Ralph Loop Status', '=================', ''];
+    const lines: string[] = ['Agent Loop Status', '=================', ''];
 
     for (const loop of displayed) {
       const statusIcon =
@@ -342,13 +342,13 @@ export class RalphStatusHandler implements CommandHandler {
 /**
  * Ralph Abort Handler
  *
- * Aborts currently running Ralph loop by killing the background process.
+ * Aborts currently running Agent loop by killing the background process.
  * Works across terminal sessions.
  */
 export class RalphAbortHandler implements CommandHandler {
   id = 'ralph-abort';
   name = 'Ralph Abort';
-  description = 'Abort currently running Ralph loop';
+  description = 'Abort currently running Agent loop';
   category = 'ralph' as const;
   aliases = ['ralph-abort'];
 
@@ -372,13 +372,13 @@ export class RalphAbortHandler implements CommandHandler {
 /**
  * Ralph Resume Handler
  *
- * Resumes previously interrupted Ralph loop as a new background process.
+ * Resumes previously interrupted Agent loop as a new background process.
  * Works across terminal sessions.
  */
 export class RalphResumeHandler implements CommandHandler {
   id = 'ralph-resume';
   name = 'Ralph Resume';
-  description = 'Resume previously aborted Ralph loop';
+  description = 'Resume previously aborted Agent loop';
   category = 'ralph' as const;
   aliases = ['ralph-resume'];
 
@@ -464,7 +464,7 @@ export const ralphExternalHandler: CommandHandler = {
 /**
  * Ralph Memory handler
  *
- * Manage semantic memory entries for Ralph loop learning.
+ * Manage semantic memory entries for Agent loop learning.
  */
 export const ralphMemoryHandler: CommandHandler = {
   id: 'ralph-memory',
@@ -482,12 +482,12 @@ export const ralphMemoryHandler: CommandHandler = {
 /**
  * Ralph Config handler
  *
- * View and set Ralph loop configuration values.
+ * View and set Agent loop configuration values.
  */
 export const ralphConfigHandler: CommandHandler = {
   id: 'ralph-config',
   name: 'Ralph Config',
-  description: 'View and configure Ralph loop settings (show, set, reset, preset)',
+  description: 'View and configure Agent loop settings (show, set, reset, preset)',
   category: 'ralph',
   aliases: ['--ralph-config'],
 
@@ -500,13 +500,13 @@ export const ralphConfigHandler: CommandHandler = {
 /**
  * Ralph Attach Handler
  *
- * Re-attaches to a running Ralph loop's live output stream.
+ * Re-attaches to a running Agent loop's live output stream.
  * Press Ctrl+C to detach — loop continues running in background.
  */
 export class RalphAttachHandler implements CommandHandler {
   id = 'ralph-attach';
   name = 'Ralph Attach';
-  description = 'Attach to a running Ralph loop\'s live output stream';
+  description = 'Attach to a running Agent loop\'s live output stream';
   category = 'ralph' as const;
   aliases = ['ralph-attach'];
 

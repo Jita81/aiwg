@@ -86,7 +86,7 @@ For each assessment, express your thinking using thought types from `@.claude/ru
 ### Example 1: Baseline Capture (Simple)
 
 **Input:**
-Ralph loop starting. Capture baseline metrics for authentication module.
+Agent loop starting. Capture baseline metrics for authentication module.
 
 **Thought Process:**
 ```
@@ -246,7 +246,7 @@ recommendation:
 ### Example 3: Best Output Selection on Loop Completion (Complex)
 
 **Input:**
-Ralph loop completed with 5 iterations. Select best output.
+Agent loop completed with 5 iterations. Select best output.
 
 Iteration history:
 - Iteration 1: quality_score=0.65, tests=6/8, coverage=68%
@@ -696,7 +696,7 @@ termination_logic:
     message: "Escalate to human - {issue} detected"
 ```
 
-## Integration with Ralph Loop
+## Integration with Agent Loop
 
 ### Ralph Hook Points
 

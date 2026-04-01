@@ -357,7 +357,7 @@ RLM integrates with multiple AIWG systems:
 - Parallel execution coordination
 - Aggregation patterns
 
-### Ralph Loops (`tools/ralph-external/`)
+### Agent Loops (`tools/ralph-external/`)
 - Iterative refinement within sub-agents
 - Best-output selection from multiple attempts
 - Feedback-driven improvement

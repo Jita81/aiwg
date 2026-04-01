@@ -352,7 +352,7 @@ Execute tests before returning code. Track execution history. Retry on failure w
 
 ### UAT Before Release (HIGH)
 
-Run `npm run uat` before every stable release tag. All 9 UAT tests must pass. UAT validates the external Ralph loop end-to-end with a stub provider and catches runtime failures that unit tests (which mock the session launcher) cannot detect. See the Release Checklist below for the full gate sequence.
+Run `npm run uat` before every stable release tag. All 9 UAT tests must pass. UAT validates the external agent loop end-to-end with a stub provider and catches runtime failures that unit tests (which mock the session launcher) cannot detect. See the Release Checklist below for the full gate sequence.
 
 ### Failure Mitigation (HIGH)
 
@@ -445,8 +445,8 @@ This is the **artifact directory** - the heart of AIWG's project management:
 ├── deployment/       # Deployment plans, runbooks
 ├── working/          # Temporary files (safe to delete)
 ├── reports/          # Generated status reports
-├── ralph/            # Internal Ralph loop state
-├── ralph-external/   # External Ralph loop state
+├── ralph/            # Internal agent loop state
+├── ralph-external/   # External agent loop state
 └── frameworks/       # Installed framework registry
     ├── registry.json
     ├── sdlc-complete/
@@ -525,7 +525,7 @@ Before pushing a version tag:
    ```bash
    npm run uat
    ```
-   All 9 tests must pass. UAT validates the external Ralph loop end-to-end with a stub provider — it catches runtime API mismatches that unit tests cannot (they mock the session launcher). Do not tag if any UAT test fails.
+   All 9 tests must pass. UAT validates the external agent loop end-to-end with a stub provider — it catches runtime API mismatches that unit tests cannot (they mock the session launcher). Do not tag if any UAT test fails.
 5. **Commit and tag** - `git tag -m "vX.X.X" vX.X.X`
 6. **Push tag to Gitea** - `git push origin main --tags` (automatically creates Gitea Release)
 7. **Optionally mirror to GitHub** - `git push github main --tags`

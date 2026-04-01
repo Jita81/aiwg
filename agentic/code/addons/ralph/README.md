@@ -1,4 +1,4 @@
-# Ralph Loop
+# Agent Loop
 
 Iterative AI task execution with automatic recovery - **iteration beats perfection**.
 

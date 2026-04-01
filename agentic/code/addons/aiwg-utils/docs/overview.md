@@ -50,7 +50,7 @@ Apply when: interactive commands (`--interactive` flag), decision gates, intake 
 
 When `AIWG_CONTEXT_WINDOW` is set, respect the declared budget for parallel subagent spawning. Opt-in directive. Max parallel count scales from 1 (32k context) to 20 (512k+ context) using the formula: `max(1, floor(context_window / 50000))`. Includes compaction guidance and per-subagent output size targets per tier.
 
-Apply when: parallel subagent spawning on constrained systems, Ralph loop batching.
+Apply when: parallel subagent spawning on constrained systems, agent loop batching.
 
 #### diagram-generation
 

@@ -143,7 +143,7 @@ Large tool outputs (>30KB) are saved to disk files instead of truncated. Agents 
 3. Analyze failures from complete output
 ```
 
-This is critical for Ralph loops where test output drives iteration decisions.
+This is critical for agent loops where test output drives iteration decisions.
 See @$AIWG_ROOT/docs/task-management-integration.md for task output patterns.
 
 ## Skills and Commands (#288)

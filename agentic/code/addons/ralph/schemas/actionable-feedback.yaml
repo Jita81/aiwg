@@ -300,7 +300,7 @@ validation_rules:
     enforcement: strict
     rationale: "Self-Refine research shows location specificity correlates with successful refinement"
 
-# Integration with Ralph loop
+# Integration with agent loop
 ralph_integration:
   memory_key: "feedback_history"
   window_size: 5
