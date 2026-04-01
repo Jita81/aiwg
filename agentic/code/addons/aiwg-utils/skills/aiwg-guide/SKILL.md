@@ -177,11 +177,11 @@ If the user's intent is ambiguous:
 
 ## References
 
-- @docs/releases/ -- Release announcements (primary data source for default mode)
-- @docs/cli-reference.md -- Command reference
-- @docs/extensions/overview.md -- Extension system
-- @agentic/code/providers/capability-matrix.yaml -- Provider features
-- @agentic/code/agents/personas/aiwg-steward.md -- Steward agent (handoff target)
+- @$AIWG_ROOT/docs/releases/ -- Release announcements (primary data source for default mode)
+- @$AIWG_ROOT/docs/cli-reference.md -- Command reference
+- @$AIWG_ROOT/docs/extensions/overview.md -- Extension system
+- @$AIWG_ROOT/agentic/code/providers/capability-matrix.yaml -- Provider features
+- @$AIWG_ROOT/agentic/code/agents/personas/aiwg-steward.md -- Steward agent (handoff target)
 - Issue #616 -- Feature request
 - Issue #599 / #600 -- Steward expansion (guide hands off to steward)
 - Issue #604 -- Capability matrix (guide reads for provider queries)

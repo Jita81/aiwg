@@ -72,11 +72,11 @@ Each `@<path>` reference is classified per the AIWG linking contract:
 ```
 Link Check: agentic/code/addons/aiwg-dev/skills/dev-doctor/SKILL.md
 
-  PASS  @$AIWG_ROOT/agentic/code/addons/aiwg-dev/rules/addon-boundaries.md
-  PASS  @.aiwg/AIWG.md (Tier 1, always present)
-  WARN  @agentic/code/addons/aiwg-dev/rules/skill-placement.md
-        → legacy bare ref; use @$AIWG_ROOT/agentic/code/... instead
-  FAIL  @.aiwg/planning/issue-driven-ralph-loop-design.md
+  PASS  $AIWG_ROOT/agentic/code/addons/aiwg-dev/rules/addon-boundaries.md
+  PASS  .aiwg/AIWG.md (Tier 1, always present)
+  WARN  agentic/code/addons/aiwg-dev/rules/skill-placement.md
+        → legacy bare ref; use $AIWG_ROOT/agentic/code/... prefix
+  FAIL  .aiwg/planning/issue-driven-ralph-loop-design.md
         → non-normalized .aiwg/ path (repo-local only)
 
 Result: 2 issues (1 WARN, 1 FAIL)
@@ -97,9 +97,9 @@ References found: 1,341
 
 Violations:
   WARN  agentic/code/addons/my-addon/skills/my-skill/SKILL.md:42
-        @agentic/code/... → use @$AIWG_ROOT/agentic/code/...
+        agentic/code/... (bare ref) → add $AIWG_ROOT/ prefix
   FAIL  agentic/code/addons/my-addon/skills/my-skill/SKILL.md:89
-        @.aiwg/planning/my-design.md → non-normalized (repo-local only)
+        .aiwg/planning/my-design.md → non-normalized (repo-local only)
 
 Overall: WARN (3 warnings, 1 failure)
 Run with --fix to auto-migrate WARN refs.
@@ -116,10 +116,10 @@ Run with --fix to auto-migrate WARN refs.
     {
       "file": "agentic/code/addons/my-addon/skills/my-skill/SKILL.md",
       "line": 42,
-      "ref": "@agentic/code/addons/aiwg-dev/rules/skill-placement.md",
+      "ref": "agentic/code/addons/aiwg-dev/rules/skill-placement.md",
       "result": "WARN",
-      "message": "legacy bare ref — migrate to @$AIWG_ROOT/agentic/code/addons/aiwg-dev/rules/skill-placement.md",
-      "fix": "@$AIWG_ROOT/agentic/code/addons/aiwg-dev/rules/skill-placement.md"
+      "message": "legacy bare ref — add $AIWG_ROOT/ prefix",
+      "fix": "$AIWG_ROOT/agentic/code/addons/aiwg-dev/rules/skill-placement.md"
     }
   ]
 }

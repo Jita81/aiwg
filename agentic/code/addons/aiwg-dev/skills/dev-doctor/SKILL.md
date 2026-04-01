@@ -95,32 +95,26 @@ For each ref found: check against allowlist.
 
 **Step 3**: Scan for bare AIWG-core refs (Section 4b — legacy migration):
 
-```bash
-grep -rn "@agentic/code/\|@src/\|@docs/\|@tools/" agentic/code/ --include="*.md"
-```
+Use Grep tool to search for bare AIWG-core ref patterns — refs to `agentic/code/`, `src/`, `docs/`, `tools/` that lack the `$AIWG_ROOT/` token prefix — in `agentic/code/` markdown files. Each match → WARN: legacy bare ref, needs `$AIWG_ROOT/` prefix.
 
-Each match → WARN: `legacy bare ref — migrate to @$AIWG_ROOT/<path>`
+**Note**: No backtick or code-block escaping exists — any `@<path>` pattern in deployed skills is processed as a file reference regardless of surrounding markup.
 
 **Step 4**: Scan for forbidden deployment-target refs (Section 4c):
 
-```bash
-grep -rn "@\.claude/" agentic/code/ --include="*.md"
-```
-
-Each match → FAIL: `deployment target ref — forbidden in distributable source`
+Use Grep tool to search for `@.claude/` in `agentic/code/` markdown files. Each match → FAIL: deployment target ref, forbidden in distributable source.
 
 **Report format**:
 ```
 SECTION 4 — @file Reference Check
 
   4a — .aiwg/ References
-  PASS  sdlc-complete/agents/requirements-analyst.md  @.aiwg/requirements/ (normalized)
-  FAIL  my-addon/skills/my-skill.md  @.aiwg/planning/my-design.md
+  PASS  sdlc-complete/agents/requirements-analyst.md  .aiwg/requirements/ (normalized)
+  FAIL  my-addon/skills/my-skill.md  .aiwg/planning/my-design.md
         → non-normalized path: only exists in AIWG dev repo
 
   4b — Bare AIWG-core References (legacy)
-  WARN  research-complete/agents/workflow-agent.md  @agentic/code/frameworks/research-complete/...
-        → migrate to @$AIWG_ROOT/agentic/code/...
+  WARN  research-complete/agents/workflow-agent.md  agentic/code/frameworks/research-complete/...
+        → add $AIWG_ROOT/ prefix
 
   4c — Deployment-Target References (forbidden)
   (none)
@@ -182,10 +176,10 @@ SECTION 3 — Placement Violations
 
 SECTION 4 — @file References
   4a .aiwg/ refs:   PASS (all normalized)
-  4b bare AIWG refs: WARN — 2 legacy refs (migrate to @$AIWG_ROOT/)
+  4b bare AIWG refs: WARN — 2 legacy refs (add $AIWG_ROOT/ prefix)
   4c .claude/ refs: PASS (none found)
   WARN  agentic/code/addons/my-addon/skills/my-skill.md
-        @agentic/code/... → migrate to @$AIWG_ROOT/agentic/code/...
+        agentic/code/... (bare ref) → add $AIWG_ROOT/ prefix
 
 SECTION 5 — TypeScript Compilation
   PASS  tsc --noEmit: 0 errors

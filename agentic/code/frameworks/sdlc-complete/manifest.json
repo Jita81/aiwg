@@ -85,6 +85,10 @@
       {
         "path": ".aiwg/compliance/",
         "description": "Compliance documentation (GDPR, PCI DSS, SOC2)"
+      },
+      {
+        "path": ".aiwg/api/",
+        "description": "API contracts and OpenAPI specifications"
       }
     ],
     "normalizedFiles": [

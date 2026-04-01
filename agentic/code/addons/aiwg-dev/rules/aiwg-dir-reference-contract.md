@@ -125,11 +125,17 @@ Skills and agents often need to cross-reference other AIWG-installed files (rule
 | `@tools/<path>` | Bare AIWG core ref (legacy) | NO — use `@$AIWG_ROOT/tools/` |
 | Within-component relative | Local ref | YES — valid within component dir |
 
+## No Escape Mechanism
+
+There is no backtick or code-block escaping for `@` references. Every `@<path>` pattern in a deployed skill or agent is processed as a file-load directive regardless of surrounding markup (inline code, code blocks, bullets). This is by design — agentic systems are confused by excessive backtick nesting just as humans are.
+
+**Consequence**: Examples and documentation in SKILL.md files must NOT use `@` prefix when showing bad/legacy patterns. Drop the `@` prefix in example output and show the raw path instead.
+
 ## Detection
 
 `validate-component`, `dev-doctor` (Section 4), and `link-check` implement the full classification:
 
-1. Find all `@<path>` references in the file(s) under review
+1. Find **all** `@<path>` references in the file(s) under review — including those in code blocks and inline code
 2. Classify per the table above
 3. For `@.aiwg/` refs: load `memory.creates` from all installed manifests; check against allowlist
 4. For `@$TOKEN/` refs: check if TOKEN is set in the environment
