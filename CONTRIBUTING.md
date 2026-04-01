@@ -1,5 +1,26 @@
 # Contributing
 
+## Contributor Setup
+
+Install the AIWG developer tools addon before making changes. It provides rules that prevent common mistakes and skills to validate your work before filing a PR:
+
+```bash
+aiwg use aiwg-dev
+```
+
+This gives you:
+
+| Tool | Purpose | When to Use |
+|------|---------|-------------|
+| `/validate-component` | Check a single skill/agent/command | Before filing a PR |
+| `/validate-addon` | Check an entire addon for release readiness | Before tagging a release |
+| `/dev-doctor` | Full repository health check | When something feels off |
+| `/devkit-create-*` | AI-guided scaffolding for new components | When creating new artifacts |
+
+Rules included enforce correct artifact placement, component completeness, and prevent circular skill calls.
+
+> **Do not place artifacts directly in `.claude/`, `.github/`, or other provider directories.** They must originate in `agentic/code/` and be deployed via `aiwg use`. The `skill-placement` rule enforces this.
+
 ## Manifests and READMEs
 
 We maintain a `manifest.json` and a README/manifest.md in every directory to help agents and humans quickly understand

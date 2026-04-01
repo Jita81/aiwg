@@ -455,6 +455,16 @@ Use this checklist for every new component. Not all items apply to every type â€
 - [ ] Component appears in deployed platform folder
 - [ ] Command/skill/agent is invocable after deployment
 
+> **Before filing a PR**, run the aiwg-dev validation skills (requires `aiwg use aiwg-dev`):
+>
+> ```bash
+> /validate-component <path>   # check a single component
+> /validate-addon <addon-id>   # check the whole addon
+> /dev-doctor                  # full repo health check
+> ```
+>
+> These catch placement violations, missing manifest entries, circular skill calls, and component completeness gaps before review.
+
 ## Context Loading Best Practices for CLAUDE.md
 
 Claude Code automatically reads and loads into context any files directly @-linked from `CLAUDE.md` (or `AGENTS.md`) at session start. This is powerful but must be used carefully â€” large documents linked directly from `CLAUDE.md` consume significant context budget on every session, even when irrelevant to the current task.

@@ -2,6 +2,20 @@
 
 The AIWG Development Kit provides tools for creating, extending, and customizing the AIWG framework ecosystem.
 
+## Prerequisites: Install aiwg-dev
+
+Before using any devkit tools, install the contributor addon:
+
+```bash
+aiwg use aiwg-dev
+```
+
+This deploys:
+- **Rules** — `skill-placement`, `no-circular-skill-calls`, `component-completeness`, `addon-boundaries`
+- **Skills** — `validate-component`, `validate-addon`, `dev-doctor`, and all `devkit-*` commands
+
+`aiwg-dev` is deliberately excluded from `aiwg use all` — it targets AIWG contributors, not end users. See [agentic/code/addons/aiwg-dev/README.md](../../agentic/code/addons/aiwg-dev/README.md) for details.
+
 ## Three-Tier Plugin Taxonomy
 
 AIWG uses a three-tier structure for extensibility:
