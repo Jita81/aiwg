@@ -195,6 +195,7 @@ Run the full reference check:
 
 ## Related
 
+- `docs/development/corpus-navigation-guide.md` — How refs guide agent context loading; composite skill pattern; context architecture
 - `agentic/code/addons/aiwg-dev/rules/aiwg-dir-reference-contract.md` — Enforcement rule
 - `agentic/code/addons/aiwg-dev/skills/link-check/SKILL.md` — Automated link verification
 - `agentic/code/addons/aiwg-dev/rules/addon-boundaries.md` — Source vs project output boundary

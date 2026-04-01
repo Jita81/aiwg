@@ -151,8 +151,48 @@ aiwg use marketing   # Deploys marketing skills
 aiwg use all         # Deploys all skills
 ```
 
+## Reference Design
+
+The References section of a SKILL.md is not a bibliography — it is the primary mechanism for injecting context into the agent. An agent follows `@` refs to load rules, templates, schemas, and related skills as needed. **The skill is the map; the corpus is the territory.**
+
+### Thin skills with refs (preferred)
+
+Avoid restating content that already exists in rules or other skills. Link instead:
+
+```markdown
 ## References
 
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/anti-laziness.md — Never skip tests
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md — Run and verify before completing
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/testing/ — Test artifact templates
+- @.aiwg/testing/ — Project test strategy and coverage baseline
+```
+
+### Composite skills
+
+A composite skill references multiple corpus documents to cover an orchestration that spans concerns. The skill contains minimal prose — it points to the docs that contain the detail:
+
+```markdown
+# Issue Workflow Orchestrator
+
+Coordinates issue listing, commenting, and closure.
+
+## References
+
+- @$AIWG_ROOT/.../skills/issue-list/SKILL.md — Fetch and filter issues
+- @$AIWG_ROOT/.../skills/issue-comment/SKILL.md — Post structured status comments
+- @$AIWG_ROOT/.../skills/issue-close/SKILL.md — Close resolved issues
+- @$AIWG_ROOT/.../rules/context-budget.md — Parallel subagent limits
+```
+
+The agent opens whichever refs are relevant to the current step. Nothing loads until the agent follows a ref.
+
+See `docs/development/corpus-navigation-guide.md` for the full context architecture and design patterns.
+
+## References
+
+- [Corpus Navigation Guide](corpus-navigation-guide.md) — How refs guide agent context; composite skill pattern
+- [Reference Contract](aiwg-dir-reference-contract.md) — What ref patterns are valid
 - [DevKit Overview](devkit-overview.md)
 - [Add-Skill CLI](https://github.com/jmagly/aiwg/blob/main/tools/scaffolding/add-skill.mjs)
 - [Skill Factory Addon](https://github.com/jmagly/aiwg/blob/main/agentic/code/addons/skill-factory/)
