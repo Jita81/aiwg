@@ -40,6 +40,6 @@ When invoked, perform quick citation check:
 
 ## References
 
-- @.claude/rules/citation-policy.md - Citation policy
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/citation-policy.md - Citation policy
 - @.aiwg/research/docs/grade-assessment-guide.md - GRADE guide
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/citation-verifier.md - Verifier agent

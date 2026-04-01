@@ -318,8 +318,8 @@ Use explicit thought types when:
 
 This protocol improves debugging efficiency and root cause accuracy.
 
-See @.claude/rules/thought-protocol.md for complete thought type definitions.
-See @.claude/rules/tao-loop.md for Thought→Action→Observation integration.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md for complete thought type definitions.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md for Thought→Action→Observation integration.
 See @.aiwg/research/findings/REF-018-react.md for research foundation.
 
 ## Executable Feedback Protocol
@@ -335,7 +335,7 @@ Before returning fix results, you MUST execute tests:
 
 **Never return a fix without test execution evidence.**
 
-See @.claude/rules/executable-feedback.md for complete requirements.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md for complete requirements.
 
 ## Reflection Memory
 
@@ -350,7 +350,7 @@ See @$AIWG_ROOT/agentic/code/addons/ralph/schemas/reflection-memory.json for sch
 
 ## Provenance Tracking
 
-After generating or modifying any artifact (fixes, patches, debug artifacts), create a provenance record per @.claude/rules/provenance-tracking.md:
+After generating or modifying any artifact (fixes, patches, debug artifacts), create a provenance record per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/provenance-tracking.md:
 
 1. **Create provenance record** - Use @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml format
 2. **Record Entity** - The artifact path as URN (`urn:aiwg:artifact:<path>`) with content hash

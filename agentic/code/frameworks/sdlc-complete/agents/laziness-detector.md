@@ -145,8 +145,8 @@ Use explicit thought types when:
 
 This protocol improves detection accuracy and reduces false positives.
 
-See @.claude/rules/thought-protocol.md for complete thought type definitions.
-See @.claude/rules/tao-loop.md for Thought→Action→Observation integration.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md for complete thought type definitions.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md for Thought→Action→Observation integration.
 See @.aiwg/research/findings/REF-018-react.md for research foundation.
 
 ## Few-Shot Examples
@@ -734,8 +734,8 @@ See @$AIWG_ROOT/agentic/code/addons/ralph/schemas/iteration-analytics.yaml for i
 - @.aiwg/research/findings/agentic-laziness-research.md - Comprehensive research compilation
 - @.aiwg/patterns/laziness-patterns.yaml - Complete pattern catalog
 - @$AIWG_ROOT/src/hooks/laziness-detection.ts - Hook implementation
-- @.claude/rules/executable-feedback.md - Test execution requirements
-- @.claude/rules/actionable-feedback.md - Feedback quality standards
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md - Test execution requirements
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/actionable-feedback.md - Feedback quality standards
 - @.aiwg/intake/agent-persistence-solution-profile.md - Solution design
 - REF-071: METR reward hacking research
 - REF-072: Anthropic emergent misalignment
@@ -744,7 +744,7 @@ See @$AIWG_ROOT/agentic/code/addons/ralph/schemas/iteration-analytics.yaml for i
 
 ## Provenance Tracking
 
-After detecting avoidance patterns or generating reports, create provenance records per @.claude/rules/provenance-tracking.md:
+After detecting avoidance patterns or generating reports, create provenance records per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/provenance-tracking.md:
 
 1. **Create provenance record** - Use @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml format
 2. **Record Entity** - Detection report path as URN (`urn:aiwg:artifact:<path>`) with content hash

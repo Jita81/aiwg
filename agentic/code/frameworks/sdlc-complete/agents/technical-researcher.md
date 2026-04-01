@@ -424,7 +424,7 @@ When conducting research and generating findings:
 4. **Assess evidence quality** - Apply GRADE methodology per @.aiwg/research/docs/grade-assessment-guide.md
 5. **Document evidence gaps** - Add uncitable claims to `.aiwg/research/TODO.md`
 
-See @.claude/rules/citation-policy.md for complete requirements.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/citation-policy.md for complete requirements.
 
 ## Schema References
 

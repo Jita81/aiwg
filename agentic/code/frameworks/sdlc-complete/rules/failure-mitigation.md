@@ -303,7 +303,7 @@ Track these metrics to monitor failure rates:
 
 - @.aiwg/research/findings/REF-002-failures-in-deployed-llm.md - Failure taxonomy
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/hallucination-detection.yaml - Detection schema
-- @.claude/rules/hitl-gates.md - Quality gates
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/hitl-gates.md - Quality gates
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/error-handling.yaml - Error handling
 - #140 - Implementation issue
 

@@ -237,8 +237,8 @@ Use explicit thought types when:
 
 This protocol improves recovery success rate and provides clear audit trail for learning.
 
-See @.claude/rules/thought-protocol.md for complete thought type definitions.
-See @.claude/rules/tao-loop.md for Thought→Action→Observation integration.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md for complete thought type definitions.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md for Thought→Action→Observation integration.
 See @.aiwg/research/findings/REF-018-react.md for research foundation.
 
 ## ConversableAgent Interface
@@ -1185,12 +1185,12 @@ recovery_session:
 - @.aiwg/requirements/use-cases/UC-AP-004-enforce-recovery-protocol.md - Recovery requirements
 - @.aiwg/patterns/laziness-patterns.yaml - Avoidance pattern catalog
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/laziness-detector.md - Detection agent
-- @.claude/rules/executable-feedback.md - Test execution requirements
-- @.claude/rules/actionable-feedback.md - Feedback quality standards
-- @.claude/rules/hitl-gates.md - Human gate patterns
-- @.claude/rules/thought-protocol.md - Thought type definitions
-- @.claude/rules/tao-loop.md - TAO loop integration
-- @.claude/rules/conversable-agent-interface.md - Agent interface specification
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md - Test execution requirements
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/actionable-feedback.md - Feedback quality standards
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/hitl-gates.md - Human gate patterns
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md - Thought type definitions
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md - TAO loop integration
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/conversable-agent-interface.md - Agent interface specification
 - @$AIWG_ROOT/agentic/code/addons/ralph/schemas/recovery-session.yaml - Recovery session schema
 - REF-057: Agent Laboratory (HITL effectiveness)
 - REF-015: Self-Refine (recovery importance)
@@ -1198,7 +1198,7 @@ recovery_session:
 
 ## Provenance Tracking
 
-After coordinating recovery sessions, create provenance records per @.claude/rules/provenance-tracking.md:
+After coordinating recovery sessions, create provenance records per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/provenance-tracking.md:
 
 1. **Create provenance record** - Use @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml format
 2. **Record Entity** - Recovery session report as URN (`urn:aiwg:artifact:.aiwg/persistence/recoveries/{id}.yaml`)

@@ -12,7 +12,7 @@ Describe the architectural baseline, including views, decisions, and rationale t
 
 ## Reasoning
 
-> Complete this section BEFORE writing the detailed document. Per @.claude/rules/reasoning-sections.md
+> Complete this section BEFORE writing the detailed document. Per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/reasoning-sections.md
 
 1. **Problem Analysis**: What is the core architectural challenge?
    > [Describe the system context, scale, complexity factors driving architecture decisions]

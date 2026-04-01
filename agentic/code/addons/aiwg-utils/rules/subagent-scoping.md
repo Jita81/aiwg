@@ -208,7 +208,7 @@ If deeper decomposition is needed, the parent agent should handle it.
 
 Before delegating, estimate whether the task fits comfortably in context. If `AIWG_CONTEXT_WINDOW` is set in the project context file, use that value as the available context. Otherwise, assume the platform default.
 
-See `@.claude/rules/context-budget.md` for the full context budget configuration system, including parallel subagent limits and compaction guidance.
+See `@$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/context-budget.md` for the full context budget configuration system, including parallel subagent limits and compaction guidance.
 
 **Context Budget Formula**:
 ```
@@ -316,7 +316,7 @@ When an orchestrator receives a large ticket or workflow:
 - **CORRECT**: Decompose into N atomic subtasks, spawn N subagents (one per subtask)
 - **WRONG**: Give one subagent the entire ticket with N tasks bundled together
 
-**Note**: If `AIWG_CONTEXT_WINDOW` is set, the total number of *concurrent* parallel subagents should respect the budget limit. All N subtasks still execute — just in sequential waves rather than all at once. See `@.claude/rules/context-budget.md`.
+**Note**: If `AIWG_CONTEXT_WINDOW` is set, the total number of *concurrent* parallel subagents should respect the budget limit. All N subtasks still execute — just in sequential waves rather than all at once. See `@$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/context-budget.md`.
 
 ### Orchestrator Pattern Examples
 
@@ -443,19 +443,19 @@ Aggregate results
 
 ### With Instruction Comprehension
 
-These rules complement `@.claude/rules/instruction-comprehension.md`:
+These rules complement `@$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/instruction-comprehension.md`:
 - Instruction comprehension: Understand the full user request
 - Subagent scoping: Break that request into manageable chunks for delegation
 
 ### With Research Before Decision
 
-These rules complement `@.claude/rules/research-before-decision.md`:
+These rules complement `@$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md`:
 - Research-before-decision: Know what needs to be done
 - Subagent scoping: Delegate that work effectively without overload
 
 ### With Anti-Laziness
 
-These rules complement `@.claude/rules/anti-laziness.md`:
+These rules complement `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/anti-laziness.md`:
 - Anti-laziness: Complete the task, don't take shortcuts
 - Subagent scoping: Complete the task by delegating appropriately, not overloading
 
@@ -490,7 +490,7 @@ Before spawning a subagent:
 - [ ] If multiple similar tasks exist, spawning separate subagents instead of bundling
 - [ ] Delegation depth will not exceed 2 levels
 - [ ] Context budget estimated and within safe bounds (<50% of window)
-- [ ] If `AIWG_CONTEXT_WINDOW` is set, parallel count is within budget (see `@.claude/rules/context-budget.md`)
+- [ ] If `AIWG_CONTEXT_WINDOW` is set, parallel count is within budget (see `@$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/context-budget.md`)
 
 Before giving a subagent multiple tasks:
 
@@ -506,11 +506,11 @@ Before limiting the number of subagents spawned:
 
 ## References
 
-- @.claude/rules/context-budget.md - Context window budget configuration and parallel limits
-- @.claude/rules/instruction-comprehension.md - Understanding user requests
-- @.claude/rules/research-before-decision.md - Informed delegation
-- @.claude/rules/anti-laziness.md - Complete work without shortcuts
-- @.claude/rules/tao-loop.md - TAO loop standardization
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/context-budget.md - Context window budget configuration and parallel limits
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/instruction-comprehension.md - Understanding user requests
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md - Informed delegation
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/anti-laziness.md - Complete work without shortcuts
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md - TAO loop standardization
 - @$AIWG_ROOT/agentic/code/addons/rlm/README.md - RLM mode for deep recursive delegation (overrides depth-2 limit)
 - `.aiwg/research/findings/REF-089-recursive-language-models.md` - Research evidence for RLM depth trade-offs
 

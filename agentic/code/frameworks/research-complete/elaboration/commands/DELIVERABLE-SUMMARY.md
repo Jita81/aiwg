@@ -188,7 +188,7 @@ All commands follow token security rules:
 - [x] Download from trusted sources only
 - [x] No sensitive data logged
 
-**Reference**: @.claude/rules/token-security.md
+**Reference**: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/token-security.md
 
 ## Traceability
 
@@ -291,7 +291,7 @@ Commands are ready for test case development:
 - **Agents**: `.aiwg/flows/research-framework/elaboration/agents/*-agent-spec.md`
 - **Architecture**: `.aiwg/flows/research-framework/elaboration/architecture/research-framework-architecture.md`
 - **Vision**: `.aiwg/flows/research-framework/inception/vision-document.md`
-- **Token Security**: `@.claude/rules/token-security.md`
+- **Token Security**: `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/token-security.md`
 
 ## Acceptance Criteria
 

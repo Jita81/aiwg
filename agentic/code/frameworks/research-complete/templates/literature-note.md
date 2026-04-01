@@ -46,7 +46,7 @@ framework: research-complete
 
 ## Reasoning
 
-> Complete this section BEFORE detailed note-taking. Per @.claude/rules/reasoning-sections.md
+> Complete this section BEFORE detailed note-taking. Per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/reasoning-sections.md
 
 1. **Relevance Analysis**: Why is this paper important for AIWG?
    > [Explain how this research connects to AIWG's mission, which components it affects, and priority level]
@@ -73,8 +73,8 @@ Priority: HIGH - Core pattern used throughout framework
    > [Concrete plans for integrating this research into AIWG]
 
 <!-- EXAMPLE:
-- Standardize all agents to use TAO loop (@.claude/rules/tao-loop.md)
-- Add thought protocol with 6 thought types (@.claude/rules/thought-protocol.md)
+- Standardize all agents to use TAO loop (@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md)
+- Add thought protocol with 6 thought types (@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md)
 - Implement tool grounding in Ralph loop
 - Add TAO logging for agent debugging
 -->
@@ -303,14 +303,14 @@ ReAct Loop:
 
 <!-- EXAMPLE:
 **AIWG Components Affected:**
-- @.claude/rules/tao-loop.md - Core loop structure
-- @.claude/rules/thought-protocol.md - Thought type taxonomy
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md - Core loop structure
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md - Thought type taxonomy
 - @$AIWG_ROOT/agentic/code/addons/ralph/schemas/iteration-analytics.yaml - Logging format
 - All tool-using agents in @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/
 -->
 
 **Implementation Status:**
-- [ ] Rule defined (@.claude/rules/)
+- [ ] Rule defined (create in agentic/code/.../rules/)
 - [ ] Schema created (if applicable)
 - [ ] Agents updated
 - [ ] Tests written
@@ -349,12 +349,12 @@ ReAct Loop:
 
 ### AIWG Implementation
 
-- @.claude/rules/tao-loop.md - [Implementation of this research]
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md - [Implementation of this research]
 - @.aiwg/requirements/use-cases/UC-XXX.md - [Use case driven by this research]
 
 <!-- EXAMPLE:
-- @.claude/rules/tao-loop.md - TAO loop standardization
-- @.claude/rules/thought-protocol.md - Six thought types
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md - TAO loop standardization
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md - Six thought types
 - @.aiwg/requirements/use-cases/UC-AP-002-track-reasoning.md - Reasoning transparency
 -->
 
@@ -367,7 +367,7 @@ This paper is the foundation for agent transparency. The TAO loop makes agent th
 
 Question: Can we extend TAO to multi-agent conversations? Each agent maintains TAO, but how do they coordinate?
 
-Insight: The thought types in @.claude/rules/thought-protocol.md map well to different TAO phases:
+Insight: The thought types in @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md map well to different TAO phases:
 - Goal/Progress thoughts → Pre-action planning
 - Extraction/Reasoning thoughts → Post-observation analysis
 - Exception thoughts → Error detection in observation

@@ -171,8 +171,8 @@ Use explicit thought types when:
 
 This protocol improves requirement quality and enables better validation of completeness.
 
-See @.claude/rules/thought-protocol.md for complete thought type definitions.
-See @.claude/rules/tao-loop.md for Thought→Action→Observation integration.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md for complete thought type definitions.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md for Thought→Action→Observation integration.
 See @.aiwg/research/findings/REF-018-react.md for research foundation.
 
 ## Usage Examples
@@ -867,4 +867,4 @@ When generating requirements documentation that references research or industry 
 3. **Never fabricate** - No invented standards, benchmarks, or metric sources
 4. **Document evidence gaps** - Flag requirements needing empirical validation
 
-See @.claude/rules/citation-policy.md for complete requirements.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/citation-policy.md for complete requirements.

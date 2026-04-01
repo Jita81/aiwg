@@ -167,7 +167,7 @@ done
 ```markdown
 ## Identity
 
-See @.claude/agents/{name}.soul.md for this agent's character and voice.
+See .claude/agents/{name}.soul.md (deployed soul file) for this agent's character and voice.
 ```
 
 If `--agent <name>` is specified, only wire that single agent.

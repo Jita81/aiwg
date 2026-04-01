@@ -353,7 +353,7 @@ on_failure:
 
 - @.aiwg/research/findings/REF-001-production-agentic.md - Reliability patterns
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/agent-capability-matrix.yaml - Capability definitions
-- @.claude/rules/failure-mitigation.md - Failure handling
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/failure-mitigation.md - Failure handling
 - #141 - Implementation issue
 
 ---

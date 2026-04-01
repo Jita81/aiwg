@@ -58,7 +58,7 @@ All markdown templates follow progressive disclosure pattern:
 
 ### Reasoning Sections
 
-All templates include mandatory reasoning sections per `@.claude/rules/reasoning-sections.md`:
+All templates include mandatory reasoning sections per `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/reasoning-sections.md`:
 
 1. **Problem Analysis** - What are we solving?
 2. **Approach Planning** - How will we approach this?
@@ -194,11 +194,11 @@ Before completing any artifact from these templates:
 - **Schemas**: `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/`
 
 ### Rules
-- `@.claude/rules/progressive-disclosure.md` - Template structure
-- `@.claude/rules/reasoning-sections.md` - Reasoning requirements
-- `@.claude/rules/provenance-tracking.md` - Provenance tracking
-- `@.claude/rules/research-metadata.md` - Metadata requirements
-- `@.claude/rules/citation-policy.md` - Citation standards
+- `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/progressive-disclosure.md` - Template structure
+- `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/reasoning-sections.md` - Reasoning requirements
+- `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/provenance-tracking.md` - Provenance tracking
+- `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/research-metadata.md` - Metadata requirements
+- `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/citation-policy.md` - Citation standards
 
 ## Manifest
 

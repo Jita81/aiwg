@@ -969,4 +969,4 @@ All future test runs will be compared against this baseline.
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/testing/regression.yaml - Regression schema
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/regression-check.md - Regression testing command
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/test-engineer.md - Test Engineer agent
-- @.claude/rules/executable-feedback.md - Executable feedback rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md - Executable feedback rules

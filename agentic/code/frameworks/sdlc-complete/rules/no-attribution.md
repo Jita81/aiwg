@@ -136,7 +136,7 @@ There is a difference between:
 - **Attribution**: Recording who made a decision and why (valuable, keep this)
 - **Advertising**: Stamping tool branding on every output (wasteful, remove this)
 
-AIWG provenance tracking (`@.claude/rules/provenance-tracking.md`) handles real attribution through structured records. Commit-level branding serves the tool vendor, not the developer.
+AIWG provenance tracking (`@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/provenance-tracking.md`) handles real attribution through structured records. Commit-level branding serves the tool vendor, not the developer.
 
 ## Platform-Universal Enforcement
 
@@ -189,7 +189,7 @@ The `aiwg new` command MUST include this rule in the generated project's context
 
 ## References
 
-- @.claude/rules/provenance-tracking.md - Real attribution via structured provenance
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/provenance-tracking.md - Real attribution via structured provenance
 - @CLAUDE.md - Project commit conventions
 
 ---

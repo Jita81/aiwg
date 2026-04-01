@@ -24,7 +24,7 @@ reasoning_required: true
 
 ## Reasoning
 
-> Complete this section BEFORE writing the detailed content. Per @.claude/rules/reasoning-sections.md
+> Complete this section BEFORE writing the detailed content. Per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/reasoning-sections.md
 
 1. **Actor Analysis**: Who are the stakeholders and what are their goals?
    > [Describe primary and secondary actors, their objectives, and why they need this capability]

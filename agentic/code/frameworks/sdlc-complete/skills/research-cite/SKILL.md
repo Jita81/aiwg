@@ -56,6 +56,6 @@ Hedging: "demonstrates" / "shows" appropriate for HIGH quality evidence
 
 ## References
 
-- @.claude/rules/citation-policy.md - Citation enforcement rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/citation-policy.md - Citation enforcement rules
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/frontmatter-schema.yaml - Source metadata
 - @.aiwg/research/docs/grade-assessment-guide.md - GRADE levels

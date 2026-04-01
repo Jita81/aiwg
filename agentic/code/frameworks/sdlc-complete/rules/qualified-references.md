@@ -196,7 +196,7 @@ Existing @-mentions without qualifiers remain valid but are candidates for enhan
 ## References
 
 - @.aiwg/research/findings/REF-056-fair-principles.md - FAIR research
-- @.claude/rules/mention-wiring.md - Base mention rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/mention-wiring.md - Base mention rules
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml - PROV integration
 - #116 - Implementation issue
 

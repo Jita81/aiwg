@@ -527,4 +527,4 @@ locals {
 
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/token-security.md - Token and secret management
 - @$AIWG_ROOT/agentic/code/addons/security/secure-token-load.md - Secure token loading patterns
-- @.claude/rules/token-security.md - Security enforcement rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/token-security.md - Security enforcement rules

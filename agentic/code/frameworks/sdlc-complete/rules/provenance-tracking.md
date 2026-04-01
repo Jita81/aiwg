@@ -77,7 +77,7 @@ This guide explains the implementation.
 
 - @.aiwg/requirements/use-cases/UC-104-provenance.md - Source requirement
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml - Schema specification
-- @.claude/rules/mention-wiring.md - Wiring conventions
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/mention-wiring.md - Wiring conventions
 
 ## Overview
 
@@ -301,7 +301,7 @@ derived_from:
 ## References
 
 - @.aiwg/requirements/use-cases/UC-XXX.md - Primary use case
-- @.claude/rules/provenance-tracking.md - Provenance requirements
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/provenance-tracking.md - Provenance requirements
 ```
 
 ## Provenance Record Location
@@ -405,7 +405,7 @@ All exceptions MUST be documented in `.aiwg/research/provenance/docs/exceptions.
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml - PROV record schema
 - @.aiwg/research/provenance/docs/provenance-guide.md - Detailed guidance
 - @.aiwg/research/provenance/examples/artifact-creation.yaml - Example record
-- @.claude/rules/mention-wiring.md - @-mention wiring patterns
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/mention-wiring.md - @-mention wiring patterns
 - @https://www.w3.org/TR/prov-dm/ - W3C PROV-DM specification
 
 ## Questions

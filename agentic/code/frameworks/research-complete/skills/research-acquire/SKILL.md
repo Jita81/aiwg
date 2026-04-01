@@ -149,4 +149,4 @@ source:
 - @$AIWG_ROOT/src/research/services/acquisition-service.ts - Download implementation
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/frontmatter-schema.yaml - Metadata format
 - @.aiwg/research/fixity-manifest.json - Checksum tracking
-- @.claude/rules/provenance-tracking.md - Provenance requirements
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/provenance-tracking.md - Provenance requirements

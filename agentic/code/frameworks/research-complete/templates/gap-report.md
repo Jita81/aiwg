@@ -42,7 +42,7 @@ Current research on agentic systems focuses on single-agent reasoning and tool u
 
 ## Reasoning
 
-> Complete this section BEFORE detailed gap analysis. Per @.claude/rules/reasoning-sections.md
+> Complete this section BEFORE detailed gap analysis. Per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/reasoning-sections.md
 
 1. **Gap Identification Strategy**: How will we systematically identify gaps?
    > [Define methodology: keyword search, citation network analysis, claim aggregation, synthesis review]

@@ -46,7 +46,7 @@ Network centers on three foundational papers: Chain-of-Thought (REF-016, 2022), 
 
 ## Reasoning
 
-> Complete this section BEFORE network analysis. Per @.claude/rules/reasoning-sections.md
+> Complete this section BEFORE network analysis. Per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/reasoning-sections.md
 
 1. **Network Construction Strategy**: How do we build this citation network?
    > [Define seed papers, expansion rules, inclusion criteria]
@@ -226,7 +226,7 @@ Top influencers:
 **Papers in Path:**
 1. REF-016: Chain-of-Thought Prompting (2022)
 2. REF-018: ReAct (2022)
-3. AIWG Implementation: @.claude/rules/tao-loop.md (2026)
+3. AIWG Implementation: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md (2026)
 
 **Knowledge Flow:**
 
@@ -261,7 +261,7 @@ Confidence: HIGH - Multiple replications, consistent findings across domains
 **Path 2: Self-Refine → Best-Output-Selection → Ralph Loop**
 
 1. REF-015: Self-Refine (2023)
-2. AIWG Implementation: @.claude/rules/best-output-selection.md (2026)
+2. AIWG Implementation: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/best-output-selection.md (2026)
 
 Knowledge Flow:
 Self-Refine discovers: Quality non-monotonic across iterations
@@ -306,7 +306,7 @@ Pattern: All subsequent agent work cites at least one paper from this cluster
 
 <!-- EXAMPLE:
 Core reasoning patterns: TAO loop, thought protocol, ensemble review.
-Implementation: @.claude/rules/tao-loop.md, @.claude/rules/thought-protocol.md, @.claude/rules/ensemble-review.md
+Implementation: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md, @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md, @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/ensemble-review.yaml
 -->
 
 #### Cluster 2: [Cluster Name]
@@ -555,7 +555,7 @@ Implication: Gap in multi-agent coordination + iterative refinement. AIWG combin
 - @.aiwg/research/findings/ - Literature notes for papers
 - @.aiwg/research/synthesis/ - Cross-paper synthesis topics
 - @.aiwg/research/gap-reports/ - Research gaps identified
-- @.claude/rules/ - AIWG implementations citing papers
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/ — AIWG implementations citing papers
 
 ## Template Usage Notes
 

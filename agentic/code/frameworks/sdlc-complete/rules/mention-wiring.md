@@ -54,7 +54,7 @@ When generating agent definitions, include References section:
 
 - @.aiwg/requirements/use-cases/UC-XXX.md - Primary use case
 - @$AIWG_ROOT/src/relevant/module.ts - Implementation this agent works with
-- @.claude/commands/related-command.md - Related slash command
+- @$AIWG_ROOT/agentic/code/.../skills/related-skill/SKILL.md - Related skill
 ```
 
 ### Creating Commands/Skills
@@ -65,7 +65,7 @@ When generating commands or skills, include References section:
 ## References
 
 - @.aiwg/requirements/use-cases/UC-XXX.md - Use case this implements
-- @.claude/agents/related-agent.md - Agent that uses this command
+- @$AIWG_ROOT/agentic/code/.../agents/related-agent.md - Agent that uses this skill
 ```
 
 ## Reference Categories
@@ -80,8 +80,8 @@ Use semantic tags to indicate relationship type:
 | `@tests` | Test coverage location | `@tests @test/unit/module.test.ts` |
 | `@source` | Source code for this test | `@source @$AIWG_ROOT/src/module.ts` |
 | `@depends` | Dependencies | `@depends @$AIWG_ROOT/src/utils/helper.ts` |
-| `@agent` | Related agent | `@agent @.claude/agents/test-engineer.md` |
-| `@command` | Related command | `@command @.claude/commands/generate-tests.md` |
+| `@agent` | Related agent | `@agent @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/test-engineer.md` |
+| `@command` | Related command | `@command @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/generate-tests/SKILL.md` |
 
 ## Bidirectional Linking
 

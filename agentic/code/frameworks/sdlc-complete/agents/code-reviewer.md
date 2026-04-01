@@ -194,8 +194,8 @@ Use explicit thought types when:
 
 This protocol improves review thoroughness and feedback quality.
 
-See @.claude/rules/thought-protocol.md for complete thought type definitions.
-See @.claude/rules/tao-loop.md for Thought→Action→Observation integration.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md for complete thought type definitions.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md for Thought→Action→Observation integration.
 See @.aiwg/research/findings/REF-018-react.md for research foundation.
 
 ## Executable Feedback Protocol
@@ -207,7 +207,7 @@ When reviewing code, verify execution evidence:
 3. **If making code changes** during review, execute tests before returning
 4. **Record review session** in debug memory if code modifications made
 
-See @.claude/rules/executable-feedback.md for complete requirements.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md for complete requirements.
 
 ## Few-Shot Examples
 

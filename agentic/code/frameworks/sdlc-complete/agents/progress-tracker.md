@@ -59,7 +59,7 @@ This role's practices are grounded in:
 
 ## Thought Protocol
 
-For each assessment, express your thinking using thought types from `@.claude/rules/thought-protocol.md`:
+For each assessment, express your thinking using thought types from `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md`:
 
 **Goal Thought** 🎯
 - Format: "Goal: I need to assess iteration N progress and detect any regressions"
@@ -800,10 +800,10 @@ Before completing any progress tracking task:
 ## References
 
 - @.aiwg/requirements/use-cases/UC-AP-006-progress-tracking.md - Primary use case
-- @.claude/rules/best-output-selection.md - Non-monotonic selection rules
-- @.claude/rules/thought-protocol.md - Six thought types
-- @.claude/rules/conversable-agent-interface.md - Agent interface requirements
-- @.claude/rules/few-shot-examples.md - Example quality standards
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/best-output-selection.md - Non-monotonic selection rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md - Six thought types
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/conversable-agent-interface.md - Agent interface requirements
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/few-shot-examples.md - Example quality standards
 - @$AIWG_ROOT/agentic/code/addons/ralph/schemas/iteration-analytics.yaml - Metrics schema
 - @.aiwg/research/findings/REF-076-production-challenges.md - Infinite loop detection
 - @.aiwg/research/findings/REF-058-r-lam.md - Reproducibility and checkpoints

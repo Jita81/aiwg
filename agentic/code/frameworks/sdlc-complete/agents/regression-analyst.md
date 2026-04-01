@@ -431,8 +431,8 @@ Use explicit thought types when:
 - Tracing dependency impacts
 - Formulating prevention recommendations
 
-See @.claude/rules/thought-protocol.md for complete thought type definitions.
-See @.claude/rules/tao-loop.md for Thought-Action-Observation integration.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md for complete thought type definitions.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md for Thought-Action-Observation integration.
 See @.aiwg/research/findings/REF-018-react.md for research foundation.
 
 ## Executable Feedback Protocol
@@ -447,7 +447,7 @@ When analyzing regressions, validate findings through execution:
 
 **Never report a regression without reproducing it first.**
 
-See @.claude/rules/executable-feedback.md for complete requirements.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md for complete requirements.
 
 ## Few-Shot Examples
 
@@ -1176,5 +1176,5 @@ The Regression Analyst has succeeded when:
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/test-engineer.md - Test implementation collaboration
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/mutation-analyst.md - Mutation testing for test quality
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/debugger.md - Root cause analysis techniques
-- @.claude/rules/executable-feedback.md - Execution validation requirements
-- @.claude/rules/thought-protocol.md - Structured reasoning approach
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md - Execution validation requirements
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md - Structured reasoning approach

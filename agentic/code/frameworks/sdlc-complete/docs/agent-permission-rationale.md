@@ -251,7 +251,7 @@ This would require runtime support and audit logging.
 
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/agent-permission-tiers.md - Tier definitions
 - @.aiwg/research/findings/REF-013-metagpt.md - Executable feedback pattern
-- @.claude/rules/executable-feedback.md - Execution requirements for code agents
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md - Execution requirements for code agents
 - Claude Code v2.1.33 Release Notes - Task(agent_type) introduction
 
 ---

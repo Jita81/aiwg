@@ -58,5 +58,5 @@ When invoked, analyze the research corpus and report on its health:
 
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/frontmatter-schema.yaml - Frontmatter requirements
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/fixity-manifest.yaml - Fixity verification
-- @.claude/rules/research-metadata.md - Research metadata rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/research-metadata.md - Research metadata rules
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/citation-verifier.md - Citation Verifier agent

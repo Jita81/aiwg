@@ -253,7 +253,7 @@ When creating agent definitions that generate documentation:
    4. Use appropriate hedging language
    5. Include full citation with @-mention
 
-   See @.claude/rules/citation-policy.md for complete requirements.
+   See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/citation-policy.md for complete requirements.
    ```
 
 2. **Quality assessment MUST be documented**:
@@ -273,7 +273,7 @@ When creating agent definitions that generate documentation:
    ```markdown
    ## References
 
-   - @.claude/rules/citation-policy.md - Citation requirements
+   - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/citation-policy.md - Citation requirements
    - @.aiwg/research/quality-assessment.md - GRADE methodology
    - @.aiwg/research/sources/ - Research corpus
    ```

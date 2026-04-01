@@ -13,7 +13,7 @@ document to anchor prioritization and stakeholder expectations throughout Incept
 
 ## Reasoning
 
-> Complete this section BEFORE writing the detailed vision. Per @.claude/rules/reasoning-sections.md
+> Complete this section BEFORE writing the detailed vision. Per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/reasoning-sections.md
 
 1. **Need Justification**: Why is this product/system necessary?
    > [Describe the market need, business opportunity, or problem being solved]

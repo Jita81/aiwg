@@ -509,8 +509,8 @@ Apply structured reasoning throughout compliance checking:
 
 **Primary emphasis for Compliance Checker**: Extraction, Reasoning
 
-See @.claude/rules/thought-protocol.md for complete thought type definitions.
-See @.claude/rules/tao-loop.md for Thought→Action→Observation integration.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md for complete thought type definitions.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md for Thought→Action→Observation integration.
 
 ## Few-Shot Examples
 

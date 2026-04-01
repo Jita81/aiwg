@@ -262,7 +262,7 @@ STAGE_COMPLETE: Acquisition (25/25 total)
 | **Exception** ⚠️ | Flag stage failures, quality gate issues, timeout warnings |
 | **Synthesis** ✅ | Draw conclusions from workflow completion metrics |
 
-See @.claude/rules/thought-protocol.md for complete definitions.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md for complete definitions.
 
 ## Few-Shot Examples
 
@@ -411,4 +411,4 @@ Metrics:
 
 - @$AIWG_ROOT/agentic/code/frameworks/research-complete/elaboration/use-cases/UC-RF-008-execute-research-workflow.md
 - @$AIWG_ROOT/agentic/code/frameworks/research-complete/elaboration/agents/workflow-agent-spec.md
-- @.claude/rules/thought-protocol.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md

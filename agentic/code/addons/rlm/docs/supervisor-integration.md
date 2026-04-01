@@ -793,7 +793,7 @@ if (metadata.depth >= maxDepth) {
 - @$AIWG_ROOT/agentic/code/addons/rlm/schemas/rlm-task-tree.yaml - Task tree schema
 - @$AIWG_ROOT/tools/daemon/task-store.mjs - Persistent task state
 - @.aiwg/research/findings/REF-089-recursive-language-models.md - RLM research
-- @.claude/rules/subagent-scoping.md - Subagent context minimization
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md - Subagent context minimization
 - Issue #323 - Supervisor integration implementation
 
 ---

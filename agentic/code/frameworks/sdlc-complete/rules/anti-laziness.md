@@ -718,9 +718,9 @@ Before completing any code task:
 - @.aiwg/architecture/agent-persistence-sad.md - Architecture document
 - @.aiwg/requirements/use-cases/UC-AP-001-detect-test-deletion.md - Detection use cases
 - @.aiwg/requirements/use-cases/UC-AP-004-enforce-recovery-protocol.md - Recovery protocol
-- @.claude/rules/executable-feedback.md - Executable feedback rules
-- @.claude/rules/actionable-feedback.md - Actionable feedback rules
-- @.claude/rules/tao-loop.md - TAO loop standardization
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md - Executable feedback rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/actionable-feedback.md - Actionable feedback rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md - TAO loop standardization
 - @$AIWG_ROOT/agentic/code/addons/persistence/patterns/avoidance-catalog.yaml - Pattern catalog
 - @$AIWG_ROOT/agentic/code/addons/ralph/schemas/reflection-memory.json - Reflection memory schema
 

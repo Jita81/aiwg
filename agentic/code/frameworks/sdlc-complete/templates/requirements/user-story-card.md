@@ -8,7 +8,7 @@ reasoning_required: true
 
 ## Reasoning
 
-> Complete this section BEFORE writing the detailed story. Per @.claude/rules/reasoning-sections.md
+> Complete this section BEFORE writing the detailed story. Per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/reasoning-sections.md
 
 1. **User Need**: Why does the user need this capability?
    > [Describe the user's problem, pain point, or goal that this story addresses]

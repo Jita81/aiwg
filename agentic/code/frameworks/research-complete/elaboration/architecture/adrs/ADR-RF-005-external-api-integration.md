@@ -407,7 +407,7 @@ Cache Status:
 
 ### Token Security
 
-Per @.claude/rules/token-security.md:
+Per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/token-security.md:
 
 ```typescript
 // Load API keys securely
@@ -426,7 +426,7 @@ logger.info('API configured', { api: 'semantic-scholar', hasKey: !!semanticSchol
 - @$AIWG_ROOT/agentic/code/frameworks/research-complete/elaboration/use-cases/UC-RF-001-discover-research-papers.md - Discovery use case
 - @$AIWG_ROOT/agentic/code/frameworks/research-complete/elaboration/use-cases/UC-RF-002-acquire-research-source.md - Acquisition use case
 - @$AIWG_ROOT/agentic/code/frameworks/research-complete/inception/initial-risk-assessment.md - Risk T-02 (API Rate Limits)
-- @.claude/rules/token-security.md - API key security patterns
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/token-security.md - API key security patterns
 - [Semantic Scholar API](https://api.semanticscholar.org/api-docs/) - API documentation
 - [CrossRef API](https://api.crossref.org/) - DOI resolution
 

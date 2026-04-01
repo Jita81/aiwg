@@ -1044,7 +1044,7 @@ If critical issues arise in v2:
 
 ## Provenance Tracking
 
-After generating or modifying any artifact (API contracts, interface definitions, versioning docs), create a provenance record per @.claude/rules/provenance-tracking.md:
+After generating or modifying any artifact (API contracts, interface definitions, versioning docs), create a provenance record per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/provenance-tracking.md:
 
 1. **Create provenance record** - Use @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml format
 2. **Record Entity** - The artifact path as URN (`urn:aiwg:artifact:<path>`) with content hash

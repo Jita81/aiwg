@@ -188,5 +188,5 @@ flow:
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/citation-verifier.md - Citation Verifier
 - @.aiwg/research/docs/grade-assessment-guide.md - GRADE methodology
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/quality-dimensions.yaml - Quality schema
-- @.claude/rules/citation-policy.md - Citation policy
-- @.claude/rules/hitl-gates.md - HITL gate rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/citation-policy.md - Citation policy
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/hitl-gates.md - HITL gate rules

@@ -930,4 +930,4 @@ consumer_contracts:
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/regression-baseline/SKILL.md
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/regression-bisect/SKILL.md
 - @.aiwg/research/findings/REF-013-metagpt.md
-- @.claude/rules/executable-feedback.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md

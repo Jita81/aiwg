@@ -566,4 +566,4 @@ rlm:
 - @$AIWG_ROOT/agentic/code/addons/ralph/schemas/loop-state.yaml - Ralph state reference
 - @$AIWG_ROOT/agentic/code/addons/ralph/commands/ralph-status.md - Ralph status command
 - @.aiwg/research/findings/REF-089-recursive-language-models.md - RLM research foundation
-- @.claude/rules/tao-loop.md - TAO loop structure underlying RLM
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md - TAO loop structure underlying RLM

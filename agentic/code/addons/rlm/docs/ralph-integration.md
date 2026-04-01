@@ -999,7 +999,7 @@ ralph "task" --strategy rlm --completion "Final set AND output exists"
 - @$AIWG_ROOT/agentic/code/addons/rlm/schemas/rlm-state.yaml - State management
 - @$AIWG_ROOT/agentic/code/addons/ralph/agents/ralph-loop.md - Ralph loop implementation
 - @.aiwg/research/findings/REF-089-recursive-language-models.md - Research foundation
-- @.claude/rules/tao-loop.md - TAO loop standardization
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md - TAO loop standardization
 - @$AIWG_ROOT/tools/daemon/agent-supervisor.mjs - Task routing
 - Issue #329 - Ralph-RLM integration epic
 

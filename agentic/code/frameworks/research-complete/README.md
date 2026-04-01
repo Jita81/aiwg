@@ -472,7 +472,7 @@ Research Framework is part of the AIWG project. See main project documentation f
 
 - @$AIWG_ROOT/agentic/code/frameworks/research-complete/elaboration/ - Complete elaboration specifications
 - @$AIWG_ROOT/agentic/code/frameworks/research-complete/inception/vision-document.md - Framework vision and goals
-- @.claude/rules/thought-protocol.md - Agent reasoning protocol
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md - Agent reasoning protocol
 - [Semantic Scholar API](https://www.semanticscholar.org/product/api)
 - [FAIR Principles](https://www.go-fair.org/fair-principles/)
 - [GRADE Framework](https://www.gradeworkinggroup.org/)

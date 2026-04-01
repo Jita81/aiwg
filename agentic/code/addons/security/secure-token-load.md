@@ -326,7 +326,7 @@ Before using tokens in any automation:
 
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/token-security.md - Comprehensive security documentation
 - @~/.claude/CLAUDE.md - Token file locations and conventions
-- @.claude/rules/token-security.md - Enforcement rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/token-security.md - Enforcement rules
 - [Gitea API Docs](https://docs.gitea.io/en-us/api-usage/)
 - [GitHub Token Best Practices](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure)
 

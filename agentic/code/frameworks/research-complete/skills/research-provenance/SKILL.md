@@ -356,5 +356,5 @@ Output:
 - @$AIWG_ROOT/src/research/services/provenance-service.ts - Provenance query implementation
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml - PROV schema
 - @.aiwg/research/provenance/README.md - Provenance tracking
-- @.claude/rules/provenance-tracking.md - Provenance requirements
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/provenance-tracking.md - Provenance requirements
 - https://www.w3.org/TR/prov-dm/ - W3C PROV-DM specification

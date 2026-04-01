@@ -432,4 +432,4 @@ Generate scheduled reports:
 - @$AIWG_ROOT/src/research/services/status-service.ts - Health check implementation
 - @.aiwg/research/fixity-manifest.json - Integrity tracking
 - @.aiwg/research/README.md - Corpus structure
-- @.claude/rules/citation-policy.md - Policy compliance
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/citation-policy.md - Policy compliance

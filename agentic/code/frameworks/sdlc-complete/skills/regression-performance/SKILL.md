@@ -922,4 +922,4 @@ jobs:
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/performance-engineer.md - Performance optimization agent
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/testing/regression.yaml - Regression schema
 - @.aiwg/research/findings/REF-013-metagpt.md - Debug memory pattern for performance history
-- @.claude/rules/executable-feedback.md - Execution validation requirements
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md - Execution validation requirements

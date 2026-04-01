@@ -485,4 +485,4 @@ Execute:
 - @$AIWG_ROOT/agentic/code/frameworks/research-complete/workflows/ - Workflow definitions
 - @$AIWG_ROOT/src/research/services/workflow-service.ts - Workflow orchestration
 - @.aiwg/research/workflows/ - Workflow state and logs
-- @.claude/rules/hitl-gates.md - Human gate patterns
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/hitl-gates.md - Human gate patterns

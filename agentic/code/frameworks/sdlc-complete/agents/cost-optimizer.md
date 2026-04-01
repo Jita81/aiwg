@@ -522,8 +522,8 @@ Apply structured reasoning throughout cost optimization:
 
 **Primary emphasis for Cost Optimizer**: Extraction, Progress
 
-See @.claude/rules/thought-protocol.md for complete thought type definitions.
-See @.claude/rules/tao-loop.md for Thought→Action→Observation integration.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md for complete thought type definitions.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md for Thought→Action→Observation integration.
 
 ## Few-Shot Examples
 

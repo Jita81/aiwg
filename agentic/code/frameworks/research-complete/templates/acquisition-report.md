@@ -65,7 +65,7 @@ framework: research-complete
 
 ## Reasoning
 
-> Complete this section BEFORE acquisition attempt. Per @.claude/rules/reasoning-sections.md
+> Complete this section BEFORE acquisition attempt. Per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/reasoning-sections.md
 
 1. **Acquisition Strategy Selection**: What's the best way to obtain this paper?
    > [Evaluate options: open access, institutional access, request from authors, purchase]
@@ -549,7 +549,7 @@ Before marking acquisition complete:
 - @.aiwg/research/sources/[filename].pdf - Acquired paper
 - @.aiwg/research/fixity-manifest.json - Fixity tracking
 - @.aiwg/research/provenance/records/REF-XXX.prov.yaml - Provenance
-- @.claude/rules/research-metadata.md - Metadata requirements
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/research-metadata.md - Metadata requirements
 - @$AIWG_ROOT/agentic/code/frameworks/research-complete/schemas/acquisition-schema.yaml - Schema
 
 ## Template Usage Notes

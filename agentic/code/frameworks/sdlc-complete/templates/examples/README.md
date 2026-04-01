@@ -395,8 +395,8 @@ Have suggestions for new examples or improvements?
 
 ## References
 
-- @.claude/rules/progressive-disclosure.md - Progressive disclosure principles
-- @.claude/rules/few-shot-examples.md - Few-shot learning research
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/progressive-disclosure.md - Progressive disclosure principles
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/few-shot-examples.md - Few-shot learning research
 - @.aiwg/research/findings/REF-006-cognitive-load-theory.md - Cognitive load research
 - @CLAUDE.md - AIWG development guide
 

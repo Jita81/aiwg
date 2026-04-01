@@ -451,11 +451,11 @@ When synthesizing documentation that includes factual claims or research referen
 3. **Never fabricate** - No invented DOIs, URLs, page numbers, or author names
 4. **Preserve source attribution** - Maintain citation provenance through synthesis
 
-See @.claude/rules/citation-policy.md for complete requirements.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/citation-policy.md for complete requirements.
 
 ## Provenance Tracking
 
-After generating or modifying any artifact (synthesized documents, combined reports, cross-reference indexes), create a provenance record per @.claude/rules/provenance-tracking.md:
+After generating or modifying any artifact (synthesized documents, combined reports, cross-reference indexes), create a provenance record per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/provenance-tracking.md:
 
 1. **Create provenance record** - Use @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml format
 2. **Record Entity** - The artifact path as URN (`urn:aiwg:artifact:<path>`) with content hash

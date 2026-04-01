@@ -1446,7 +1446,7 @@ describe("Error handling", () => {
 - @$AIWG_ROOT/agentic/code/frameworks/research-complete/inception/solution-profile.md - Overall research framework design
 - @$AIWG_ROOT/agentic/code/frameworks/research-complete/inception/use-cases.md - Research workflow use cases
 - @$AIWG_ROOT/agentic/code/frameworks/research-complete/elaboration/data-model.md - Paper metadata schema
-- @.claude/rules/token-security.md - Secure token handling patterns
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/token-security.md - Secure token handling patterns
 - [Semantic Scholar API Docs](https://api.semanticscholar.org/api-docs/)
 - [CrossRef API Docs](https://api.crossref.org/swagger-ui/)
 - [arXiv API Docs](https://arxiv.org/help/api/)

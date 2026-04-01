@@ -63,4 +63,4 @@ When providing domain expertise that references research, standards, or industry
 3. **Distinguish expertise from evidence** - Mark claims from domain experience vs. cited research
 4. **Never fabricate** - No invented regulations, standards, or statistical claims
 
-See @.claude/rules/citation-policy.md for complete requirements.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/citation-policy.md for complete requirements.

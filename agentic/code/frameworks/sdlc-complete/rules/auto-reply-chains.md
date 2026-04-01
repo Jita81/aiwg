@@ -370,7 +370,7 @@ Before enabling auto-reply chains:
 ## References
 
 - @.aiwg/research/findings/REF-022-autogen.md - Research foundation
-- @.claude/rules/conversable-agent-interface.md - Agent interface
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/conversable-agent-interface.md - Agent interface
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/agent-pubsub.yaml - Event-driven activation
 - #183 - Implementation issue
 

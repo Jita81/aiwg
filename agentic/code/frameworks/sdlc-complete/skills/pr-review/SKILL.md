@@ -264,5 +264,5 @@ After completing review:
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/regression-check.md - Regression detection command
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/regression-analyst.md - Deep regression analysis agent
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/testing/regression.yaml - Regression detection schema
-- @.claude/rules/executable-feedback.md - Executable feedback loop implementation
-- @.claude/rules/test-first-development.md - Test-first principles
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md - Executable feedback loop implementation
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md - Test-first principles

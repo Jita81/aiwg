@@ -225,11 +225,11 @@ Before declaring work complete:
 
 ## References
 
-- @.claude/rules/research-before-decision.md - Complementary research rule
-- @.claude/rules/anti-laziness.md - Complementary anti-shortcut rules
-- @.claude/rules/tao-loop.md - TAO loop standardization
-- @.claude/rules/thought-protocol.md - Thought type protocol
-- @.claude/rules/failure-mitigation.md - Instruction following failure archetype
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md - Complementary research rule
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/anti-laziness.md - Complementary anti-shortcut rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md - TAO loop standardization
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md - Thought type protocol
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/failure-mitigation.md - Instruction following failure archetype
 
 ---
 

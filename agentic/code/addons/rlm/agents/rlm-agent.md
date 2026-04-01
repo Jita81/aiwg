@@ -843,9 +843,9 @@ Artifacts:
 ## References
 
 - @.aiwg/research/findings/REF-089-recursive-language-models.md - Research foundation
-- @.claude/rules/research-before-decision.md - Environment-first pattern validation
-- @.claude/rules/subagent-scoping.md - Delegation depth limits
-- @.claude/rules/tao-loop.md - Structurally equivalent to RLM REPL loop
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md - Environment-first pattern validation
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md - Delegation depth limits
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md - Structurally equivalent to RLM REPL loop
 - @$AIWG_ROOT/agentic/code/addons/ralph/agents/ralph-loop.md - Iterative execution framework
 - @$AIWG_ROOT/tools/daemon/agent-supervisor.mjs - Task routing to RLM agent
 - @$AIWG_ROOT/tools/daemon/task-store.mjs - Persistent state management

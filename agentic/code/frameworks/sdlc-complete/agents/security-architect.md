@@ -60,6 +60,6 @@ Always use `--json` flag for programmatic consumption. See @$AIWG_ROOT/agentic/c
 - @$AIWG_ROOT/src/plugin/registry-validator.ts - Plugin security validation implementation
 - @.aiwg/requirements/nfr-modules/security.md - Security requirements
 - @.aiwg/architecture/software-architecture-doc.md - Architecture baseline (Section 4.6 Security View)
-- @.claude/commands/security-gate.md - Security gate command
-- @.claude/commands/flow-security-review-cycle.md - Security review workflow
-- @.claude/commands/security-audit.md - Comprehensive security audit
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/security-gate/SKILL.md - Security gate command
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/flow-security-review-cycle/SKILL.md - Security review workflow
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/security-audit/SKILL.md - Comprehensive security audit

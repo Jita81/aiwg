@@ -649,9 +649,9 @@ From REF-089 Appendix B, important limitations to be aware of:
 ## References
 
 - @.aiwg/research/findings/REF-089-recursive-language-models.md - Complete research analysis
-- @.claude/rules/research-before-decision.md - Complementary research patterns
-- @.claude/rules/subagent-scoping.md - Context limits for delegation
-- @.claude/rules/tao-loop.md - TAO loop integration with RLM patterns
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md - Complementary research patterns
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md - Context limits for delegation
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md - TAO loop integration with RLM patterns
 - @$AIWG_ROOT/tools/ralph-external/ - Ralph loop implementation
 - @$AIWG_ROOT/tools/daemon/agent-supervisor.mjs - Agent orchestration
 - @$AIWG_ROOT/tools/daemon/task-store.mjs - Persistent state (REPL variables)

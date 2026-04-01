@@ -206,10 +206,10 @@ Before making a technical decision, verify:
 
 ## References
 
-- @.claude/rules/thought-protocol.md - Research thought type
-- @.claude/rules/tao-loop.md - TAO loop standardization
-- @.claude/rules/anti-laziness.md - Complementary anti-shortcut rules
-- @.claude/rules/failure-mitigation.md - Failure archetype mitigations
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md - Research thought type
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md - TAO loop standardization
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/anti-laziness.md - Complementary anti-shortcut rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/failure-mitigation.md - Failure archetype mitigations
 
 ---
 

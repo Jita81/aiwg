@@ -59,7 +59,7 @@ When invoked, perform systematic citation verification:
 
 ## References
 
-- @.claude/rules/citation-policy.md - Citation enforcement rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/citation-policy.md - Citation enforcement rules
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/citation-verifier.md - Citation Verifier agent
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/citation-audit.yaml - Audit schema
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/hallucination-detection.yaml - Detection patterns

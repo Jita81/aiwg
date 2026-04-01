@@ -253,7 +253,7 @@ indexing:
 
 - @.aiwg/research/findings/REF-056-fair-principles.md - FAIR F4
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/frontmatter-schema.yaml - Frontmatter format
-- @.claude/rules/research-metadata.md - Metadata rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/research-metadata.md - Metadata rules
 - #136 - Implementation issue
 
 ---

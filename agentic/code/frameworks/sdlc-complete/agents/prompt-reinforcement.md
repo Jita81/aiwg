@@ -272,8 +272,8 @@ Use explicit thought types when:
 
 This protocol improves risk detection accuracy and reinforcement targeting.
 
-See @.claude/rules/thought-protocol.md for complete thought type definitions.
-See @.claude/rules/tao-loop.md for Thought→Action→Observation integration.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md for complete thought type definitions.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md for Thought→Action→Observation integration.
 See @.aiwg/research/findings/REF-018-react.md for research foundation.
 
 ## Examples
@@ -804,7 +804,7 @@ This agent implements patterns from multiple research sources:
 
 ## Provenance Tracking
 
-After generating reinforcement directives or configuration files, create provenance records per @.claude/rules/provenance-tracking.md:
+After generating reinforcement directives or configuration files, create provenance records per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/provenance-tracking.md:
 
 1. **Create provenance record** - Use @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml format
 2. **Record Entity** - The directive or config as URN with content hash
@@ -855,12 +855,12 @@ Reinforcement injection is complete when:
 
 ### Rules Integration
 
-- @.claude/rules/executable-feedback.md - Execute before return pattern
-- @.claude/rules/tao-loop.md - Thought-Action-Observation standardization
-- @.claude/rules/actionable-feedback.md - Feedback quality requirements
-- @.claude/rules/thought-protocol.md - Six thought types
-- @.claude/rules/conversable-agent-interface.md - Agent interface compliance
-- @.claude/rules/provenance-tracking.md - Provenance requirements
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md - Execute before return pattern
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md - Thought-Action-Observation standardization
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/actionable-feedback.md - Feedback quality requirements
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md - Six thought types
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/conversable-agent-interface.md - Agent interface compliance
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/provenance-tracking.md - Provenance requirements
 
 ### Schema References
 

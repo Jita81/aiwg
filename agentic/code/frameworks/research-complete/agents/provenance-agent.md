@@ -207,7 +207,7 @@ Last operation: 2026-02-03 16:30:00
 | **Exception** ⚠️ | Flag log write failures (non-blocking) |
 | **Synthesis** ✅ | Draw conclusions from lineage patterns |
 
-See @.claude/rules/thought-protocol.md for complete definitions.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md for complete definitions.
 
 ## Few-Shot Examples
 
@@ -330,6 +330,6 @@ Note: PDFs excluded for copyright compliance
 
 - @$AIWG_ROOT/agentic/code/frameworks/research-complete/elaboration/use-cases/UC-RF-005-track-provenance.md
 - @$AIWG_ROOT/agentic/code/frameworks/research-complete/elaboration/agents/provenance-agent-spec.md
-- @.claude/rules/provenance-tracking.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/provenance-tracking.md
 - [W3C PROV Overview](https://www.w3.org/TR/prov-overview/)
 - [PROV-JSON](https://www.w3.org/Submission/prov-json/)

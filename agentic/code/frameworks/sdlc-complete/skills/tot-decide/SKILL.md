@@ -119,4 +119,4 @@ ADR saved: .aiwg/architecture/adr-auth-approach.md
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/enhancements/architecture-designer-tot-protocol.md - Agent enhancement
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/architecture/adr-with-tot.md - ADR template
 - @.aiwg/research/findings/REF-020-tree-of-thoughts.md - Research foundation
-- @.claude/rules/reasoning-sections.md - Reasoning requirements
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/reasoning-sections.md - Reasoning requirements

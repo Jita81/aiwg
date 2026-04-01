@@ -170,6 +170,6 @@ Trace the full provenance chain for `.aiwg/architecture/adr-005-caching.md`
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml - PROV record schema
 - @.aiwg/research/provenance/docs/provenance-guide.md - Detailed guidance
 - @.aiwg/research/provenance/examples/artifact-creation.yaml - Example record
-- @.claude/rules/provenance-tracking.md - Provenance tracking rules
-- @.claude/rules/qualified-references.md - Qualified @-mention rules
-- @.claude/rules/mention-wiring.md - @-mention wiring patterns
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/provenance-tracking.md - Provenance tracking rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/qualified-references.md - Qualified @-mention rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/mention-wiring.md - @-mention wiring patterns

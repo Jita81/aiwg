@@ -1047,10 +1047,10 @@ To enable persistence for existing Ralph installations:
 
 ### Rules
 
-- `@.claude/rules/conversable-agent-interface.md` - ConversableAgent protocol
-- `@.claude/rules/executable-feedback.md` - Execute before return pattern
-- `@.claude/rules/actionable-feedback.md` - Feedback quality requirements
-- `@.claude/rules/best-output-selection.md` - Best output selection rules
+- `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/conversable-agent-interface.md` - ConversableAgent protocol
+- `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md` - Execute before return pattern
+- `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/actionable-feedback.md` - Feedback quality requirements
+- `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/best-output-selection.md` - Best output selection rules
 
 ---
 

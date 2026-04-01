@@ -325,8 +325,8 @@ Apply structured reasoning throughout debt analysis:
 
 **Primary emphasis for Technical Debt Analyst**: Extraction, Reasoning
 
-See @.claude/rules/thought-protocol.md for complete thought type definitions.
-See @.claude/rules/tao-loop.md for Thought→Action→Observation integration.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md for complete thought type definitions.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md for Thought→Action→Observation integration.
 
 ## Few-Shot Examples
 

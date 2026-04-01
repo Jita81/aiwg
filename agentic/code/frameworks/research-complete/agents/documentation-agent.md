@@ -263,8 +263,8 @@ Use explicit thought types when:
 
 This protocol improves documentation quality and prevents hallucinations.
 
-See @.claude/rules/thought-protocol.md for complete thought type definitions.
-See @.claude/rules/tao-loop.md for Thought→Action→Observation integration.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md for complete thought type definitions.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md for Thought→Action→Observation integration.
 See @.aiwg/research/findings/REF-018-react.md for research foundation.
 
 ## Few-Shot Examples
@@ -695,7 +695,7 @@ grade_assessment:
 
 ## Provenance Tracking
 
-After generating summaries and extractions, create provenance records per @.claude/rules/provenance-tracking.md:
+After generating summaries and extractions, create provenance records per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/provenance-tracking.md:
 
 1. **Create provenance record** using @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml format
 2. **Record Entity** - Summary/extraction as URN
@@ -711,8 +711,8 @@ See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/provenance-manager.
 - @$AIWG_ROOT/agentic/code/frameworks/research-complete/elaboration/agents/documentation-agent-spec.md - Agent specification
 - @$AIWG_ROOT/agentic/code/frameworks/research-complete/elaboration/use-cases/UC-RF-003-document-research-paper.md - Primary use case
 - @$AIWG_ROOT/agentic/code/frameworks/research-complete/elaboration/use-cases/UC-RF-006-assess-source-quality.md - GRADE assessment
-- @.claude/rules/thought-protocol.md - Thought type definitions
-- @.claude/rules/tao-loop.md - TAO loop integration
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md - Thought type definitions
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md - TAO loop integration
 - @.aiwg/research/findings/REF-018-react.md - ReAct methodology research
 - [GRADE Framework](https://www.gradeworkinggroup.org/)
 - [Zettelkasten Method](https://zettelkasten.de/introduction/)

@@ -14,7 +14,7 @@ reasoning_required: true
 
 ## Reasoning
 
-> Complete this section BEFORE detailed evaluation. Per @.claude/rules/reasoning-sections.md
+> Complete this section BEFORE detailed evaluation. Per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/reasoning-sections.md
 
 1. **Context Analysis**: What architectural concern does this address?
    > [Describe the specific architectural problem or opportunity driving this decision]

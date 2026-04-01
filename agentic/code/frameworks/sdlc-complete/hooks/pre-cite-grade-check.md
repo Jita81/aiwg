@@ -59,7 +59,7 @@ Required fix: Change to one of:
   - "Limited evidence suggests that prompt chaining may improve accuracy"
   - "Preliminary findings indicate potential accuracy improvements from prompt chaining"
 
-Reference: @.claude/rules/citation-policy.md (Rule 6)
+Reference: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/citation-policy.md (Rule 6)
 ===================================
 ```
 
@@ -126,7 +126,7 @@ hook:
 
 ## References
 
-- @.claude/rules/citation-policy.md - Citation policy rules (Rule 6: GRADE hedging)
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/citation-policy.md - Citation policy rules (Rule 6: GRADE hedging)
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/quality-assessor.md - Quality Assessor agent
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/citation-verifier.md - Citation Verifier agent
 - @.aiwg/research/docs/grade-assessment-guide.md - GRADE methodology

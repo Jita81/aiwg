@@ -482,7 +482,7 @@ The executable feedback loop conforms to:
 ## References
 
 - @.aiwg/research/findings/REF-013-metagpt.md — MetaGPT research findings
-- @.claude/rules/executable-feedback.md — Executable feedback rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md — Executable feedback rules
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/executable-feedback.yaml — Workflow schema
 - @$AIWG_ROOT/agentic/code/addons/ralph/schemas/debug-memory.yaml — Debug memory schema
 - @$AIWG_ROOT/agentic/code/addons/ralph/docs/reflection-memory-guide.md — Related: Reflexion memory guide

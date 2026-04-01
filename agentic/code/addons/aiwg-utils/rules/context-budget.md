@@ -128,7 +128,7 @@ These rules operate at the prompt/convention level. There is no runtime system t
 
 ### With Subagent Scoping Rules
 
-This rule extends `@.claude/rules/subagent-scoping.md` Rule 7 (Context Budget Estimation). When `AIWG_CONTEXT_WINDOW` is set, the context budget formula uses the declared value instead of assuming a default window size.
+This rule extends `@$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md` Rule 7 (Context Budget Estimation). When `AIWG_CONTEXT_WINDOW` is set, the context budget formula uses the declared value instead of assuming a default window size.
 
 ### With Ralph Loops
 
@@ -220,9 +220,9 @@ Before spawning parallel subagents:
 
 ## References
 
-- @.claude/rules/subagent-scoping.md - Subagent scoping and delegation rules
-- @.claude/rules/subagent-scoping.md#rule-7 - Context budget estimation
-- @.claude/rules/instruction-comprehension.md - Understanding user constraints
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md - Subagent scoping and delegation rules
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md#rule-7 - Context budget estimation
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/instruction-comprehension.md - Understanding user constraints
 
 ---
 

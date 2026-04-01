@@ -118,7 +118,7 @@ Contents:
 
 ## Resume Support
 
-State tracked in `.aiwg/reports/accelerate-state.json` (schema: `@accelerate-state.yaml`). `--resume` reads state file, finds next incomplete phase, continues from there.
+State tracked in `.aiwg/reports/accelerate-state.json` (schema: `accelerate-state.yaml`). `--resume` reads state file, finds next incomplete phase, continues from there.
 
 ## Dry Run Behavior
 
@@ -126,6 +126,11 @@ With `--dry-run`: detect entry point, show planned phases with commands to invok
 
 ## References
 
-- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/accelerate-state.yaml
-- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/management/construction-ready-brief-template.md
-- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/sdlc-accelerate/SKILL.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/flows/ — Phase flow templates
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/ — Artifact templates used in each phase
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/ — Agent catalog for agent dispatch
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/accelerate-state.yaml — State file schema
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/management/construction-ready-brief-template.md — Final brief template
+- @$AIWG_ROOT/src/cli/handlers/sdlc-accelerate.ts — CLI command handler
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference entry
+- @$AIWG_ROOT/agentic/code/addons/ralph/skills/ralph/SKILL.md — Ralph loop pattern (used in doc generation refinement)

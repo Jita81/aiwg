@@ -177,4 +177,4 @@ Avoids:
 - @$AIWG_ROOT/src/research/services/documentation-service.ts - Documentation implementation
 - @$AIWG_ROOT/agentic/code/frameworks/research-complete/templates/finding-template.md - Finding template
 - @$AIWG_ROOT/agentic/code/addons/voice-framework/voices/technical-authority.md - Voice profile
-- @.claude/rules/citation-policy.md - Citation requirements
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/citation-policy.md - Citation requirements

@@ -70,6 +70,6 @@ dashboards, interpret trends, and recommend actions to improve outcomes.
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/agent-efficiency.yaml — Agent grounding, subscriptions, and reflection tracking
 - @$AIWG_ROOT/agentic/code/addons/ralph/schemas/iteration-analytics.yaml — Iteration quality tracking and best output selection
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/lats-evaluation.yaml — LATS hybrid value function for artifact evaluation
-- @.claude/rules/hitl-gates.md — Human gate cost savings model
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/hitl-gates.md — Human gate cost savings model
 - @.aiwg/research/findings/REF-057-agent-laboratory.md — 84% cost reduction research
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/iteration-analytics.yaml — Iteration quality tracking and adaptive stopping

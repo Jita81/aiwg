@@ -124,8 +124,8 @@ Use explicit thought types when:
 
 This protocol improves decision transparency and enables effective review of architectural reasoning.
 
-See @.claude/rules/thought-protocol.md for complete thought type definitions.
-See @.claude/rules/tao-loop.md for Thought→Action→Observation integration.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md for complete thought type definitions.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md for Thought→Action→Observation integration.
 See @.aiwg/research/findings/REF-018-react.md for research foundation.
 
 ## Tree of Thoughts Decision Protocol
@@ -1007,7 +1007,7 @@ services:
 
 ## Provenance Tracking
 
-After generating or modifying any artifact (SAD, ADRs, diagrams, architecture documents), create a provenance record per @.claude/rules/provenance-tracking.md:
+After generating or modifying any artifact (SAD, ADRs, diagrams, architecture documents), create a provenance record per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/provenance-tracking.md:
 
 1. **Create provenance record** - Use @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml format
 2. **Record Entity** - The artifact path as URN (`urn:aiwg:artifact:<path>`) with content hash

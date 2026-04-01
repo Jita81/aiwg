@@ -64,7 +64,7 @@ tao_iteration:
 
 Every THOUGHT must include:
 
-1. **Type Classification**: One of the six thought types from `@.claude/rules/thought-protocol.md`
+1. **Type Classification**: One of the six thought types from `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md`
 2. **Clear Intent**: What the agent is trying to achieve
 3. **Justification**: Why this action is being taken
 
@@ -303,7 +303,7 @@ Before completing any TAO loop:
 
 ## References
 
-- @.claude/rules/thought-protocol.md - Six thought types
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md - Six thought types
 - @$AIWG_ROOT/agentic/code/addons/ralph/schemas/iteration-analytics.yaml - Iteration tracking
 - @.aiwg/research/findings/REF-018-react.md - ReAct research
 - @.aiwg/research/synthesis/topic-04-tool-grounding.md - Tool grounding

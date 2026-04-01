@@ -296,4 +296,4 @@ Rationale: Single study, no comparison available
 - @$AIWG_ROOT/src/research/services/quality-service.ts - GRADE implementation
 - @.aiwg/research/docs/grade-assessment-guide.md - GRADE methodology
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/quality-dimensions.yaml - Quality schema
-- @.claude/rules/citation-policy.md - Hedging language requirements
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/citation-policy.md - Hedging language requirements

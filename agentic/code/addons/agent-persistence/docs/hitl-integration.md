@@ -472,14 +472,14 @@ async function beforeFileWrite(file, changes) {
 - @.aiwg/architecture/decisions/ADR-AP-002-rule-enforcement-strategy.md
 
 ### Rules
-- @.claude/rules/hitl-gates.md - HITL gate configuration rules
-- @.claude/rules/hitl-patterns.md - HITL workflow patterns
-- @.claude/rules/human-gate-display.md - Gate display format
-- @.claude/rules/anti-laziness.md - Anti-laziness enforcement
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/hitl-gates.md - HITL gate configuration rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/hitl-patterns.md - HITL workflow patterns
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/human-gate-display.md - Gate display format
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/anti-laziness.md - Anti-laziness enforcement
 
 ### Agents
-- @.claude/agents/recovery-orchestrator.md - Recovery coordination
-- @.claude/agents/laziness-detector.md - Pattern detection
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/recovery-orchestrator.md - Recovery coordination
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/laziness-detector.md - Pattern detection
 
 ### Gates
 - @$AIWG_ROOT/agentic/code/addons/agent-persistence/gates/recovery-escalation-gate.yaml

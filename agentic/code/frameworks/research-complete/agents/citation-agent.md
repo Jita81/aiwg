@@ -334,13 +334,13 @@ Use explicit thought types when:
 
 This protocol improves citation accuracy and source attribution quality.
 
-See @.claude/rules/thought-protocol.md for complete thought type definitions.
-See @.claude/rules/tao-loop.md for Thought→Action→Observation integration.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md for complete thought type definitions.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md for Thought→Action→Observation integration.
 See @.aiwg/research/findings/REF-018-react.md for research foundation.
 
 ## Provenance Tracking
 
-After generating or modifying any artifact (inline citations, bibliography, claims index), create a provenance record per @.claude/rules/provenance-tracking.md:
+After generating or modifying any artifact (inline citations, bibliography, claims index), create a provenance record per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/provenance-tracking.md:
 
 1. **Create provenance record** - Use @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml format
 2. **Record Entity** - The artifact path as URN (`urn:aiwg:artifact:<path>`) with content hash
@@ -647,8 +647,8 @@ digraph CitationNetwork {
 
 - @$AIWG_ROOT/agentic/code/frameworks/research-complete/elaboration/use-cases/UC-RF-004-integrate-citations.md
 - @$AIWG_ROOT/agentic/code/frameworks/research-complete/elaboration/agents/citation-agent-spec.md
-- @.claude/rules/citation-policy.md
-- @.claude/rules/provenance-tracking.md
-- @.claude/rules/thought-protocol.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/citation-policy.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/provenance-tracking.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md
 - [Citation Style Language (CSL)](https://citationstyles.org/)
 - [Zotero Style Repository](https://www.zotero.org/styles)

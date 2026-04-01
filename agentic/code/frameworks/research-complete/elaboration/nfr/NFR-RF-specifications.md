@@ -467,7 +467,7 @@ API keys (Semantic Scholar, LLM services) SHALL be stored in environment variabl
 
 **Traceability**:
 - @$AIWG_ROOT/agentic/code/frameworks/research-complete/inception/initial-risk-assessment.md - Risk S-01 (API Key Exposure)
-- @.claude/rules/token-security.md - Token security patterns
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/token-security.md - Token security patterns
 
 ---
 
@@ -840,7 +840,7 @@ All changes SHALL follow semantic versioning (MAJOR.MINOR.PATCH), with CHANGELOG
 
 **Traceability**:
 - @CLAUDE.md - Release Documentation Requirements
-- @.claude/rules/versioning.md - CalVer format
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/versioning.md - CalVer format
 
 ---
 

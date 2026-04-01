@@ -462,5 +462,5 @@ This command succeeds when:
 
 - @$AIWG_ROOT/agentic/code/addons/rlm/commands/rlm-batch.md - Batch parallel queries
 - @$AIWG_ROOT/agentic/code/addons/rlm/docs/rlm-patterns.md - RLM design patterns
-- @.claude/rules/subagent-scoping.md - Subagent scoping rules (context minimization)
-- @.claude/rules/instruction-comprehension.md - Instruction following for sub-prompts
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md - Subagent scoping rules (context minimization)
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/instruction-comprehension.md - Instruction following for sub-prompts

@@ -21,7 +21,7 @@ The Security addon provides patterns, documentation, and enforcement rules for s
 | Location | Purpose |
 |----------|---------|
 | `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/token-security.md` | Comprehensive token security guide |
-| `@.claude/rules/token-security.md` | Enforcement rules for agents |
+| `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/token-security.md` | Enforcement rules for agents |
 | `@~/.claude/CLAUDE.md` | Global token configuration |
 
 ## Key Patterns
@@ -133,7 +133,7 @@ Planned additions to this addon:
 ## References
 
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/token-security.md - Full documentation
-- @.claude/rules/token-security.md - Enforcement rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/token-security.md - Enforcement rules
 - [OWASP API Security Top 10](https://owasp.org/www-project-api-security/)
 - [NIST 800-63B Digital Identity Guidelines](https://pages.nist.gov/800-63-3/sp800-63b.html)
 

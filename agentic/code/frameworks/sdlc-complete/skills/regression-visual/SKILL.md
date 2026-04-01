@@ -799,4 +799,4 @@ ci_integration:
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/regression-baseline/SKILL.md
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/regression-report/SKILL.md
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/test-engineer.md
-- @.claude/rules/executable-feedback.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md

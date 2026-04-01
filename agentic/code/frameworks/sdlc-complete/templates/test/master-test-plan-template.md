@@ -12,7 +12,7 @@ Establish the overarching testing strategy, scope, resources, and schedule acros
 
 ## Reasoning
 
-> Complete this section BEFORE writing the detailed plan. Per @.claude/rules/reasoning-sections.md
+> Complete this section BEFORE writing the detailed plan. Per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/reasoning-sections.md
 
 1. **Test Scope**: What functionality is being validated?
    > [Define what the test plan covers - features, components, integration points, user workflows]

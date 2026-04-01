@@ -40,7 +40,7 @@ framework: research-complete
 
 ## Reasoning
 
-> Complete this section BEFORE writing summaries. Per @.claude/rules/reasoning-sections.md
+> Complete this section BEFORE writing summaries. Per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/reasoning-sections.md
 
 1. **Audience Identification**: Who will read each summary level?
    > [Define target audience for 1-sentence (executives), 1-paragraph (practitioners), 1-page (researchers)]
@@ -105,7 +105,7 @@ THE key message: Feedback quality determines refinement success - 94% of failure
 > 5-7 sentences covering: What problem? What method? What result? What impact?
 
 <!-- EXAMPLE:
-Self-Refine (Madaan et al., 2023) addresses the challenge of improving LLM outputs without additional training or external feedback. The method implements an iterative loop where the LLM generates output, provides structured feedback on its own work, and refines the output based on that feedback. Across seven diverse tasks (code optimization, dialogue generation, math reasoning, sentiment control, acronym generation, constrained generation, and review rewriting), Self-Refine achieves average improvements of ~20% over baseline. Critically, the research reveals that 94% of iteration failures stem from poor-quality feedback rather than inadequate refinement capability, making feedback structure the paramount concern. For AIWG, this finding directly informs Ralph loop design: structured, actionable feedback (per @.claude/rules/actionable-feedback.md) is more important than iteration count. The research also introduces best-output-selection (choosing highest-quality iteration rather than final) to handle non-monotonic quality trajectories. Applications include agent self-assessment, iterative artifact refinement, and quality-gate implementation across SDLC phases.
+Self-Refine (Madaan et al., 2023) addresses the challenge of improving LLM outputs without additional training or external feedback. The method implements an iterative loop where the LLM generates output, provides structured feedback on its own work, and refines the output based on that feedback. Across seven diverse tasks (code optimization, dialogue generation, math reasoning, sentiment control, acronym generation, constrained generation, and review rewriting), Self-Refine achieves average improvements of ~20% over baseline. Critically, the research reveals that 94% of iteration failures stem from poor-quality feedback rather than inadequate refinement capability, making feedback structure the paramount concern. For AIWG, this finding directly informs Ralph loop design: structured, actionable feedback (per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/actionable-feedback.md) is more important than iteration count. The research also introduces best-output-selection (choosing highest-quality iteration rather than final) to handle non-monotonic quality trajectories. Applications include agent self-assessment, iterative artifact refinement, and quality-gate implementation across SDLC phases.
 -->
 
 <!-- ANTI-PATTERN: Paragraph that just expands the sentence without adding substance -->
@@ -175,8 +175,8 @@ Baselines included GPT-4 direct generation, best-of-k sampling, and CoT promptin
 #### AIWG Applications
 
 **Implemented:**
-- @.claude/rules/actionable-feedback.md - Structured feedback schema
-- @.claude/rules/best-output-selection.md - Non-monotonic quality handling
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/actionable-feedback.md - Structured feedback schema
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/best-output-selection.md - Non-monotonic quality handling
 - @$AIWG_ROOT/agentic/code/addons/ralph/schemas/actionable-feedback.yaml - Feedback format
 
 **Key Design Decisions Informed:**
@@ -186,9 +186,9 @@ Baselines included GPT-4 direct generation, best-of-k sampling, and CoT promptin
 4. Use task-specific feedback aspects (security for code, clarity for docs)
 
 **Future Work:**
-- Multi-agent review panels for diverse feedback (@.claude/rules/ensemble-review.md)
+- Multi-agent review panels for diverse feedback (@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/ensemble-review.yaml)
 - Feedback quality metrics and learning
-- Integration with executable feedback (@.claude/rules/executable-feedback.md)
+- Integration with executable feedback (@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md)
 
 #### Citation
 
@@ -300,8 +300,8 @@ Generate an improved version that addresses all feedback points.
 ## References
 
 - @.aiwg/research/sources/[PDF-filename].pdf - Original paper
-- @.claude/rules/actionable-feedback.md - AIWG implementation
-- @.claude/rules/best-output-selection.md - Non-monotonic handling
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/actionable-feedback.md - AIWG implementation
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/best-output-selection.md - Non-monotonic handling
 - @$AIWG_ROOT/agentic/code/addons/ralph/schemas/actionable-feedback.yaml - Schema
 - @.aiwg/research/findings/REF-015-self-refine.md - Literature note
 

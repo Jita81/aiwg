@@ -527,8 +527,8 @@ Use explicit thought types when:
 
 This protocol improves audit thoroughness and vulnerability detection.
 
-See @.claude/rules/thought-protocol.md for complete thought type definitions.
-See @.claude/rules/tao-loop.md for Thought→Action→Observation integration.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md for complete thought type definitions.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md for Thought→Action→Observation integration.
 See @.aiwg/research/findings/REF-018-react.md for research foundation.
 
 ## Integration with SDLC Templates
@@ -1132,7 +1132,7 @@ describe('JWT Security', () => {
 
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/token-security.md - Comprehensive token security guide
 - @$AIWG_ROOT/agentic/code/addons/security/secure-token-load.md - Token loading patterns
-- @.claude/rules/token-security.md - Security enforcement rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/token-security.md - Security enforcement rules
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/quality-assurance.yaml — Quality assurance and hallucination detection
 - @$AIWG_ROOT/agentic/code/addons/ralph/schemas/actionable-feedback.yaml — Structured actionable feedback for security findings
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/hallucination-detection.yaml — Hallucination detection for security claims
@@ -1141,7 +1141,7 @@ describe('JWT Security', () => {
 
 ## Provenance Tracking
 
-After generating or modifying any artifact (threat models, security assessments, compliance reports), create a provenance record per @.claude/rules/provenance-tracking.md:
+After generating or modifying any artifact (threat models, security assessments, compliance reports), create a provenance record per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/provenance-tracking.md:
 
 1. **Create provenance record** - Use @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml format
 2. **Record Entity** - The artifact path as URN (`urn:aiwg:artifact:<path>`) with content hash

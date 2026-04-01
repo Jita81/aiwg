@@ -59,4 +59,4 @@ When invoked, create provenance record:
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/provenance-manager.md - Provenance Manager agent
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml - PROV record schema
 - @.aiwg/research/provenance/docs/provenance-guide.md - Provenance guide
-- @.claude/rules/provenance-tracking.md - Provenance tracking rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/provenance-tracking.md - Provenance tracking rules

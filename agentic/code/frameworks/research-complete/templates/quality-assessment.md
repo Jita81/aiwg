@@ -48,7 +48,7 @@ framework: research-complete
 
 <!-- EXAMPLE:
 **Baseline (Source Type):** HIGH (Peer-reviewed top-tier conference)
-Per @.claude/rules/research-metadata.md, peer-reviewed conferences start at HIGH.
+Per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/research-metadata.md, peer-reviewed conferences start at HIGH.
 -->
 
 **Adjustments:** [Factors that raised or lowered from baseline]
@@ -68,7 +68,7 @@ Final: HIGH (retained baseline)
 
 ## Reasoning
 
-> Complete this section BEFORE detailed assessment. Per @.claude/rules/reasoning-sections.md
+> Complete this section BEFORE detailed assessment. Per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/reasoning-sections.md
 
 1. **Baseline Determination**: What is the starting quality level?
    > [Assess publication venue quality per GRADE guidelines]
@@ -76,7 +76,7 @@ Final: HIGH (retained baseline)
 <!-- EXAMPLE:
 Source: ICLR 2023 (International Conference on Learning Representations)
 Venue quality: Top-tier ML conference (acceptance rate ~28%, rigorous peer review)
-Baseline per @.claude/rules/research-metadata.md: HIGH
+Baseline per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/research-metadata.md: HIGH
 
 Rationale: ICLR is top-3 ML conference alongside NeurIPS and ICML. Strong review process, high standards.
 -->
@@ -550,8 +550,8 @@ Priority: #1 and #2 (directly affect AIWG production use)
 
 - @.aiwg/research/sources/[PDF-filename].pdf - Original paper
 - @.aiwg/research/findings/REF-XXX.md - Literature note
-- @.claude/rules/citation-policy.md - GRADE-based citation language
-- @.claude/rules/research-metadata.md - Baseline quality by source type
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/citation-policy.md - GRADE-based citation language
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/research-metadata.md - Baseline quality by source type
 - @$AIWG_ROOT/agentic/code/frameworks/research-complete/schemas/grade-schema.yaml - GRADE assessment schema
 
 ## Template Usage Notes
@@ -582,7 +582,7 @@ Priority: #1 and #2 (directly affect AIWG production use)
 - LOW: "limited evidence", "preliminary findings"
 - VERY LOW: "anecdotal", "exploratory"
 
-Per @.claude/rules/citation-policy.md
+Per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/citation-policy.md
 
 ## Metadata
 

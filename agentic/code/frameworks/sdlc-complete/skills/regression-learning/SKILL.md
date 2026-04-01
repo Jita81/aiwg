@@ -656,7 +656,7 @@ Track learning effectiveness:
 
 - @$AIWG_ROOT/agentic/code/addons/ralph/schemas/debug-memory.yaml - Debug memory structure
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/testing/regression.yaml - Regression schema
-- @.claude/rules/executable-feedback.md - Feedback loop patterns
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md - Feedback loop patterns
 - @.aiwg/research/findings/REF-013-metagpt.md - MetaGPT executable feedback
 - @.aiwg/research/findings/REF-015-self-refine.md - Self-Refine learning patterns
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/regression-baseline/SKILL.md - Baseline management

@@ -149,7 +149,7 @@ Run corpus health check
 
 ## Citation Rules Reference
 
-All verification follows @.claude/rules/citation-policy.md:
+All verification follows @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/citation-policy.md:
 - Never generate citations without retrieval
 - Never invent DOIs, URLs, or page numbers
 - Never cite sources not in research corpus
@@ -160,7 +160,7 @@ All verification follows @.claude/rules/citation-policy.md:
 
 ## References
 
-- @.claude/rules/citation-policy.md - Citation policy rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/citation-policy.md - Citation policy rules
 - @.aiwg/research/docs/citation-verification-guide.md - Verification guide
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/citation-audit.yaml - Audit schema
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/hallucination-detection.yaml - Hallucination detection

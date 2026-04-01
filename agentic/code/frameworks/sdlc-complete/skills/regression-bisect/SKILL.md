@@ -490,4 +490,4 @@ If bisect takes too long:
 
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/test/regression-schema.yaml
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/regression-test.md
-- @.claude/agents/debugger.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/debugger.md

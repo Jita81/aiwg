@@ -59,7 +59,7 @@ before release.
 
 ### Reproducibility Validation
 
-- Run reproducibility checks per `@.claude/rules/reproducibility-validation.md`
+- Run reproducibility checks per `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/reproducibility-validation.md`
 - Require 95%+ match rate for critical workflows (5 verification runs)
 - Document non-determinism sources when full reproducibility cannot be achieved
 
@@ -70,7 +70,7 @@ before release.
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/execution-snapshot.yaml — Complete execution context capture for replay
 - @$AIWG_ROOT/agentic/code/addons/ralph/schemas/checkpoint.yaml — Multi-level checkpoint and recovery schema
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/reliability-patterns.yaml — Reliability and error recovery patterns
-- @.claude/rules/reproducibility.md — Reproducibility enforcement rules
-- @.claude/rules/reproducibility-validation.md — Validation thresholds and process
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/reproducibility.md — Reproducibility enforcement rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/reproducibility-validation.md — Validation thresholds and process
 - @.aiwg/research/findings/REF-058-r-lam.md — 47% non-reproducible workflows research
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/error-handling.yaml — Error recovery and graceful degradation patterns

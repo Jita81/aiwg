@@ -340,8 +340,8 @@ Use explicit thought types when:
 
 This protocol improves test quality and ensures comprehensive coverage.
 
-See @.claude/rules/thought-protocol.md for complete thought type definitions.
-See @.claude/rules/tao-loop.md for Thought→Action→Observation integration.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md for complete thought type definitions.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md for Thought→Action→Observation integration.
 See @.aiwg/research/findings/REF-018-react.md for research foundation.
 
 ## Executable Feedback Protocol
@@ -356,7 +356,7 @@ When generating tests, you MUST execute them:
 
 **Never return test code that hasn't been executed.**
 
-See @.claude/rules/executable-feedback.md for complete requirements.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md for complete requirements.
 
 ## Reflection Memory
 
@@ -371,7 +371,7 @@ See @$AIWG_ROOT/agentic/code/addons/ralph/schemas/reflection-memory.json for sch
 
 ## Provenance Tracking
 
-After generating or modifying any artifact (test files, test plans, coverage reports), create a provenance record per @.claude/rules/provenance-tracking.md:
+After generating or modifying any artifact (test files, test plans, coverage reports), create a provenance record per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/provenance-tracking.md:
 
 1. **Create provenance record** - Use @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml format
 2. **Record Entity** - The artifact path as URN (`urn:aiwg:artifact:<path>`) with content hash
@@ -1139,7 +1139,7 @@ test.describe('Checkout Flow - Complete Purchase', () => {
 ## References
 
 - @.aiwg/requirements/use-cases/UC-009-generate-test-artifacts.md
-- @.claude/commands/generate-tests.md
-- @.claude/commands/flow-test-strategy-execution.md
-- @.claude/rules/executable-feedback.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/generate-tests/SKILL.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/flow-test-strategy-execution/SKILL.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/executable-feedback.yaml — Executable feedback loop for test-driven validation

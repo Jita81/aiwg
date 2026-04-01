@@ -314,12 +314,31 @@ completion:
 /address-issues 17 18 19 --guidance "These are all related to the auth refactor, address them as a batch"
 ```
 
+## Composition
+
+This skill orchestrates the following corpus skills per issue:
+
+```
+/address-issues 17 18 19
+    │
+    ├── For each issue:
+    │   ├── issue-list    — fetch issue details and comments
+    │   ├── ralph         — execute work loop
+    │   │   ├── Cycle N: do work
+    │   │   │   └── issue-comment — post structured status to thread
+    │   │   ├── scan thread for feedback (incorporate next cycle)
+    │   │   └── repeat until resolved or max-cycles reached
+    │   ├── issue-sync    — link commits to issue
+    │   └── issue-close   — close if resolved
+    └── aggregate report
+```
+
 ## References
 
-- @.aiwg/planning/issue-driven-ralph-loop-design.md - Design document
-- @.claude/commands/ralph.md - Ralph loop command
-- @.claude/commands/issue-comment.md - Issue comment templates
-- @.claude/commands/issue-list.md - Issue listing and filtering
-- @.claude/commands/issue-close.md - Issue closure
-- @.claude/commands/issue-sync.md - Commit-to-issue sync
-- @.claude/rules/context-budget.md - Parallel subagent limits
+- @$AIWG_ROOT/agentic/code/addons/ralph/skills/ralph/SKILL.md — Ralph loop engine
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/issue-list/SKILL.md — Fetch and filter issues
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/issue-comment/SKILL.md — Post structured cycle status comments
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/issue-close/SKILL.md — Close resolved issues
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/issue-sync/SKILL.md — Link commits to issues
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/issue-driven-ralph/SKILL.md — Issue-thread ralph loop pattern
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/context-budget.md — Parallel subagent limits

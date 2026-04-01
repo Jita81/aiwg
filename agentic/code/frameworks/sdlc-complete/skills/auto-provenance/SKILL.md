@@ -159,6 +159,6 @@ skill:
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/provenance-manager.md - Provenance Manager agent
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml - PROV record schema
 - @.aiwg/research/provenance/docs/provenance-guide.md - Provenance guide
-- @.claude/rules/provenance-tracking.md - Provenance tracking rules
-- @.claude/rules/mention-wiring.md - @-mention wiring patterns
-- @.claude/rules/qualified-references.md - Qualified reference rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/provenance-tracking.md - Provenance tracking rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/mention-wiring.md - @-mention wiring patterns
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/qualified-references.md - Qualified reference rules

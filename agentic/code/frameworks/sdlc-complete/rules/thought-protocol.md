@@ -297,7 +297,7 @@ After completing tasks, verify:
 - @.aiwg/research/findings/REF-018-react.md - ReAct research
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/ - Agent definitions
 - @.aiwg/research/synthesis/topic-04-tool-grounding.md - Tool grounding
-- @.claude/rules/reasoning-sections.md - Reasoning patterns
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/reasoning-sections.md - Reasoning patterns
 - @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md - Research enforcement
 - @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/instruction-comprehension.md - Instruction following
 - #158 - Implementation issue
