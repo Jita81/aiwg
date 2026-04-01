@@ -23,7 +23,7 @@
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import { getFrameworksForMode, normalizeDeploymentMode } from '../agents/providers/base.mjs';
+import { getFrameworksForMode, normalizeDeploymentMode, skillMatchesProvider } from '../agents/providers/base.mjs';
 
 const CODEX_SKILLS_DIR = path.join(os.homedir(), '.codex', 'skills');
 const MAX_NAME_LENGTH = 100;
@@ -181,6 +181,12 @@ function transformToCodexSkill(skillDir) {
   const skillPath = path.join(skillDir, 'SKILL.md');
   const skillName = path.basename(skillDir);
   const content = fs.readFileSync(skillPath, 'utf8');
+
+  // Platform filtering: only enforce when filterByPlatform is enabled.
+  // Legacy skills have incomplete platform lists; enabling this prematurely
+  // would skip skills that should deploy to codex. Enable after source cleanup.
+  // if (!skillMatchesProvider(content, 'codex')) { return null; }
+
   const parsed = parseSkillContent(content, skillName);
 
   if (!parsed) {

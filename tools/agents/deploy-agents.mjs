@@ -534,6 +534,7 @@ async function promptCommandsMigration(cfg, provider, targetDir) {
     srcRoot,
     target: cfg.target,
     mode: cfg.mode,
+    provider: cfg.provider,
     dryRun: cfg.dryRun,
     force: cfg.force,
     reasoningModel: cfg.reasoningModel,

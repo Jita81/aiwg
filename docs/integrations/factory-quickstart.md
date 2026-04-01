@@ -337,6 +337,9 @@ aiwg use sdlc --provider factory --force
 # Verify AIWG server is listed and enabled
 ```
 
+**Testing automation?** See the dedicated guide:
+[Factory Testing Automation Hooks](factory-testing-hooks.md) — covers all 7 testing hook patterns, MD5 caching, coverage enforcement, and AIWG skill integration.
+
 **Hooks not firing?** Verify settings:
 ```text
 /settings

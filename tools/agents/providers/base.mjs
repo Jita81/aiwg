@@ -144,6 +144,92 @@ export function loadModelConfig(srcRoot) {
 // ============================================================================
 
 /**
+ * Maps provider names to the platform identifiers used in skill platforms: fields.
+ * Skills use descriptive names (e.g. "claude-code") while providers use short names (e.g. "claude").
+ */
+const PROVIDER_TO_PLATFORM = {
+  'claude': 'claude-code'
+};
+
+/**
+ * Parse the platforms: field from a SKILL.md frontmatter block.
+ * Handles both inline array (platforms: [a, b]) and multi-line list formats.
+ * Returns null if no platforms field is present (= deploy to all providers).
+ * Returns an empty array only if the field is explicitly empty.
+ */
+export function parseSkillPlatforms(content) {
+  const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
+  if (!fmMatch) return null;
+
+  const fm = fmMatch[1];
+
+  // Inline array: platforms: [claude-code, codex] or platforms: [all]
+  const inlineMatch = fm.match(/^platforms:\s*\[([^\]]*)\]/m);
+  if (inlineMatch) {
+    const items = inlineMatch[1].split(',').map(s => s.trim()).filter(Boolean);
+    if (items.length === 0 || (items.length === 1 && items[0] === 'all')) return null;
+    return items;
+  }
+
+  // Multi-line list:
+  //   platforms:
+  //     - claude-code
+  //     - hermes
+  const multiMatch = fm.match(/^platforms:\s*\n((?:[ \t]+-[ \t]+\S[^\n]*\n?)+)/m);
+  if (multiMatch) {
+    const items = multiMatch[1]
+      .split('\n')
+      .map(line => line.match(/^[ \t]+-[ \t]+(\S+)/)?.[1])
+      .filter(Boolean);
+    return items.length > 0 ? items : null;
+  }
+
+  // platforms: key present but empty
+  if (/^platforms:\s*$/m.test(fm)) return null;
+
+  return null; // Field absent = deploy to all
+}
+
+/**
+ * Returns true if a skill (given its source content) should be deployed to the given provider.
+ * If no provider is specified, always returns true.
+ */
+export function skillMatchesProvider(content, provider) {
+  if (!provider) return true;
+
+  const platforms = parseSkillPlatforms(content);
+  if (!platforms) return true; // No restriction
+
+  const platformName = PROVIDER_TO_PLATFORM[provider] || provider;
+  return platforms.includes(platformName) || platforms.includes(provider);
+}
+
+/**
+ * Strip the platforms: field from a SKILL.md frontmatter block.
+ * Deployed copies don't need it — it's a source-side restriction hint.
+ */
+export function stripPlatformsFromContent(content) {
+  const fmMatch = content.match(/^(---\n)([\s\S]*?)(\n---\n?)([\s\S]*)$/);
+  if (!fmMatch) return content;
+
+  const [, open, fm, close, body] = fmMatch;
+
+  // Remove inline: platforms: [...]
+  let cleaned = fm.replace(/^platforms:\s*\[[^\]]*\]\n?/m, '');
+
+  // Remove multi-line block:
+  // platforms:
+  //   - a
+  //   - b
+  cleaned = cleaned.replace(/^platforms:\s*\n(?:[ \t]+-[ \t]+\S[^\n]*\n?)*/m, '');
+
+  // Remove bare: platforms:
+  cleaned = cleaned.replace(/^platforms:\s*\n?/m, '');
+
+  return open + cleaned + close + body;
+}
+
+/**
  * Parse YAML frontmatter from markdown content
  * Returns { frontmatter: string, body: string, metadata: object }
  */
@@ -373,14 +459,36 @@ export function deploySoulCompanions(soulFiles, destDir, opts) {
 }
 
 /**
- * Deploy a skill directory (copy recursively)
+ * Deploy a skill directory (copy recursively).
+ *
+ * Platform filtering (opt-in via opts.filterByPlatform):
+ *   - If the skill's SKILL.md has no platforms: field → deploy to all providers
+ *   - If platforms: [all] → deploy to all providers
+ *   - If explicit list → only deploy if opts.provider is in the list
+ *   - platforms: is always stripped from the deployed copy (source-side hint only)
+ *
+ * NOTE: opts.filterByPlatform defaults to false until source skill files have been
+ * updated to use platforms: [all] for universal skills. Enabling it prematurely
+ * would skip skills that have incomplete legacy platform lists.
  */
 export function deploySkillDir(skillDir, destDir, opts) {
-  const { force = false, dryRun = false } = opts;
+  const { force = false, dryRun = false, provider, filterByPlatform = false } = opts;
   const verbose = opts.verbose === true;
   const skillName = path.basename(skillDir);
-  const destSkillDir = path.join(destDir, skillName);
 
+  // Platform filtering: only enforced when explicitly enabled
+  if (filterByPlatform && provider) {
+    const skillMdPath = path.join(skillDir, 'SKILL.md');
+    if (fs.existsSync(skillMdPath)) {
+      const skillContent = fs.readFileSync(skillMdPath, 'utf8');
+      if (!skillMatchesProvider(skillContent, provider)) {
+        if (verbose) console.log(`skip (platform restricted): ${skillName}`);
+        return;
+      }
+    }
+  }
+
+  const destSkillDir = path.join(destDir, skillName);
   if (!dryRun) ensureDir(destSkillDir);
 
   function copyRecursive(src, dest) {
@@ -393,7 +501,12 @@ export function deploySkillDir(skillDir, destDir, opts) {
         if (!dryRun) ensureDir(destPath);
         copyRecursive(srcPath, destPath);
       } else {
-        const srcContent = fs.readFileSync(srcPath, 'utf8');
+        let srcContent = fs.readFileSync(srcPath, 'utf8');
+
+        // Strip platforms: from SKILL.md — deployed copies don't need it
+        if (entry.name === 'SKILL.md') {
+          srcContent = stripPlatformsFromContent(srcContent);
+        }
 
         if (fs.existsSync(destPath)) {
           const destContent = fs.readFileSync(destPath, 'utf8');
