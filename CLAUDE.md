@@ -133,7 +133,7 @@ aiwg new my-project    # Scaffold new project
 aiwg help              # Show all commands
 aiwg doctor            # Check installation health
 
-# See @docs/cli-reference.md for all 50 commands
+# See @docs/cli-reference.md for all 67 commands
 ```
 
 ## Project Artifacts (.aiwg/)
@@ -184,7 +184,7 @@ AIWG uses a unified extension system for all extension types:
 - `@src/extensions/types.ts` - TypeScript type definitions
 - `@src/extensions/commands/definitions.ts` - All 50 command definitions
 
-## CLI Commands (50 Total)
+## CLI Commands (67 Total)
 
 **See `@docs/cli-reference.md` for complete documentation.**
 
