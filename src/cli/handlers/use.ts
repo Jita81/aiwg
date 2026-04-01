@@ -41,20 +41,44 @@ const MODE_MAP: Record<Framework, string> = {
 };
 
 /**
- * Valid addon identifiers (deployed independently via `aiwg use <addon>`)
+ * Addons excluded from `aiwg use all`.
+ * aiwg-dev is contributor-only tooling — not for end users.
  */
-const VALID_ADDONS = ['rlm', 'ring', 'daemon', 'aiwg-dev'] as const;
-type Addon = typeof VALID_ADDONS[number];
+const USE_ALL_DISALLOW = new Set(['aiwg-dev']);
 
 /**
- * Addon name to source directory mapping (relative to framework root)
+ * Discover all addon names from the filesystem, minus the disallow list.
  */
-const ADDON_PATHS: Record<Addon, string> = {
-  rlm: 'agentic/code/addons/rlm',
-  ring: 'agentic/code/addons/ring-methodology',
-  daemon: 'agentic/code/addons/daemon',
-  'aiwg-dev': 'agentic/code/addons/aiwg-dev',
-};
+async function getAllAddons(frameworkRoot: string): Promise<string[]> {
+  const addonsDir = path.join(frameworkRoot, 'agentic/code/addons');
+  const entries = await fs.readdir(addonsDir, { withFileTypes: true });
+  return entries
+    .filter(e => e.isDirectory() && !USE_ALL_DISALLOW.has(e.name))
+    .map(e => e.name);
+}
+
+/**
+ * Check whether a given addon name exists on disk (and is not disallowed).
+ */
+async function isValidAddon(frameworkRoot: string, name: string): Promise<boolean> {
+  if (USE_ALL_DISALLOW.has(name)) return false;
+  try {
+    const stat = await fs.stat(path.join(frameworkRoot, 'agentic/code/addons', name));
+    return stat.isDirectory();
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Resolve addon source path from its name.
+ * Handles the ring-methodology special case where the folder name differs from the alias.
+ */
+function addonPath(frameworkRoot: string, name: string): string {
+  // Legacy alias: `ring` → ring-methodology folder
+  const folderName = name === 'ring' ? 'ring-methodology' : name;
+  return path.join(frameworkRoot, 'agentic/code/addons', folderName);
+}
 
 /**
  * Provider to deployment paths mapping
@@ -319,13 +343,14 @@ export class UseHandler implements CommandHandler {
       };
     }
 
+    const frameworkRoot = await getFrameworkRoot();
     const isFramework = VALID_FRAMEWORKS.includes(framework as Framework);
-    const isAddon = VALID_ADDONS.includes(framework as Addon);
+    const isAddon = !isFramework && await isValidAddon(frameworkRoot, framework);
 
     if (!isFramework && !isAddon) {
       return {
         exitCode: 1,
-        message: `Error: Unknown target '${framework}'\nFrameworks: ${VALID_FRAMEWORKS.join(', ')}\nAddons: ${VALID_ADDONS.join(', ')}\n\nRun 'aiwg help' for usage information.`,
+        message: `Error: Unknown target '${framework}'\nFrameworks: ${VALID_FRAMEWORKS.join(', ')}\n\nFor addons, run 'aiwg list' to see available addons.\nRun 'aiwg help' for usage information.`,
       };
     }
 
@@ -343,8 +368,7 @@ export class UseHandler implements CommandHandler {
 
       ui.blank();
       ui.header(`  Deploying ${framework} addon...`);
-      const frameworkRoot = await getFrameworkRoot();
-      const addonSource = path.join(frameworkRoot, ADDON_PATHS[framework as Addon]);
+      const addonSource = addonPath(frameworkRoot, framework);
       const addonResult = await runner.run('tools/agents/deploy-agents.mjs', [
         '--quiet', '--source', addonSource,
         ...addonBaseArgs,
@@ -450,35 +474,22 @@ export class UseHandler implements CommandHandler {
     if (target) addonBaseArgs.push('--target', target);
     if (verbose) addonBaseArgs.push('--verbose');
 
-    // Deploy aiwg-utils unless --no-utils
+    // Deploy all addons (excluding disallow list) unless --no-utils
     if (!skipUtils) {
-      if (verbose) {
-        console.log('');
-        console.log('Deploying aiwg-utils addon...');
-      }
-      const frameworkRoot = await getFrameworkRoot();
-      const utilsSource = path.join(frameworkRoot, 'agentic/code/addons/aiwg-utils');
-      const addonArgs = quiet ? ['--quiet', '--source', utilsSource, ...addonBaseArgs] : ['--source', utilsSource, ...addonBaseArgs];
-      const utilsResult = await runner.run('tools/agents/deploy-agents.mjs', addonArgs, captureOpts);
-
-      if (utilsResult.exitCode !== 0) {
-        return utilsResult;
-      }
-    }
-
-    // Deploy ralph addon (iterative execution loops)
-    if (!skipUtils) {
-      if (verbose) {
-        console.log('');
-        console.log('Deploying ralph addon...');
-      }
-      const frameworkRoot = await getFrameworkRoot();
-      const ralphSource = path.join(frameworkRoot, 'agentic/code/addons/ralph');
-      const ralphArgs = quiet ? ['--quiet', '--source', ralphSource, ...addonBaseArgs] : ['--source', ralphSource, ...addonBaseArgs];
-      const ralphResult = await runner.run('tools/agents/deploy-agents.mjs', ralphArgs, captureOpts);
-
-      if (ralphResult.exitCode !== 0) {
-        return ralphResult;
+      const allAddons = await getAllAddons(frameworkRoot);
+      for (const addon of allAddons) {
+        if (verbose) {
+          console.log('');
+          console.log(`Deploying ${addon} addon...`);
+        }
+        const source = addonPath(frameworkRoot, addon);
+        const addonArgs = quiet
+          ? ['--quiet', '--source', source, ...addonBaseArgs]
+          : ['--source', source, ...addonBaseArgs];
+        const result = await runner.run('tools/agents/deploy-agents.mjs', addonArgs, captureOpts);
+        if (result.exitCode !== 0) {
+          return result;
+        }
       }
     }
 

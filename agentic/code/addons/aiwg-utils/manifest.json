@@ -90,7 +90,8 @@
     "soul-apply",
     "soul-blend",
     "aiwg-sync",
-    "aiwg-guide"
+    "aiwg-guide",
+    "new-project"
   ],
   "rules": [
     "agent-deployment",
