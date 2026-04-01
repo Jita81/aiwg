@@ -245,6 +245,7 @@ aiwg use <framework|addon>
 - `--no-utils` - Skip aiwg-utils addon installation (frameworks only)
 - `--force` - Overwrite existing deployments
 - `--dry-run` - Preview without making changes
+- `--skip-commands-migration` - Skip deleting the legacy commands directory (warns about duplicate entries in the command palette)
 
 **Capabilities:** cli, framework, deployment, addon
 **Platforms:** All
@@ -324,6 +325,10 @@ aiwg use sdlc --model sonnet --save
 | Hermes | `hermes` | `~/.hermes/skills/`, `AGENTS.md` (lean) | — |
 | OpenClaw | `openclaw` | `~/.openclaw/agents/`, `~/.openclaw/commands/`, `~/.openclaw/skills/`, `~/.openclaw/rules/`, `~/.openclaw/behaviors/` | ✓ |
 | Local/Ollama | `local` | Same as `claude` (local model, Claude Code paths) | — |
+
+**Commands → Skills migration:**
+
+On first run after the commands-to-skills migration, `aiwg use` detects an existing commands directory and offers to delete it before deploying skills. Keeping both causes duplicate entries in the provider command palette. The prompt is shown when running interactively; in CI/non-TTY contexts the migration runs silently. Pass `--skip-commands-migration` to opt out (a warning is printed instead). Home-directory providers (codex, openclaw) are excluded from this migration.
 
 **Notes:**
 - **Codex**: Commands and skills deploy to `~` (user-level) for availability across all projects; the provider ID is `codex`, not `openai`

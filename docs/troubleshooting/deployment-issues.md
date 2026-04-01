@@ -38,6 +38,28 @@ ls .claude/commands/
 # Should show flow-*.md and other command files
 ```
 
+## Duplicate Commands in Command Palette
+
+**Symptoms**: Slash commands appear twice in Claude Code (or another provider's command palette) after running `aiwg use`.
+
+**Cause**: An old `.claude/commands/` directory exists alongside the new `.claude/skills/` directory. Both locations are scanned, so every overlapping file produces two entries.
+
+**Solution**: Remove the legacy commands directory:
+
+```bash
+rm -rf .claude/commands/
+```
+
+Then re-run `aiwg use` to ensure skills are fully deployed:
+
+```bash
+aiwg use sdlc
+```
+
+**Prevention**: `aiwg use` normally prompts to delete the commands directory automatically (the commands → skills migration step). If you skipped that prompt or passed `--skip-commands-migration`, remove the directory manually as shown above.
+
+---
+
 ## Agent Access Denied
 
 **Symptoms**: "Permission denied" when agent tries to read AIWG files.

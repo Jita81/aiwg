@@ -42,7 +42,7 @@ AIWG deploys skills/commands to platform-specific directories. With unification:
     └── intake-wizard.md
 ```
 
-**Recommendation**: AIWG should standardize on `.claude/commands/` for all deployable command/skill files since this is the more established convention. The distinction is purely organizational.
+**Current standard**: AIWG deploys all slash commands and skills to `.claude/skills/`. The `.claude/commands/` directory is a legacy location — still functional, but `aiwg use` now migrates away from it automatically (see [Automatic Migration](#automatic-migration) below).
 
 ### Argument Migration
 
@@ -98,6 +98,39 @@ All AIWG commands listed in `@docs/cli-reference.md` work from either directory.
 | GitHub Copilot | `.github/agents/` | `@agent-name` |
 | Cursor | `.cursor/rules/` | Rule-based |
 | Warp | `WARP.md` commands section | Natural language |
+
+## Automatic Migration
+
+`aiwg use` automatically removes the legacy `.claude/commands/` directory before deploying skills. Without this cleanup, stale command files and newly deployed skills create duplicate entries in the Claude Code command palette.
+
+**Default behavior (interactive TTY):**
+
+```
+⚠  Commands → Skills Migration
+   .claude/commands contains 47 legacy command file(s).
+   AIWG now serves these as skills (.claude/skills/).
+   Keeping both causes duplicate entries in the Claude Code command palette.
+
+   Remove commands directory and migrate? [Y/n]
+```
+
+**CI / non-interactive:** migrates silently without prompting.
+
+**Opt out:**
+
+```bash
+aiwg use sdlc --skip-commands-migration
+```
+
+Skipping prints a reminder about the duplicate entries and the manual fix:
+
+```
+Warning: commands migration skipped for .claude/commands
+  Duplicate entries may appear in the command palette...
+  Remove the directory manually to fix: rm -rf .claude/commands
+```
+
+**Excluded providers:** home-directory providers (codex, openclaw) share their commands paths across all projects and are never touched by this migration.
 
 ## Migration Checklist
 
