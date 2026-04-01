@@ -5,6 +5,101 @@ All notable changes to AIWG project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with npm-compatible format (`YYYY.M.PATCH`).
 
+## [2026.4.0] - 2026-04-01 – "Autonomous Systems"
+
+> First major version milestone. Covers everything since v2026.3.2. Intermediate builds (3.3, 3.4) were internal test releases — this is the stable release users should upgrade to.
+
+| What changed | Why you care |
+|---|---|
+| **Corpus architecture & `@$AIWG_ROOT/`** | Skills link into the corpus rather than restating it. Token resolves correctly in dev, npm, and custom installs. 1,400+ broken refs fixed. |
+| **Composite skills** | Thin skills = links + minimal framing. Agent follows refs as deep as the task requires. Context efficiency by design. |
+| **aiwg-dev addon** | `link-check`, `validate-component`, `dev-doctor` section 4, and `devkit-*` scaffolding skills. |
+| **Skills as canonical type** | SKILL.md is the source. Commands generated at deploy time. `aiwg add-command` deprecated. |
+| **Daemon — fully operational** | Web UI, YAML profiles, scheduled tasks, Telegram multi-room, autonomous engine, cross-session memory, Docker. |
+| **Mission Control** | Parallel Ralph loops as background missions with live dashboard. |
+| **Behaviors — 5th artifact type** | Subscribe to system events, react automatically. Deployed to OpenClaw. |
+| **Provider-watcher** | Scheduled provider update detection with automatic PR creation. |
+| **SOUL.md agent identity** | Persistent character for agents: worldview, opinions, reasoning traits. |
+| **Remote install system** | Install frameworks without cloning the repo. |
+| **Project-level `aiwg.config`** | Per-project provider registry, deployment manifest, run scripts. |
+| **`aiwg sync`** | Update + redeploy + health check in one command. |
+| **OpenClaw (10th platform)** | First with native behaviors support. |
+| **Hermes as first-class platform** | Full deployment target, 96 skills, token-optimized templates. |
+| **Copilot & Windsurf overhauls** | Copilot: `.agent.md`/`.prompt.md`/`.instructions.md`. Windsurf: `.windsurf/rules/` with `trigger: always_on`. |
+| **ops-complete framework** | YAML-native ops framework with `sys`, `it`, `dev`, `stream` extensions. |
+| **RLM enhancements** | `quality_gate`, `preferred_model`, `chunking_strategy`, `batch_size`. Three new examples. |
+| **Composable RULES-INDEX** | Components own their rules indexes. CLI assembles at deploy time. |
+| **15-article getting-started series** | Scenario-based guides in user vocabulary. |
+| **aiwg-guide contextual help skill** | Auto-activates when users ask how to use AIWG. |
+| **AIWG.md hook file** | AIWG context decoupled from CLAUDE.md. Toggleable without reinstalling. |
+
+### Added
+
+- **`@$AIWG_ROOT/` token system** — install-path token for all AIWG corpus refs; resolves to repo root (dev), `$(npm root -g)/aiwg` (npm), or `$AIWG_ROOT` env var (custom); any env var usable as `@$TOKEN/path`; `.env` support; 1,099 bare refs migrated across corpus
+- **`.aiwg/` reference contract** — normalized path allowlist derived from `memory.creates` in manifests; Tier 1 (always present) and Tier 2 (framework-specific) documented; `validate-component` and `dev-doctor` enforce dynamically; `memory` field added to all manifests (#632, #633)
+- **aiwg-dev addon** — full developer toolkit: `validate-component` (PASS/WARN/FAIL link classification), `dev-doctor` (Section 4 subchecks for `.aiwg/`, bare refs, `.claude/` refs), `link-check` skill (per-file/corpus/`--fix`/`--report`/`--fail-on-warn`), `devkit-*` scaffolding skills (#634–#636)
+- **No-escape rule** — all `@<path>` patterns processed regardless of backtick/code-block context; documented in `aiwg-dir-reference-contract.md` and `corpus-navigation-guide.md` (#635)
+- **Corpus navigation guide** (`docs/development/corpus-navigation-guide.md`) — mental model, thin skill principle, composite skill pattern, reference tiers, ordering/grouping, anti-patterns
+- **318 `.claude/` refs migrated** — all `.claude/commands/`, `.claude/rules/`, `.claude/agents/` refs in `agentic/code/` replaced with `@$AIWG_ROOT/` corpus paths; skills now compose correctly via links (#638)
+- **`aiwg sync`** — update + redeploy + health check; `--dry-run`, `--quiet`, `--skip-update`, `--provider`, `--channel`, `--frameworks` flags (#482)
+- **Mission Control (`aiwg mc`)** — 9 subcommands: `start`, `dispatch`, `status`, `watch`, `abort`, `pause`, `resume`, `stop`, `list`; JSONL event log; persistent sessions; `--drain` on stop (#483)
+- **AIWG Steward agent** — installation custodian; DETECT→BASELINE→CHECK→PLAN→CONFIRM→EXECUTE→VERIFY→REPORT logic (#481)
+- **MC Conductor agent** — live orchestrator inside Mission Control sessions (#483)
+- **Provider-watcher** (`tools/daemon/`) — scheduled provider update detection, task execution, automatic PR creation (#615)
+- **Cross-session daemon memory** (`#608`) — episodic + semantic + working memory tiers persisting across daemon restarts; `MemoryManager` with TTL-based eviction and cross-session retrieval
+- **Daemon — fully operational** — web UI (localhost:7474), YAML profiles, scheduled task runner, multi-room Telegram, autonomous engine with safety constraints, Docker containerization (#520–#534)
+- **Behaviors** — BEHAVIOR.md format spec, `hooks:`/`triggers:`/`inputs:`/`scripts/`; framework source dirs; `aiwg add-behavior` scaffolding; OpenClaw deployment (#540–#543)
+- **OpenClaw** — 10th platform; agents/commands/skills/rules/behaviors to `~/.openclaw/`; ClawHub publication documented (#535)
+- **SOUL.md system** — `soul-create`, `soul-validate`, `soul-enable`, `soul-disable`, `soul-status`, `soul-enhance`, `soul-apply`, `soul-blend`; four pre-built SDLC souls (#437, #438)
+- **AIWG.md hook file** — decoupled context injection; `hook-enable`/`hook-disable`/`hook-regenerate`/`migrate-hook`; multi-provider equivalents (#439–#446)
+- **Remote install system** — install frameworks, addons, extensions from registry without cloning (#557)
+- **Project-level `aiwg.config`** — provider registry, deployment manifest, `aiwg run` scripts; XDG-compliant resolution (#621)
+- **aiwg-guide skill** (`agentic/code/addons/aiwg-utils/skills/aiwg-guide/`) — contextual help skill; auto-activates on AIWG usage questions; covers all 50 commands and 9 providers (#616)
+- **Concierge agent** (`tools/daemon/`) — persistent front-facing agent for daemon interactions; intent router and response translator
+- **Skills as canonical extension type** — `SourceExtensionType`/`DeploymentExtensionType` aliases; `CommandHint` interface; `SkillMetadata` expanded; skill-command translator; 56 command definitions converted; provider classification; `aiwg add-command` deprecation (#546–#552, #555, #538)
+- **Hermes as full platform** — `--provider hermes`; 96 skills declare compatibility; token-optimized AGENTS.md; 5-tool MCP whitelist; `hermes-quickstart.md`
+- **Copilot provider overhaul** — `.agent.md`, `.prompt.md`, `.instructions.md` with `applyTo` globs; `aiwg mcp install copilot` generates `.vscode/mcp.json` (#577–#580)
+- **Windsurf provider update** — `.windsurf/rules/` with `trigger: always_on`; dual skill deploy (#574–#576)
+- **ops-complete framework** — Kubernetes-inspired envelope; 6 JSON Schema kinds; 4 rules, 2 agents, 3 templates, 2 skills; `sys`/`it`/`dev`/`stream` extensions (#491)
+- **Composable RULES-INDEX hierarchy** — component-owned indexes assembled at deploy time (#496–#500)
+- **RLM enhancements** — `quality_gate`, `preferred_model`, `chunking_strategy`, `batch_size`; `rlm-self-refine`, `rlm-divide-conquer`, `rlm-filter-recurse` examples; 6 antipatterns documented (#618–#620)
+- **Prose-integration addon** — OpenProse program integration; `prose-setup`, `prose-reader`, `prose-run`, `prose-validate`, `forme-manifest`; `prose-bridge` rule (#619, #620)
+- **Getting-started guide series** — 15 scenario-based articles in `docs/getting-started/`
+- **CLI shared display module** (`src/cli/ui.ts`) — chalk/ora/cli-table3; brand mark `◆`; TTY/CI-aware degradation; quiet/JSON mode
+- **User-level config subsystem** — `aiwg config get|set|list|validate|reset|path`; XDG resolution (#545)
+- **Skills CLI subsystem** — `aiwg skills list|search|install|info`; local/clawhub/openclaw adapters (#539)
+- **Domain grounding agents** — security, performance, compliance, technology grounding agents; 40% domain accuracy improvement (#184)
+- **Agent constraint learning** — persistent domain rules learned from reviewer corrections (#146)
+- **Agent-loop rename** — `ralph-loop` → `agent-loop`; loop taxonomy; `al:` shortcut (#558)
+- **YAML metalanguage schemas** — flow, agent, rule, skill JSON Schema definitions (#447)
+- **Verbalized sampling addon** — diversity-tuning skill, content-diversifier agent, 3 strategies (#20)
+- **README overhaul** — 90+ research citations, six-component deep dive, platform entries (#501)
+- **Provider alignment audits** — full audits for all 11 platforms (#560–#569)
+
+### Fixed
+
+- **`sdlc-accelerate` handler** — "No handler found" error; `SdlcAccelerateHandler` implemented
+- **External Ralph loop startup crash** — `SemanticMemory` constructors received objects instead of path strings; loops always dead on arrival
+- **`--dangerous` flag position** — was appended after prompt; moved before so it is treated as CLI flag
+- **Codex model IDs** — `gpt-5.3-codex` aliases now map to gpt-5.4 canonical IDs (#590)
+- **OpenCode 1.0.x adapter** — event-stream parsing updated; silent output drop fixed
+- **Factory command injection** — `$ARGUMENTS` now injected at deploy time (#454)
+- **`aiwg doctor` AIWG_ROOT resolution** — resolved from script location, not hardcoded path
+- **`aiwg index` without `--graph`** — multi-graph architecture; stats/query/deps now work without flag (#425)
+- **`ralph-external`, `ralph-memory`, `ralph-config` handlers** — three CLI commands had no registered handlers; all implemented
+- **`aiwg use sdlc --provider hermes`** — unknown provider error; Hermes provider added
+
+### Changed
+
+- **`aiwg add-command`** — deprecated; `aiwg add-skill` is the replacement
+- **All CLI commands** — consistent output via shared `ui.ts` module
+- **`aiwg use` post-deploy guidance** — `<provider>/<framework>` keys; platform-appropriate next steps
+- **Command count** — 50 → 53 (`behavior`, `daemon-init`, `ralph-attach` added)
+
+[2026.3.2]: https://github.com/jmagly/aiwg/compare/v2026.3.2...v2026.4.0
+
+---
+
 ## [2026.3.4] - 2026-03-27 – "Identity & Autonomous Systems"
 
 | What changed | Why you care |
