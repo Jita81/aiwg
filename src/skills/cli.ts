@@ -11,6 +11,7 @@
  * @implements #539
  */
 
+import { spawn } from 'child_process';
 import {
   searchSkills,
   listSkills,
@@ -20,6 +21,12 @@ import {
   getAllAdapters,
 } from './registry.js';
 import type { SkillResult } from './types.js';
+import {
+  parseAgentSpawnFlags,
+  buildAgentArgs,
+  getProviderConfig,
+  isSpawnableProvider,
+} from '../cli/agent-spawn.js';
 
 const SUPPORTED_TARGETS = [
   'claude', 'copilot', 'factory', 'cursor', 'codex', 'opencode',
@@ -279,6 +286,80 @@ async function handlePublish(args: string[]): Promise<void> {
 }
 
 /**
+ * Handle 'skills run' command
+ *
+ * Looks up a skill by name, substitutes $ARGUMENTS, and dispatches
+ * the full skill prompt to the configured provider for execution.
+ *
+ * Always routes through a provider — no local execution fallback.
+ *
+ * @implements roctinam/aiwg#630
+ */
+async function handleRun(args: string[]): Promise<void> {
+  const { opts, remaining } = parseAgentSpawnFlags(args);
+  const skillName = remaining[0];
+  const skillArgs = remaining.slice(1);
+
+  if (!skillName) {
+    console.error('Error: Skill name required');
+    console.log('Usage: aiwg skills run <skill-name> [args...] [--provider <provider>]');
+    console.log('');
+    console.log('Examples:');
+    console.log('  aiwg skills run workspace-health');
+    console.log('  aiwg skills run ralph "Fix failing tests" --completion "npm test passes"');
+    console.log('  aiwg skills run doc-sync --dry-run --provider claude');
+    process.exit(1);
+  }
+
+  const details = await getSkillInfo(skillName);
+
+  if (!details) {
+    console.error(`Error: Skill '${skillName}' not found`);
+    console.log("Run 'aiwg skills list' to see available skills");
+    process.exit(1);
+  }
+
+  if (!details.content) {
+    console.error(`Error: Skill '${skillName}' has no executable content`);
+    process.exit(1);
+  }
+
+  // Substitute $ARGUMENTS with the provided args
+  const argString = skillArgs.join(' ');
+  const prompt = details.content.replace(/\$ARGUMENTS/g, argString);
+
+  // Resolve provider — default to claude
+  const providerName = opts.provider ?? 'claude';
+
+  if (!isSpawnableProvider(providerName)) {
+    const config = getProviderConfig(providerName);
+    console.error(`Error: Provider '${config.name}' cannot be spawned from the CLI.`);
+    if (config.guidanceMessage) {
+      console.log('');
+      console.log(config.guidanceMessage);
+    }
+    process.exit(1);
+  }
+
+  const config = getProviderConfig(providerName);
+  const spawnArgs = buildAgentArgs(prompt, opts);
+
+  console.log(`Running skill '${skillName}' via ${config.name}...`);
+  console.log('');
+
+  const child = spawn(config.binary!, spawnArgs, { stdio: 'inherit' });
+
+  child.on('error', (err) => {
+    console.error(`Error: Failed to spawn ${config.binary}: ${err.message}`);
+    process.exit(1);
+  });
+
+  child.on('close', (code) => {
+    process.exit(code ?? 1);
+  });
+}
+
+/**
  * Main skills command router
  */
 export async function main(args: string[]): Promise<void> {
@@ -286,6 +367,10 @@ export async function main(args: string[]): Promise<void> {
   const subcommandArgs = args.slice(1);
 
   switch (subcommand) {
+    case 'run':
+      await handleRun(subcommandArgs);
+      break;
+
     case 'search':
       await handleSearch(subcommandArgs);
       break;
@@ -308,9 +393,11 @@ export async function main(args: string[]): Promise<void> {
 
     case undefined:
       console.error('Error: Skills subcommand required');
-      console.log('Available: search, info, list, install, publish');
+      console.log('Available: run, search, info, list, install, publish');
       console.log('');
       console.log('Examples:');
+      console.log('  aiwg skills run workspace-health');
+      console.log('  aiwg skills run ralph "Fix failing tests" --completion "npm test passes"');
       console.log('  aiwg skills list');
       console.log('  aiwg skills search "parallel"');
       console.log('  aiwg skills info parallel-dispatch');
@@ -323,7 +410,7 @@ export async function main(args: string[]): Promise<void> {
 
     default:
       console.error(`Error: Unknown skills subcommand '${subcommand}'`);
-      console.log('Available: search, info, list, install, publish');
+      console.log('Available: run, search, info, list, install, publish');
       process.exit(1);
   }
 }

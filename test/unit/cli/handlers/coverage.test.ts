@@ -24,14 +24,18 @@ describe('Handler Coverage', () => {
     // Build a Set of handler IDs for O(1) lookup
     const handlerIds = new Set(allHandlers.map((h) => h.id));
 
-    // Separate definitions into those that opt out and those that must have a handler
-    const disabledCommands = commandDefinitions.filter(
-      (cmd) => (cmd.metadata as SkillMetadata)?.commandHint?.cliDisabled === true
-    );
+    // Separate definitions into those that opt out and those that must have a handler.
+    // A command is exempt from the handler requirement when either:
+    //   - cliDisabled: true  — slash-command-only, no CLI execution
+    //   - executedViaSkillRunner: true — dispatched via `aiwg skills run`, no bespoke handler needed
+    const isExempt = (cmd: (typeof commandDefinitions)[number]) => {
+      const hint = (cmd.metadata as SkillMetadata)?.commandHint;
+      return hint?.cliDisabled === true || hint?.executedViaSkillRunner === true;
+    };
 
-    const requiredCommands = commandDefinitions.filter(
-      (cmd) => (cmd.metadata as SkillMetadata)?.commandHint?.cliDisabled !== true
-    );
+    const disabledCommands = commandDefinitions.filter(isExempt);
+
+    const requiredCommands = commandDefinitions.filter((cmd) => !isExempt(cmd));
 
     // Compute the missing handlers up front so the failure message is maximally useful
     const missingHandlers = requiredCommands.filter((cmd) => !handlerIds.has(cmd.id));

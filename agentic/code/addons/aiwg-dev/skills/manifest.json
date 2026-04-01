@@ -1,0 +1,5 @@
+{
+  "name": "aiwg-dev-skills",
+  "version": "1.0.0",
+  "skills": ["validate-component", "validate-addon", "dev-doctor"]
+}

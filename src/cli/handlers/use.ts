@@ -43,7 +43,7 @@ const MODE_MAP: Record<Framework, string> = {
 /**
  * Valid addon identifiers (deployed independently via `aiwg use <addon>`)
  */
-const VALID_ADDONS = ['rlm', 'ring', 'daemon'] as const;
+const VALID_ADDONS = ['rlm', 'ring', 'daemon', 'aiwg-dev'] as const;
 type Addon = typeof VALID_ADDONS[number];
 
 /**
@@ -53,6 +53,7 @@ const ADDON_PATHS: Record<Addon, string> = {
   rlm: 'agentic/code/addons/rlm',
   ring: 'agentic/code/addons/ring-methodology',
   daemon: 'agentic/code/addons/daemon',
+  'aiwg-dev': 'agentic/code/addons/aiwg-dev',
 };
 
 /**
@@ -314,7 +315,7 @@ export class UseHandler implements CommandHandler {
     if (!framework) {
       return {
         exitCode: 1,
-        message: 'Error: Framework or addon name required\nFrameworks: sdlc, marketing, media-curator, research, writing, all\nAddons: rlm, ring, daemon',
+        message: 'Error: Framework or addon name required\nFrameworks: sdlc, marketing, media-curator, research, writing, all\nAddons: rlm, ring, daemon, aiwg-dev',
       };
     }
 

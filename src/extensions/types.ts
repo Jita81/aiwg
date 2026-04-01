@@ -662,6 +662,13 @@ export interface CommandHint {
    * Exempts it from handler coverage checks.
    */
   cliDisabled?: boolean;
+
+  /**
+   * When true, this skill is executed via `aiwg skills run` (provider dispatch)
+   * rather than a bespoke TypeScript handler.
+   * Exempts it from handler coverage checks.
+   */
+  executedViaSkillRunner?: boolean;
 }
 
 /**

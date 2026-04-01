@@ -1618,6 +1618,7 @@ export const sdlcAccelerateCommand: Extension = {
     triggerPhrases: ['sdlc accelerate', 'accelerate sdlc', 'bootstrap project', 'ramp up sdlc', 'construction ready'],
     commandHint: {
       template: 'orchestration',
+      executedViaSkillRunner: true,
       argumentHint: '<description> [--from-codebase <path> --resume --dry-run]',
       allowedTools: ['Task', 'Read', 'Write', 'Glob', 'TodoWrite'],
       executionSteps: [

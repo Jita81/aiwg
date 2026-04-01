@@ -196,6 +196,7 @@ export const CommandMetadataSchema = z.object({
   executionSteps: z.array(z.string()).optional(),
   successCriteria: z.array(z.string()).optional(),
   cliDisabled: z.boolean().optional(),
+  executedViaSkillRunner: z.boolean().optional(),
   generatedFrom: z.string().optional(),
 });
 
@@ -212,6 +213,7 @@ export const CommandHintSchema = z.object({
   successCriteria: z.array(z.string()).optional(),
   model: z.string().optional(),
   cliDisabled: z.boolean().optional(),
+  executedViaSkillRunner: z.boolean().optional(),
 });
 
 /**
