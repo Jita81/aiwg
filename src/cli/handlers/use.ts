@@ -44,12 +44,12 @@ const MODE_MAP: Record<Framework, string> = {
  * Addons excluded from `aiwg use all`.
  * aiwg-dev is contributor-only tooling — not for end users.
  */
-const USE_ALL_DISALLOW = new Set(['aiwg-dev']);
+export const USE_ALL_DISALLOW = new Set(['aiwg-dev']);
 
 /**
  * Discover all addon names from the filesystem, minus the disallow list.
  */
-async function getAllAddons(frameworkRoot: string): Promise<string[]> {
+export async function getAllAddons(frameworkRoot: string): Promise<string[]> {
   const addonsDir = path.join(frameworkRoot, 'agentic/code/addons');
   const entries = await fs.readdir(addonsDir, { withFileTypes: true });
   return entries
@@ -60,7 +60,7 @@ async function getAllAddons(frameworkRoot: string): Promise<string[]> {
 /**
  * Check whether a given addon name exists on disk (and is not disallowed).
  */
-async function isValidAddon(frameworkRoot: string, name: string): Promise<boolean> {
+export async function isValidAddon(frameworkRoot: string, name: string): Promise<boolean> {
   if (USE_ALL_DISALLOW.has(name)) return false;
   try {
     const stat = await fs.stat(path.join(frameworkRoot, 'agentic/code/addons', name));
@@ -74,7 +74,7 @@ async function isValidAddon(frameworkRoot: string, name: string): Promise<boolea
  * Resolve addon source path from its name.
  * Handles the ring-methodology special case where the folder name differs from the alias.
  */
-function addonPath(frameworkRoot: string, name: string): string {
+export function addonPath(frameworkRoot: string, name: string): string {
   // Legacy alias: `ring` → ring-methodology folder
   const folderName = name === 'ring' ? 'ring-methodology' : name;
   return path.join(frameworkRoot, 'agentic/code/addons', folderName);

@@ -878,6 +878,9 @@ export function discoverAddons(srcRoot) {
       }
     }
 
+    // Skip addons marked devOnly — they are contributor tools, not end-user deployables
+    if (manifest.devOnly === true) continue;
+
     addons.push({
       name: entry.name,
       path: addonPath,
