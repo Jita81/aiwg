@@ -19,6 +19,7 @@ import { MessageRouter } from './message-router.mjs';
 import { ScheduledTaskRunner } from './scheduled-task-runner.mjs';
 import { AutonomousEngine } from './autonomous-engine.mjs';
 import { MemoryManager } from './memory-manager.mjs';
+import { ProviderWatcher } from './provider-watcher.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -42,6 +43,7 @@ class DaemonMain {
     this.autonomousEngine = null;
     this.roomManager = null;
     this.memoryManager = null;
+    this.providerWatcher = null;
     this.shutdownInProgress = false;
     this.isRotating = false;
     this.startTime = Date.now();
@@ -333,6 +335,43 @@ class DaemonMain {
       }
     }
 
+    // Initialize ProviderWatcher if configured
+    const providerWatchConfig = this.config.get('provider_watch');
+    if (providerWatchConfig?.enabled) {
+      this.providerWatcher = new ProviderWatcher({
+        stateDir: '.aiwg/daemon/provider-watch',
+        providers: providerWatchConfig.providers || undefined,
+        intervalHours: providerWatchConfig.interval_hours || 6,
+      });
+      this.providerWatcher.on('changes-detected', (e) => {
+        this.log(`Provider changes detected: ${e.changes.length} change(s)`);
+        this.eventRouter.route({
+          source: 'provider-watch',
+          type: 'provider.changes',
+          payload: e,
+        });
+      });
+      this.providerWatcher.on('error', (e) => {
+        this.log(`Provider watcher error (${e.provider}): ${e.error}`);
+      });
+      this.providerWatcher.start();
+
+      // Register default automation rule for PR creation on provider changes
+      if (this.automationEngine) {
+        const existingRule = this.automationEngine.getRule('provider-watch-pr');
+        if (!existingRule) {
+          const prRule = ProviderWatcher.getAutomationRule();
+          this.automationEngine.loadRules([
+            ...this.automationEngine.rules,
+            prRule,
+          ]);
+          this.log('Registered provider-watch-pr automation rule');
+        }
+      }
+
+      this.log(`ProviderWatcher initialized (${this.providerWatcher.providers.length} providers, every ${this.providerWatcher.intervalHours}h)`);
+    }
+
     // Start web server if configured
     const webConfig = this.config.get('interface.web');
     if (webConfig?.enabled) {
@@ -388,6 +427,7 @@ class DaemonMain {
           file_watcher: this.fileWatcher?.getStats() || { enabled: false },
           scheduler: this.cronScheduler?.getStats() || { enabled: false },
           messaging: this.messagingBus ? { enabled: true, adapters: this.messagingBus.adapterCount } : { enabled: false },
+          provider_watcher: this.providerWatcher ? { enabled: true, ...this.providerWatcher.getStatus() } : { enabled: false },
         },
       }),
 
@@ -543,6 +583,21 @@ class DaemonMain {
         return this.scheduledTaskRunner ? this.scheduledTaskRunner.getStatus() : { started: false };
       },
 
+      // Provider watch
+      'provider-watch.status': () => {
+        return this.providerWatcher ? this.providerWatcher.getStatus() : { enabled: false };
+      },
+
+      'provider-watch.check': async () => {
+        if (!this.providerWatcher) {
+          const err = new Error('Provider watcher not initialized — enable provider_watch in daemon config');
+          err.code = 'INVALID_STATE';
+          throw err;
+        }
+        const changes = await this.providerWatcher.checkAll();
+        return { changes, count: changes.length };
+      },
+
       // Room management
       'rooms.list': () => {
         return this.roomManager ? this.roomManager.getStatus() : { totalRooms: 0 };
@@ -671,6 +726,11 @@ class DaemonMain {
     if (this.autonomousEngine) {
       this.autonomousEngine.stop();
       this.autonomousEngine = null;
+    }
+
+    if (this.providerWatcher) {
+      this.providerWatcher.stop();
+      this.providerWatcher = null;
     }
   }
 
