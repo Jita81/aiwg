@@ -1,12 +1,14 @@
 ---
 name: concierge
 type: behavior
-version: 2026.3.0
+version: 2026.4.0
 description: Front-facing concierge for daemon sessions — anticipates needs, routes silently, shields from complexity
+module: tools/daemon/concierge/orchestrator.mjs
 trigger:
   - session-start
   - pre-response
   - on-error
+  - chat-message
 scope: daemon
 tone:
   register: professional-warm

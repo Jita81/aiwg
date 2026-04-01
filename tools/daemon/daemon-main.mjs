@@ -20,6 +20,7 @@ import { ScheduledTaskRunner } from './scheduled-task-runner.mjs';
 import { AutonomousEngine } from './autonomous-engine.mjs';
 import { MemoryManager } from './memory-manager.mjs';
 import { ProviderWatcher } from './provider-watcher.mjs';
+import { DaemonBehaviorLoader } from './behavior-loader.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -44,6 +45,7 @@ class DaemonMain {
     this.roomManager = null;
     this.memoryManager = null;
     this.providerWatcher = null;
+    this.behaviorLoader = null;
     this.shutdownInProgress = false;
     this.isRotating = false;
     this.startTime = Date.now();
@@ -244,6 +246,23 @@ class DaemonMain {
       this.log(`Behavior registry init failed (non-fatal): ${err.message}`);
     }
 
+    // Load and activate daemon behaviors (injectable orchestrators)
+    try {
+      this.behaviorLoader = new DaemonBehaviorLoader({
+        projectRoot: process.cwd(),
+        supervisor: this.supervisor,
+        memoryManager: this.memoryManager,
+        provider: this.config.get('provider') || null,
+        config: this.config,
+      });
+      const active = await this.behaviorLoader.loadAll();
+      if (active.size > 0) {
+        this.log(`Daemon behaviors activated: ${[...active.keys()].join(', ')}`);
+      }
+    } catch (err) {
+      this.log(`Behavior loader init failed (non-fatal): ${err.message}`);
+    }
+
     // Initialize MessageRouter
     this.messageRouter = new MessageRouter({ supervisor: this.supervisor });
     this.log('MessageRouter initialized');
@@ -428,6 +447,7 @@ class DaemonMain {
           scheduler: this.cronScheduler?.getStats() || { enabled: false },
           messaging: this.messagingBus ? { enabled: true, adapters: this.messagingBus.adapterCount } : { enabled: false },
           provider_watcher: this.providerWatcher ? { enabled: true, ...this.providerWatcher.getStatus() } : { enabled: false },
+          behaviors: this.behaviorLoader ? this.behaviorLoader.getStatus() : { active: {}, count: 0 },
         },
       }),
 
@@ -503,15 +523,32 @@ class DaemonMain {
       },
 
       // Chat (send message via IPC for non-tmux clients)
-      'chat.send': (params) => {
+      // Routes through active chat-message behaviors when available.
+      'chat.send': async (params) => {
         if (!params.message) {
           const err = new Error('Missing required parameter: message');
           err.code = 'INVALID_PARAMS';
           throw err;
         }
-        // Submit as a task via supervisor
+        // Route through behaviors registered for chat-message trigger
+        if (this.behaviorLoader && !params.raw) {
+          const handlers = this.behaviorLoader.getForTrigger('chat-message');
+          for (const handler of handlers) {
+            if (typeof handler.handleMessage === 'function') {
+              try {
+                return await handler.handleMessage(params.message, {
+                  source: 'ipc-chat',
+                  provider: params.provider,
+                });
+              } catch (err) {
+                this.log(`Behavior chat handler error (falling back): ${err.message}`);
+              }
+            }
+          }
+        }
+        // Fallback: direct supervisor submit (no behavior mediation)
         const task = this.supervisor.submit(params.message, {
-          priority: params.priority || 5, // Chat messages get higher priority
+          priority: params.priority || 5,
           metadata: { source: 'ipc-chat' },
         });
         return { taskId: task.id };
@@ -551,6 +588,17 @@ class DaemonMain {
       'memory.context': () => {
         if (!this.memoryManager) return { context: '', available: false };
         return { context: this.memoryManager.getContext(), available: true };
+      },
+
+      // Behavior management (injectable daemon behaviors)
+      'behaviors.status': () => {
+        return this.behaviorLoader ? this.behaviorLoader.getStatus() : { active: {}, count: 0 };
+      },
+
+      'behaviors.list': () => {
+        if (!this.behaviorLoader) return { behaviors: [] };
+        const status = this.behaviorLoader.getStatus();
+        return { behaviors: Object.entries(status.active).map(([name, info]) => ({ name, ...info })) };
       },
 
       // Autonomous mode management
@@ -731,6 +779,10 @@ class DaemonMain {
     if (this.providerWatcher) {
       this.providerWatcher.stop();
       this.providerWatcher = null;
+    }
+
+    if (this.behaviorLoader) {
+      this.behaviorLoader = null;
     }
   }
 
