@@ -1,41 +1,58 @@
 ---
 description: Contextual AIWG help — explains current version features, answers how-to questions, routes live queries to the steward
-commandHint:
-  argumentHint: "[topic-or-question]"
-  allowedTools: Bash, Read, Glob, Grep
-  model: sonnet
-  category: help
-platforms: [claude-code, codex, copilot, factory, cursor, opencode, warp, windsurf, openclaw]
+platforms:
+  - claude-code
+  - hermes
+  - openclaw
 ---
 
 # aiwg-guide
 
-Contextual help interface for AIWG users. Default mode reads the release announcement for the currently installed version and explains what's new in plain language. Given a topic or question, answers from prioritized documentation sources. Routes live-state queries to the steward.
+You provide contextual AIWG help. Default mode reads the release announcement for the currently installed version and explains what's new in plain language. Given a topic or question, you answer from prioritized documentation sources. You route live-state queries to the steward.
 
 ## Triggers
 
 Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
 
-- "what's new" / "what changed" -> default whats-new mode
-- "how do I [action]" -> contextual help
-- "explain [feature]" -> feature explanation
-- "what is [aiwg-concept]" -> concept lookup
-- "help with aiwg" -> general help
-- "aiwg guide" -> explicit invocation
-- "what does [command] do" -> command reference
-- "what providers support [feature]" -> capability matrix lookup
+- "what's new" / "what changed" → default what's-new mode
+- "how do I [action]" → contextual help from docs
+- "explain [feature]" → feature explanation from docs
+- "what is [aiwg-concept]" → concept lookup from docs
+- "help with aiwg" → general help
+- "aiwg guide" → explicit invocation
+- "what does [command] do" → CLI reference lookup
+- "what providers support [feature]" → capability matrix lookup via steward
 
-## Default Mode: What's New
+## Trigger Patterns Reference
 
-When invoked with no arguments (or "what's new", "what changed"):
+| Pattern | Example | Action |
+|---------|---------|--------|
+| No arguments | "aiwg guide" | Default: read release announcement for installed version |
+| What's new | "what's new in AIWG" | Read `docs/releases/v{version}-announcement.md` |
+| How-to | "how do I deploy to copilot" | Search docs in priority order |
+| What-is | "what is a soul file" | Concept lookup from extension/addon docs |
+| Command help | "what does aiwg sync do" | Search `docs/cli-reference.md` |
+| Provider query | "does cursor support MCP" | Read capability matrix |
+| Status query | "is AIWG healthy" | Steward handoff → `aiwg doctor` |
+| Version query | "what version of AIWG" | Steward handoff → `aiwg version` |
 
-1. **Read installed version**:
+## Behavior
+
+When triggered:
+
+1. **Classify the request** into one of three modes:
+   - **Default (what's new)**: No arguments, or "what's new" / "what changed"
+   - **Contextual help**: A topic or question about AIWG features
+   - **Steward handoff**: A question requiring live system state
+
+2. **Default mode** (no arguments or "what's new"):
+
+   a. Read the installed version:
    ```bash
    aiwg version
    ```
-   Extract the version number (e.g., `2026.3.3`).
 
-2. **Locate release announcement**:
+   b. Locate the release announcement:
    ```bash
    # Primary: exact version match
    docs/releases/v{version}-announcement.md
@@ -44,145 +61,105 @@ When invoked with no arguments (or "what's new", "what changed"):
    ls -t docs/releases/v*-announcement.md | head -1
    ```
 
-3. **Read and summarize** the announcement:
-   - Lead with the most impactful changes
-   - Use conversational tone, not raw markdown dump
-   - Group changes by theme (features, fixes, improvements)
-   - Mention specific commands or workflows the user can try
+   c. Read and summarize in conversational tone — lead with the most impactful changes, group by theme, mention specific commands the user can try. Offer to go deeper on any feature.
 
-4. **Offer to go deeper**:
-   - "Want me to walk through any of these in detail?"
-   - If the user asks about a specific feature, switch to contextual help mode
+   d. If no announcement file exists, fall back to `CHANGELOG.md` for the version section, then `docs/cli-reference.md`. Note the fallback: "No release announcement found for v{version}. Here's what I can tell from the changelog..."
 
-**Example output style**:
+3. **Contextual help mode** (topic or question given):
 
-> Version 2026.3.3 brings three things worth knowing about: skills-first deployment, a revised config system, and improvements to the ops subsystem. The biggest change is skills-first -- skills are now the primary artifact type across all providers, which means `aiwg use sdlc` now deploys skills before commands. Want me to walk through any of these in detail?
+   Search documentation sources in this priority order:
 
-**Fallback** (announcement file not found):
+   | Priority | Source | Best For |
+   |----------|--------|----------|
+   | 1 | `docs/releases/v{version}-announcement.md` | What's new, recent changes |
+   | 2 | `docs/cli-reference.md` | Command usage, syntax, examples |
+   | 3 | `docs/extensions/` | Extension system, creating extensions |
+   | 4 | Framework READMEs (`agentic/code/frameworks/*/README.md`) | Framework capabilities, setup |
+   | 5 | `agentic/code/providers/capability-matrix.yaml` | Provider features, platform support |
+   | 6 | `CLAUDE.md` and `AIWG.md` | Quick-start, overview, project structure |
+   | 7 | Addon READMEs (`agentic/code/addons/*/README.md`) | Addon features, voice profiles |
 
-If no release announcement exists for the installed version:
-1. Read `CHANGELOG.md` for the version section
-2. If that also fails, summarize from `docs/cli-reference.md`
-3. Note: "No release announcement found for v{version}. Here's what I can tell from the changelog..."
+   Strategy: keyword-grep across sources, extract the relevant section (not the whole file), synthesize from multiple sources if needed, cite where the information came from.
 
-## Contextual Help Mode
+4. **Steward handoff** (live system state needed):
 
-When given a topic or question, answer from documentation sources in this priority order:
+   Some questions require live state rather than docs. Detect and delegate:
 
-| Priority | Source | Best For |
-|----------|--------|----------|
-| 1 | `docs/releases/v{version}-announcement.md` | What's new, recent changes |
-| 2 | `docs/cli-reference.md` | Command usage, syntax, examples |
-| 3 | `docs/extensions/` | Extension system, creating extensions |
-| 4 | Framework READMEs (`agentic/code/frameworks/*/README.md`) | Framework capabilities, setup |
-| 5 | `agentic/code/providers/capability-matrix.yaml` | Provider features, platform support |
-| 6 | `CLAUDE.md` and `AIWG.md` | Quick-start, overview, project structure |
-| 7 | Addon READMEs (`agentic/code/addons/*/README.md`) | Addon features, voice profiles |
+   | Question Type | Detection Pattern | Handler |
+   |--------------|-------------------|---------|
+   | Installation status | "what's installed", "what frameworks" | `aiwg list` |
+   | Health check | "is everything healthy", "any issues" | `aiwg doctor` |
+   | Version info | "what version am I on" | `aiwg version` |
+   | Deployment state | "what's deployed to [provider]" | `aiwg status` |
 
-### Search Strategy
+   Run the CLI command via Bash, weave the output into a natural language response, and note the information comes from live system state. The handoff is transparent to the user.
 
-1. **Keyword match**: Grep the question terms across documentation sources
-2. **Section extraction**: Read the relevant section, not the whole file
-3. **Synthesize**: Combine information from multiple sources if needed
-4. **Cite sources**: Tell the user where the information came from so they can read further
+5. **If the user's intent is ambiguous**, ask a clarifying question:
+   - "Are you asking about [feature] in general, or how it's configured in your project?"
+   - "Would you like the documentation explanation, or should I check your live installation?"
 
-### Example Interactions
+## Examples
+
+### Example 1: Default mode — what's new
+
+**User**: "what's new"
+
+**Extraction**: No specific topic — default what's-new mode
+
+**Action**:
+```bash
+aiwg version
+# → 2026.3.3
+cat docs/releases/v2026.3.3-announcement.md
+```
+
+**Response**: "Version 2026.3.3 brings three things worth knowing about: skills-first deployment, a revised config system, and improvements to the ops subsystem. The biggest change is skills-first — skills are now the primary artifact type across all providers, which means `aiwg use sdlc` now deploys skills before commands. Want me to walk through any of these in detail?"
+
+### Example 2: Contextual help — how-to question
 
 **User**: "how do I schedule a task"
 
+**Extraction**: Topic = "schedule a task", contextual help mode
+
 **Action**:
-1. Grep `docs/cli-reference.md` for "schedule"
-2. Read the schedule command section
-3. Check if `/schedule` skill exists for additional context
+```bash
+grep -n "schedule" docs/cli-reference.md
+# Read the schedule command section
+```
 
-**Response**: "You can schedule recurring tasks with the `/schedule` skill or `aiwg ralph-external` for one-off loops. The schedule skill supports cron expressions..."
+**Response**: "You can schedule recurring tasks with the `/schedule` skill or `aiwg ralph-external` for one-off loops. The schedule skill supports cron expressions — see `docs/cli-reference.md` for full syntax."
 
----
+### Example 3: Provider query
 
 **User**: "what providers support agent teams"
 
-**Action**:
-1. Read `agentic/code/providers/capability-matrix.yaml`
-2. Filter for `agent_teams` feature across all providers
-
-**Response**: "Agent teams are natively supported by Claude Code and Codex. Other providers emulate them through AIWG's multi-agent orchestration..."
-
----
-
-**User**: "what is a behavior"
+**Extraction**: Topic = "agent teams" + "providers", capability matrix lookup
 
 **Action**:
-1. Grep capability matrix for "behaviors"
-2. Read extension types docs for behavior definition
+```bash
+cat agentic/code/providers/capability-matrix.yaml
+# Filter for agent_teams feature
+```
 
-**Response**: "Behaviors are a new artifact type currently exclusive to OpenClaw. They define persistent behavioral modifications..."
+**Response**: "Agent teams are natively supported by Claude Code and Codex. Other providers emulate them through AIWG's multi-agent orchestration. See the capability matrix for the full breakdown."
 
-## Steward Handoff
+### Example 4: Steward handoff — health check
 
-Some questions require live system state rather than documentation. The guide detects these and delegates to the steward.
+**User**: "is AIWG healthy"
 
-| Question Type | Detection Pattern | Handler |
-|--------------|-------------------|---------|
-| Installation status | "what's installed", "what frameworks" | Steward: `aiwg list` |
-| Health check | "is everything healthy", "any issues" | Steward: `aiwg doctor` |
-| Version info | "what version am I on" | Steward: `aiwg version` |
-| Deployment state | "what's deployed to [provider]" | Steward: `aiwg status` |
-| Feature explanation | "how do I use X", "what does X do" | Guide (docs) |
-| Change history | "what changed in X" | Guide (release announcement) |
-| Provider features | "what providers support X" | Guide (capability matrix) |
+**Extraction**: Live system state needed — steward handoff
 
-### Handoff Protocol
+**Action**:
+```bash
+aiwg doctor
+```
 
-When a steward handoff is needed:
-
-1. **Detect**: Classify the question as requiring live state
-2. **Invoke**: Run the appropriate CLI command via Bash
-   ```bash
-   aiwg list        # for installation queries
-   aiwg doctor      # for health queries
-   aiwg version     # for version queries
-   aiwg status      # for deployment queries
-   ```
-3. **Incorporate**: Weave the command output into a natural language response
-4. **Attribute**: Note that the information comes from live system state
-
-The handoff is transparent to the user -- they see a unified response.
-
-## Trigger Phrase Mappings
-
-| Pattern | Example | Action |
-|---------|---------|--------|
-| No arguments | `/aiwg-guide` | Default: what's new |
-| What's new | "what's new in AIWG" | Read release announcement |
-| How-to | "how do I deploy to copilot" | Contextual help from docs |
-| What-is | "what is a soul file" | Concept lookup from docs |
-| Command help | "what does aiwg sync do" | CLI reference lookup |
-| Provider query | "does cursor support MCP" | Capability matrix lookup |
-| Status query | "is AIWG healthy" | Steward handoff |
-| Version query | "what version of AIWG" | Steward handoff |
-
-## Clarification Prompts
-
-If the user's intent is ambiguous:
-
-- "Are you asking about [feature] in general, or how it's configured in your project?"
-- "Would you like the documentation explanation, or should I check your live installation?"
-- "I can explain the concept, or show you the current state in your project. Which would help?"
-
-## Context Budget
-
-- Default mode (what's new): ~2,000 tokens (read announcement, summarize)
-- Contextual help: ~1,500 tokens per source consulted (max 3 sources)
-- Steward handoff: ~500 tokens (CLI command + response)
+**Response**: "I just ran `aiwg doctor`. All checks pass: CLI version 2026.3.3, 3 frameworks deployed (sdlc, marketing, media-curator), node_modules installed, no stale deployments detected."
 
 ## References
 
-- @$AIWG_ROOT/docs/releases/ -- Release announcements (primary data source for default mode)
-- @$AIWG_ROOT/docs/cli-reference.md -- Command reference
-- @$AIWG_ROOT/docs/extensions/overview.md -- Extension system
-- @$AIWG_ROOT/agentic/code/providers/capability-matrix.yaml -- Provider features
-- @$AIWG_ROOT/agentic/code/agents/personas/aiwg-steward.md -- Steward agent (handoff target)
-- Issue #616 -- Feature request
-- Issue #599 / #600 -- Steward expansion (guide hands off to steward)
-- Issue #604 -- Capability matrix (guide reads for provider queries)
-- Issue #612 -- Documentation (guide surfaces to users)
+- @$AIWG_ROOT/docs/releases/ — Release announcements (primary data source for default mode)
+- @$AIWG_ROOT/docs/cli-reference.md — Command reference
+- @$AIWG_ROOT/docs/extensions/overview.md — Extension system
+- @$AIWG_ROOT/agentic/code/providers/capability-matrix.yaml — Provider features
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/agents/aiwg-steward.md — Steward agent (handoff target)

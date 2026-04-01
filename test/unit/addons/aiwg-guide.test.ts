@@ -9,33 +9,53 @@ const ADDON_MANIFEST = 'agentic/code/addons/aiwg-utils/manifest.json';
 const SKILLS_MANIFEST = 'agentic/code/addons/aiwg-utils/skills/manifest.json';
 
 describe('aiwg-guide skill (#616)', () => {
-  describe('skill file', () => {
+  describe('skill file structure', () => {
     it('should exist at the expected path', async () => {
       await expect(access(SKILL_FILE, constants.F_OK)).resolves.toBeUndefined();
     });
 
-    it('should have valid YAML frontmatter', async () => {
+    it('should have valid YAML frontmatter with required fields', async () => {
       const content = await readFile(SKILL_FILE, 'utf-8');
       expect(content).toMatch(/^---\n/);
       expect(content).toMatch(/\n---\n/);
-    });
-
-    it('should declare required frontmatter fields', async () => {
-      const content = await readFile(SKILL_FILE, 'utf-8');
       expect(content).toMatch(/description:/);
-      expect(content).toMatch(/commandHint:/);
       expect(content).toMatch(/platforms:/);
+      expect(content).toContain('claude-code');
     });
 
-    it('should list all 9 platforms', async () => {
+    it('should follow standard section ordering', async () => {
       const content = await readFile(SKILL_FILE, 'utf-8');
-      const platforms = [
-        'claude-code', 'codex', 'copilot', 'factory',
-        'cursor', 'opencode', 'warp', 'windsurf', 'openclaw',
+      const sections = [
+        '## Triggers',
+        '## Trigger Patterns Reference',
+        '## Behavior',
+        '## Examples',
+        '## References',
       ];
-      for (const platform of platforms) {
-        expect(content, `missing platform: ${platform}`).toContain(platform);
+      let lastIndex = -1;
+      for (const section of sections) {
+        const index = content.indexOf(section);
+        expect(index, `missing section: ${section}`).toBeGreaterThan(lastIndex);
+        lastIndex = index;
       }
+    });
+
+    it('should have numbered examples with User/Extraction/Action/Response', async () => {
+      const content = await readFile(SKILL_FILE, 'utf-8');
+      expect(content).toMatch(/### Example 1:/);
+      expect(content).toMatch(/### Example 2:/);
+      expect(content).toMatch(/\*\*User\*\*:/);
+      expect(content).toMatch(/\*\*Extraction\*\*:/);
+      expect(content).toMatch(/\*\*Action\*\*:/);
+      expect(content).toMatch(/\*\*Response\*\*:/);
+    });
+
+    it('should use @$AIWG_ROOT/ reference convention', async () => {
+      const content = await readFile(SKILL_FILE, 'utf-8');
+      const refs = content.match(/@\$AIWG_ROOT\//g) || [];
+      expect(refs.length).toBeGreaterThanOrEqual(3);
+      // Must not use old .claude/ references
+      expect(content).not.toMatch(/@\.claude\//);
     });
   });
 
@@ -61,32 +81,23 @@ describe('aiwg-guide skill (#616)', () => {
   describe('contextual help mode', () => {
     it('should define prioritized documentation sources', async () => {
       const content = await readFile(SKILL_FILE, 'utf-8');
-      // Priority sources from issue spec
       expect(content).toContain('docs/cli-reference.md');
       expect(content).toContain('docs/extensions/');
       expect(content).toContain('capability-matrix');
     });
-
-    it('should include example interactions', async () => {
-      const content = await readFile(SKILL_FILE, 'utf-8');
-      expect(content).toMatch(/how do I/i);
-      expect(content).toMatch(/what providers support/i);
-      expect(content).toMatch(/what is/i);
-    });
   });
 
   describe('steward handoff', () => {
-    it('should define handoff detection patterns', async () => {
+    it('should define handoff detection patterns in behavior', async () => {
       const content = await readFile(SKILL_FILE, 'utf-8');
-      expect(content).toContain('Steward Handoff');
       expect(content).toContain('aiwg list');
       expect(content).toContain('aiwg doctor');
+      expect(content).toContain('aiwg status');
     });
 
-    it('should describe transparent handoff protocol', async () => {
+    it('should describe transparent handoff', async () => {
       const content = await readFile(SKILL_FILE, 'utf-8');
       expect(content).toMatch(/transparent/i);
-      expect(content).toMatch(/handoff.*protocol/i);
     });
   });
 
