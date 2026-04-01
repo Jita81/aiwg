@@ -139,13 +139,13 @@ If you want audits to run automatically (before commits, on a schedule, or when 
 
 ## Iterative fixing
 
-Found issues you want to fix? Use Ralph to run them down:
+Found issues you want to fix? Use Al to run them down:
 
 ```
 /ralph "Fix all the security issues found in the audit" --completion "security review passes"
 ```
 
-Ralph will iterate — fix, re-audit, fix again — until the completion criterion is met or it needs your input.
+Al will iterate — fix, re-audit, fix again — until the completion criterion is met or it needs your input.
 
 ---
 

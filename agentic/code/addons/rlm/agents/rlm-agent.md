@@ -644,10 +644,10 @@ advanced_rlm_config:
 
 ### With Agent Loops
 
-RLM agents can operate within Ralph iterations:
+RLM agents can operate within Al iterations:
 - Agent loop calls RLM agent for complex sub-tasks
 - RLM agent maintains state in `.aiwg/rlm/tasks/{task-id}/`
-- Ralph verifies completion via existence of `final-result.md`
+- Al verifies completion via existence of `final-result.md`
 
 ### With Agent Supervisor
 
@@ -770,7 +770,7 @@ AIWG mitigations:
 ## Collaboration
 
 Works with:
-- **ralph-loop**: RLM agent can execute within Ralph iterations
+- **ralph-loop**: RLM agent can execute within Al iterations
 - **agent-supervisor**: Routes long-context tasks to RLM agent
 - **software-implementer**: RLM discovers files, implementer makes changes
 - **test-engineer**: RLM finds test gaps, test-engineer writes tests

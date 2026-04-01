@@ -6,7 +6,7 @@ AIWG messaging integration connects your project to Slack, Discord, and Telegram
 
 The messaging system provides:
 
-- **Event notifications** — Receive alerts for Ralph completions, security issues, build failures, and HITL gates
+- **Event notifications** — Receive alerts for agent loop completions, security issues, build failures, and HITL gates
 - **Interactive commands** — Query status, approve gates, and manage workflows from chat
 - **2-way AI chat** — Ask questions about your project directly from messaging platforms
 - **Multi-platform** — Same event stream delivered to all connected platforms simultaneously
@@ -116,7 +116,7 @@ Route different event types to separate Discord channels using `config.rooms` in
 |-------|-------------|
 | `channel_id` | Discord channel ID (also accepts `channelId`) |
 | `label` | Human-readable name for this channel |
-| `is_default` | When `true`, the channel receives all broadcast messages (e.g., Ralph completions, health alerts). When `false`, the channel only receives messages sent to it explicitly. Also accepts `isDefault`. |
+| `is_default` | When `true`, the channel receives all broadcast messages (e.g., agent loop completions, health alerts). When `false`, the channel only receives messages sent to it explicitly. Also accepts `isDefault`. |
 | `purpose` | Informational. `interactive` (commands), `notifications` (one-way events), `logs` (verbose output) |
 
 Rooms with `is_default: true` receive `broadcastToRooms()` messages. Multiple default rooms can exist — all receive the same broadcast. Rooms with `is_default: false` only receive messages sent via `sendToRoom(message, channelId)`.
@@ -290,7 +290,7 @@ The messaging system forwards events from the internal event bus to all connecte
 
 | Category | Topics | Description |
 |----------|--------|-------------|
-| **Ralph** | `ralph.started`, `ralph.iteration`, `ralph.completed`, `ralph.failed`, `ralph.aborted` | Agent loop lifecycle events |
+| **Al** | `ralph.started`, `ralph.iteration`, `ralph.completed`, `ralph.failed`, `ralph.aborted` | Agent loop lifecycle events |
 | **HITL Gates** | `gate.pending`, `gate.approved`, `gate.rejected`, `gate.timeout` | Human-in-the-loop gate events |
 | **Security** | `security.critical`, `security.warning`, `security.scan_done` | Security scan results |
 | **Health** | `health.check`, `health.degraded`, `health.recovered` | System health transitions |
@@ -411,7 +411,7 @@ this.client.on('message', (msg) => {
 │  └──────────┘    └────────┬─────────┘           │
 │       ↑                   ↓                      │
 │  Events from         Formatted messages          │
-│  Ralph, Health,      ┌─────────┬─────────┐      │
+│  Al, Health,      ┌─────────┬─────────┐      │
 │  Security, etc.      ↓         ↓         ↓      │
 │                  ┌───────┐ ┌───────┐ ┌────────┐ │
 │                  │ Slack │ │Discord│ │Telegram│  │
@@ -463,7 +463,7 @@ If a platform rate-limits the bot, errors appear in daemon logs. The adapters ha
 ## Cross-References
 
 - [Daemon Guide](daemon-guide.md) — Daemon setup and management
-- [Ralph Guide](ralph-guide.md) — Agent loops with messaging notifications
+- [Al Guide](ralph-guide.md) — Agent loops with messaging notifications
 - `.aiwg/architecture/adrs/ADR-messaging-bot-mode.md` — Architecture decision
 - `.aiwg/architecture/adrs/ADR-2way-chat.md` — Chat architecture
 - `tools/messaging/README.md` — Developer documentation

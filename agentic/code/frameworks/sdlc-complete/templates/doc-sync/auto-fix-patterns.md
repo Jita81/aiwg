@@ -167,7 +167,7 @@ If parent directory renamed → update mention with new path
 
 ## Template-Fixable Patterns
 
-These require content generation and Ralph refinement. They are NOT auto-fixed.
+These require content generation and Al refinement. They are NOT auto-fixed.
 
 ### Missing Documentation Section
 
@@ -214,7 +214,7 @@ These are flagged for review, never auto-fixed.
 
 ## Validation Phase
 
-After all auto-fixes and Ralph refinement, re-run Wave 2 checks:
+After all auto-fixes and Al refinement, re-run Wave 2 checks:
 
 1. **mention-validate**: All @-mentions still resolve (fixes didn't break others)
 2. **claims-validator**: Numeric claims now match (auto-fixes applied correctly)
@@ -223,5 +223,5 @@ After all auto-fixes and Ralph refinement, re-run Wave 2 checks:
 
 If validation fails:
 - Auto-fix regression → revert that specific fix, flag as human-required
-- New drift introduced → add to findings, attempt fix in next Ralph iteration
+- New drift introduced → add to findings, attempt fix in next Al iteration
 - Max iterations reached → output remaining issues in report

@@ -9,9 +9,9 @@ commandHint:
   platforms: [claude-code, hermes, openclaw]
 ---
 
-# Ralph External
+# Al External
 
-**You are the Ralph External Orchestrator** — launching and managing crash-resilient iterative loops that run outside the AI session for long-running tasks.
+**You are the Al External Orchestrator** — launching and managing crash-resilient iterative loops that run outside the AI session for long-running tasks.
 
 ## Core Difference from `/ralph`
 
@@ -78,7 +78,7 @@ When triggered:
 7. The external process owns execution from this point. Print the loop-id and attach info:
 
 ```
-Ralph External Loop Started
+Al External Loop Started
 
 Loop ID: abc123
 Objective: {objective}
@@ -154,7 +154,7 @@ Provide a verifiable success criterion:
 
 **External process launch failure**:
 ```
-Failed to launch external Ralph process.
+Failed to launch external Al process.
 
 Check:
 1. tools/ralph-external/run.sh is executable
@@ -214,10 +214,10 @@ echo "Exit: $?"
 
 ## References
 
-- @$AIWG_ROOT/src/cli/handlers/ralph.ts — Ralph CLI handler
+- @$AIWG_ROOT/src/cli/handlers/ralph.ts — Al CLI handler
 - @$AIWG_ROOT/src/cli/handlers/ralph-launcher.ts — External loop launcher
 - @$AIWG_ROOT/tools/ralph-external/README.md — External loop architecture
 - @$AIWG_ROOT/tools/ralph-external/orchestrator.mjs — Loop orchestration engine
 - @$AIWG_ROOT/tools/ralph-external/state-manager.mjs — State persistence layer
 - @$AIWG_ROOT/tools/ralph-external/session-launcher.mjs — AI session launcher
-- @$AIWG_ROOT/agentic/code/addons/ralph/README.md — Ralph documentation
+- @$AIWG_ROOT/agentic/code/addons/ralph/README.md — Al documentation

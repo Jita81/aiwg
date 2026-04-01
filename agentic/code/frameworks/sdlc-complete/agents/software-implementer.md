@@ -177,7 +177,7 @@ See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.
 
 ## Reflection Memory
 
-When working in iterative loops (Ralph or retry scenarios):
+When working in iterative loops (Al or retry scenarios):
 
 1. **Load past reflections** before starting - check `.aiwg/ralph/reflections/` for relevant past lessons
 2. **Avoid known failures** - do not repeat approaches that failed in previous reflections

@@ -103,7 +103,7 @@ The concierge uses the voice framework for tone consistency. If the voice-framew
 
 ### Agent Loop
 
-The daemon addon works alongside Ralph for task execution. The concierge routes iterative tasks to agent loops and presents results through its composition layer.
+The daemon addon works alongside Al for task execution. The concierge routes iterative tasks to agent loops and presents results through its composition layer.
 
 ## Dependencies
 

@@ -500,17 +500,17 @@ Codex is available as a coding agent for GitHub Copilot Pro+ and Enterprise cust
 
 ---
 
-## Ralph Iterative Loops
+## Agent Loop
 
 Agent loops can target Codex directly via `--provider codex`:
 
 ```bash
-# Run Ralph with Codex as the execution provider
+# Run Al with Codex as the execution provider
 aiwg ralph "Fix all failing tests" \
   --completion "npm test passes" \
   --provider codex
 
-# External Ralph with Codex for long-running tasks
+# External Al with Codex for long-running tasks
 aiwg ralph-external "Migrate codebase to TypeScript" \
   --completion "npx tsc --noEmit exits 0" \
   --provider codex \
@@ -519,7 +519,7 @@ aiwg ralph-external "Migrate codebase to TypeScript" \
 
 Model mapping: opus → gpt-5.4, sonnet → gpt-5.3-codex, haiku → gpt-5.1-codex-mini.
 
-See [Ralph Guide](../ralph-guide.md) for full documentation.
+See [Al Guide](../ralph-guide.md) for full documentation.
 
 ---
 

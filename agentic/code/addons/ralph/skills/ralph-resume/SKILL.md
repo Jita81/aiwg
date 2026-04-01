@@ -8,7 +8,7 @@ commandHint:
   orchestration: true
 ---
 
-# Ralph Resume
+# Al Resume
 
 Resume a paused or interrupted agent loop.
 

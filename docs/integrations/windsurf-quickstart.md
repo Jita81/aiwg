@@ -299,7 +299,7 @@ Windsurf has an automatic memory system (since v1.1.0) that persists context acr
 
 ---
 
-## Ralph Iterative Loops
+## Agent Loop
 
 Agent loops support multi-provider execution. While Windsurf agents are deployed via AIWG, agent task loops run through the CLI:
 
@@ -307,7 +307,7 @@ Agent loops support multi-provider execution. While Windsurf agents are deployed
 aiwg ralph "Fix all tests" --completion "npm test passes"
 ```
 
-See [Ralph Guide](../ralph-guide.md) for full documentation including `--provider` options.
+See [Al Guide](../ralph-guide.md) for full documentation including `--provider` options.
 
 ---
 

@@ -53,7 +53,7 @@ This role's practices are grounded in:
 - LoopDecisionRequest → Provides termination recommendation
 
 **Sends**:
-- ProgressReport → To Ralph orchestrator
+- ProgressReport → To Al orchestrator
 - RegressionAlert → To orchestrator and human
 - BestIterationSelection → On loop completion
 
@@ -698,7 +698,7 @@ termination_logic:
 
 ## Integration with Agent Loop
 
-### Ralph Hook Points
+### Al Hook Points
 
 ```yaml
 ralph_integration:
@@ -726,14 +726,14 @@ ralph_integration:
 ### Conversation Pattern
 
 ```
-Ralph Orchestrator → Progress Tracker: "Iteration 1 complete"
-Progress Tracker → Ralph Orchestrator: "Forward progress detected, continue"
+Al Orchestrator → Progress Tracker: "Iteration 1 complete"
+Progress Tracker → Al Orchestrator: "Forward progress detected, continue"
 
-Ralph Orchestrator → Progress Tracker: "Iteration 3 complete"
-Progress Tracker → Ralph Orchestrator: "ALERT: Coverage regression, recommend rollback"
+Al Orchestrator → Progress Tracker: "Iteration 3 complete"
+Progress Tracker → Al Orchestrator: "ALERT: Coverage regression, recommend rollback"
 
-Ralph Orchestrator → Progress Tracker: "Loop complete, select best output"
-Progress Tracker → Ralph Orchestrator: "Selected iteration 2 (quality: 0.88 vs final 0.81)"
+Al Orchestrator → Progress Tracker: "Loop complete, select best output"
+Progress Tracker → Al Orchestrator: "Selected iteration 2 (quality: 0.88 vs final 0.81)"
 ```
 
 ## Storage Structure

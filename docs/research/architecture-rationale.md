@@ -261,7 +261,7 @@ Roig's research on agentic AI failures provides additional justification for che
 
 ---
 
-## Decision 4: Ralph Closed-Loop Over Single-Shot
+## Decision 4: Agent Loop (Al) Over Single-Shot
 
 ### The Decision
 
@@ -298,7 +298,7 @@ R-LAM provides the reproducibility framework that makes agent loops debuggable:
 4. **Failure-Aware Execution**: Pre-check -> Execute -> Post-verify with rollback
 5. **Workflow Forking**: Checkpointing for resume/compare
 
-**Ralph Implementation**:
+**Al Implementation**:
 - Checkpoints saved after successful iterations
 - State captured for resume on failure
 - Execution modes configurable per loop
@@ -306,7 +306,7 @@ R-LAM provides the reproducibility framework that makes agent loops debuggable:
 
 #### REF-057: Agent Laboratory (Schmidgall et al., 2025)
 
-Agent Laboratory validates the draft-then-edit pattern that Ralph implements:
+Agent Laboratory validates the draft-then-edit pattern that Al implements:
 
 > "Human oversight remains essential at decision points: hypothesis selection, result interpretation, and final approval." (Schmidgall et al., 2025)
 
@@ -334,7 +334,7 @@ Agent loops implement iteration between agent execution and validation (either a
 2. **Loop detection**: REF-002 Archetype 4 describes generation loops
 3. **No adaptation**: Same strategy repeated without learning
 
-**Ralph Implementation**: Bounded iterations (configurable, default 10), strategy adaptation between iterations, graceful escalation to human.
+**Al Implementation**: Bounded iterations (configurable, default 10), strategy adaptation between iterations, graceful escalation to human.
 
 ### Trade-offs
 
@@ -687,7 +687,7 @@ AIWG's architecture is not arbitrary---it operationalizes quantified research fi
 | **Multi-Agent** | REF-007, REF-004 | 2x faster learning, 8x better GitHub issue resolution |
 | **Structured Memory** | REF-008, REF-056, REF-058 | 98% reproducibility (vs 53%), FAIR compliance |
 | **Stage-Gate Process** | REF-010, REF-002 | 3-6x quality improvement, recovery capability |
-| **Ralph Closed-Loop** | REF-002, REF-058 | 92.2% success (vs 59.4%), 99.5% replay success |
+| **Al Closed-Loop** | REF-002, REF-058 | 92.2% success (vs 59.4%), 99.5% replay success |
 | **FAIR Identifiers** | REF-056, REF-061 | 17,000+ citations, G20/EU/NIH endorsement |
 | **Human-in-the-Loop** | REF-057, REF-002 | 84% cost reduction, prevents Archetype 2 failures |
 | **Retrieval-First Citations** | REF-059 | 0% hallucination (vs 56%) |

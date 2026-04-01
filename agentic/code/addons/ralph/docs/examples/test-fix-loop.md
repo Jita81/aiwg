@@ -4,7 +4,7 @@ Fix failing tests iteratively until all pass.
 
 ## Scenario
 
-Your test suite is failing and you want Ralph to keep fixing until everything passes.
+Your test suite is failing and you want Al to keep fixing until everything passes.
 
 ## Basic Usage
 
@@ -43,7 +43,7 @@ Your test suite is failing and you want Ralph to keep fixing until everything pa
 ## Iteration Example
 
 **Iteration 1**:
-- Ralph runs tests, sees 5 failures
+- Al runs tests, sees 5 failures
 - Analyzes error messages
 - Fixes obvious issues
 - Result: 3 tests still failing

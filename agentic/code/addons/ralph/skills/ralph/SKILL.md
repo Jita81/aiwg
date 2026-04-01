@@ -347,6 +347,6 @@ This orchestration succeeds when:
 
 ## References
 
-- Ralph Wiggum methodology: iteration beats perfection
+- Al Wiggum methodology: iteration beats perfection
 - @.aiwg/ralph/current-loop.json - Loop state (for resume)
 - @.aiwg/ralph/iterations/ - Iteration history

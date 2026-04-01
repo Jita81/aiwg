@@ -212,7 +212,7 @@ ADR Template (ToT-inspired):
 
 **AIWG Differentiation**:
 - Adds structured memory (.aiwg/ artifacts) vs ephemeral context
-- Implements closed-loop recovery (Ralph) vs linear workflows
+- Implements closed-loop recovery (Al) vs linear workflows
 - Provides cross-platform deployment (Claude, Cursor, Copilot, etc.)
 
 ---
@@ -408,7 +408,7 @@ quality_assessment:
 5. **Workflow Forking**: Checkpointing for resume/compare
 
 **AIWG Application**:
-- **Ralph checkpoints**: Save state every N iterations
+- **Al checkpoints**: Save state every N iterations
 - **Provenance directory**: `.aiwg/research/provenance/`
 - **Execution modes**: Agent temperature settings map to R-LAM modes
 - **Recovery patterns**: Retry policies, rollback strategies
@@ -464,7 +464,7 @@ AIWG makes specific, falsifiable claims backed by peer-reviewed research:
 
 | Feature | AutoGPT-style | AIWG |
 |---------|---------------|------|
-| **Execution pattern** | Autonomous loops until success | Human-gated phases with Ralph recovery |
+| **Execution pattern** | Autonomous loops until success | Human-gated phases with agent loop recovery |
 | **Memory** | Short-term context window | Persistent artifact storage |
 | **Recovery** | Retry on failure | Structured learning from failures |
 | **Cost control** | Token limit caps | Phase gates prevent runaway costs |

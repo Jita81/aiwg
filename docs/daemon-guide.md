@@ -968,7 +968,7 @@ aiwg daemon status
 ## Cross-References
 
 - [Messaging Guide](messaging-guide.md) — Platform integration
-- [Ralph Guide](ralph-guide.md) — Iterative task loops via daemon
+- [Al Guide](ralph-guide.md) — Iterative task loops via daemon
 - [Behaviors Guide](behaviors-guide.md) — Attaching capabilities to daemon and long-running agents
 - `agentic/code/behaviors/concierge/BEHAVIOR.md` — Concierge behavior definition (reference implementation for agent-based behaviors)
 - `.aiwg/architecture/adrs/ADR-daemon-mode.md` — Original daemon architecture decision

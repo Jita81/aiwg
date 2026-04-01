@@ -4,7 +4,7 @@ Migrate code between formats/versions iteratively.
 
 ## Scenario
 
-You need to migrate code from one format to another (CommonJS to ESM, JavaScript to TypeScript, etc.) and want Ralph to keep iterating until the migration is complete.
+You need to migrate code from one format to another (CommonJS to ESM, JavaScript to TypeScript, etc.) and want Al to keep iterating until the migration is complete.
 
 ## CommonJS to ESM Migration
 

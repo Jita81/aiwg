@@ -96,7 +96,7 @@ AIWG implements reproducibility constraints addressing the finding that 47% of A
 | Workflow consistency | Reproducibility Constraints | R-LAM Sureshkumar et al. (2026) REF-058 |
 | Config tracking | Environment Versioning | R-LAM Component 1: Environment REF-058 |
 | Checkpoint/recovery | Workflow Checkpointing | R-LAM Component 2: Checkpoints REF-058 |
-| Ralph state | Execution Provenance | R-LAM Component 3: Provenance REF-058 |
+| Agent loop state | Execution Provenance | R-LAM Component 3: Provenance REF-058 |
 | Deterministic mode | Controlled Stochasticity | R-LAM Component 4: Determinism REF-058 |
 | Run metadata | Execution Context | R-LAM Component 5: Metadata REF-058 |
 | Iteration logs | Execution Trace | Software Tracing Literature |

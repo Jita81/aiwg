@@ -141,13 +141,13 @@ Run `opencode models` to list available models.
 
 ---
 
-## Ralph Iterative Loops
+## Agent Loop
 
 ```bash
 aiwg ralph "Fix all tests" --completion "npm test passes" --provider opencode --model anthropic/claude-sonnet-4-6
 ```
 
-See [Ralph Guide](../ralph-guide.md) for full documentation.
+See [Al Guide](../ralph-guide.md) for full documentation.
 
 ---
 

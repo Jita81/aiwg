@@ -114,18 +114,18 @@ As the project evolves, memory files may need pruning:
 
 Memory quality degrades if it grows too large (aim to keep files under 500 lines) or contains outdated information. A periodic review (monthly or after major architectural changes) keeps it useful.
 
-## Relationship to Ralph Debug Memory
+## Relationship to Agent Loop Debug Memory
 
 Both mechanisms maintain debugging history but serve different purposes:
 
-| Aspect | Automatic Memory | Ralph Debug Memory |
+| Aspect | Automatic Memory | Agent Loop Debug Memory |
 |--------|-----------------|-------------------|
 | Scope | Project-wide recurring patterns | Single loop execution state |
 | Lifetime | Permanent (manually pruned) | Per-loop (ephemeral) |
 | Location | `~/.claude/projects/<project>/memory/` | `.aiwg/ralph/debug-memory/` |
 | Use case | "We always have async test issues" | "Iteration 3 failed with timeout error" |
 
-When the same issue appears in Ralph debug memory across multiple loops, it is a candidate for promotion to automatic memory's `debugging.md` as a known pattern.
+When the same issue appears in agent loop debug memory across multiple loops, it is a candidate for promotion to automatic memory's `debugging.md` as a known pattern.
 
 ## Platform Notes
 
@@ -139,4 +139,4 @@ If you switch platforms, the knowledge in automatic memory files is transferable
 ## References
 
 - `@$AIWG_ROOT/agentic/code/addons/auto-memory/seeds/` — Seed template files
-- `@$AIWG_ROOT/agentic/code/addons/ralph/schemas/debug-memory.yaml` — Ralph debug memory schema
+- `@$AIWG_ROOT/agentic/code/addons/ralph/schemas/debug-memory.yaml` — agent loop debug memory schema

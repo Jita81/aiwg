@@ -29,14 +29,14 @@ Good task descriptions include:
 | Scope | Example | Risk |
 |-------|---------|------|
 | Too broad | "Refactor entire codebase" | Will hit limits |
-| Too narrow | "Add semicolon to line 42" | Overkill for Ralph |
+| Too narrow | "Add semicolon to line 42" | Overkill for Al |
 | Just right | "Convert CommonJS to ESM in src/lib/" | Achievable |
 
 ## Writing Effective Completion Criteria
 
 ### Rule: Must Be Verifiable
 
-The completion criteria MUST be checkable by running a command. If you can't verify it programmatically, Ralph can't either.
+The completion criteria MUST be checkable by running a command. If you can't verify it programmatically, Al can't either.
 
 | Subjective (Bad) | Verifiable (Good) |
 |------------------|-------------------|
@@ -107,7 +107,7 @@ Combine multiple checks with AND:
 --completion "npm test passes AND npm run lint passes AND npx tsc --noEmit passes"
 ```
 
-Ralph will verify ALL conditions are met.
+Al will verify ALL conditions are met.
 
 ## Setting Iteration Limits
 
@@ -154,7 +154,7 @@ Split into smaller tasks if:
 
 ### Auto-Commit (Default)
 
-Ralph commits after each iteration:
+Al commits after each iteration:
 ```
 ralph: iteration 1 - initial implementation
 ralph: iteration 2 - fix auth test

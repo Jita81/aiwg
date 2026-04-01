@@ -1,5 +1,5 @@
 ---
-description: Synchronize documentation and code to eliminate drift with parallel audit, auto-fix, and Ralph refinement
+description: Synchronize documentation and code to eliminate drift with parallel audit, auto-fix, and Al refinement
 commandHint:
   argumentHint: <direction> [--interactive --guidance "text" --scope "path" --dry-run --parallel N --incremental --verbose --no-commit --max-iterations N]
   allowedTools: Task, Read, Write, Bash, Glob, Grep, Edit
@@ -34,7 +34,7 @@ When invoked with `/doc-sync <direction> [options]`:
 | `--incremental` | false | Git-diff since last sync instead of full scan |
 | `--verbose` | false | Detailed per-file findings |
 | `--no-commit` | false | Skip auto-commit |
-| `--max-iterations N` | 3 | Ralph refinement iterations |
+| `--max-iterations N` | 3 | agent loop refinement iterations |
 
 ## Execution Phases
 
@@ -93,7 +93,7 @@ Categorize each drift item:
 | Category | Criteria | Action |
 |----------|----------|--------|
 | Auto-fixable | Numeric claims, table entries, argument hints | Direct edit |
-| Template-fixable | Missing sections, outdated descriptions | Generate via template + Ralph |
+| Template-fixable | Missing sections, outdated descriptions | Generate via template + Al |
 | Human-required | Architectural changes, ambiguous intent | Flag for review |
 
 If `--dry-run`: Output report and exit.
@@ -107,7 +107,7 @@ Apply auto-fixes:
 - Update argument hints from `definitions.ts` metadata
 - Fix broken internal links
 
-### Phase 7 — Ralph Refinement
+### Phase 7 — Al Refinement
 
 For template-fixable items:
 1. Generate initial fix from template

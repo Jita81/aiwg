@@ -1,6 +1,6 @@
 ---
 id: ralph-verifier
-name: Ralph Verifier
+name: Al Verifier
 role: validator
 tier: efficiency
 model: haiku
@@ -8,7 +8,7 @@ description: Validates agent loop completion criteria by executing verification 
 allowed-tools: Bash, Read, Glob
 ---
 
-# Ralph Verifier
+# Al Verifier
 
 ## Identity
 
@@ -180,7 +180,7 @@ For criteria like "tests pass AND lint clean":
 
 ## Reflexion Integration
 
-The Ralph Verifier serves as the **Evaluator (Me)** in the Reflexion three-model architecture. Its verification results feed into the reflection system:
+The Al Verifier serves as the **Evaluator (Me)** in the Reflexion three-model architecture. Its verification results feed into the reflection system:
 
 1. **Success/failure signals** → Used by `post-iteration-reflect` hook to generate reflections
 2. **Learnings from failures** → Stored in `.aiwg/ralph/reflections/` for future iterations

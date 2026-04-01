@@ -99,7 +99,7 @@ aiwg use writing           # Add Voice Framework
 
 ---
 
-## Iterative Task Execution with Ralph
+## Iterative Task Execution with Al
 
 For tasks that need multiple attempts or long-running operations:
 
@@ -111,13 +111,13 @@ For tasks that need multiple attempts or long-running operations:
 /ralph-external "Migrate to TypeScript" --completion "npx tsc --noEmit exits 0"
 ```
 
-See the [Ralph Guide](ralph-guide.md) for detailed documentation.
+See the [Al Guide](ralph-guide.md) for detailed documentation.
 
 ---
 
 ## What's Next?
 
 - [Intake Guide](intake-guide.md) - Starting your first project
-- [Ralph Guide](ralph-guide.md) - Iterative task execution
+- [Al Guide](ralph-guide.md) - Iterative task execution
 - [CLI Usage](CLI_USAGE.md) - Full command reference
 - [SDLC Framework Docs](https://github.com/jmagly/aiwg/blob/main/agentic/code/frameworks/sdlc-complete/README.md) - Complete agent catalog

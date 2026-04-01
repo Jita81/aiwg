@@ -111,9 +111,9 @@ Architecture Document Creation:
 
 ---
 
-### 3. Learning: Failure Analysis and Strategy Adaptation (Ralph)
+### 3. Learning: Failure Analysis and Strategy Adaptation (Al)
 
-**What It Is**: Ralph is a closed-loop self-correction system that executes tasks iteratively, learns from failures, and adapts strategy based on error patterns.
+**What It Is**: Al is a closed-loop self-correction system that executes tasks iteratively, learns from failures, and adapts strategy based on error patterns.
 
 **The Research Foundation**: Control theory principles and findings from Roig (2025) showing recovery capability—not initial correctness—predicts agentic task success. Self-Refine (Madaan et al., NeurIPS 2023) and Reflexion (Shinn et al., 2023) provide the iterative improvement patterns.
 
@@ -135,19 +135,19 @@ Agent Loop (TAO: Thought → Action → Observation):
 
 | Mode | Duration | Resilience | Use Case |
 |------|----------|-----------|----------|
-| **In-Session Ralph** | Minutes to hours | Within single session | Fix tests, reach coverage target, refactor module |
-| **External Ralph** | Hours to days | Crash-resilient (PID file, checkpoints, auto-restart) | TypeScript migration, full test suite repair, multi-file refactor |
+| **In-Session Al** | Minutes to hours | Within single session | Fix tests, reach coverage target, refactor module |
+| **External Al** | Hours to days | Crash-resilient (PID file, checkpoints, auto-restart) | TypeScript migration, full test suite repair, multi-file refactor |
 
-External Ralph runs as a **persistent background process** that survives terminal disconnects, process crashes, and system reboots. State persists in `.aiwg/ralph-external/` with checkpoint-and-resume capability.
+External Al runs as a **persistent background process** that survives terminal disconnects, process crashes, and system reboots. State persists in `.aiwg/ralph-external/` with checkpoint-and-resume capability.
 
-**Issue-Driven Ralph**: The `/issue-driven-ralph` command drives issues with 2-way human-AI collaboration — the agent posts cycle status to issue threads and incorporates human feedback at each iteration.
+**Issue-Driven Al**: The `/issue-driven-ralph` command drives issues with 2-way human-AI collaboration — the agent posts cycle status to issue threads and incorporates human feedback at each iteration.
 
 **Scheduled Agents**: Recurring autonomous tasks via `/schedule` — daily code reviews, weekly dependency updates, continuous monitoring with completion criteria and automatic evaluation.
 
 **Failure Modes Addressed** (from Roig 2025):
-- Archetype 1: Ungrounded Reasoning — Ralph grounds with external verification (run tests, check types)
-- Archetype 3: Context Pollution — Ralph uses focused iterations to avoid distractor interference
-- Archetype 4: Fragile Execution Under Load — Ralph saves checkpoints, enabling resume after interruption
+- Archetype 1: Ungrounded Reasoning — Al grounds with external verification (run tests, check types)
+- Archetype 3: Context Pollution — Al uses focused iterations to avoid distractor interference
+- Archetype 4: Fragile Execution Under Load — Al saves checkpoints, enabling resume after interruption
 
 **What This Enables**:
 - Automatic retry with strategy modification (not blind "try again")
@@ -157,7 +157,7 @@ External Ralph runs as a **persistent background process** that survives termina
 - Long-horizon autonomous operation (6-8+ hours with crash recovery)
 - Human-in-the-loop iteration (issue-driven mode with feedback incorporation)
 
-**The Difference**: Base assistants fail once and wait for you to fix the problem. Ralph tries multiple strategies, documents what did not work, learns from each failure, and presents options when stuck. External Ralph does this for hours without supervision.
+**The Difference**: Base assistants fail once and wait for you to fix the problem. Al tries multiple strategies, documents what did not work, learns from each failure, and presents options when stuck. External Al does this for hours without supervision.
 
 ---
 
@@ -333,7 +333,7 @@ Consider a typical multi-week project:
   - Synthesizer consolidates feedback
   - Architecture Designer revises based on synthesis
 
-**Learning**: Ralph iterates on ADRs (generate options, evaluate, refine based on feedback)
+**Learning**: Al iterates on ADRs (generate options, evaluate, refine based on feedback)
 
 **Verification**: Architecture references requirements, code stubs reference architecture sections
 
@@ -351,7 +351,7 @@ Consider a typical multi-week project:
 
 **Reasoning**: Test Engineer creates test strategy, DevOps Engineer plans deployment, multiple developers implement features
 
-**Learning**: Ralph handles implementation iterations:
+**Learning**: Al handles implementation iterations:
   - Execute: Generate code for feature X
   - Verify: Run tests, type check, lint
   - Learn: "Test failed due to async race condition"
@@ -374,7 +374,7 @@ Consider a typical multi-week project:
 
 **Reasoning**: DevOps Engineer creates deployment automation, Technical Writer documents operations
 
-**Learning**: Ralph retries deployment steps if environments fail validation
+**Learning**: Al retries deployment steps if environments fail validation
 
 **Verification**: Deployment scripts reference architecture (which services, what order), runbooks reference code (how to debug service X)
 
@@ -492,8 +492,8 @@ Full reference: `@docs/cli-reference.md`
 | Memory across sessions | None | Persistent `.aiwg/` artifacts (50-100+ per project) |
 | Specialized agents | General assistant | 162 role-specific agents across 5 frameworks |
 | Quality gates | Ad-hoc | Phase gates with entry/exit criteria + human approval |
-| Recovery patterns | Manual retry | Ralph closed-loop learning (in-session + crash-resilient external) |
-| Long-running tasks | Babysit the terminal | External Ralph runs 6-8+ hours autonomously |
+| Recovery patterns | Manual retry | agent loop closed-loop learning (in-session + crash-resilient external) |
+| Long-running tasks | Babysit the terminal | External Al runs 6-8+ hours autonomously |
 | Citation integrity | Can hallucinate | Retrieval-first (0% hallucination rate) |
 | Standards compliance | None | FAIR, OAIS, PROV, GRADE, MCP, NIST, MITRE ATT&CK |
 | Platform support | Single platform | 8 platforms (Claude Code, Copilot, Cursor, Warp, Factory, OpenCode, Codex, Windsurf) |
@@ -511,7 +511,7 @@ Full reference: `@docs/cli-reference.md`
 | Auditability | Limited provenance | Full W3C PROV chain of custody |
 | Reproducibility | Non-deterministic | Checkpointing, execution logs |
 | Cross-platform | Single environment | 8 platforms (Claude, Cursor, Copilot, Warp, Factory, OpenCode, Codex, Windsurf) |
-| Long-running tasks | Token limit = hard stop | External Ralph with crash recovery (hours to days) |
+| Long-running tasks | Token limit = hard stop | External Al with crash recovery (hours to days) |
 | Scheduled agents | Not supported | Cron-based recurring tasks with completion criteria |
 
 **Key Difference**: AIWG prioritizes reliability and auditability over full autonomy. Research shows 84% cost reduction keeping humans on high-stakes decisions rather than removing them.
@@ -647,7 +647,7 @@ AIWG uses dual terminology (informal + professional) for accessibility and credi
 | Context stacks | Structured Semantic Memory | Working memory extended with external storage |
 | Multi-agent review | Ensemble Validation | Multiple specialized agents critique artifacts |
 | Agent loop | Closed-Loop Self-Correction | Iterative execution with failure learning |
-| External Ralph | Crash-Resilient Autonomous Execution | Long-running agents with PID tracking and checkpoint recovery |
+| External Al | Crash-Resilient Autonomous Execution | Long-running agents with PID tracking and checkpoint recovery |
 | .aiwg/ directory | Artifact Repository | Persistent storage for project knowledge |
 | @-mentions | Traceability Links | References enabling provenance tracking |
 | Phase gates | Stage-Gate Process | Quality checkpoints with human approval |

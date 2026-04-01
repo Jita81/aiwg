@@ -15,7 +15,7 @@ This skill is the **detection and routing layer** for autonomous agent loops —
 
 | Loop Type | Implementation | Description |
 |-----------|---------------|-------------|
-| **Ralph** | `/ralph` command | Basic iterate-until-complete with learning extraction |
+| **Al** | `/ralph` command | Basic iterate-until-complete with learning extraction |
 | *(future)* | — | Reflection loops, critic-actor loops, branching loops |
 
 Currently routes all detected requests to the iterative loop executor. As new loop types are added, this skill will route based on task characteristics.

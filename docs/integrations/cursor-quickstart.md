@@ -126,7 +126,7 @@ Cursor 2.0+ supports up to 8 agents running in parallel via Git worktrees. Confi
 
 ---
 
-## Ralph Iterative Loops
+## Agent Loop
 
 Agent loops support multi-provider execution. While Cursor agents are deployed via AIWG, agent task loops run through the CLI:
 
@@ -134,7 +134,7 @@ Agent loops support multi-provider execution. While Cursor agents are deployed v
 aiwg ralph "Fix all tests" --completion "npm test passes"
 ```
 
-See [Ralph Guide](../ralph-guide.md) for full documentation including `--provider` options.
+See [Al Guide](../ralph-guide.md) for full documentation including `--provider` options.
 
 ---
 
@@ -201,7 +201,7 @@ The AIWG MCP server can also run inside the Cloud Agent VM. Add it to `.cursor/m
 
 **Automation triggers:**
 
-Cloud Agents can be triggered by commenting `@cursor` on GitHub issues or PRs, or via Slack/Linear. AIWG agent loops pair well with this: trigger a Cloud Agent on an issue, and Ralph handles the iterative fix cycle automatically.
+Cloud Agents can be triggered by commenting `@cursor` on GitHub issues or PRs, or via Slack/Linear. AIWG agent loops pair well with this: trigger a Cloud Agent on an issue, and Al handles the iterative fix cycle automatically.
 
 > **Note:** Test `npm install -g aiwg` in your target environment first — Cloud Agent VMs may have npm available but require `--prefix` or `--location=global` flags depending on the base image.
 

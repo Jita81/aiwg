@@ -1,12 +1,12 @@
-# When to Use Ralph (And When Not To)
+# When to Use Al (And When Not To)
 
-Understanding Ralph's sweet spot and avoiding the token-burning trap.
+Understanding Al's sweet spot and avoiding the token-burning trap.
 
 ## The Controversy
 
-Ralph divides people. Some swear by it. Others have war stories about it running all night, burning tokens, producing junk. Both are right - Ralph is a power tool, and like any power tool, it can build or destroy depending on how you use it.
+Al divides people. Some swear by it. Others have war stories about it running all night, burning tokens, producing junk. Both are right - Al is a power tool, and like any power tool, it can build or destroy depending on how you use it.
 
-**The truth**: Ralph's effectiveness is directly proportional to how well-defined your project is before you invoke it.
+**The truth**: Al's effectiveness is directly proportional to how well-defined your project is before you invoke it.
 
 ## The Two Extremes
 
@@ -48,11 +48,11 @@ What happens:
 6. AI learns from specific failures and fixes them
 7. Convergence to working code is predictable
 
-**Why this works**: The "WHAT" is settled. Ralph focuses entirely on "HOW" - the implementation mechanics where iteration genuinely helps.
+**Why this works**: The "WHAT" is settled. Al focuses entirely on "HOW" - the implementation mechanics where iteration genuinely helps.
 
-## The AIWG + Ralph Synergy
+## The AIWG + Al Synergy
 
-AIWG was designed with Ralph in mind. The entire SDLC framework exists to create a corpus so complete that an AI can't thrash on what to build - it can only focus on how.
+AIWG was designed with Al in mind. The entire SDLC framework exists to create a corpus so complete that an AI can't thrash on what to build - it can only focus on how.
 
 ### What AIWG Provides
 
@@ -70,12 +70,12 @@ AIWG was designed with Ralph in mind. The entire SDLC framework exists to create
 ```
 Without AIWG:
 ┌─────────────────────────────────────────────────────────┐
-│  Ralph → "What to build?" → Hallucinate → Thrash → $$$  │
+│  Al → "What to build?" → Hallucinate → Thrash → $$$  │
 └─────────────────────────────────────────────────────────┘
 
 With AIWG:
 ┌─────────────────────────────────────────────────────────┐
-│  AIWG → Defines "What" → Ralph → "How to build" → Done  │
+│  AIWG → Defines "What" → Al → "How to build" → Done  │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -89,9 +89,9 @@ By the time you've completed AIWG's Discovery Track:
 - Non-functional requirements are explicit
 - Even pseudo-code or interface shapes may exist
 
-**The docs are one step away from code.** Ralph's job becomes mechanical: translate this specification into working code, iterate on the implementation details until tests pass.
+**The docs are one step away from code.** Al's job becomes mechanical: translate this specification into working code, iterate on the implementation details until tests pass.
 
-## When Ralph Excels
+## When Al Excels
 
 ### Implementation of Well-Defined Features
 
@@ -100,7 +100,7 @@ By the time you've completed AIWG's Discovery Track:
   --completion "npm test -- payment passes"
 ```
 
-The use case document tells Ralph exactly what to build. Ralph figures out the implementation.
+The use case document tells Al exactly what to build. Al figures out the implementation.
 
 ### Mechanical Transformations
 
@@ -109,7 +109,7 @@ The use case document tells Ralph exactly what to build. Ralph figures out the i
   --completion "npx tsc --noEmit passes"
 ```
 
-The ADR defines the transformation rules. Ralph applies them iteratively.
+The ADR defines the transformation rules. Al applies them iteratively.
 
 ### Test-Driven Fixes
 
@@ -118,7 +118,7 @@ The ADR defines the transformation rules. Ralph applies them iteratively.
   --completion "npm test -- auth passes"
 ```
 
-Tests define expected behavior. Ralph makes code match expectations.
+Tests define expected behavior. Al makes code match expectations.
 
 ### Dependency Resolution
 
@@ -127,7 +127,7 @@ Tests define expected behavior. Ralph makes code match expectations.
   --completion "npm test passes AND npm run build succeeds"
 ```
 
-Ralph excels at the tedious iteration of finding compatible versions and fixing API changes.
+Al excels at the tedious iteration of finding compatible versions and fixing API changes.
 
 ### Code Quality Gates
 
@@ -136,13 +136,13 @@ Ralph excels at the tedious iteration of finding compatible versions and fixing 
   --completion "coverage report shows src/services >80%"
 ```
 
-Clear metric, well-defined scope. Ralph adds tests until the threshold is met.
+Clear metric, well-defined scope. Al adds tests until the threshold is met.
 
-## When NOT to Use Ralph
+## When NOT to Use Al
 
 ### Greenfield Without Documentation
 
-If you have no architecture doc, no requirements, no design - **stop**. Don't invoke Ralph. Use the AIWG intake process first.
+If you have no architecture doc, no requirements, no design - **stop**. Don't invoke Al. Use the AIWG intake process first.
 
 ```bash
 # First: Define what you're building
@@ -163,7 +163,7 @@ If you have no architecture doc, no requirements, no design - **stop**. Don't in
 /ralph "optimize performance" --completion "app is fast"
 ```
 
-If you can't write a command that verifies success, Ralph can't iterate toward it.
+If you can't write a command that verifies success, Al can't iterate toward it.
 
 ### Research or Exploration
 
@@ -172,7 +172,7 @@ If you can't write a command that verifies success, Ralph can't iterate toward i
 /ralph "figure out how authentication should work" --completion "auth design is done"
 ```
 
-Use `/flow-discovery-track` or manual exploration for research. Ralph is for implementation.
+Use `/flow-discovery-track` or manual exploration for research. Al is for implementation.
 
 ### Undefined Scope
 
@@ -183,9 +183,9 @@ Use `/flow-discovery-track` or manual exploration for research. Ralph is for imp
 
 Break this into specific, documented features first.
 
-## Ralph for Documentation (Carefully Scoped)
+## Al for Documentation (Carefully Scoped)
 
-Ralph can help with documentation itself - but only with specific, verifiable scope:
+Al can help with documentation itself - but only with specific, verifiable scope:
 
 ```bash
 # GOOD - specific, verifiable
@@ -202,7 +202,7 @@ Ralph can help with documentation itself - but only with specific, verifiable sc
 /ralph "document the project" --completion "docs are complete"
 ```
 
-## Warning Signs: Is Ralph Thrashing?
+## Warning Signs: Is Al Thrashing?
 
 Watch for these indicators:
 
@@ -214,7 +214,7 @@ Watch for these indicators:
 | Unrelated files changing | Lost context, working on wrong problem |
 | "Refactoring" without tests | No verification, just churning |
 
-**If you see these**: Abort Ralph, create documentation, then resume.
+**If you see these**: Abort Al, create documentation, then resume.
 
 ```bash
 /ralph-abort
@@ -223,9 +223,9 @@ Watch for these indicators:
 /ralph "Implement [specific, documented feature]" --completion "tests pass"
 ```
 
-## The Ralph Readiness Checklist
+## The Al Readiness Checklist
 
-Before invoking Ralph, ask:
+Before invoking Al, ask:
 
 - [ ] Is the feature documented in a use case or user story?
 - [ ] Is the architecture defined (or simple enough to be implicit)?
@@ -233,7 +233,7 @@ Before invoking Ralph, ask:
 - [ ] Is the scope specific enough to complete in <20 iterations?
 - [ ] Are tests available to validate correctness?
 
-**If any answer is "no"**: Document first, Ralph second.
+**If any answer is "no"**: Document first, Al second.
 
 ## Summary
 
@@ -242,16 +242,16 @@ Before invoking Ralph, ask:
 | Greenfield, no docs | Use AIWG intake/flows first |
 | Vague requirements | Write use cases first |
 | No architecture | Create SAD/ADRs first |
-| Clear spec, need implementation | **Use Ralph** |
-| Tests failing, need fixes | **Use Ralph** |
-| Migration with clear rules | **Use Ralph** |
-| Coverage gap with clear target | **Use Ralph** |
+| Clear spec, need implementation | **Use Al** |
+| Tests failing, need fixes | **Use Al** |
+| Migration with clear rules | **Use Al** |
+| Coverage gap with clear target | **Use Al** |
 
-**The formula**: AIWG defines WHAT. Ralph implements HOW. Together they work. Apart, Ralph thrashes.
+**The formula**: AIWG defines WHAT. Al implements HOW. Together they work. Apart, Al thrashes.
 
 ## Industry Perspectives and Research
 
-The debate around iterative AI execution isn't unique to Ralph. Here's what the broader industry has learned.
+The debate around iterative AI execution isn't unique to Al. Here's what the broader industry has learned.
 
 ### The Context Problem
 
@@ -259,13 +259,13 @@ The debate around iterative AI execution isn't unique to Ralph. Here's what the 
 
 > "Context understanding trumps coordination strategy... Perfect coordination doesn't help when agents are coordinating around incomplete information. Comprehensive specifications don't help when you can't specify what you don't fully understand."
 
-**AIWG's answer**: Create comprehensive context *first* through documentation. Ralph then operates in a rich-context environment where iteration actually helps.
+**AIWG's answer**: Create comprehensive context *first* through documentation. Al then operates in a rich-context environment where iteration actually helps.
 
 ### Loop Drift and Thrashing
 
 [Research into agent loops](https://www.fixbrokenaiapps.com/blog/ai-agents-infinite-loops) identified "Loop Drift" as a core failure mode - agents misinterpreting termination signals, generating repetitive actions, or suffering from inconsistent internal state.
 
-**Why this matters for Ralph**: Clear completion criteria with objective verification commands (exit codes, test results) prevent drift. Subjective criteria like "code is good" invite drift.
+**Why this matters for Al**: Clear completion criteria with objective verification commands (exit codes, test results) prevent drift. Subjective criteria like "code is good" invite drift.
 
 ### Context Window Degradation
 
@@ -273,7 +273,7 @@ The debate around iterative AI execution isn't unique to Ralph. Here's what the 
 
 > "Early in the window, Claude is sharp. As tokens accumulate, quality degrades. If you try to cram multiple features into one iteration, you're working in the degraded part of the curve."
 
-**Best practice**: Keep iterations focused on single changes. Ralph's git-based state persistence lets each iteration start with fresh context while inheriting the work from prior iterations.
+**Best practice**: Keep iterations focused on single changes. Al's git-based state persistence lets each iteration start with fresh context while inheriting the work from prior iterations.
 
 ### The Double-Loop Alternative
 
@@ -283,7 +283,7 @@ The debate around iterative AI execution isn't unique to Ralph. Here's what the 
 
 Their approach: First loop for exploration (treat implementation as disposable), second loop for polish (traditional code review).
 
-**AIWG's response**: Both models can work. Double-loop suits exploratory greenfield work where you're discovering requirements. Ralph + AIWG suits implementation of known requirements. The key is recognizing which phase you're in.
+**AIWG's response**: Both models can work. Double-loop suits exploratory greenfield work where you're discovering requirements. Al + AIWG suits implementation of known requirements. The key is recognizing which phase you're in.
 
 ### Security Concerns
 
@@ -291,11 +291,11 @@ Their approach: First loop for exploration (treat implementation as disposable),
 
 > "AI-generated code is inherently untrusted. Systems that execute LLM-generated code must treat that code with the same caution as user-supplied inputs."
 
-**Ralph's safeguards**: Auto-commit creates rollback points. Tests verify correctness. Iteration limits prevent runaway execution. But the warning is real - always review final output before production.
+**Al's safeguards**: Auto-commit creates rollback points. Tests verify correctness. Iteration limits prevent runaway execution. But the warning is real - always review final output before production.
 
 ### Success Stories
 
-The Ralph methodology has proven effective for:
+The Al methodology has proven effective for:
 
 - **React v16 to v19 migration**: 14 hours autonomous, no human intervention ([source](https://sidbharath.com/blog/ralph-wiggum-claude-code/))
 - **Overnight multi-repo delivery**: "Ship 6 repos overnight. $50k contract for $297 in API costs" ([source](https://venturebeat.com/technology/how-ralph-wiggum-went-from-the-simpsons-to-the-biggest-name-in-ai-right-now))
@@ -317,7 +317,7 @@ Industry practitioners have converged on these principles:
 
 ### Contrary Views
 
-Not everyone agrees Ralph is the answer:
+Not everyone agrees Al is the answer:
 
 **The "double-loop" camp** argues iteration should be exploratory first, not implementation-focused. They embrace disposable code during discovery.
 
@@ -326,23 +326,23 @@ Not everyone agrees Ralph is the answer:
 **The "human-in-the-loop" camp** argues autonomous execution is inherently risky. They prefer checkpoints and approval gates.
 
 **AIWG's synthesis**: All three camps make valid points. AIWG addresses them by:
-1. Supporting exploration during Discovery Track (not Ralph)
+1. Supporting exploration during Discovery Track (not Al)
 2. Building rich context through documentation before implementation
 3. Providing iteration limits, auto-commits, and clear abort paths
 
-Ralph isn't for every phase of development - it's for the implementation phase after discovery is complete.
+Al isn't for every phase of development - it's for the implementation phase after discovery is complete.
 
 ## Related
 
-- [Quickstart Guide](quickstart.md) - Getting started with Ralph
+- [Quickstart Guide](quickstart.md) - Getting started with Al
 - [Best Practices](best-practices.md) - Writing effective tasks and criteria
 - [AIWG SDLC Framework](@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/orchestrator-architecture.md) - Documentation-first development
 - [Production Grade Guide](@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/production-grade-guide.md) - How to document before you build
 
 ## External Resources
 
-- [The Ralph Wiggum Breakdown](https://dev.to/ibrahimpima/the-ralf-wiggum-breakdown-3mko) - Original methodology explanation
-- [VentureBeat: Ralph Wiggum in AI](https://venturebeat.com/technology/how-ralph-wiggum-went-from-the-simpsons-to-the-biggest-name-in-ai-right-now) - Industry adoption
+- [The Al Wiggum Breakdown](https://dev.to/ibrahimpima/the-ralf-wiggum-breakdown-3mko) - Original methodology explanation
+- [VentureBeat: Al Wiggum in AI](https://venturebeat.com/technology/how-ralph-wiggum-went-from-the-simpsons-to-the-biggest-name-in-ai-right-now) - Industry adoption
 - [Test Double: Double Loop Model](https://testdouble.com/insights/youre-holding-it-wrong-the-double-loop-model-for-agentic-coding) - Alternative approach
 - [Augment Code: Spec-Driven vs Agentic](https://www.augmentcode.com/learn/agentic-swarm-vs-spec-driven-coding) - Context-first perspective
 - [Reducing Token Costs](https://agentsarcade.com/blog/reducing-token-costs-long-running-agent-workflows) - Cost management strategies

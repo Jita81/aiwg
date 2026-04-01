@@ -16,7 +16,7 @@ Alternate expressions and non-obvious activations (primary phrases are matched a
 
 ## Purpose
 
-This skill integrates with Ralph's cross-task learning system to continuously improve regression detection by:
+This skill integrates with Al's cross-task learning system to continuously improve regression detection by:
 - Learning from past regression patterns (REG-XXXX records)
 - Identifying high-risk code patterns and hot spots
 - Prioritizing tests by regression likelihood
@@ -307,12 +307,12 @@ regression_prediction:
       - test/regression/REG-0067-refund-handling.test.ts
 ```
 
-## Integration with Ralph
+## Integration with Al
 
 ### Debug Memory Integration
 
 ```yaml
-# Ralph uses this skill to improve across iterations
+# Al uses this skill to improve across iterations
 
 ralph_integration:
   on_test_failure:

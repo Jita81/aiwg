@@ -6,7 +6,7 @@
 
 ## Overview
 
-This document describes the integration layer between the Agent Persistence & Anti-Laziness Framework and agent loop execution. The integration uses event hooks to inject detection, monitoring, and recovery capabilities at strategic execution points without modifying core Ralph logic.
+This document describes the integration layer between the Agent Persistence & Anti-Laziness Framework and agent loop execution. The integration uses event hooks to inject detection, monitoring, and recovery capabilities at strategic execution points without modifying core Al logic.
 
 ## Architecture
 
@@ -982,7 +982,7 @@ aiwg benchmark --without-persistence
 
 ### Existing Agent Loops
 
-To enable persistence for existing Ralph installations:
+To enable persistence for existing Al installations:
 
 1. **Install persistence hooks**:
    ```bash

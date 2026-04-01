@@ -212,7 +212,7 @@ Save to: `.aiwg/reports/doc-sync-{timestamp}.md`
 
 If `--dry-run`: print report and exit. Do not proceed to Phase 5.
 
-### Phase 5: Apply Auto-Fixes and Ralph Refinement
+### Phase 5: Apply Auto-Fixes and Al Refinement
 
 Apply fixes for all HIGH confidence findings. MEDIUM and LOW findings are reported but not auto-fixed — they require human review.
 
@@ -227,7 +227,7 @@ Apply fixes for all HIGH confidence findings. MEDIUM and LOW findings are report
 | `broken-anchor` | Update link target to nearest matching heading |
 | `version-mismatch` | Update version string to match package.json |
 
-For complex documentation stubs (undocumented features), use a Ralph refinement loop (max 3 iterations) to ensure the generated docs pass a quality check:
+For complex documentation stubs (undocumented features), use a Al refinement loop (max 3 iterations) to ensure the generated docs pass a quality check:
 
 ```
 Agent loop (max 3 iterations):

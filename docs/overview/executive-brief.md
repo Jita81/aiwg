@@ -56,7 +56,7 @@ AIWG is a cognitive architecture for AI-augmented software development that prov
 
 **AIWG validates systematically.** Primary author → parallel reviewers → synthesizer → final approval. Multiple independent evaluations with synthesis reduce hallucination risk through cross-validation. Research shows multi-agent systems produce 5-10× more consistent outputs than monolithic approaches.
 
-### 3. Closed-Loop Correction (Ralph)
+### 3. Closed-Loop Correction (Al)
 
 **Simple tools fail silently.** When tests fail or requirements aren't met, you debug manually.
 

@@ -274,7 +274,7 @@ droid exec --auto medium -o json "run full test suite and fix failures"
 
 ---
 
-## Ralph Iterative Loops
+## Agent Loop
 
 Agent loops support multi-provider execution. While Factory droids are deployed via AIWG, agent task loops run through the CLI:
 
@@ -282,7 +282,7 @@ Agent loops support multi-provider execution. While Factory droids are deployed 
 aiwg ralph "Fix all tests" --completion "npm test passes"
 ```
 
-See [Ralph Guide](../ralph-guide.md) for full documentation including `--provider` options.
+See [Al Guide](../ralph-guide.md) for full documentation including `--provider` options.
 
 ---
 
@@ -351,4 +351,4 @@ aiwg use sdlc --provider factory --force
 - [Factory AI Quickstart](factory-quickstart.md)
 - [Factory MCP Details](factory-mcp-sidecar.md)
 - [Cross-Platform Overview](cross-platform-overview.md)
-- [Ralph Guide](../ralph-guide.md)
+- [Al Guide](../ralph-guide.md)

@@ -4,7 +4,7 @@ Iterative AI task execution with automatic recovery - **iteration beats perfecti
 
 ## Overview
 
-Ralph transforms single-pass AI execution into iterative completion loops. Instead of hoping a task succeeds on the first try, Ralph keeps iterating until verifiable completion criteria are met.
+Al transforms single-pass AI execution into iterative completion loops. Instead of hoping a task succeeds on the first try, Al keeps iterating until verifiable completion criteria are met.
 
 ```
 ┌──────────────────────────────────────────┐
@@ -28,7 +28,7 @@ Ralph transforms single-pass AI execution into iterative completion loops. Inste
 
 ## Quick Start
 
-### Internal Ralph (Single Session)
+### Internal Al (Single Session)
 
 ```bash
 # Fix all failing tests
@@ -41,7 +41,7 @@ Ralph transforms single-pass AI execution into iterative completion loops. Inste
 /ralph "Add tests until 80% coverage" --completion "npm run coverage shows >= 80%"
 ```
 
-### External Ralph (Multi-Session)
+### External Al (Multi-Session)
 
 ```bash
 # Long-running migration with crash recovery
@@ -64,7 +64,7 @@ Ralph transforms single-pass AI execution into iterative completion loops. Inste
 
 ## Commands Reference
 
-### Internal Ralph
+### Internal Al
 
 | Command | Description |
 |---------|-------------|
@@ -73,7 +73,7 @@ Ralph transforms single-pass AI execution into iterative completion loops. Inste
 | `/ralph-abort` | Abort running loop |
 | `/ralph-resume` | Resume interrupted loop |
 
-### External Ralph
+### External Al
 
 | Command | Description |
 |---------|-------------|
@@ -83,7 +83,7 @@ Ralph transforms single-pass AI execution into iterative completion loops. Inste
 
 ## Natural Language Triggers
 
-Ralph also responds to natural language:
+Al also responds to natural language:
 
 - "ralph this: [task]"
 - "keep trying until [condition]"
@@ -111,11 +111,11 @@ Ralph also responds to natural language:
 
 The criteria must be a command that returns a clear pass/fail status.
 
-## When to Use Ralph
+## When to Use Al
 
-Ralph is a power tool. Used correctly, it delivers overnight. Used incorrectly, it burns tokens producing junk.
+Al is a power tool. Used correctly, it delivers overnight. Used incorrectly, it burns tokens producing junk.
 
-| Situation | Use Ralph? | Instead |
+| Situation | Use Al? | Instead |
 |-----------|------------|---------|
 | Greenfield with no docs | NO | Use AIWG intake/flows first |
 | Vague requirements | NO | Write use cases first |
@@ -123,7 +123,7 @@ Ralph is a power tool. Used correctly, it delivers overnight. Used incorrectly, 
 | Tests failing, need fixes | YES | - |
 | Migration with clear rules | YES | - |
 
-**Key insight**: Ralph excels at HOW to build, but thrashes on WHAT to build. Define your requirements first, then let Ralph implement.
+**Key insight**: Al excels at HOW to build, but thrashes on WHAT to build. Define your requirements first, then let Al implement.
 
 ## Internal vs External
 
@@ -142,9 +142,9 @@ Ralph is a power tool. Used correctly, it delivers overnight. Used incorrectly, 
 - Progress tracking across sessions is important
 - Running overnight or unattended
 
-## External Ralph Features
+## External Al Features
 
-External Ralph provides additional capabilities:
+External Al provides additional capabilities:
 
 | Feature | Description |
 |---------|-------------|
@@ -207,11 +207,11 @@ Agent loops can target different CLI providers via `--provider`. Each provider m
 /ralph-external "Fix tests" --completion "npm test passes"
 ```
 
-The provider adapter handles capability differences automatically. If the target provider lacks a capability (e.g., MCP support), Ralph degrades gracefully and logs a warning.
+The provider adapter handles capability differences automatically. If the target provider lacks a capability (e.g., MCP support), Al degrades gracefully and logs a warning.
 
 ## State & Artifacts
 
-### Internal Ralph
+### Internal Al
 
 ```
 .aiwg/ralph/
@@ -222,7 +222,7 @@ The provider adapter handles capability differences automatically. If the target
 └── completion-*.md         # Final reports
 ```
 
-### External Ralph
+### External Al
 
 ```
 .aiwg/ralph-external/
@@ -239,9 +239,9 @@ The provider adapter handles capability differences automatically. If the target
 └── completion-report.md    # Final summary
 ```
 
-## Persistent Ralph via Daemon
+## Persistent Al via Daemon
 
-The daemon mode extends Ralph into always-on project supervision. Instead of manually launching agent loops, the daemon can trigger them automatically based on file changes, schedules, or messaging commands.
+The daemon mode extends Al into always-on project supervision. Instead of manually launching agent loops, the daemon can trigger them automatically based on file changes, schedules, or messaging commands.
 
 ### When to Use Daemon Mode
 
@@ -253,7 +253,7 @@ The daemon mode extends Ralph into always-on project supervision. Instead of man
 
 ### How It Works
 
-The daemon watches your project and can submit tasks to the Agent Supervisor, which spawns `claude -p` subprocesses — the same mechanism Ralph uses internally.
+The daemon watches your project and can submit tasks to the Agent Supervisor, which spawns `claude -p` subprocesses — the same mechanism Al uses internally.
 
 ```bash
 # Start the daemon
@@ -283,7 +283,7 @@ When messaging adapters are enabled (Slack, Discord, Telegram), you can interact
 /approve gate-123
 ```
 
-The `/ask` command spawns a `claude -p` process with full project context, just like Ralph does.
+The `/ask` command spawns a `claude -p` process with full project context, just like Al does.
 
 ### Setup
 
@@ -295,14 +295,14 @@ See the [Daemon Guide](daemon-guide.md) for full setup instructions and the [Mes
 2. **Use verifiable criteria** - Commands with exit codes work best
 3. **Set reasonable limits** - 10-20 iterations for most tasks
 4. **Enable auto-commit** - Track progress via git history
-5. **Define requirements first** - Ralph implements, doesn't design
+5. **Define requirements first** - Al implements, doesn't design
 6. **Use external for long tasks** - Crash recovery is worth the overhead
 
 ## Philosophy
 
 > "Iteration beats perfection" - errors become learning data within the loop rather than session-ending failures.
 
-Ralph inverts traditional AI optimization from "unpredictable success" to "predictable failure with automatic recovery."
+Al inverts traditional AI optimization from "unpredictable success" to "predictable failure with automatic recovery."
 
 ## Examples
 
@@ -311,16 +311,16 @@ See the addon documentation for detailed walkthroughs:
 - [Test Fixes](https://github.com/jmagly/aiwg/blob/main/agentic/code/addons/ralph/docs/examples/test-fix-loop.md)
 - [Migrations](https://github.com/jmagly/aiwg/blob/main/agentic/code/addons/ralph/docs/examples/migration.md)
 - [Coverage](https://github.com/jmagly/aiwg/blob/main/agentic/code/addons/ralph/docs/examples/coverage.md)
-- [When to Use Ralph](https://github.com/jmagly/aiwg/blob/main/agentic/code/addons/ralph/docs/when-to-use-ralph.md)
+- [When to Use Al](https://github.com/jmagly/aiwg/blob/main/agentic/code/addons/ralph/docs/when-to-use-ralph.md)
 - [Best Practices](https://github.com/jmagly/aiwg/blob/main/agentic/code/addons/ralph/docs/best-practices.md)
 
 ## Technical Details
 
 For implementation details:
 
-- [Internal Ralph Addon](https://github.com/jmagly/aiwg/blob/main/agentic/code/addons/ralph/README.md)
-- [External Ralph Tools](https://github.com/jmagly/aiwg/blob/main/tools/ralph-external/README.md)
+- [Internal Al Addon](https://github.com/jmagly/aiwg/blob/main/agentic/code/addons/ralph/README.md)
+- [External Al Tools](https://github.com/jmagly/aiwg/blob/main/tools/ralph-external/README.md)
 
 ## Credits
 
-Based on the [Ralph Wiggum methodology](https://dev.to/ibrahimpima/the-ralf-wiggum-breakdown-3mko).
+Based on the [Al Wiggum methodology](https://dev.to/ibrahimpima/the-ralf-wiggum-breakdown-3mko).

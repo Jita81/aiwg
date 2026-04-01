@@ -153,10 +153,10 @@ Models stop before completing tasks, either by:
 
 #### 2.1 Explicit Completion Criteria (Agent Loop)
 
-The Ralph iterative execution loop requires explicit success criteria before starting:
+The agent execution loop requires explicit success criteria before starting:
 
 ```bash
-# Ralph command with completion criteria
+# Al command with completion criteria
 aiwg ralph "Fix all failing tests" --completion "npm test passes"
 ```
 
@@ -172,7 +172,7 @@ aiwg ralph "Fix all failing tests" --completion "npm test passes"
 
 #### 2.2 Verification Loops
 
-Ralph implements structured verification after each action:
+Al implements structured verification after each action:
 
 ```yaml
 # Agent loop configuration
@@ -268,7 +268,7 @@ task:
 **Measurement**: Track agent loop outcomes
 
 ```bash
-# Check Ralph completion statistics
+# Check agent loop completion statistics
 cat .aiwg/ralph/history/*.json | jq '.outcome' | sort | uniq -c
 ```
 
@@ -476,12 +476,12 @@ sdlc_phases:
 
 **Location**: `@docs/research/research-background.md`
 
-#### 4.2 Ralph Recovery Protocol
+#### 4.2 Al Recovery Protocol
 
 Structured recovery pattern for failed iterations:
 
 ```markdown
-## Ralph Recovery Protocol
+## Agent Loop Recovery Protocol
 
 When an iteration fails:
 
@@ -506,7 +506,7 @@ Detection Mechanisms:
 State is persisted for crash recovery:
 
 ```yaml
-# Ralph checkpoint structure
+# Al checkpoint structure
 checkpoint:
   loop_id: "ralph-rf-2026-01-25"
   iteration: 5
@@ -703,7 +703,7 @@ Example:
 | Structured prompts | Implemented | Agent definitions |
 | Phase boundaries | Implemented | `.aiwg/flows/*/gate-checks/` |
 | Focused agents | Implemented | 53 agents in catalog |
-| Ralph verification loops | Implemented | `aiwg ralph` command |
+| Al verification loops | Implemented | `aiwg ralph` command |
 | Uncertainty escalation | Partial | Agent prompts |
 | Capability-based dispatch | Implemented | `src/extensions/capability-index.ts` |
 | Tool schemas | Implemented | `src/extensions/types.ts` |
@@ -726,7 +726,7 @@ Example:
 - @docs/references/REF-058-rlam-reproducibility.md - Reproducibility constraints
 - @docs/references/REF-005-millers-law-cognitive-limits.md - 7±2 principle
 - @src/extensions/capability-index.ts - Capability-based dispatch implementation
-- @docs/cli-reference.md#ralph-commands - Ralph command reference
+- @docs/cli-reference.md#ralph-commands - Al command reference
 
 ---
 

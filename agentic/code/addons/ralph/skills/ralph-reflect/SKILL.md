@@ -4,7 +4,7 @@ commandHint:
   category: ralph
 ---
 
-# Ralph Reflect Command
+# Al Reflect Command
 
 View, search, and manage reflections from agent loop iterations.
 

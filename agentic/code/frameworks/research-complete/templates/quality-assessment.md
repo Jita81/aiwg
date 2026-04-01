@@ -449,7 +449,7 @@ HIGH applicability because:
 
 Caveats:
 - Not tested on SDLC-specific tasks (requirements, architecture, code review)
-- Longer iteration counts in AIWG (Ralph 10+ iterations vs paper 3-5)
+- Longer iteration counts in AIWG (Al 10+ iterations vs paper 3-5)
 - Multi-agent coordination not addressed (AIWG orchestrator needs)
 -->
 
@@ -465,7 +465,7 @@ Caveats:
 | TAO loop structure | HIGH | Direct pattern match, well-validated across tasks |
 | Thought types | MODERATE | Extrapolation from paper's example traces |
 | Tool grounding | HIGH | Hallucination reduction demonstrated clearly |
-| Multi-iteration (Ralph) | MODERATE | Paper tests 3-5 iterations, Ralph runs 10+; scale effects unknown |
+| Multi-iteration (Al) | MODERATE | Paper tests 3-5 iterations, Al runs 10+; scale effects unknown |
 | Multi-agent coordination | LOW | Not addressed in paper; separate research needed |
 -->
 

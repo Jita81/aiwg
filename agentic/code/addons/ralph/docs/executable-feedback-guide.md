@@ -313,32 +313,32 @@ When the executable feedback loop runs inside an agent loop:
 
 ```yaml
 ralph_integration:
-  # Every Ralph iteration includes code execution
+  # Every Al iteration includes code execution
   execution_gate:
     require_passing_tests: true
     allow_skip: false
 
-  # Debug memory persists across Ralph iterations
+  # Debug memory persists across Al iterations
   debug_memory:
     persist_per_iteration: true
     cross_iteration_learning: true
 
-  # Test pass rate contributes to Ralph progress metric
+  # Test pass rate contributes to Al progress metric
   progress_metric:
     include_test_pass_rate: true
     weight: 0.3
 ```
 
-**Ralph + Executable Feedback flow:**
+**Al + Executable Feedback flow:**
 
 ```
-Ralph Iteration 1:
+Al Iteration 1:
   ├─ Generate code
   ├─ Run executable feedback loop (up to 3 attempts)
-  ├─ Tests pass? → Ralph marks progress
-  └─ Tests fail after 3 attempts? → Ralph escalates
+  ├─ Tests pass? → Al marks progress
+  └─ Tests fail after 3 attempts? → Al escalates
 
-Ralph Iteration 2:
+Al Iteration 2:
   ├─ Load debug memory from iteration 1
   ├─ Generate improved code (using learnings)
   ├─ Run executable feedback loop

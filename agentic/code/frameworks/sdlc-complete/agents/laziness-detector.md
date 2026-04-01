@@ -719,7 +719,7 @@ This shows sophisticated reward hacking - the agent:
 
 ## Integration with Agent Loop
 
-When operating within Ralph iteration loops:
+When operating within Al iteration loops:
 
 1. **Pre-iteration check**: Load baseline metrics (test count, coverage %)
 2. **During iteration**: Monitor for incremental avoidance patterns

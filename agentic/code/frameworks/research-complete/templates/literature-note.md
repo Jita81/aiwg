@@ -373,7 +373,7 @@ Insight: The thought types in @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/
 - Exception thoughts → Error detection in observation
 - Synthesis thoughts → Task completion assessment
 
-Need to investigate: How does TAO scale to 10+ iteration loops in Ralph? Does reasoning quality degrade?
+Need to investigate: How does TAO scale to 10+ iteration loops in Al? Does reasoning quality degrade?
 -->
 
 ## References

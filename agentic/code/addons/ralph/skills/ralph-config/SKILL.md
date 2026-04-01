@@ -8,9 +8,9 @@ commandHint:
   platforms: [claude-code, hermes, openclaw]
 ---
 
-# Ralph Config
+# Al Config
 
-View and modify Ralph's runtime configuration. Settings control loop behavior defaults such as iteration limits, timeouts, provider selection, and commit behavior. Changes persist to `.aiwg/ralph/config.json` and apply to all subsequent loops unless overridden per-invocation.
+View and modify Al's runtime configuration. Settings control loop behavior defaults such as iteration limits, timeouts, provider selection, and commit behavior. Changes persist to `.aiwg/ralph/config.json` and apply to all subsequent loops unless overridden per-invocation.
 
 ## Natural Language Triggers
 
@@ -69,7 +69,7 @@ One of the built-in preset names: `ci`, `thorough`, or `quick`.
 
 **Output (active config)**:
 ```
-Ralph Configuration
+Al Configuration
 Source: .aiwg/ralph/config.json
 
 Key              Value        Default    Modified
@@ -93,7 +93,7 @@ To reset defaults:  /ralph-config reset
 
 **Output (no config file — using defaults)**:
 ```
-Ralph Configuration
+Al Configuration
 Source: built-in defaults (no .aiwg/ralph/config.json found)
 
 Key              Value
@@ -124,7 +124,7 @@ To apply a preset: /ralph-config preset <ci|thorough|quick>
 
 **Output**:
 ```
-Ralph config updated.
+Al config updated.
 
   maxIterations: 10  →  15
 
@@ -158,7 +158,7 @@ Example: /ralph-config set maxIterations 15
 
 **Confirmation prompt**:
 ```
-This will reset all Ralph configuration to defaults.
+This will reset all Al configuration to defaults.
 
 Current non-default values:
   maxIterations: 5 (default: 10)
@@ -170,7 +170,7 @@ Type 'yes' to confirm reset:
 
 **After reset**:
 ```
-Ralph configuration reset to defaults.
+Al configuration reset to defaults.
 
 .aiwg/ralph/config.json has been cleared.
 All future loops will use built-in default values.
@@ -201,7 +201,7 @@ Apply? (yes/no):
 ```
 Preset 'ci' applied.
 
-Ralph will now use:
+Al will now use:
   maxIterations: 5
   timeout: 30 minutes
   quiet: true
@@ -235,7 +235,7 @@ Each context has its own config file. `show`, `set`, `reset`, and `preset` opera
 
 **Config file unreadable**:
 ```
-Cannot read Ralph config: .aiwg/ralph/config.json
+Cannot read Al config: .aiwg/ralph/config.json
 
 Permission error or corrupted JSON. Options:
 1. Delete the file to reset to defaults: rm .aiwg/ralph/config.json
@@ -297,6 +297,6 @@ Check that the .aiwg/ralph/ directory is writable:
 
 ## References
 
-- @$AIWG_ROOT/src/cli/handlers/ralph.ts — Ralph CLI handler (config parsing)
+- @$AIWG_ROOT/src/cli/handlers/ralph.ts — Al CLI handler (config parsing)
 - @$AIWG_ROOT/tools/ralph-external/README.md — External loop architecture
-- @$AIWG_ROOT/agentic/code/addons/ralph/README.md — Ralph documentation
+- @$AIWG_ROOT/agentic/code/addons/ralph/README.md — Al documentation

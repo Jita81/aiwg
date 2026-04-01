@@ -202,7 +202,7 @@ flow_phases:
 ### With Agent Loop
 
 ```yaml
-# Ralph iteration checkpoint
+# Al iteration checkpoint
 ralph_config:
   iteration_gate:
     trigger:

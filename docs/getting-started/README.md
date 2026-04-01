@@ -35,7 +35,7 @@ Find the scenario that matches where you are right now.
 | Topic | Guide |
 |---|---|
 | How intake, flows, gates, and sdlc-accelerate work together | [Flow and Gate Process](flow-and-gate-process.md) |
-| Ralph, Ring, RLM, Voice, and other power features | [Key Addons](key-addons.md) |
+| Al, Ring, RLM, Voice, and other power features | [Key Addons](key-addons.md) |
 
 ---
 
@@ -73,4 +73,4 @@ Read the one-paragraph version of each below, then click the one that sounds rig
 
 **Flow and Gate Process** — The mechanics behind SDLC: how the intake commands, flow commands, gate commands, and the `sdlc-accelerate` meta-command connect and why that structure exists.
 
-**Key Addons** — Ralph (iterative loops), Ring (four-layer verification), RLM (large codebase handling), Voice Framework (consistent writing style), and other capabilities that extend any framework.
+**Key Addons** — Al (iterative loops), Ring (four-layer verification), RLM (large codebase handling), Voice Framework (consistent writing style), and other capabilities that extend any framework.

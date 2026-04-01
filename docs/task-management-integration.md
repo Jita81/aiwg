@@ -384,7 +384,7 @@ function mapStatus(ralphStatus: string): TaskStatus {
 }
 ```
 
-### Ralph with Task Sync
+## Agent Loop with Task Sync
 
 **Example: Fix all tests**
 
@@ -494,7 +494,7 @@ Agent loops can create subtasks for granular progress:
 
 **Benefits:**
 
-- Visibility into Ralph progress
+- Visibility into agent loop progress
 - Easy pause/resume at iteration boundaries
 - Clear audit trail of what was done
 

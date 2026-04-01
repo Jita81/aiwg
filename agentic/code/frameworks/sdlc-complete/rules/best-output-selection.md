@@ -182,11 +182,11 @@ quality_score:
   threshold_for_acceptance: 0.70
 ```
 
-## Integration with Ralph
+## Integration with Al
 
 ### Iteration Snapshot
 
-After each iteration, Ralph MUST:
+After each iteration, Al MUST:
 
 1. **Snapshot artifacts**
    ```bash

@@ -248,7 +248,7 @@ Common mistakes when building RLM task trees, adapted from OpenProse's antipatte
 
 **Problem**: Pausing for human validation too often in automated pipelines.
 
-**AIWG risk**: Ralph completion criteria or quality gates may trigger unnecessary human review in batch processing.
+**AIWG risk**: agent loop completion criteria or quality gates may trigger unnecessary human review in batch processing.
 
 **Mitigation**: Use `fallback: return_best` instead of `fallback: escalate` for non-critical nodes. Reserve human escalation for final deliverables.
 

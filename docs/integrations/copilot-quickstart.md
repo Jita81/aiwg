@@ -138,7 +138,7 @@ See [Copilot MCP Integration](copilot-mcp-sidecar.md) for full details.
 
 ---
 
-## Ralph Iterative Loops
+## Agent Loop
 
 Agent loops support multi-provider execution. While Copilot agents are deployed via AIWG, agent task loops run through the CLI:
 
@@ -146,7 +146,7 @@ Agent loops support multi-provider execution. While Copilot agents are deployed 
 aiwg ralph "Fix all tests" --completion "npm test passes"
 ```
 
-See [Ralph Guide](../ralph-guide.md) for full documentation including `--provider` options.
+See [Al Guide](../ralph-guide.md) for full documentation including `--provider` options.
 
 ---
 

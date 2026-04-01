@@ -7,7 +7,7 @@ commandHint:
   category: automation
 ---
 
-# Ralph Abort
+# Al Abort
 
 Abort a running or paused agent loop.
 

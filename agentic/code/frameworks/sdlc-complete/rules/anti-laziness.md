@@ -489,7 +489,7 @@ ralph_integration:
     - record_lessons_learned
 ```
 
-**Example Ralph Integration**:
+**Example Al Integration**:
 
 ```bash
 # Agent loop with anti-laziness enforcement

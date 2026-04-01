@@ -8,7 +8,7 @@ commandHint:
   platforms: [claude-code, hermes, openclaw]
 ---
 
-# Ralph Attach
+# Al Attach
 
 Attach to a running external agent loop and tail its output log in real time. Press Ctrl+C to detach without interrupting the loop.
 
@@ -145,7 +145,7 @@ Press `Ctrl+C` while attached.
 
 ## References
 
-- @$AIWG_ROOT/src/cli/handlers/ralph.ts — Ralph handler (attachToLoopOutput)
+- @$AIWG_ROOT/src/cli/handlers/ralph.ts — Al handler (attachToLoopOutput)
 - @$AIWG_ROOT/src/cli/handlers/ralph-launcher.ts — Loop launcher and state management
-- @$AIWG_ROOT/agentic/code/addons/ralph/README.md — Ralph documentation
+- @$AIWG_ROOT/agentic/code/addons/ralph/README.md — Al documentation
 - @$AIWG_ROOT/tools/ralph-external/README.md — External loop architecture

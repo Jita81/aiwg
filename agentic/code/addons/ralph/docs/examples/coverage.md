@@ -4,7 +4,7 @@ Iteratively add tests until coverage threshold is met.
 
 ## Scenario
 
-Your code coverage is below target and you want Ralph to keep adding tests until coverage meets the threshold.
+Your code coverage is below target and you want Al to keep adding tests until coverage meets the threshold.
 
 ## Basic Coverage Target
 

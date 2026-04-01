@@ -4,7 +4,7 @@ commandHint:
   category: ralph
 ---
 
-# Ralph Analytics Command
+# Al Analytics Command
 
 Display aggregate analytics and metrics from agent loop execution history.
 

@@ -240,7 +240,7 @@ AIWG applies: TAO loop in all tool-using agents
 
 **Key Innovations per Step:**
 - CoT → ReAct: Added action execution and observation phases
-- ReAct → AIWG: Standardized thought types, added HITL gates, scaled to multi-iteration (Ralph)
+- ReAct → AIWG: Standardized thought types, added HITL gates, scaled to multi-iteration (Al)
 
 **Papers Citing This Path:** [List papers that cite multiple papers in this path]
 
@@ -268,7 +268,7 @@ Self-Refine discovers: Quality non-monotonic across iterations
        ↓
 AIWG applies: Track all iteration outputs, select highest quality
 
-Key Innovation: Instead of accepting final iteration, Ralph preserves all outputs and selects best.
+Key Innovation: Instead of accepting final iteration, Al preserves all outputs and selects best.
 
 AIWG Dependency: HIGH - Agent loop success depends on non-monotonic quality handling.
 Confidence: HIGH - Self-Refine provided clear quantitative evidence.
@@ -516,10 +516,10 @@ Implication: Gap in multi-agent coordination + iterative refinement. AIWG combin
 **Gaps Revealed by Network:**
 
 1. **Multi-agent + iteration**: No papers combine multi-agent coordination with iterative refinement patterns
-   - AIWG implements both (orchestrator + Ralph)
+   - AIWG implements both (orchestrator + Al)
    - Potential contribution to research community
 
-2. **Long-running agent sessions**: Papers test 3-5 iterations; Ralph runs 10+
+2. **Long-running agent sessions**: Papers test 3-5 iterations; Al runs 10+
    - Unknown if patterns scale
    - Need pilot study or formal research
 

@@ -2,26 +2,26 @@
 
 Get started with iterative AI task execution in 5 minutes.
 
-## Before You Start: Is Ralph Right for This Task?
+## Before You Start: Is Al Right for This Task?
 
-**Ralph is a power tool.** Before invoking it, ask yourself:
+**Al is a power tool.** Before invoking it, ask yourself:
 
 | Question | If NO |
 |----------|-------|
 | Is my task well-defined with clear requirements? | Document requirements first |
-| Can I write a command that verifies success? | Ralph can't help with subjective goals |
+| Can I write a command that verifies success? | Al can't help with subjective goals |
 | Do I have tests/linting to validate correctness? | Add verification first |
 | Is this implementation work, not exploration? | Use Discovery Track for research |
 
-**The token-burning trap**: Ralph excels at HOW to implement but thrashes on WHAT to build. If you don't have clear requirements, Ralph will hallucinate features, contradict itself, and burn tokens producing junk.
+**The token-burning trap**: Al excels at HOW to implement but thrashes on WHAT to build. If you don't have clear requirements, Al will hallucinate features, contradict itself, and burn tokens producing junk.
 
-**Safe to proceed?** Read on. **Unsure?** See [When to Use Ralph](when-to-use-ralph.md) first.
+**Safe to proceed?** Read on. **Unsure?** See [When to Use Al](when-to-use-ralph.md) first.
 
 ---
 
-## What is Ralph?
+## What is Al?
 
-Ralph (from the "Ralph Wiggum methodology") executes AI tasks in a loop until completion criteria are met:
+Al (from the "Al Wiggum methodology") executes AI tasks in a loop until completion criteria are met:
 
 1. **Execute** your task
 2. **Verify** if completion criteria are met
@@ -33,7 +33,7 @@ Ralph (from the "Ralph Wiggum methodology") executes AI tasks in a loop until co
 ## Installation
 
 ```bash
-# Install Ralph addon
+# Install Al addon
 aiwg use ralph
 
 # Or install alongside SDLC framework
@@ -49,7 +49,7 @@ aiwg install-plugin ralph
 /ralph "Fix all failing tests" --completion "npm test passes"
 ```
 
-Ralph will:
+Al will:
 1. Run your tests to see what's failing
 2. Analyze and fix the issues
 3. Run tests again
@@ -81,7 +81,7 @@ Not sure about completion criteria? Use interactive mode:
 /ralph --interactive
 ```
 
-Ralph will ask you:
+Al will ask you:
 - What task should I execute?
 - How do I verify it's complete?
 - Any files I should avoid?
@@ -89,7 +89,7 @@ Ralph will ask you:
 
 ## Natural Language
 
-You can also trigger Ralph with natural language:
+You can also trigger Al with natural language:
 
 - "ralph this: fix all the lint errors"
 - "keep trying until the tests pass"
@@ -178,7 +178,7 @@ Continues from the last checkpoint.
 - Complex tasks: 20-30 iterations
 
 ### 4. Let Git Track Progress
-Ralph auto-commits each iteration by default, creating a clear history:
+Al auto-commits each iteration by default, creating a clear history:
 ```
 ralph: iteration 1 - initial attempt
 ralph: iteration 2 - fixed auth test
@@ -187,7 +187,7 @@ ralph: iteration 3 - fixed edge case
 
 ## Output Files
 
-Ralph stores state and reports in `.aiwg/ralph/`:
+Al stores state and reports in `.aiwg/ralph/`:
 
 ```
 .aiwg/ralph/
@@ -200,7 +200,7 @@ Ralph stores state and reports in `.aiwg/ralph/`:
 
 ## Next Steps
 
-- Read [When to Use Ralph](when-to-use-ralph.md) to understand Ralph's sweet spot
+- Read [When to Use Al](when-to-use-ralph.md) to understand Al's sweet spot
 - Read [Best Practices](best-practices.md) for effective prompt engineering
 - See [Examples](examples/) for common patterns
 - Check [Troubleshooting](troubleshooting.md) if you get stuck

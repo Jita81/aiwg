@@ -7,7 +7,7 @@ commandHint:
   category: automation
 ---
 
-# Ralph Status
+# Al Status
 
 Check the status of agent loops.
 
@@ -103,7 +103,7 @@ View report: /ralph-status --report 2025-01-15
 
 **No state directory**:
 ```
-Ralph has not been used in this project yet.
+Al has not been used in this project yet.
 
 Get started with:
   /ralph "your task" --completion "verification command"
@@ -114,7 +114,7 @@ Or:
 
 **Corrupted state**:
 ```
-Ralph state file is corrupted.
+agent loop state file is corrupted.
 
 Options:
 1. Delete and start fresh: rm -rf .aiwg/ralph/

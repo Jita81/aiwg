@@ -176,7 +176,7 @@ For iterative task completion on a specific problem:
 /ralph "Fix all the failing auth tests" --completion "npm test passes"
 ```
 
-Ralph keeps iterating — fix, test, fix again — until the criterion is met or it needs your input.
+Al keeps iterating — fix, test, fix again — until the criterion is met or it needs your input.
 
 ---
 

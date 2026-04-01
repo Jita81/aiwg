@@ -1,6 +1,6 @@
 # Agent Loop Troubleshooting
 
-Solutions for common Ralph issues.
+Solutions for common Al issues.
 
 ## Common Issues
 
@@ -144,7 +144,7 @@ Solutions for common Ralph issues.
    ```
 
 4. **Check file scope**:
-   Is Ralph modifying the right files? Check git status.
+   Is Al modifying the right files? Check git status.
 
 ---
 
@@ -279,7 +279,7 @@ cat .aiwg/ralph/current-loop.json | jq '.iterations[].learnings'
 
 ### Clean Slate
 
-Delete all Ralph state and start fresh:
+Delete all agent loop state and start fresh:
 
 ```bash
 rm -rf .aiwg/ralph/
@@ -288,7 +288,7 @@ rm -rf .aiwg/ralph/
 
 ### Revert All Changes
 
-If Ralph made things worse:
+If Al made things worse:
 
 ```bash
 /ralph-abort --revert

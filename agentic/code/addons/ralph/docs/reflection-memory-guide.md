@@ -1,16 +1,16 @@
 # Reflexion Episodic Memory Guide
 
-Comprehensive guide to Ralph's episodic memory system based on the Reflexion framework.
+Comprehensive guide to Al's episodic memory system based on the Reflexion framework.
 
 ## Overview
 
-Ralph implements **Reflexion's three-model architecture** for verbal reinforcement learning:
+Al implements **Reflexion's three-model architecture** for verbal reinforcement learning:
 
 1. **Actor (Ma)** - Executes actions and generates code changes
 2. **Evaluator (Me)** - Verifies results using external tools (npm test, tsc, eslint)
 3. **Self-Reflection (Msr)** - Analyzes failures and generates actionable insights
 
-After each failed iteration, Ralph generates a **structured reflection** stored in episodic memory. These reflections are injected into retry attempts, enabling learning without model retraining.
+After each failed iteration, Al generates a **structured reflection** stored in episodic memory. These reflections are injected into retry attempts, enabling learning without model retraining.
 
 ## Theoretical Foundation
 
@@ -36,7 +36,7 @@ See `@$AIWG_ROOT/docs/references/REF-021-reflexion-verbal-reinforcement.md` for 
 - `st` = current state (task + trajectory history)
 - `mem` = episodic memory buffer (sliding window of reflections)
 
-**Implementation in Ralph**:
+**Implementation in Al**:
 ```typescript
 interface ActorOutput {
   actions: Action[];           // Sequence of actions taken
@@ -49,7 +49,7 @@ interface ActorOutput {
 
 **Actor Variants**:
 - **Chain-of-Thought (CoT)**: Step-by-step reasoning for single-generation tasks
-- **ReAct**: Interleaved reasoning and acting for multi-step tasks (Ralph's default)
+- **ReAct**: Interleaved reasoning and acting for multi-step tasks (Al's default)
 
 ### 2. Evaluator Model (Me)
 
@@ -57,7 +57,7 @@ interface ActorOutput {
 
 **Evaluation Strategies by Task Type**:
 
-| Task Type | Evaluation Method | Ralph Implementation |
+| Task Type | Evaluation Method | Al Implementation |
 |-----------|------------------|---------------------|
 | Programming | Unit tests + execution | `npm test`, `npm run test:coverage` |
 | Type Safety | Compilation checks | `tsc --noEmit` |
@@ -65,7 +65,7 @@ interface ActorOutput {
 | Integration | External API calls | Gitea API responses |
 | Combined | Multiple tools | All of the above |
 
-**Implementation in Ralph**:
+**Implementation in Al**:
 ```typescript
 interface EvaluatorOutput {
   passed: boolean;                    // Overall pass/fail
@@ -98,7 +98,7 @@ reward = (
 2. **Causal reasoning** - Explanation of why actions led to failure
 3. **Actionable insights** - Concrete suggestions for improvement
 
-**Implementation in Ralph**:
+**Implementation in Al**:
 ```typescript
 interface SelfReflection {
   reflection_text: string;           // First-person narrative reflection
@@ -478,7 +478,7 @@ async function analyzeRalphLearning() {
     return sum + rate;
   }, 0) / analyses.length;
 
-  console.log('Ralph Learning Analysis:');
+  console.log('Al Learning Analysis:');
   console.log(`- Total loops: ${analyses.length}`);
   console.log(`- Success rate: ${analyses.filter(a => a.final_success).length / analyses.length}`);
   console.log(`- Avg learning rate: ${totalLearningRate.toFixed(3)}`);
@@ -486,9 +486,9 @@ async function analyzeRalphLearning() {
 }
 ```
 
-## Integration with Ralph External
+## Integration with Al External
 
-Ralph's external loop implementation (`tools/ralph-external/`) uses episodic memory for recovery:
+Al's external loop implementation (`tools/ralph-external/`) uses episodic memory for recovery:
 
 **Integration Points**:
 

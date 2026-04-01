@@ -90,7 +90,7 @@ input_validation:
 
 **AIWG Implementation**:
 ```yaml
-# Ralph task decomposition
+# Al task decomposition
 task_decomposition:
   complexity_threshold: 5  # Max complexity score
   decomposition_strategy: recursive
@@ -393,7 +393,7 @@ consistency:
 | A1. Format Sensitivity | Canonical templates | agent-efficiency.yaml |
 | A2. Instruction Ambiguity | Structured task sections | SDLC templates |
 | A3. Prompt Injection | Input validation | quality-assurance.yaml |
-| B1. Complexity Overload | Ralph decomposition | reliability-patterns.yaml |
+| B1. Complexity Overload | Al decomposition | reliability-patterns.yaml |
 | B2. Reasoning Chain Breaks | Working memory | agent-efficiency.yaml |
 | B3. Planning Failures | Plan validation | SDLC flows |
 | C1. Context Length | Budget management | rag-context-management.yaml |

@@ -110,7 +110,7 @@ These will be applied automatically:
 
 ### Template-fixable Items ({template_fix_count})
 
-These require iterative generation via Ralph:
+These require iterative generation via Al:
 
 | ID | File | Template | Iterations |
 |----|------|----------|------------|

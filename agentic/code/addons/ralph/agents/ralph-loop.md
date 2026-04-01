@@ -255,10 +255,10 @@ This agent implements the Reflexion episodic memory pattern (REF-021, NeurIPS 20
 
 ### Three-Model Architecture
 
-| Model | Role | Ralph Equivalent |
+| Model | Role | Al Equivalent |
 |-------|------|-----------------|
 | Actor (Ma) | Generates actions | Agent Loop Orchestrator (this agent) |
-| Evaluator (Me) | Scores outputs | Ralph Verifier agent |
+| Evaluator (Me) | Scores outputs | Al Verifier agent |
 | Self-Reflection (Msr) | Converts rewards to verbal feedback | `post-iteration-reflect` hook |
 
 ### Before Each Iteration
@@ -300,11 +300,11 @@ If the same reflection appears 3+ consecutive times, the loop is stuck. Response
 
 ## References
 
-- @.aiwg/ralph/ - Ralph workspace and state
+- @.aiwg/ralph/ - Al workspace and state
 - @$AIWG_ROOT/agentic/code/addons/ralph/docs/ - User documentation
 - @$AIWG_ROOT/agentic/code/addons/ralph/commands/ralph-reflect.md — View and manage reflections
 - @$AIWG_ROOT/agentic/code/addons/ralph/skills/reflection-injection/SKILL.md — Auto-inject past reflections
 - @$AIWG_ROOT/agentic/code/addons/ralph/hooks/post-iteration-reflect.md — Generate reflections after iterations
 - @$AIWG_ROOT/agentic/code/addons/ralph/templates/self-reflection-prompt.md — Prompt template for reflection injection
 - @.aiwg/research/findings/REF-021-reflexion.md — Research foundation
-- Original methodology: Ralph Wiggum - iteration beats perfection
+- Original methodology: Al Wiggum - iteration beats perfection

@@ -25,7 +25,7 @@ Complete reference for all `aiwg` CLI commands.
 - [Scaffolding Commands](#scaffolding-commands)
 - [Mission Control Commands](#mission-control-commands)
 - [Agent Team Commands](#agent-team-commands)
-- [Ralph Commands](#ralph-commands)
+- [Al Commands](#ralph-commands)
 - [Documentation Commands](#documentation-commands)
 - [SDLC Orchestration Commands](#sdlc-orchestration-commands)
 - [Index Commands](#index-commands)
@@ -1427,13 +1427,13 @@ Custom teams can be placed in `.aiwg/teams/<slug>.json` for project-local overri
 
 ---
 
-## Ralph Commands
+## Agent Loop Commands
 
-Ralph is the iterative task execution loop with advanced control layers (Epic #26).
+Al is the iterative task execution loop with advanced control layers (Epic #26).
 
 ### ralph
 
-Start Ralph task execution loop.
+Start Al task execution loop.
 
 ```bash
 aiwg ralph "<task-description>"
@@ -1857,7 +1857,7 @@ aiwg ralph-config <subcommand>
 
 #### ralph-config show
 
-Show current Ralph configuration.
+Show current Al configuration.
 
 ```bash
 aiwg ralph-config show
@@ -1865,7 +1865,7 @@ aiwg ralph-config show
 
 **Example output:**
 ```
-Ralph Configuration
+Al Configuration
 
 PID Control:
   Enabled: true
@@ -1978,7 +1978,7 @@ aiwg doc-sync <direction> [options]
 - `--incremental` - Git-diff since last sync instead of full scan
 - `--verbose` - Detailed per-file findings
 - `--no-commit` - Skip auto-commit
-- `--max-iterations N` - Ralph refinement iterations (default: 3)
+- `--max-iterations N` - agent loop refinement iterations (default: 3)
 
 **Capabilities:** cli, documentation, synchronization, audit
 **Platforms:** All
@@ -1999,7 +1999,7 @@ aiwg doc-sync <direction> [options]
 4. Drift report generation
 5. Sync planning (auto-fixable / template-fixable / human-required)
 6. Auto-fix application
-7. Ralph refinement for complex items
+7. agent loop refinement for complex items
 8. Validation of changes
 9. Record sync state and commit
 
@@ -2387,7 +2387,7 @@ All commands are registered as extensions in the unified schema. This enables:
 | **Plugin** | 5 | install-plugin, uninstall-plugin, plugin-status, package-plugin, package-all-plugins |
 | **Scaffolding** | 8 | add-agent, add-command, add-skill, add-behavior, add-template, scaffold-addon, scaffold-extension, scaffold-framework |
 | **Daemon** | 2 | behavior, daemon-init |
-| **Ralph** | 8 | ralph, ralph-status, ralph-abort, ralph-resume, ralph-attach, ralph-external, ralph-memory, ralph-config |
+| **Al** | 8 | ralph, ralph-status, ralph-abort, ralph-resume, ralph-attach, ralph-external, ralph-memory, ralph-config |
 | **Mission Control** | 1 | mc (9 subcommands) |
 | **Agent Teams** | 1 | team (3 subcommands) |
 | **Metrics** | 3 | cost-report, cost-history, metrics-tokens |
@@ -2553,7 +2553,7 @@ aiwg remove marketing
 aiwg use marketing --force
 ```
 
-### Ralph Task Execution (Epic #26)
+### Agent Loop Task Execution (Epic #26)
 
 ```bash
 # Basic task
@@ -2682,7 +2682,7 @@ aiwg ralph-resume
 - @.aiwg/architecture/unified-extension-schema.md - Extension schema
 - @.aiwg/architecture/unified-extension-system-implementation-plan.md - Implementation details
 - @.aiwg/planning/epic-26-ralph-control-improvements.md - Epic #26 specification
-- @tools/ralph-external/ - Ralph external implementation
-- @.aiwg/ralph/ - Ralph state and memory storage
+- @tools/ralph-external/ - Al external implementation
+- @.aiwg/ralph/ - agent loop state and memory storage
 - @CLAUDE.md - Project-level CLI integration
 - @README.md - Quick start guide

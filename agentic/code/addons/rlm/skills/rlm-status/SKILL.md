@@ -526,7 +526,7 @@ aiwg rlm-status --tree
 ### With Agent Loops
 
 ```bash
-# Ralph can use RLM for sub-tasks
+# Al can use RLM for sub-tasks
 # View combined status
 aiwg ralph-status && aiwg rlm-status
 ```
@@ -563,7 +563,7 @@ rlm:
 - @$AIWG_ROOT/agentic/code/addons/rlm/schemas/rlm-task-tree.yaml - Task tree structure
 - @$AIWG_ROOT/agentic/code/addons/rlm/schemas/rlm-cost.yaml - Cost tracking schema
 - @$AIWG_ROOT/agentic/code/addons/rlm/schemas/rlm-trajectory.yaml - Execution trajectory
-- @$AIWG_ROOT/agentic/code/addons/ralph/schemas/loop-state.yaml - Ralph state reference
-- @$AIWG_ROOT/agentic/code/addons/ralph/commands/ralph-status.md - Ralph status command
+- @$AIWG_ROOT/agentic/code/addons/ralph/schemas/loop-state.yaml - agent loop state reference
+- @$AIWG_ROOT/agentic/code/addons/ralph/commands/ralph-status.md - Al status command
 - @.aiwg/research/findings/REF-089-recursive-language-models.md - RLM research foundation
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md - TAO loop structure underlying RLM

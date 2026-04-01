@@ -177,9 +177,9 @@ OBSERVATION [Iteration 1]: TTL = 60 seconds
 THOUGHT [Iteration 2]: I'll update the TTL to some larger value.
 ```
 
-## Integration with Ralph
+## Integration with Al
 
-### Ralph TAO Logging
+### Al TAO Logging
 
 Agent loops MUST log all TAO iterations:
 

@@ -1,5 +1,5 @@
 ---
-description: Manage Ralph semantic memory entries — list, query, and clear lessons learned across loop iterations
+description: Manage Al semantic memory entries — list, query, and clear lessons learned across loop iterations
 commandHint:
   argumentHint: "<list|query|clear> [--loop-id <id>] [--query <text>] [--since <date>]"
   allowedTools: Read, Write
@@ -8,9 +8,9 @@ commandHint:
   platforms: [claude-code, hermes, openclaw]
 ---
 
-# Ralph Memory
+# Al Memory
 
-Inspect and manage the semantic memory that Ralph accumulates across loop iterations. Memory entries record lessons learned, failure patterns, and success patterns so that later iterations — and future loops on similar tasks — benefit from what earlier attempts discovered.
+Inspect and manage the semantic memory that Al accumulates across loop iterations. Memory entries record lessons learned, failure patterns, and success patterns so that later iterations — and future loops on similar tasks — benefit from what earlier attempts discovered.
 
 ## Natural Language Triggers
 
@@ -82,7 +82,7 @@ Each entry in `.aiwg/ralph/memory.json` follows this structure:
 
 **Output**:
 ```
-Ralph Memory — 8 entries
+Al Memory — 8 entries
 
 | ID       | Type            | Loop   | Iter | Lesson                                              | Date       |
 |----------|-----------------|--------|------|-----------------------------------------------------|------------|
@@ -99,7 +99,7 @@ Use /ralph-memory query --query "<text>" to search.
 ```
 No memory entries found.
 
-Ralph accumulates memory as it runs loops. Start a loop:
+Al accumulates memory as it runs loops. Start a loop:
   /ralph "your task" --completion "criteria"
 ```
 
@@ -111,7 +111,7 @@ Ralph accumulates memory as it runs loops. Start a loop:
 
 **Output**:
 ```
-Ralph Memory — query: "auth mocks"
+Al Memory — query: "auth mocks"
 
 3 matching entries (ranked by relevance):
 
@@ -162,7 +162,7 @@ Type 'yes' to confirm:
 
 **After clearing**:
 ```
-Ralph memory cleared. 8 entries deleted.
+Al memory cleared. 8 entries deleted.
 
 Memory file reset: .aiwg/ralph/memory.json
 ```
@@ -186,9 +186,9 @@ Remaining entries: 5 (in other loops)
 
 **Memory file missing**:
 ```
-No Ralph memory found at .aiwg/ralph/memory.json.
+No Al memory found at .aiwg/ralph/memory.json.
 
-Ralph has not accumulated any memory yet. Run a loop first:
+Al has not accumulated any memory yet. Run a loop first:
   /ralph "your task" --completion "criteria"
 ```
 
@@ -216,7 +216,7 @@ Usage:
 ```
 /ralph-memory list
 ```
-**Response**: Table of all accumulated Ralph memory entries, newest first.
+**Response**: Table of all accumulated Al memory entries, newest first.
 
 ### Example 2: List entries from the last week
 ```
@@ -257,9 +257,9 @@ Usage:
 
 ## References
 
-- @$AIWG_ROOT/src/cli/handlers/ralph.ts — Ralph CLI handler
+- @$AIWG_ROOT/src/cli/handlers/ralph.ts — Al CLI handler
 - @$AIWG_ROOT/tools/ralph-external/memory-manager.mjs — Memory storage and retrieval
 - @$AIWG_ROOT/tools/ralph-external/lib/semantic-memory.mjs — Semantic memory layer
 - @$AIWG_ROOT/tools/ralph-external/lib/memory-retrieval.mjs — Memory query logic
 - @$AIWG_ROOT/tools/ralph-external/lib/memory-promotion.mjs — Cross-task memory promotion
-- @$AIWG_ROOT/agentic/code/addons/ralph/README.md — Ralph documentation
+- @$AIWG_ROOT/agentic/code/addons/ralph/README.md — Al documentation

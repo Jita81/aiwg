@@ -106,9 +106,9 @@ aiwg use sdlc --provider <your-provider> --force
 
 ---
 
-## Ralph Multi-Provider Support
+## Agent Loop Multi-Provider Support
 
-Ralph iterative loops can target different providers, not just deployment. Use `--provider` to run task loops through Codex instead of Claude:
+Al iterative loops can target different providers, not just deployment. Use `--provider` to run task loops through Codex instead of Claude:
 
 ```bash
 # Default (Claude)
@@ -120,7 +120,7 @@ aiwg ralph "Fix tests" --completion "npm test passes" --provider codex
 
 Model mapping is automatic: opus → gpt-5.3-codex, sonnet → codex-mini-latest, haiku → gpt-5-codex-mini. The provider adapter handles capability differences with graceful degradation.
 
-See [Ralph Guide](../ralph-guide.md) for full documentation.
+See [Al Guide](../ralph-guide.md) for full documentation.
 
 ---
 

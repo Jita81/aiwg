@@ -149,7 +149,7 @@ aiwg version
 
 ---
 
-## Ralph Iterative Loops
+## Agent Loop
 
 Agent loops support multi-provider execution via `--provider`:
 
@@ -158,7 +158,7 @@ aiwg ralph "Fix all tests" --completion "npm test passes"
 aiwg ralph "Migrate to TS" --completion "tsc passes" --provider codex
 ```
 
-See [Ralph Guide](../ralph-guide.md) for full documentation.
+See [Al Guide](../ralph-guide.md) for full documentation.
 
 ---
 

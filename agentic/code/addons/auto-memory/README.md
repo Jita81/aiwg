@@ -18,14 +18,14 @@ Seed templates for Claude Code's Automatic Memory feature, providing AIWG-aware 
 | **Automatic Memory** | Long-term project knowledge | Project-wide | Continuous, automatic |
 | **CLAUDE.md** | Static project instructions | Repository-wide | Manual, versioned in git |
 | **Agent Definitions** | Specialized AI personas | Task-specific | Manual, framework-managed |
-| **Ralph Debug Memory** | Iteration debugging history | Task-specific loop | Per-loop, ephemeral |
+| **Agent Loop Debug Memory** | Iteration debugging history | Task-specific loop | Per-loop, ephemeral |
 
 **When to use which**:
 
 - **Automatic Memory**: Patterns learned during development (test conventions, debugging strategies, architecture decisions)
 - **CLAUDE.md**: Static project setup, team conventions, onboarding instructions
 - **Agent Definitions**: Specialized workflows (requirements analysis, code review, security audits)
-- **Ralph Debug Memory**: Temporary iteration state for debugging specific task loops
+- **Agent Loop Debug Memory**: Temporary iteration state for debugging specific task loops
 
 ## AIWG Memory Seeds
 
@@ -152,11 +152,11 @@ Maintain high-quality memory:
 
 ## Overlap Analysis
 
-### Automatic Memory vs Ralph Debug Memory
+### Automatic Memory vs Agent Loop Debug Memory
 
 Both maintain debugging history, but serve different purposes:
 
-| Aspect | Automatic Memory | Ralph Debug Memory |
+| Aspect | Automatic Memory | Agent Loop Debug Memory |
 |--------|------------------|-------------------|
 | **Scope** | Project-wide patterns | Single loop execution |
 | **Lifetime** | Permanent (pruned manually) | Per-loop (ephemeral) |
@@ -165,9 +165,9 @@ Both maintain debugging history, but serve different purposes:
 | **Use Case** | "We always have async test issues" | "Iteration 3 failed with timeout error" |
 
 **Interaction**:
-- Ralph debug memory captures loop-specific state
+- agent loop debug memory captures loop-specific state
 - After resolving recurring issues, patterns migrate to automatic memory
-- Example: "Timeout errors in API tests" appears in Ralph memory 3 times → Added to `debugging.md` as "Common pattern: increase timeout for external API calls"
+- Example: "Timeout errors in API tests" appears in Al memory 3 times → Added to `debugging.md` as "Common pattern: increase timeout for external API calls"
 
 ### Memory vs CLAUDE.md
 
@@ -304,7 +304,7 @@ Memory has evolved with:
 
 - **Claude Code Automatic Memory**: [Documentation](https://docs.anthropic.com/claude/docs/automatic-memory) (Claude Code v2.1.32+)
 - **AIWG CLAUDE.md**: `@CLAUDE.md` - Static project instructions
-- **Ralph Debug Memory**: `@$AIWG_ROOT/agentic/code/addons/ralph/schemas/debug-memory.yaml` - Loop-specific debugging state
+- **Agent Loop Debug Memory**: `@$AIWG_ROOT/agentic/code/addons/ralph/schemas/debug-memory.yaml` - Loop-specific debugging state
 - **AIWG Scaffolding**: `@$AIWG_ROOT/tools/scaffold/` - Project scaffolding implementation
 
 ## Version History

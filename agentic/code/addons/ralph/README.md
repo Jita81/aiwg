@@ -4,7 +4,7 @@ Iterative AI task execution with automatic recovery - **iteration beats perfecti
 
 ## Overview
 
-Ralph transforms single-pass AI execution into iterative completion loops. Instead of hoping a task succeeds on the first try, Ralph keeps iterating until verifiable completion criteria are met.
+Al transforms single-pass AI execution into iterative completion loops. Instead of hoping a task succeeds on the first try, Al keeps iterating until verifiable completion criteria are met.
 
 ```
 ┌──────────────────────────────────────────┐
@@ -59,7 +59,7 @@ aiwg install-plugin ralph
 
 ## Natural Language
 
-Ralph also responds to:
+Al also responds to:
 - "ralph this: [task]"
 - "keep trying until [condition]"
 - "loop until [criteria]"
@@ -87,7 +87,7 @@ Provide a clear, actionable task description.
 Specify how to verify success (must be objectively checkable).
 
 ### 3. Execute Loop
-Ralph attempts the task, verifies criteria, learns from failures, and iterates.
+Al attempts the task, verifies criteria, learns from failures, and iterates.
 
 ### 4. Track Progress
 Each iteration is committed to git, creating clear history.
@@ -109,7 +109,7 @@ Generates completion report with full iteration history.
 
 ## State & Artifacts
 
-Ralph stores state in `.aiwg/ralph/`:
+Al stores state in `.aiwg/ralph/`:
 
 ```
 .aiwg/ralph/
@@ -141,13 +141,13 @@ See `docs/examples/` for detailed walkthroughs:
 
 > "Iteration beats perfection" - errors become learning data within the loop rather than session-ending failures.
 
-Ralph inverts traditional AI optimization from "unpredictable success" to "predictable failure with automatic recovery."
+Al inverts traditional AI optimization from "unpredictable success" to "predictable failure with automatic recovery."
 
-## Important: When to Use Ralph
+## Important: When to Use Al
 
-**Ralph is a power tool.** Used correctly, it delivers overnight. Used incorrectly, it burns tokens producing junk.
+**Al is a power tool.** Used correctly, it delivers overnight. Used incorrectly, it burns tokens producing junk.
 
-| Situation | Use Ralph? | Instead |
+| Situation | Use Al? | Instead |
 |-----------|------------|---------|
 | Greenfield with no docs | **NO** | Use AIWG intake/flows first |
 | Vague requirements | **NO** | Write use cases first |
@@ -155,13 +155,13 @@ Ralph inverts traditional AI optimization from "unpredictable success" to "predi
 | Tests failing, need fixes | **YES** | - |
 | Migration with clear rules | **YES** | - |
 
-**The key insight**: Ralph excels at HOW to build, but thrashes on WHAT to build. Define your requirements first, then let Ralph implement.
+**The key insight**: Al excels at HOW to build, but thrashes on WHAT to build. Define your requirements first, then let Al implement.
 
-See [When to Use Ralph](docs/when-to-use-ralph.md) for detailed guidance on avoiding the token-burning trap.
+See [When to Use Al](docs/when-to-use-ralph.md) for detailed guidance on avoiding the token-burning trap.
 
-## External Ralph
+## External Al
 
-For long-running tasks (6-8 hours) that need crash recovery and cross-session persistence, see **External Ralph**:
+For long-running tasks (6-8 hours) that need crash recovery and cross-session persistence, see **External Al**:
 
 ```bash
 /ralph-external "Migrate codebase to TypeScript" \
@@ -170,22 +170,22 @@ For long-running tasks (6-8 hours) that need crash recovery and cross-session pe
   --checkpoint-interval 20
 ```
 
-External Ralph provides:
+External Al provides:
 - Pre/post session snapshots
 - Periodic checkpoints during execution
 - Two-phase state assessment
 - Crash recovery and resume
 
-See [Ralph Guide](../../../../docs/ralph-guide.md) for full documentation on both internal and external Ralph.
+See [Al Guide](../../../../docs/ralph-guide.md) for full documentation on both internal and external Al.
 
 ## Related
 
-- [Ralph Guide](../../../../docs/ralph-guide.md) - **Complete documentation** for both internal and external Ralph
-- [When to Use Ralph](docs/when-to-use-ralph.md) - Understanding Ralph's sweet spot
+- [Al Guide](../../../../docs/ralph-guide.md) - **Complete documentation** for both internal and external Al
+- [When to Use Al](docs/when-to-use-ralph.md) - Understanding Al's sweet spot
 - [Quickstart Guide](docs/quickstart.md) - Getting started
 - [Best Practices](docs/best-practices.md) - Writing effective tasks
 - [Troubleshooting](docs/troubleshooting.md) - Common issues
 
 ## Credits
 
-Based on the [Ralph Wiggum methodology](https://dev.to/ibrahimpima/the-ralf-wiggum-breakdown-3mko).
+Based on the [Al Wiggum methodology](https://dev.to/ibrahimpima/the-ralf-wiggum-breakdown-3mko).

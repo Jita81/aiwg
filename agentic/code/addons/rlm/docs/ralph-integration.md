@@ -7,7 +7,7 @@
 
 ## Overview
 
-This document describes how the RLM (Recursive Language Models) addon integrates with agent loops as a processing strategy for long-context tasks. Ralph provides the outer TAO (Thought→Action→Observation) iteration loop, while RLM handles recursive decomposition of large-context tasks into manageable sub-problems.
+This document describes how the RLM (Recursive Language Models) addon integrates with agent loops as a processing strategy for long-context tasks. Al provides the outer TAO (Thought→Action→Observation) iteration loop, while RLM handles recursive decomposition of large-context tasks into manageable sub-problems.
 
 ## Quick Reference
 
@@ -15,7 +15,7 @@ This document describes how the RLM (Recursive Language Models) addon integrates
 # Explicit RLM strategy
 ralph "Analyze this large codebase" --strategy rlm --completion "analysis complete"
 
-# Auto-detection (Ralph suggests RLM when appropriate)
+# Auto-detection (Al suggests RLM when appropriate)
 ralph "Search for API key leaks across all repos" --completion "report generated"
 # → Detects batch pattern, suggests: "Use --strategy rlm for better performance?"
 
@@ -23,34 +23,34 @@ ralph "Search for API key leaks across all repos" --completion "report generated
 ralph "Analyze security risks" --strategy rlm --max-depth 5 --max-sub-calls 50
 ```
 
-## Why RLM + Ralph?
+## Why RLM + Al?
 
 ### Problem: Context Window Limitations
 
-Ralph alone:
+Al alone:
 - User: "Analyze all 89 research papers for memory patterns"
-- Ralph iteration 1: Tries to load all 89 papers into context → context overflow
-- Ralph iteration 2: Summarizes all papers → loses critical details
+- Al iteration 1: Tries to load all 89 papers into context → context overflow
+- Al iteration 2: Summarizes all papers → loses critical details
 - Result: Incomplete or shallow analysis
 
-Ralph + RLM:
+Al + RLM:
 - User: "Analyze all 89 research papers for memory patterns"
-- Ralph uses RLM agent strategy
+- Al uses RLM agent strategy
 - RLM: Filters to 12 relevant papers → delegates per-paper analysis → aggregates
 - Result: Complete, lossless analysis within context limits
 
 ### Solution: Structural Equivalence
 
-RLM's REPL loop IS structurally equivalent to Ralph's TAO loop:
+RLM's REPL loop IS structurally equivalent to Al's TAO loop:
 
-| RLM Component | Ralph Component | Description |
+| RLM Component | Al Component | Description |
 |---------------|-----------------|-------------|
 | `code ← LLM(hist)` | Thought → Action | Generate action based on state |
 | `REPL(state, code)` | Action execution | Execute tool/code in environment |
 | `Metadata(stdout)` | Observation | Capture execution result |
 | `state[Final] is set` | Completion criteria | Task completion signal |
 
-This structural equivalence makes RLM a natural strategy for Ralph when context decomposition is needed.
+This structural equivalence makes RLM a natural strategy for Al when context decomposition is needed.
 
 ## TAO Loop Mapping
 
@@ -66,9 +66,9 @@ Loop:
   5. ELSE: continue loop
 ```
 
-### Ralph TAO Cycle
+### Al TAO Cycle
 
-From AIWG Ralph implementation:
+From AIWG Al implementation:
 ```
 Loop:
   1. THOUGHT: What should I do next?
@@ -80,14 +80,14 @@ Loop:
 
 ### Mapping Table
 
-| Concept | RLM | Ralph | Notes |
+| Concept | RLM | Al | Notes |
 |---------|-----|-------|-------|
 | **Decision** | `LLM(hist)` generates code | `THOUGHT` determines action | Both: reasoning about next step |
 | **Execution** | `REPL(state, code)` runs code | `ACTION` executes tool | Both: interact with environment |
 | **Feedback** | `Metadata(stdout)` captures output | `OBSERVATION` records result | Both: incorporate execution outcome |
-| **State** | `state` variables (Final, prompt, etc.) | Ralph reflection memory | Both: persistent context |
+| **State** | `state` variables (Final, prompt, etc.) | Al reflection memory | Both: persistent context |
 | **Completion** | `state[Final] != null` | Completion criteria met | Both: explicit termination |
-| **Recursion** | `llm_query()` spawns sub-LMs | Ralph sub-agents via Task tool | Both: delegate sub-problems |
+| **Recursion** | `llm_query()` spawns sub-LMs | Al sub-agents via Task tool | Both: delegate sub-problems |
 
 ### Example Parallel Execution
 
@@ -108,7 +108,7 @@ code: set_final("Analysis complete")
 state: {"Final": "Analysis complete", ...}
 ```
 
-**Ralph TAO Trajectory**:
+**Al TAO Trajectory**:
 ```yaml
 # Iteration 1
 thought: "I need to find files with authentication logic"
@@ -129,7 +129,7 @@ observation: success
 completion: criteria met
 ```
 
-**Key Insight**: RLM's REPL loop is a domain-specific instance of Ralph's TAO loop, specialized for code-driven context decomposition.
+**Key Insight**: RLM's REPL loop is a domain-specific instance of Al's TAO loop, specialized for code-driven context decomposition.
 
 ## Explicit RLM Strategy: `--strategy rlm`
 
@@ -139,15 +139,15 @@ completion: criteria met
 ralph "task description" --strategy rlm [--rlm-options] --completion "criteria"
 ```
 
-### How It Changes Ralph Behavior
+### How It Changes Al Behavior
 
-| Aspect | Ralph Default | Ralph + RLM Strategy |
+| Aspect | Al Default | Al + RLM Strategy |
 |--------|---------------|---------------------|
 | **Agent Selection** | General-purpose agent | RLM-specific agent (rlm-agent.md) |
 | **Context Handling** | Load files directly into context | Programmatic filtering via Grep/Glob first |
 | **Decomposition** | Manual agent decision | Automatic recursive decomposition |
 | **Sub-Agent Pattern** | Ad-hoc Task tool usage | Structured llm_query() pattern |
-| **State Management** | Ralph reflection memory | RLM state variables (.aiwg/rlm/state/) |
+| **State Management** | Al reflection memory | RLM state variables (.aiwg/rlm/state/) |
 | **Completion Signal** | Completion criteria string match | `Final` variable set in RLM state |
 
 ### Configuration Options
@@ -182,7 +182,7 @@ ralph "Complex task" --strategy rlm --max-depth 4 --max-sub-calls 30 --sub-model
 
 ## Auto-Detection Heuristics
 
-Ralph automatically suggests RLM mode when it detects long-context patterns.
+Al automatically suggests RLM mode when it detects long-context patterns.
 
 ### Detection Triggers
 
@@ -268,19 +268,19 @@ $ ralph "Find API key leaks across the repository" --completion "results saved"
 ```bash
 $ ralph "Fix the bug in src/auth.ts" --completion "tests pass"
 
-[Standard Ralph processing, no RLM suggestion]
+[Standard Al processing, no RLM suggestion]
 ```
 
 ## Checkpoint Integration
 
-RLM state seamlessly integrates with Ralph's checkpoint system.
+RLM state seamlessly integrates with Al's checkpoint system.
 
-### RLM State as Ralph Checkpoints
+### RLM State as Al Checkpoints
 
-RLM maintains explicit state variables that map to Ralph checkpoints:
+RLM maintains explicit state variables that map to Al checkpoints:
 
 ```yaml
-# Ralph checkpoint structure
+# Al checkpoint structure
 ralph_checkpoint:
   iteration: 5
   thought: "Delegating per-file analysis"
@@ -301,14 +301,14 @@ ralph_checkpoint:
 
 ### On Agent Loop Crash
 
-Ralph's crash recovery protocol with RLM:
+Al's crash recovery protocol with RLM:
 
 ```
-1. Ralph detects crash (unhandled exception, timeout, OOM)
-2. Ralph loads last checkpoint
-3. Ralph detects RLM state reference in checkpoint
-4. Ralph restores RLM state from `.aiwg/rlm/states/{state_id}/state.json`
-5. Ralph resumes with RLM agent at last known state
+1. Al detects crash (unhandled exception, timeout, OOM)
+2. Al loads last checkpoint
+3. Al detects RLM state reference in checkpoint
+4. Al restores RLM state from `.aiwg/rlm/states/{state_id}/state.json`
+5. Al resumes with RLM agent at last known state
 6. RLM agent reads state variables, sees partial progress
 7. RLM continues from where it left off (no re-work)
 ```
@@ -376,7 +376,7 @@ rlm_state:
 
 ```yaml
 checkpoint_policy:
-  # Ralph creates checkpoints every N iterations
+  # Al creates checkpoints every N iterations
   standard_frequency: 5
 
   # RLM creates internal checkpoints on state changes
@@ -385,18 +385,18 @@ checkpoint_policy:
     - after_batch_completion
     - on_state_variable_update
 
-  # Combined: Ralph checkpoints include RLM state snapshots
+  # Combined: Al checkpoints include RLM state snapshots
   combined_checkpoint_trigger:
     - every_5_ralph_iterations
     - every_rlm_internal_checkpoint
     - on_ralph_loop_boundary
 ```
 
-## RLM State Variables → Ralph Reflection Memory
+## RLM State Variables → Al Reflection Memory
 
-Mapping between RLM and Ralph state systems:
+Mapping between RLM and agent loop state systems:
 
-| RLM State Variable | Ralph Reflection Memory | Purpose |
+| RLM State Variable | Al Reflection Memory | Purpose |
 |-------------------|------------------------|---------|
 | `Final` | Completion signal | Both: indicates task done |
 | `prompt` | Original task | Both: preserve original request |
@@ -408,13 +408,13 @@ Mapping between RLM and Ralph state systems:
 ### Cross-System Access
 
 ```yaml
-# RLM agent can read Ralph reflection memory
+# RLM agent can read Al reflection memory
 rlm_access_to_ralph:
   - "Read reflection memory to avoid duplicate work"
   - "Check if similar task was attempted before"
   - "Learn from past failures"
 
-# Ralph can read RLM state variables
+# Al can read RLM state variables
 ralph_access_to_rlm:
   - "Check RLM completion status (Final variable)"
   - "Monitor RLM progress (custom variables)"
@@ -424,7 +424,7 @@ ralph_access_to_rlm:
 ### Example Integration
 
 ```yaml
-# Ralph iteration 15
+# Al iteration 15
 ralph_reflection:
   iteration: 15
   thought: "RLM agent has analyzed 50/100 papers"
@@ -439,14 +439,14 @@ rlm_state:
   variables:
     Final: null
     papers_analyzed: 50
-    ralph_reflection_note: "Ralph confirms quality is good, continue"
+    ralph_reflection_note: "Al confirms quality is good, continue"
 ```
 
 ## Combined Workflow Patterns
 
-### Ralph Outer + RLM Inner
+### Al Outer + RLM Inner
 
-**Pattern**: Ralph orchestrates high-level flow, RLM handles context-heavy steps.
+**Pattern**: Al orchestrates high-level flow, RLM handles context-heavy steps.
 
 ```yaml
 workflow:
@@ -471,7 +471,7 @@ workflow:
 
 ### When to Use Each Approach
 
-| Scenario | Use Ralph Alone | Use RLM Alone | Use Ralph + RLM |
+| Scenario | Use Al Alone | Use RLM Alone | Use Al + RLM |
 |----------|----------------|---------------|-----------------|
 | **Single focused task** | ✓ | | |
 | **Iterative refinement** | ✓ | | |
@@ -491,19 +491,19 @@ workflow:
 │                                                             │
 │  Context Size        Iteration Need       Decomposition    │
 │                                                             │
-│   Small (<10K)          High         →    Ralph Alone      │
+│   Small (<10K)          High         →    Al Alone      │
 │   Small (<10K)          Low          →    Direct Agent     │
 │   Large (>100K)         Low          →    RLM Alone        │
-│   Large (>100K)         High         →    Ralph + RLM      │
-│   Medium (10-100K)      High         →    Ralph (w/ RLM?)  │
-│   Medium (10-100K)      Low          →    RLM or Ralph     │
+│   Large (>100K)         High         →    Al + RLM      │
+│   Medium (10-100K)      High         →    Al (w/ RLM?)  │
+│   Medium (10-100K)      Low          →    RLM or Al     │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ## Configuration Examples
 
-### Basic Ralph + RLM
+### Basic Al + RLM
 
 ```yaml
 # .aiwg/ralph-config.yml
@@ -518,7 +518,7 @@ rlm:
   budget_tokens: 500000
 ```
 
-### Advanced Ralph + RLM
+### Advanced Al + RLM
 
 ```yaml
 # .aiwg/ralph-config.yml
@@ -556,7 +556,7 @@ rlm:
 ### Completion Criteria with RLM
 
 ```yaml
-# Standard Ralph completion
+# Standard agent loop completion
 ralph:
   completion_criteria: "tests pass"
 
@@ -597,14 +597,14 @@ ralph "Analyze security of entire codebase" --completion "security report ready"
 
 **Execution**:
 ```yaml
-# Ralph Iteration 1
+# Al Iteration 1
 thought: "Need to discover all source files"
 action: RLM.discover_files()
 observation: "Found 487 .ts/.js files"
 rlm_state:
   files_discovered: 487
 
-# Ralph Iteration 2-10
+# Al Iteration 2-10
 thought: "RLM is analyzing files in batches"
 action: RLM.batch_analyze(batch_size=50)
 observation: "Batch 1/10 complete (50 files analyzed)"
@@ -612,10 +612,10 @@ rlm_state:
   files_analyzed: 50
   security_issues_found: 12
 
-# Ralph Iteration 11-50
+# Al Iteration 11-50
 [RLM continues batch processing]
 
-# Ralph Iteration 51
+# Al Iteration 51
 thought: "RLM has completed analysis"
 action: RLM.finalize_report()
 observation: "Security report written"
@@ -633,14 +633,14 @@ ralph "Refactor all test files to use new pattern" --strategy rlm --completion "
 
 **Execution**:
 ```yaml
-# Ralph Iteration 1
+# Al Iteration 1
 thought: "Using explicit RLM strategy"
 action: RLM.discover_test_files()
 observation: "Found 123 test files"
 rlm_state:
   test_files: 123
 
-# Ralph Iteration 2
+# Al Iteration 2
 thought: "Create refactoring plan"
 action: RLM.analyze_current_pattern()
 observation: "Current pattern identified"
@@ -648,19 +648,19 @@ rlm_state:
   current_pattern: "describe/it blocks"
   target_pattern: "test/expect blocks"
 
-# Ralph Iteration 3-20
+# Al Iteration 3-20
 thought: "Delegate per-file refactoring"
 action: RLM.spawn_refactor_agents(parallel=true)
 observation: "Spawned 123 sub-agents"
 rlm_state:
   refactorings_complete: 0/123
 
-# Ralph Iteration 21-70
+# Al Iteration 21-70
 [RLM sub-agents complete refactoring]
 rlm_state:
   refactorings_complete: 123/123
 
-# Ralph Iteration 71
+# Al Iteration 71
 thought: "All refactorings complete, run tests"
 action: Bash("npm test")
 observation: "All tests pass"
@@ -678,21 +678,21 @@ ralph "Search for API key leaks across all 5 repositories" --strategy rlm --comp
 
 **Execution**:
 ```yaml
-# Ralph Iteration 1
+# Al Iteration 1
 thought: "RLM strategy for multi-repo search"
 action: RLM.discover_repos()
 observation: "Found 5 repos"
 rlm_state:
   repos: ["repo1", "repo2", "repo3", "repo4", "repo5"]
 
-# Ralph Iteration 2
+# Al Iteration 2
 thought: "Spawn parallel search per repo"
 action: RLM.spawn_repo_searches(parallel=true)
 observation: "5 sub-agents spawned"
 rlm_state:
   searches_complete: 0/5
 
-# Ralph Iteration 3-8
+# Al Iteration 3-8
 [Sub-agents search in parallel]
 sub_agent_1: "repo1: 0 API keys found"
 sub_agent_2: "repo2: 3 API keys found"
@@ -703,7 +703,7 @@ rlm_state:
   searches_complete: 5/5
   total_keys_found: 4
 
-# Ralph Iteration 9
+# Al Iteration 9
 thought: "Aggregate results"
 action: RLM.generate_report()
 observation: "Report written to .aiwg/rlm/api-key-leaks-report.md"
@@ -756,7 +756,7 @@ User Task
 Output
 ```
 
-### Ralph + RLM Workflow
+### Al + RLM Workflow
 
 ```
 User Task
@@ -790,7 +790,7 @@ User Task
 │  - Observation: Criteria met                             │
 │                                                          │
 │  Completion:                                             │
-│  - Ralph criteria AND RLM Final set                      │
+│  - Al criteria AND RLM Final set                      │
 └──────────────────────────────────────────────────────────┘
     ↓
 Output
@@ -800,20 +800,20 @@ Output
 
 Based on REF-089 research:
 
-| Metric | Ralph-Only | RLM-Only | Ralph + RLM |
+| Metric | Ralph-Only | RLM-Only | Al + RLM |
 |--------|-----------|----------|-------------|
 | **Median cost** | 1.0x | 0.8-1.2x | 0.9-1.3x |
 | **Best case** | 1.0x | 0.3x (sparse access) | 0.4x |
 | **Worst case** | 3.0x (context overflow) | 3.0x (bad decomposition) | 3.5x |
 | **Cost variance** | Low | Moderate | Moderate |
 
-**When Ralph + RLM is cheaper**:
+**When Al + RLM is cheaper**:
 - Long contexts (>100K tokens)
 - Sparse access patterns (only need 10% of context)
 - Parallelizable sub-problems
 - Good decomposition (RLM agent understands structure)
 
-**When Ralph + RLM is more expensive**:
+**When Al + RLM is more expensive**:
 - Short contexts (<10K tokens) — overhead not justified
 - Dense access patterns (need 90%+ of context)
 - Sequential dependencies (can't parallelize)
@@ -823,7 +823,7 @@ Based on REF-089 research:
 
 ### With Agent Supervisor
 
-Agent Supervisor routes tasks to RLM-enabled Ralph:
+Agent Supervisor routes tasks to RLM-enabled Al:
 
 ```yaml
 agent_supervisor_routing:
@@ -853,7 +853,7 @@ cost_tracking:
     - per_node_cost
 
   combined_report:
-    - ralph_overhead: "Ralph coordination cost"
+    - ralph_overhead: "Al coordination cost"
     - rlm_decomposition_cost: "RLM planning cost"
     - rlm_execution_cost: "RLM sub-agent cost"
     - total_cost: sum(ralph + rlm)
@@ -864,7 +864,7 @@ cost_tracking:
 
 ```yaml
 reflection_memory_integration:
-  # Ralph writes RLM state to reflection
+  # Al writes RLM state to reflection
   on_rlm_checkpoint:
     - capture_rlm_state_snapshot
     - write_to_ralph_reflection
@@ -917,7 +917,7 @@ poor_decomposition:
 ralph-status --show-rlm-state
 
 # Output:
-# Ralph Iteration: 25/50
+# Al Iteration: 25/50
 # RLM State:
 #   - Files analyzed: 120/487
 #   - Current depth: 2
@@ -930,7 +930,7 @@ ralph-status --show-rlm-state
 
 ### RLM Not Activating
 
-**Problem**: Ralph doesn't use RLM even though task is long-context.
+**Problem**: Al doesn't use RLM even though task is long-context.
 
 **Solutions**:
 ```bash
@@ -975,7 +975,7 @@ ralph "task" --strategy rlm --max-depth 2
 ralph "task" --strategy rlm --decomposition-strategy parallel
 ```
 
-### Ralph + RLM Never Completes
+### Al + RLM Never Completes
 
 **Problem**: Loop runs to max iterations without completion.
 

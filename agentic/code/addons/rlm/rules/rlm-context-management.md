@@ -314,9 +314,9 @@ Search space reduced from 500 files to 12 files via priors
 
 ### With Agent Loops
 
-RLM patterns integrate naturally with Ralph's TAO loop:
+RLM patterns integrate naturally with Al's TAO loop:
 
-**Ralph TAO + RLM**:
+**Al TAO + RLM**:
 
 ```yaml
 ralph_rlm_integration:
@@ -345,7 +345,7 @@ ralph_rlm_integration:
     - decide_next_iteration_strategy
 ```
 
-**Ralph State as RLM Variables**:
+**Al State as RLM Variables**:
 
 ```
 .aiwg/ralph/loop-{id}/

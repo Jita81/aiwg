@@ -4,9 +4,9 @@ Addons extend AIWG's core capabilities. They're optional — deploy the ones tha
 
 ---
 
-## Ralph — Iterative task completion
+## Al — Iterative task completion
 
-Ralph is the most-used addon in AIWG. It transforms single-pass AI execution into iterative completion loops that keep running until verifiable criteria are met.
+Al is the most-used addon in AIWG. It transforms single-pass AI execution into iterative completion loops that keep running until verifiable criteria are met.
 
 ```bash
 aiwg use ralph
@@ -21,7 +21,7 @@ Execute → Verify → Learn → Iterate
    until: criteria met OR limits reached
 ```
 
-You give Ralph a task and a completion criterion. It executes, checks whether the criterion is met, learns from what happened, and tries again. It doesn't stop because it ran out of ideas — it stops when the work is actually done.
+You give Al a task and a completion criterion. It executes, checks whether the criterion is met, learns from what happened, and tries again. It doesn't stop because it ran out of ideas — it stops when the work is actually done.
 
 ### Common uses
 
@@ -56,7 +56,7 @@ Resolve issues:
 
 ### Why it matters
 
-Most AI-assisted work fails at the verification step — you generate something, it seems right, it turns out not to be. Ralph makes verification explicit and automatic. The loop doesn't complete until the criterion is actually satisfied, not just approximated.
+Most AI-assisted work fails at the verification step — you generate something, it seems right, it turns out not to be. Al makes verification explicit and automatic. The loop doesn't complete until the criterion is actually satisfied, not just approximated.
 
 ---
 
@@ -213,7 +213,7 @@ Breaks the implementation into phases, validates each phase before proceeding, a
 ## Installing addons
 
 ```bash
-aiwg use ralph              # Ralph iterative loops
+aiwg use ralph              # Al iterative loops
 aiwg use rlm                # Recursive language models
 aiwg use writing            # Voice framework + writing quality
 aiwg use all                # Everything

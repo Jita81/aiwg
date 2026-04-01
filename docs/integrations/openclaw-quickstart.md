@@ -96,7 +96,7 @@ AIWG agents deploy to `~/.openclaw/agents/`. Invoke them in OpenClaw chat:
 
 ---
 
-## Ralph Iterative Loops
+## Agent Loop
 
 Agent loops support multi-provider execution:
 
@@ -104,7 +104,7 @@ Agent loops support multi-provider execution:
 aiwg ralph "Fix all tests" --completion "npm test passes"
 ```
 
-See the [Ralph Guide](../ralph-guide.md) for full documentation.
+See the [Al Guide](../ralph-guide.md) for full documentation.
 
 ---
 
