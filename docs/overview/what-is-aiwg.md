@@ -140,7 +140,7 @@ Agent Loop (TAO: Thought → Action → Observation):
 
 External Al runs as a **persistent background process** that survives terminal disconnects, process crashes, and system reboots. State persists in `.aiwg/ralph-external/` with checkpoint-and-resume capability.
 
-**Issue-Driven Al**: The `/issue-driven-ralph` command drives issues with 2-way human-AI collaboration — the agent posts cycle status to issue threads and incorporates human feedback at each iteration.
+**Issue-Driven Al**: The `/issue-driven-al` command drives issues with 2-way human-AI collaboration — the agent posts cycle status to issue threads and incorporates human feedback at each iteration.
 
 **Scheduled Agents**: Recurring autonomous tasks via `/schedule` — daily code reviews, weekly dependency updates, continuous monitoring with completion criteria and automatic evaluation.
 

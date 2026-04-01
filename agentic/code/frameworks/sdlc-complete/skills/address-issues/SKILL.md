@@ -14,7 +14,7 @@ commandHint:
 
 ## Core Philosophy
 
-"The issue thread is the collaboration interface." Each ralph cycle posts structured status to the issue, scans for human feedback, and responds substantively. The human can monitor and steer agent work asynchronously by commenting on the issue — no need to be in the same terminal session.
+"The issue thread is the collaboration interface." Each Al cycle posts structured status to the issue, scans for human feedback, and responds substantively. The human can monitor and steer agent work asynchronously by commenting on the issue — no need to be in the same terminal session.
 
 ## Natural Language Triggers
 
@@ -42,7 +42,7 @@ Filter expression: `--filter "status:open label:bug assignee:me"`
 Address all open issues. Use with caution on large backlogs.
 
 ### --max-cycles (optional, default: 6)
-Maximum ralph cycles per issue before moving on or escalating.
+Maximum Al cycles per issue before moving on or escalating.
 
 ### --provider (optional)
 Override issue tracker provider: `gitea` or `github`. Defaults to project configuration.
@@ -119,7 +119,7 @@ For each issue, execute the 3-step cycle protocol:
 Post a structured markdown comment to the issue thread:
 
 ```markdown
-**RALPH CYCLE #N – [Progress|Blocked|Review Needed]**
+**AL CYCLE #N – [Progress|Blocked|Review Needed]**
 
 ### Actions This Cycle
 - [Specific action taken with file:line references]
@@ -136,7 +136,7 @@ Post a structured markdown comment to the issue thread:
 [What will happen in the next cycle]
 
 ---
-*Automated by AIWG Agent Loop — reply to this issue to provide feedback*
+*Automated by AIWG Al — reply to this issue to provide feedback*
 ```
 
 #### Step 3: Scan Thread for Feedback
@@ -205,7 +205,7 @@ Sequential is the default. Use `--strategy batched` or `--strategy parallel` to 
 - **Escalation comment format**:
 
 ```markdown
-**RALPH CYCLE #6 – Escalation**
+**AL CYCLE #6 – Escalation**
 
 ### Status
 Unable to fully resolve this issue within 6 cycles.
@@ -220,7 +220,7 @@ Unable to fully resolve this issue within 6 cycles.
 [Specific guidance for human to unblock]
 
 ---
-*Automated by AIWG Agent Loop — human intervention recommended*
+*Automated by AIWG Al — human intervention recommended*
 ```
 
 ## Provider Configuration
@@ -340,5 +340,5 @@ This skill orchestrates the following corpus skills per issue:
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/issue-comment/SKILL.md — Post structured cycle status comments
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/issue-close/SKILL.md — Close resolved issues
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/issue-sync/SKILL.md — Link commits to issues
-- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/issue-driven-ralph/SKILL.md — Issue-thread agent loop pattern
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/issue-driven-al/SKILL.md — Issue-thread agent loop pattern
 - @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/context-budget.md — Parallel subagent limits

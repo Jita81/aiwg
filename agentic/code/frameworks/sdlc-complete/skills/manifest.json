@@ -115,7 +115,7 @@
       "triggers": ["decompose this file", "split this file into smaller modules", "this file is too large, break it up"]
     },
     {
-      "name": "issue-driven-ralph",
+      "name": "issue-driven-al",
       "description": "Orchestrates issue-driven agent loops that post cycle status to issue threads and incorporate human feedback",
       "triggers": ["address the open issues", "work through the bugs", "fix open issues", "tackle issue"]
     },

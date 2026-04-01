@@ -1,5 +1,5 @@
 ---
-name: issue-driven-ralph
+name: issue-driven-al
 description: Orchestrates issue-driven agent loops that post cycle status to issue threads and incorporate human feedback in each cycle.
 platforms: [claude-code, openclaw]
 ---
@@ -17,7 +17,7 @@ Alternate expressions and non-obvious activations (primary phrases are matched a
 
 ## Purpose
 
-Transforms the issue tracker from a passive record into an active 2-way collaboration surface. Each ralph cycle posts structured status to the issue thread, scans for human feedback, and responds substantively. The human can monitor and steer agent work asynchronously by commenting on the issue.
+Transforms the issue tracker from a passive record into an active 2-way collaboration surface. Each Al cycle posts structured status to the issue thread, scans for human feedback, and responds substantively. The human can monitor and steer agent work asynchronously by commenting on the issue.
 
 ## Behavior
 
@@ -58,7 +58,7 @@ Each cycle of the agent loop follows this protocol:
 
 **Step 2: Post Status** — Post structured comment to the issue thread:
 ```
-**RALPH CYCLE #N – [Progress|Blocked|Review Needed]**
+**AL CYCLE #N – [Progress|Blocked|Review Needed]**
 - Actions taken this cycle
 - Task checklist (updated)
 - Blockers (if any)
