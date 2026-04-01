@@ -70,10 +70,10 @@ async function cleanProject(dir: string) {
 // ---------------------------------------------------------------------------
 
 describe('aiwg use — disallow list', () => {
-  it('rejects aiwg-dev with a helpful error', () => {
-    const result = runAiwg(['use', 'aiwg-dev']);
-    expect(result.exitCode).not.toBe(0);
-    expect(result.stdout + result.stderr).toMatch(/unknown target|not found|aiwg-dev/i);
+  it('accepts aiwg-dev as an explicit install (contributor workflow)', () => {
+    // aiwg-dev is excluded from `use all` but must be installable explicitly
+    const result = runAiwg(['use', 'aiwg-dev', '--dry-run']);
+    expect(result.exitCode).toBe(0);
   });
 
   it('rejects unknown addon names', () => {

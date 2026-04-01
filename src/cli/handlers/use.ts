@@ -58,12 +58,14 @@ export async function getAllAddons(frameworkRoot: string): Promise<string[]> {
 }
 
 /**
- * Check whether a given addon name exists on disk (and is not disallowed).
+ * Check whether a given addon name exists on disk.
+ * The USE_ALL_DISALLOW list does NOT block explicit single-addon installs —
+ * contributors can still run `aiwg use aiwg-dev` directly.
  */
 export async function isValidAddon(frameworkRoot: string, name: string): Promise<boolean> {
-  if (USE_ALL_DISALLOW.has(name)) return false;
   try {
-    const stat = await fs.stat(path.join(frameworkRoot, 'agentic/code/addons', name));
+    const folderName = name === 'ring' ? 'ring-methodology' : name;
+    const stat = await fs.stat(path.join(frameworkRoot, 'agentic/code/addons', folderName));
     return stat.isDirectory();
   } catch {
     return false;

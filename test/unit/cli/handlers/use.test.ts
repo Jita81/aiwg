@@ -168,24 +168,18 @@ describe('isValidAddon()', () => {
     expect(await isValidAddon(tmpDir, 'does-not-exist')).toBe(false);
   });
 
-  it('returns false for aiwg-dev even when directory exists', async () => {
+  it('returns true for aiwg-dev — explicit installs are allowed', async () => {
     await createFakeAddonTree(tmpDir, ['aiwg-dev']);
-    expect(await isValidAddon(tmpDir, 'aiwg-dev')).toBe(false);
+    expect(await isValidAddon(tmpDir, 'aiwg-dev')).toBe(true);
   });
 
-  it('returns false for all entries in the disallow list', async () => {
-    await createFakeAddonTree(tmpDir, [...USE_ALL_DISALLOW]);
-    for (const disallowed of USE_ALL_DISALLOW) {
-      expect(await isValidAddon(tmpDir, disallowed)).toBe(false);
-    }
-  });
-
-  it('returns true for real addons in the actual repo', async () => {
+  it('returns true for real addons in the actual repo including aiwg-dev', async () => {
     const repoRoot = path.resolve(__dirname, '../../../..');
     expect(await isValidAddon(repoRoot, 'ralph')).toBe(true);
     expect(await isValidAddon(repoRoot, 'aiwg-utils')).toBe(true);
     expect(await isValidAddon(repoRoot, 'rlm')).toBe(true);
     expect(await isValidAddon(repoRoot, 'daemon')).toBe(true);
-    expect(await isValidAddon(repoRoot, 'aiwg-dev')).toBe(false);
+    // aiwg-dev is excluded from `use all` but can be installed explicitly
+    expect(await isValidAddon(repoRoot, 'aiwg-dev')).toBe(true);
   });
 });
