@@ -73,7 +73,7 @@ Each artifact is discoverable via `@-mentions` (like `@.aiwg/requirements/use-ca
 - Provenance tracking (what artifacts derived from what sources)
 - Human review without losing work (edit artifacts in place)
 
-**The Difference**: A three-month project accumulates 50-100 interconnected artifacts. Week 12 builds on weeks 1-11 automatically, because memory persists.
+**The Difference**: A substantial project accumulates 50-100 interconnected artifacts. Later phases build on earlier ones automatically, because memory persists.
 
 ---
 
@@ -305,9 +305,9 @@ AIWG aligns with internationally recognized standards to ensure professional cre
 
 ## How the Components Work Together
 
-Consider a typical multi-week project:
+How long each phase takes depends entirely on the project. AIWG is a force multiplier — it doesn't make production work happen faster, but it lets teams do more with less. Most projects arrive at a complete, reviewed document set in hours to a day. What takes time is the human work that matters: reviewing, editing, and making decisions. The more input your team provides, the better the output. AIWG memory gives operators the ability to participate through the tools they already use — industry-standard documents and templates, issues, and knowledge bases.
 
-### Week 1: Inception Phase
+### Inception Phase
 
 **Memory**: Create intake documents capturing project goals, constraints, stakeholders in `.aiwg/intake/`
 
@@ -321,7 +321,7 @@ Consider a typical multi-week project:
 
 ---
 
-### Week 2-4: Elaboration Phase
+### Elaboration Phase
 
 **Memory**: Build architecture doc, ADRs, threat model, test strategy in `.aiwg/architecture/` and `.aiwg/testing/`
 
@@ -333,7 +333,7 @@ Consider a typical multi-week project:
   - Synthesizer consolidates feedback
   - Architecture Designer revises based on synthesis
 
-**Learning**: Al iterates on ADRs (generate options, evaluate, refine based on feedback)
+**Learning**: AI iterates on ADRs (generate options, evaluate, refine based on feedback)
 
 **Verification**: Architecture references requirements, code stubs reference architecture sections
 
@@ -343,15 +343,15 @@ Consider a typical multi-week project:
 
 ---
 
-### Week 5-10: Construction Phase
+### Construction Phase
 
 **Memory**: Test plans, implementation code, deployment scripts accumulate in `.aiwg/testing/`, `src/`, `.aiwg/deployment/`
 
-**Planning**: Iteration plans break construction into 1-2 week sprints
+**Planning**: Iteration plans break construction into bounded sprints
 
 **Reasoning**: Test Engineer creates test strategy, DevOps Engineer plans deployment, multiple developers implement features
 
-**Learning**: Al handles implementation iterations:
+**Learning**: AI handles implementation iterations:
   - Execute: Generate code for feature X
   - Verify: Run tests, type check, lint
   - Learn: "Test failed due to async race condition"
@@ -366,7 +366,7 @@ Consider a typical multi-week project:
 
 ---
 
-### Week 11-12: Transition Phase
+### Transition Phase
 
 **Memory**: Deployment plans, operational runbooks, post-mortem reports in `.aiwg/deployment/`, `.aiwg/reports/`
 
@@ -374,7 +374,7 @@ Consider a typical multi-week project:
 
 **Reasoning**: DevOps Engineer creates deployment automation, Technical Writer documents operations
 
-**Learning**: Al retries deployment steps if environments fail validation
+**Learning**: AI retries deployment steps if environments fail validation
 
 **Verification**: Deployment scripts reference architecture (which services, what order), runbooks reference code (how to debug service X)
 

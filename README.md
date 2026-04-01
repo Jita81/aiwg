@@ -48,7 +48,7 @@ Each conversation starts fresh. The assistant has no idea what happened yesterda
 
 **Without AIWG**: Projects stall as context rebuilding eats time. A three-month project requires continuity, not fresh starts every session.
 
-**With AIWG**: The `.aiwg/` directory maintains 50-100+ interconnected artifacts across days, weeks, and months. Week 12 builds on weeks 1-11 automatically because memory persists. Agents read prior work via `@-mentions` instead of regenerating from scratch.
+**With AIWG**: The `.aiwg/` directory maintains 50-100+ interconnected artifacts across days, weeks, and months. Later phases build on earlier ones automatically because memory persists. Agents read prior work via `@-mentions` instead of regenerating from scratch.
 
 ### 2. No Recovery Patterns
 
@@ -150,9 +150,9 @@ Built-in voices: `technical-authority` (docs, RFCs), `friendly-explainer` (tutor
 
 ## A Real Project Walkthrough
 
-Here is how the six components work together across a typical multi-week project:
+Here is how the six components work together across a project lifecycle. How long each phase takes depends entirely on the project — AIWG is a force multiplier, not a clock. Most projects arrive at a complete, reviewed document set in hours to a day. What takes time is the human work that matters: reviewing, editing, and making decisions. The more input your team provides, the better the output. AIWG memory lets operators participate through the tools they already use — industry-standard documents and templates, issues, and knowledge bases.
 
-### Week 1: Inception
+### Inception
 
 ```bash
 /intake-wizard "Build customer portal with real-time chat" --interactive
@@ -164,7 +164,7 @@ Here is how the six components work together across a typical multi-week project
 **Verification**: Requirements reference intake forms, ensuring alignment
 **Human Gate**: Stakeholder reviews intake → approves transition to Elaboration
 
-### Weeks 2-4: Elaboration
+### Elaboration
 
 ```bash
 /flow-inception-to-elaboration
@@ -176,7 +176,7 @@ Here is how the six components work together across a typical multi-week project
 **Style**: Technical documents use `technical-authority`, stakeholder summaries use `executive-brief`
 **Human Gate**: Architect reviews SAD, security team approves threat model
 
-### Weeks 5-10: Construction
+### Construction
 
 ```bash
 /flow-elaboration-to-construction
@@ -188,7 +188,7 @@ Here is how the six components work together across a typical multi-week project
 **Memory**: Test plans, implementation, deployment scripts accumulate across iterations
 **Human Gate**: Code review approves merges, QA approves test results
 
-### Weeks 11-12: Transition
+### Transition
 
 ```bash
 /flow-deploy-to-production
