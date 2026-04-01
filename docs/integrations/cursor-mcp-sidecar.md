@@ -239,6 +239,6 @@ If MCP tools aren't working:
 ## Related Resources
 
 - [Cursor Quick Start](cursor-quickstart.md) — Basic AIWG + Cursor integration
-- [Cursor Platform Reference](../../.aiwg/references/platforms/cursor.md) — Detailed capability reference
+- [Cursor Quickstart](cursor-quickstart.md)
 - [Hermes MCP Sidecar](hermes-quickstart.md) — Reference sidecar implementation
 - [AIWG MCP server reference](../cli-reference.md#mcp)

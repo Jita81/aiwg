@@ -1,4 +1,4 @@
-# Agent Persistence Framework - Ralph Loop Integration
+# Agent Persistence Framework - Agent Loop Integration
 
 **Version**: 1.0.0
 **Status**: Implementation Guide
@@ -6,13 +6,13 @@
 
 ## Overview
 
-This document describes the integration layer between the Agent Persistence & Anti-Laziness Framework and Ralph loop execution. The integration uses event hooks to inject detection, monitoring, and recovery capabilities at strategic execution points without modifying core Ralph logic.
+This document describes the integration layer between the Agent Persistence & Anti-Laziness Framework and agent loop execution. The integration uses event hooks to inject detection, monitoring, and recovery capabilities at strategic execution points without modifying core Ralph logic.
 
 ## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                           Ralph Loop Execution                          │
+│                           Agent Loop Execution                          │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                         │
 │  loop_start                                                             │
@@ -73,7 +73,7 @@ This document describes the integration layer between the Agent Persistence & An
 
 ```yaml
 Event: loop_start
-Trigger: Ralph loop begins execution
+Trigger: Agent loop begins execution
 
 Sequence:
   1. Initialize Progress Tracker Agent
@@ -887,7 +887,7 @@ describe("Agent Persistence Hooks", () => {
 Test full event flows:
 
 ```typescript
-describe("Ralph Loop with Persistence", () => {
+describe("Agent Loop with Persistence", () => {
   it("should detect and recover from test deletion", async () => {
     // Setup
     const loop = createRalphLoop({
@@ -980,7 +980,7 @@ aiwg benchmark --without-persistence
 
 ## Migration Guide
 
-### Existing Ralph Loops
+### Existing Agent Loops
 
 To enable persistence for existing Ralph installations:
 
@@ -995,7 +995,7 @@ To enable persistence for existing Ralph installations:
      enabled: true
    ```
 
-3. **Restart Ralph loop** (if running):
+3. **Restart agent loop** (if running):
    ```bash
    aiwg ralph-pause {loop_id}
    aiwg ralph-resume {loop_id}  # Hooks now active

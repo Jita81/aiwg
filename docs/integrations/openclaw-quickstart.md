@@ -171,7 +171,7 @@ See the [OpenClaw MCP Sidecar Guide](openclaw-mcp-sidecar.md) for complete setup
 
 - [OpenClaw MCP Sidecar Guide](openclaw-mcp-sidecar.md) - Full MCP integration
 - [Cross-Platform Overview](cross-platform-overview.md) - All provider comparison
-- [OpenClaw Platform Reference](../../.aiwg/references/platforms/openclaw.md) - Detailed capability reference
+- [OpenClaw Guide](../openclaw-guide.md)
 - [OpenClaw Integration Guide](../openclaw-guide.md) - Comprehensive guide with routing advice
 - [Behaviors Guide](../behaviors-guide.md) - Behaviors format spec and authoring
 - [OpenClaw Official Docs](https://docs.openclaw.ai) - Upstream documentation

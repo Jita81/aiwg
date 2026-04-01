@@ -1,4 +1,4 @@
-# Ralph Loop Guide
+# Agent Loop Guide
 
 Iterative AI task execution with automatic recovery - **iteration beats perfection**.
 
@@ -8,7 +8,7 @@ Ralph transforms single-pass AI execution into iterative completion loops. Inste
 
 ```
 ┌──────────────────────────────────────────┐
-│            RALPH LOOP                    │
+│            AGENT LOOP                    │
 │                                          │
 │   Execute → Verify → Learn → Iterate     │
 │      ↑                          │        │
@@ -188,7 +188,7 @@ Commands:
 
 ### Multi-Provider Support
 
-Ralph loops can target different CLI providers via `--provider`. Each provider maps AIWG model names to provider-specific models:
+Agent loops can target different CLI providers via `--provider`. Each provider maps AIWG model names to provider-specific models:
 
 | AIWG Model | Claude | Codex |
 |------------|--------|-------|
@@ -241,7 +241,7 @@ The provider adapter handles capability differences automatically. If the target
 
 ## Persistent Ralph via Daemon
 
-The daemon mode extends Ralph into always-on project supervision. Instead of manually launching Ralph loops, the daemon can trigger them automatically based on file changes, schedules, or messaging commands.
+The daemon mode extends Ralph into always-on project supervision. Instead of manually launching agent loops, the daemon can trigger them automatically based on file changes, schedules, or messaging commands.
 
 ### When to Use Daemon Mode
 

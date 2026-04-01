@@ -14,7 +14,7 @@ This deploys:
 - **Rules** — `skill-placement`, `no-circular-skill-calls`, `component-completeness`, `addon-boundaries`
 - **Skills** — `validate-component`, `validate-addon`, `dev-doctor`, and all `devkit-*` commands
 
-`aiwg-dev` is deliberately excluded from `aiwg use all` — it targets AIWG contributors, not end users. See [agentic/code/addons/aiwg-dev/README.md](../../agentic/code/addons/aiwg-dev/README.md) for details.
+`aiwg-dev` is deliberately excluded from `aiwg use all` — it targets AIWG contributors, not end users. See the [aiwg-dev overview](../addons/aiwg-dev/overview) for details.
 
 ## Three-Tier Plugin Taxonomy
 

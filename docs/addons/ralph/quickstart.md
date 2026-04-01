@@ -1,4 +1,4 @@
-# Ralph Loop Quickstart
+# Agent Loop Quickstart
 
 Get started with iterative AI task execution in 5 minutes.
 
@@ -41,7 +41,7 @@ aiwg use sdlc
 aiwg install-plugin ralph
 ```
 
-## Your First Ralph Loop
+## Your First Agent Loop
 
 ### Example 1: Fix Failing Tests
 

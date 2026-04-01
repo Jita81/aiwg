@@ -336,8 +336,8 @@ Ralph isn't for every phase of development - it's for the implementation phase a
 
 - [Quickstart Guide](quickstart.md) - Getting started with Ralph
 - [Best Practices](best-practices.md) - Writing effective tasks and criteria
-- [AIWG SDLC Framework](../../frameworks/sdlc-complete/README.md) - Documentation-first development
-- [Discovery Track](../../frameworks/sdlc-complete/docs/phases/discovery-track.md) - How to document before you build
+- [AIWG SDLC Framework](@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/orchestrator-architecture.md) - Documentation-first development
+- [Production Grade Guide](@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/production-grade-guide.md) - How to document before you build
 
 ## External Resources
 

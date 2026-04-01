@@ -227,4 +227,4 @@ aiwg mcp serve
 
 ## Platform Reference
 
-For the full capability reference including all Copilot features, field schemas, and tool mappings, see the [GitHub Copilot Reference](../../.aiwg/references/platforms/github-copilot.md).
+For the full capability reference including all Copilot features, field schemas, and tool mappings, see the [Copilot Quickstart](copilot-quickstart.md).

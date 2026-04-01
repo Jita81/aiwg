@@ -205,6 +205,6 @@ The AIWG MCP server exposes tools for:
 ## Related Resources
 
 - [Copilot Quick Start](copilot-quickstart.md) — Full AIWG + Copilot integration
-- [GitHub Copilot Reference](../../.aiwg/references/platforms/github-copilot.md) — Complete capability reference
+- [Copilot Quickstart](copilot-quickstart.md)
 - [Cross-Platform Overview](cross-platform-overview.md) — All supported providers
 - [Claude MCP Sidecar](claude-mcp-sidecar.md) — Alternative with full MCP support

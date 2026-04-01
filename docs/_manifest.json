@@ -20,7 +20,6 @@
     "research-pdf-optimization",
     "session-pr-linking",
     "skills-commands-unification",
-    "soul-md-guide",
     "sponsors",
     "task-management-integration",
     "usage-notes",
@@ -47,6 +46,7 @@
     "integrations/warp-terminal-quickstart",
     "integrations/windsurf-quickstart",
     "integrations/cross-platform-config",
+    "openclaw-guide",
     "quickstart-sdlc",
     "quickstart-mmk",
     "guides",
@@ -72,6 +72,7 @@
     "mcp/README",
     "plugin-marketplace-guide",
     "daemon-guide",
+    "soul-md-guide",
     "messaging-guide",
     "behaviors-guide",
     "frameworks",
@@ -353,6 +354,13 @@
       "parent": "integrations"
     },
     {
+      "id": "openclaw-guide",
+      "title": "OpenClaw Guide",
+      "summary": "Deploy to OpenClaw — 10th platform, first with native behaviors support. ClawHub publication and ~/.openclaw/ structure.",
+      "file": "openclaw-guide.md",
+      "parent": "integrations"
+    },
+    {
       "id": "quickstart-sdlc",
       "title": "SDLC Framework",
       "summary": "Software development workflows",
@@ -521,6 +529,13 @@
       "title": "Daemon Mode",
       "summary": "Background daemon operations",
       "file": "daemon-guide.md",
+      "parent": "reference"
+    },
+    {
+      "id": "soul-md-guide",
+      "title": "SOUL.md — Agent Identity",
+      "summary": "Give agents persistent character: worldview, opinions, reasoning traits. soul-create, soul-enable, soul-blend.",
+      "file": "soul-md-guide.md",
       "parent": "reference"
     },
     {

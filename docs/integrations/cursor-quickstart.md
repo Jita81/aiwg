@@ -223,5 +223,5 @@ See the [Cursor MCP Sidecar Guide](cursor-mcp-sidecar.md) for complete setup inc
 
 - [Cursor MCP Sidecar Guide](cursor-mcp-sidecar.md) - Full MCP integration
 - [Cross-Platform Overview](cross-platform-overview.md) - All provider comparison
-- [Cursor Platform Reference](../../.aiwg/references/platforms/cursor.md) - Detailed capability reference
+- [Cursor Quickstart](cursor-quickstart.md)
 - [Cursor Official Docs](https://cursor.com/docs) - Upstream documentation

@@ -348,7 +348,7 @@ aiwg use sdlc --provider factory --force
 ## Reference
 
 - [Factory AI Documentation](https://docs.factory.ai)
-- [AIWG Factory Reference](.aiwg/references/platforms/factory-ai.md)
+- [Factory AI Quickstart](factory-quickstart.md)
 - [Factory MCP Details](factory-mcp-sidecar.md)
 - [Cross-Platform Overview](cross-platform-overview.md)
 - [Ralph Guide](../ralph-guide.md)

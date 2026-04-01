@@ -185,7 +185,7 @@ When both modes are active, route requests based on complexity:
 ## Related Resources
 
 - [OpenClaw Quick Start](openclaw-quickstart.md) - Basic AIWG + OpenClaw integration
-- [OpenClaw Platform Reference](../../.aiwg/references/platforms/openclaw.md) - Detailed capability reference
+- [OpenClaw Guide](../openclaw-guide.md)
 - [OpenClaw Integration Guide](../openclaw-guide.md) - Comprehensive guide with routing advice
 - [Behaviors Guide](../behaviors-guide.md) - Behaviors format and authoring
 - [AIWG MCP server reference](../cli-reference.md#mcp)
