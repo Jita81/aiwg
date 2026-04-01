@@ -50,6 +50,10 @@ Each conversation starts fresh. The assistant has no idea what happened yesterda
 
 **With AIWG**: The `.aiwg/` directory maintains 50-100+ interconnected artifacts across days, weeks, and months. Later phases build on earlier ones automatically because memory persists. Agents read prior work via `@-mentions` instead of regenerating from scratch.
 
+The segmented structure also makes large projects tractable. As code files grow, the project doesn't become harder to reason about — agents load only the slice of memory relevant to the current task (`@requirements/UC-001.md`, `@architecture/sad.md`, `@testing/test-plan.md`) rather than the entire codebase. Each subdirectory is a focused knowledge domain that fits comfortably in context, while cross-references keep everything connected.
+
+The artifact index (`aiwg index`) takes this further. Without any tooling, agents often need to browse 3-6 documents before finding what they need. AIWG's structured artifacts reduce this to 2-3. With the index enabled, agents resolve artifact lookups in one query more often than not — a direct hit on the right requirement, architecture decision, or test case without browsing.
+
 ### 2. No Recovery Patterns
 
 When AI generates broken code or flawed designs, you manually intervene, explain the problem, and hope the next attempt works. There is no systematic learning from failures, no structured retry, no checkpoint-and-resume.
@@ -1191,6 +1195,10 @@ All SDLC artifacts persist in `.aiwg/` — structured project memory that surviv
 ├── ralph/            # Agent loop state and history
 └── frameworks/       # Installed framework registry
 ```
+
+This segmentation is what makes large projects manageable. Individual code files inevitably grow, but the project knowledge stays organized into focused domains. An agent working on a deployment problem loads `@.aiwg/deployment/` and `@.aiwg/architecture/` — not the entire codebase. An agent debugging a test failure loads the relevant requirement, the test plan, and the specific source file. Context stays sharp regardless of project size.
+
+`aiwg index` amplifies this further — it builds a searchable artifact index so agents resolve lookups in a single query instead of browsing. Without tooling: 3-6 documents to find what's needed. With AIWG structure: 2-3. With the index: usually 1.
 
 ---
 

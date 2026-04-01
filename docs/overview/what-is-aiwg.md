@@ -75,6 +75,10 @@ Each artifact is discoverable via `@-mentions` (like `@.aiwg/requirements/use-ca
 
 **The Difference**: A substantial project accumulates 50-100 interconnected artifacts. Later phases build on earlier ones automatically, because memory persists.
 
+**Handling Large Projects**: The segmentation of `.aiwg/` is what makes large projects tractable. Even when individual code files grow large, agents don't need to load the entire project — they load the relevant slice. Debugging a deployment issue? Load `@deployment/` and `@architecture/`. Writing acceptance tests? Load `@requirements/` and `@testing/`. The directory structure maps naturally to problem domains, so context stays focused regardless of overall project scale.
+
+**The Index Multiplier**: `aiwg index` builds a searchable index of all project artifacts and their relationships. Without any tooling, agents browse 3-6 documents before finding what they need. AIWG's structured memory cuts this to 2-3. With the index active, artifact lookups resolve in a single query more often than not — the agent gets a direct hit on the right requirement, architecture decision, or test case without scanning.
+
 ---
 
 ### 2. Reasoning: Multi-Agent Deliberation with Synthesis
