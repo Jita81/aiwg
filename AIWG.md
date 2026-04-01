@@ -320,7 +320,7 @@ You: [Orchestrate flow-security-review-cycle with guidance="focus on authenticat
 
 ## AIWG Self-Maintenance
 
-AIWG maintains itself using its own CLI. Agents should use CLI commands — not manual file operations — for all installation and deployment tasks.
+AIWG maintains itself using its own CLI. Agents should prefer CLI commands for installation and deployment tasks when the CLI is available — it keeps the registry in sync and handles provider detection automatically. Agents may use any available tools to complete tasks effectively.
 
 ### When to Self-Maintain
 

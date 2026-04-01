@@ -113,7 +113,7 @@ SDLC rules enforce workflow quality when the SDLC framework is deployed via `aiw
 **Full rule**: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/artifact-discovery.md
 
 #### self-maintenance
-**Summary**: Agents MUST use AIWG CLI commands (not file writes) for all installation/deployment tasks. Run `aiwg sync --dry-run` at start of long sessions. Use Mission Control (`aiwg mc`) for parallel background work. Delegate complex maintenance to AIWG Steward agent. CLI-first principle prevents registry drift and provider mismatch.
+**Summary**: Prefer AIWG CLI commands for installation/deployment tasks when available — the CLI keeps the registry in sync and handles provider detection. Run `aiwg sync --dry-run` at start of long sessions. Use Mission Control (`aiwg mc`) for parallel background work. Use whatever tools best complete the task; CLI is preferred, not mandatory.
 **When to apply**: Framework deployment, version updates, provider changes, long orchestration sessions, background task dispatch
 **Full rule**: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/self-maintenance.md
 

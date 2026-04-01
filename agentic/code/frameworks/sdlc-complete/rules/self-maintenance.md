@@ -6,24 +6,24 @@
 
 ## Summary
 
-Agents MUST use AIWG CLI commands — not manual file writes — for all installation, deployment, and framework management tasks. The CLI is the authoritative interface for maintaining AIWG; bypassing it creates drift between the registry and the filesystem.
+Agents should prefer AIWG CLI commands for installation, deployment, and framework management tasks when the CLI is available and appropriate. The CLI is the authoritative interface for AIWG maintenance and avoids registry drift. Agents may use any available tools to complete tasks effectively — use the CLI when it adds value, not as a constraint.
 
 ## Rule
 
-### 1. CLI-First Principle
+### 1. CLI Preference
 
-For any AIWG maintenance operation, prefer the CLI command over direct file manipulation:
+For AIWG maintenance operations, the CLI is the preferred approach over direct file manipulation:
 
-| Operation | CLI Command | Never Do |
-|-----------|-------------|----------|
-| Deploy framework | `aiwg use <framework>` | Manually copy files to `.claude/` |
+| Operation | Preferred CLI Command | Alternative (when CLI unavailable or impractical) |
+|-----------|----------------------|---------------------------------------------------|
+| Deploy framework | `aiwg use <framework>` | Manually copy files (update registry too) |
 | Remove framework | `aiwg remove <framework>` | Delete framework files manually |
 | Check health | `aiwg doctor` | Manually inspect file presence |
 | Update AIWG | `aiwg update` | `npm install -g aiwg` directly |
 | Sync deployment | `aiwg sync` | Run `use` for each framework individually |
 | Add extension | `aiwg add-agent/add-command/add-skill` | Write directly to `.claude/agents/` |
 | Check version | `aiwg version` | Read `package.json` manually |
-| Detect provider | `aiwg runtime-info` | Guess from directory structure |
+| Detect provider | `aiwg runtime-info` | Inspect directory structure |
 
 ### 2. Pre-Flight Check (Long Sessions)
 
@@ -76,21 +76,25 @@ Without this rule, agents bypass the CLI and write files directly, causing:
 
 The CLI encapsulates all the logic for provider detection, registry updates, file placement, and post-deployment verification. Bypassing it discards that logic.
 
-## Detection
+## When to Prefer CLI vs Direct Operations
 
-An agent is violating this rule when it:
+Use the AIWG CLI when:
+- Deploying or removing frameworks (registry must stay in sync)
+- Performing health checks (`aiwg doctor` covers more than manual inspection)
+- The CLI command is simpler and more reliable than the manual equivalent
 
-- Writes directly to `.claude/agents/`, `.claude/commands/`, `.claude/skills/`, or `.claude/rules/` for deployment purposes
-- Copies framework files without going through `aiwg use`
-- Edits `.aiwg/frameworks/registry.json` directly
-- Runs `npm install -g aiwg` instead of `aiwg update`
-- Skips the pre-flight check before a long orchestration
+Direct operations are acceptable when:
+- The CLI is not installed or unavailable
+- The task is a one-off file edit that doesn't affect the registry
+- Working on AIWG source code itself (this repo)
+- Emergency repair when `aiwg doctor` itself is broken
+- Any situation where another approach completes the task more effectively
 
 ## Exceptions
 
 - **Development context**: When working on AIWG source code itself (this repo), direct file manipulation is expected
-- **No CLI available**: If AIWG CLI is not installed, fall back to manual operations with a note to install
-- **Emergency repair**: If `aiwg doctor` itself is broken, manual intervention is acceptable
+- **No CLI available**: If AIWG CLI is not installed, fall back to manual operations
+- **Effectiveness**: Always use whatever tools best accomplish the task at hand
 
 ## Examples
 
