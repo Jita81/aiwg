@@ -2,7 +2,13 @@
 description: Contextual AIWG help — explains current version features, answers how-to questions, routes live queries to the steward
 platforms:
   - claude-code
-  - hermes
+  - codex
+  - copilot
+  - factory
+  - cursor
+  - opencode
+  - warp
+  - windsurf
   - openclaw
 ---
 
