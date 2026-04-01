@@ -20,7 +20,7 @@ AIWG is a comprehensive SDLC framework providing:
 
 ### Installation and Access
 
-**AIWG Installation Path**: `/mnt/dev-inbox/jmagly/aiwg`
+**AIWG Installation Path**: `{AIWG_ROOT}`
 
 **Agent Access**: Claude Code agents have read access to AIWG templates and documentation via allowed-tools configuration.
 
@@ -28,7 +28,7 @@ AIWG is a comprehensive SDLC framework providing:
 
 ```bash
 # Check AIWG is accessible
-ls /mnt/dev-inbox/jmagly/aiwg/agentic/code/frameworks/sdlc-complete/
+ls {AIWG_ROOT}/agentic/code/frameworks/sdlc-complete/
 
 # Available resources:
 # - agents/     → 58 SDLC role agents
