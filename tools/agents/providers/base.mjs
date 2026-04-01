@@ -1248,6 +1248,53 @@ export function cleanupOldRuleFiles(rulesDir, opts = {}) {
   return removed;
 }
 
+/**
+ * Migrate commands directory by removing it before skills deployment.
+ *
+ * AIWG migrated from commands to skills. If an existing commands directory is
+ * left in place alongside newly deployed skills, the provider TUI (e.g. Claude
+ * Code's command palette) will show duplicate entries — one from the stale
+ * command file and one from the skill. Deleting the directory before deployment
+ * eliminates the duplicates.
+ *
+ * Home-directory providers (codex, openclaw) are excluded: their commands paths
+ * are shared across all projects and must not be deleted wholesale.
+ *
+ * @param {string} commandsDir - Full path to the provider's commands directory
+ * @param {object} opts
+ * @param {boolean} opts.dryRun - Log but don't delete
+ * @param {boolean} opts.skipCommandsMigration - User opted out; warn about duplicates instead
+ * @returns {boolean} true if the directory was deleted (or would be in dry-run)
+ */
+export function migrateCommandsDirectory(commandsDir, opts = {}) {
+  const { dryRun = false, skipCommandsMigration = false } = opts;
+
+  if (!fs.existsSync(commandsDir)) return false;
+
+  const entries = fs.readdirSync(commandsDir);
+  if (entries.length === 0) return false;
+
+  if (skipCommandsMigration) {
+    const rel = path.relative(process.cwd(), commandsDir);
+    console.warn(`\nWarning: commands migration skipped for ${rel}`);
+    console.warn('  Duplicate entries may appear in the command palette because old command');
+    console.warn('  files overlap with newly deployed skills. Remove the directory manually');
+    console.warn(`  to fix: rm -rf ${rel}`);
+    return false;
+  }
+
+  if (dryRun) {
+    const rel = path.relative(process.cwd(), commandsDir);
+    console.log(`[dry-run] would remove commands directory: ${rel} (${entries.length} file(s))`);
+    return true;
+  }
+
+  fs.rmSync(commandsDir, { recursive: true, force: true });
+  const rel = path.relative(process.cwd(), commandsDir);
+  console.log(`  Removed ${rel} (${entries.length} old command file(s) — now served as skills)`);
+  return true;
+}
+
 // ============================================================================
 // Provider Interface
 // ============================================================================

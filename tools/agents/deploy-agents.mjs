@@ -25,8 +25,9 @@
  *   --reasoning-model <name> Override model for reasoning tasks
  *   --coding-model <name>    Override model for coding tasks
  *   --efficiency-model <name> Override model for efficiency tasks
- *   --as-agents-md           Aggregate to single AGENTS.md (OpenAI/Codex)
- *   --create-agents-md       Create/update AGENTS.md template (Factory/Codex/OpenCode/Cursor)
+ *   --as-agents-md               Aggregate to single AGENTS.md (OpenAI/Codex)
+ *   --create-agents-md           Create/update AGENTS.md template
+ *   --skip-commands-migration    Skip deleting the commands directory (warns about duplicate TUI entries) (Factory/Codex/OpenCode/Cursor)
  *
  * Modes:
  *   general       - Deploy only writing-quality addon agents and commands (alias: writing)
@@ -59,8 +60,9 @@
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
+import readline from 'readline';
 import { fileURLToPath } from 'url';
-import { loadModelConfig } from './providers/base.mjs';
+import { loadModelConfig, migrateCommandsDirectory } from './providers/base.mjs';
 
 // ============================================================================
 // Provider Registry
@@ -105,7 +107,8 @@ function parseArgs() {
     verbose: false,         // Show per-file deployment details
     quiet: false,           // Suppress all non-error output (for embedding in use.ts)
     asPlugin: false,        // Generate .factory-plugin/ bundle (Factory provider only)
-    deployBehaviors: false  // Deploy behaviors in addition to agents
+    deployBehaviors: false, // Deploy behaviors in addition to agents
+    skipCommandsMigration: false  // Skip commands → skills migration (warns about duplicates)
   };
   for (let i = 0; i < args.length; i++) {
     const a = args[i];
@@ -136,6 +139,7 @@ function parseArgs() {
     else if (a === '--verbose' || a === '-v') cfg.verbose = true;
     else if (a === '--quiet' || a === '-q') cfg.quiet = true;
     else if (a === '--as-plugin') cfg.asPlugin = true;
+    else if (a === '--skip-commands-migration') cfg.skipCommandsMigration = true;
     else if (a === '--help' || a === '-h') {
       printHelp();
       process.exit(0);
@@ -173,8 +177,10 @@ Options:
   --filter-role <role>     Only deploy agents of role: reasoning|coding|efficiency
   --save                   Save model config to project models.json
   --save-user              Save model config to ~/.config/aiwg/models.json
-  --as-agents-md           Aggregate to single AGENTS.md (Codex)
-  --create-agents-md       Create/update AGENTS.md template
+  --as-agents-md               Aggregate to single AGENTS.md (Codex)
+  --create-agents-md           Create/update AGENTS.md template
+  --skip-commands-migration    Skip deleting the commands directory before skills deployment
+                               (warns about duplicate entries in the provider command palette)
 
 Model Override Examples:
   # Use sonnet for everything
@@ -399,6 +405,62 @@ function deepMerge(target, source) {
 }
 
 // ============================================================================
+// Commands → Skills Migration
+// ============================================================================
+
+/**
+ * Ask the user whether to delete the provider's commands directory before
+ * deploying skills. Skipped automatically when not running in a TTY (CI/pipe)
+ * or when --quiet is set.
+ *
+ * @param {object} cfg - Parsed CLI config
+ * @param {object} provider - Loaded provider module
+ * @param {string} targetDir - Resolved target directory
+ * @returns {Promise<boolean>} true = proceed with migration, false = skip
+ */
+async function promptCommandsMigration(cfg, provider, targetDir) {
+  // Home-directory providers share commands across projects — do not delete.
+  if (provider.capabilities?.homeDirectoryDeploy) return false;
+
+  const commandsRelPath = provider.paths?.commands;
+  if (!commandsRelPath) return false;
+
+  const commandsDir = path.join(targetDir, commandsRelPath);
+  if (!fs.existsSync(commandsDir)) return false;
+
+  const entries = fs.readdirSync(commandsDir).filter(e => e.endsWith('.md'));
+  if (entries.length === 0) return false;
+
+  // Non-interactive context: migrate silently.
+  if (cfg.quiet || !process.stdout.isTTY) return true;
+
+  const rel = path.relative(process.cwd(), commandsDir);
+  console.log(`\n⚠  Commands → Skills Migration`);
+  console.log(`   ${rel} contains ${entries.length} legacy command file(s).`);
+  console.log(`   AIWG now serves these as skills (.claude/skills/).`);
+  console.log(`   Keeping both causes duplicate entries in the Claude Code command palette.`);
+  console.log('');
+
+  const answer = await new Promise(resolve => {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    rl.question('   Remove commands directory and migrate? [Y/n] ', ans => {
+      rl.close();
+      resolve(ans.trim().toLowerCase());
+    });
+  });
+
+  if (answer === 'n' || answer === 'no') {
+    console.log('');
+    console.log('   Skipping migration. Run `aiwg use` again without --skip-commands-migration');
+    console.log(`   to clean up, or delete ${rel} manually.`);
+    console.log('');
+    return false;
+  }
+
+  return true;
+}
+
+// ============================================================================
 // Main Entry Point
 // ============================================================================
 
@@ -493,8 +555,30 @@ function deepMerge(target, source) {
     saveUser: cfg.saveUser,
     verbose: cfg.verbose,
     asPlugin: cfg.asPlugin,
-    deployBehaviors: cfg.deployBehaviors
+    deployBehaviors: cfg.deployBehaviors,
+    skipCommandsMigration: cfg.skipCommandsMigration
   };
+
+  // Commands → Skills migration: prompt then delete the commands directory
+  // so stale command files don't create duplicates in the provider TUI.
+  if (!cfg.dryRun && !cfg.skipCommandsMigration) {
+    const doMigrate = await promptCommandsMigration(cfg, provider, cfg.target);
+    if (doMigrate) {
+      const commandsRelPath = provider.paths?.commands;
+      if (commandsRelPath) {
+        migrateCommandsDirectory(path.join(cfg.target, commandsRelPath), opts);
+      }
+    } else {
+      // User said no — flip the flag so the provider knows to emit the duplicate warning
+      opts.skipCommandsMigration = true;
+    }
+  } else if (cfg.skipCommandsMigration) {
+    // Flag was passed explicitly — emit the duplicate warning now via a dry migration call
+    const commandsRelPath = provider.paths?.commands;
+    if (commandsRelPath && !provider.capabilities?.homeDirectoryDeploy) {
+      migrateCommandsDirectory(path.join(cfg.target, commandsRelPath), opts);
+    }
+  }
 
   // Delegate to provider
   try {
