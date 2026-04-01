@@ -1,0 +1,219 @@
+# aiwg-utils Rules Reference
+
+Seven enforcement rules deployed with every AIWG installation. These rules apply automatically based on context — you do not invoke them explicitly.
+
+---
+
+## subagent-scoping
+
+**Priority**: HIGH  
+**Full rule**: `@$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md`
+
+### What It Enforces
+
+Each subagent receives exactly one focused task with minimal context. Constraints:
+
+- Prompt budget: under 20% of context window per subagent
+- Delegation depth: no chains deeper than 2 levels (orchestrator → agent; not orchestrator → agent → agent)
+- Parallelism: spawn many focused subagents over few overloaded ones
+- When `AIWG_CONTEXT_WINDOW` is set: concurrent parallel count must respect the budget limit
+
+### When It Applies
+
+Task delegation, subagent spawning, parallel dispatch, orchestrator fan-out.
+
+### Why It Matters
+
+An overloaded subagent — one given 10 tasks and a large context dump — produces worse results than three focused subagents each handling one task. Token-efficient subagent design also reduces cost in proportion to how well scoping is applied.
+
+### Example: Correct vs Incorrect
+
+```
+# Incorrect: one subagent with too much
+Task(agent, "Analyze the authentication module, write tests,
+fix any bugs, update documentation, and check for security issues")
+
+# Correct: parallel focused subagents
+Task(code-reviewer, "Review auth module for bugs and security issues")
+Task(test-engineer, "Write unit tests for auth module")
+Task(technical-writer, "Update auth module documentation")
+```
+
+---
+
+## instruction-comprehension
+
+**Priority**: HIGH  
+**Full rule**: `@$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/instruction-comprehension.md`
+
+### What It Enforces
+
+Before acting on any user request:
+1. Fully parse all instructions
+2. Extract prohibitions first (what NOT to do)
+3. Extract requirements (what to do)
+4. Extract preferences (how to do it)
+5. Track multi-part requests to full completion
+
+On failure: re-read original instructions instead of guessing or retrying with variations.
+
+On long tasks: periodically recheck against original requirements to detect drift.
+
+**Absolute prohibition**: Never override user preferences with "best practices." If a user specifies a pattern, use it.
+
+### When It Applies
+
+Every user request. Critical for multi-part tasks, specification compliance, and correction handling.
+
+### Example: Drift Detection
+
+If implementing feature X and a test fails on attempt 2, the rule requires re-reading the original spec rather than weakening the test or removing the validation to make progress.
+
+---
+
+## research-before-decision
+
+**Priority**: HIGH  
+**Full rule**: `@$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md`
+
+### What It Enforces
+
+Research first; act second. The execution pattern:
+
+```
+IDENTIFY  → What decision needs to be made?
+SEARCH    → What existing code/docs/patterns are relevant?
+EXTRACT   → What do those sources tell me?
+REASON    → Given the evidence, what is the right choice?
+ACT       → Implement the decision
+VERIFY    → Confirm the result is correct
+```
+
+**Whack-a-mole detection**: If an action fails, diagnose the root cause before retrying. Retrying with random variations without diagnosis is prohibited.
+
+**Read error messages completely**: They frequently contain the answer.
+
+**Check existing patterns first**: Before creating a new implementation, check whether the project already has one.
+
+### When It Applies
+
+API usage, configuration changes, dependency selection, error diagnosis, import resolution, any technical decision.
+
+---
+
+## native-ux-tools
+
+**Priority**: HIGH  
+**Full rule**: `@$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/native-ux-tools.md`
+
+### What It Enforces
+
+Use platform-native interaction tools for questions. For Claude Code, this means using `AskUserQuestion` rather than generating plain text with a question in it. One question per interaction turn.
+
+Fallback: if native tools are unavailable, use formatted Markdown question blocks.
+
+### When It Applies
+
+Interactive commands (any command with `--interactive` flag), decision gates, user confirmations, intake wizards.
+
+### Platform Support
+
+The rule includes a capability matrix defining which tool to use on each of the 8 supported platforms. Always check tool availability before invoking.
+
+---
+
+## context-budget
+
+**Priority**: MEDIUM  
+**Full rule**: `@$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/context-budget.md`
+
+### What It Enforces
+
+Opt-in constraint. When `AIWG_CONTEXT_WINDOW` is set in project context, agents must respect it for parallel subagent spawning.
+
+**Max parallel count formula**: `max(1, floor(context_window / 50000))`
+
+| Context Window | Max Parallel |
+|---------------|-------------|
+| 32k | 1 |
+| 64k | 1 |
+| 128k | 2 |
+| 200k | 4 |
+| 256k | 5 |
+| 512k+ | 10-20 |
+
+Compaction guidance scales with tier: aggressive compaction at 32-64k, relaxed at 512k+.
+
+### When It Applies
+
+Parallel subagent spawning, task scheduling, Ralph loop batching, orchestrator fan-out on constrained systems. Not active unless `AIWG_CONTEXT_WINDOW` is explicitly set.
+
+---
+
+## diagram-generation
+
+**Priority**: MEDIUM  
+**Full rule**: `@$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/diagram-generation.md`
+
+### What It Enforces
+
+Diagrams are required outputs alongside major documentation artifacts. Required types by artifact:
+
+| Artifact | Required Diagram |
+|----------|-----------------|
+| Software Architecture Document (SAD) | C4 context + container diagram |
+| Data model / schema | ER diagram |
+| API design | Sequence diagram |
+| Threat model | Data Flow Diagram (DFD) |
+| Deployment plan | Infrastructure topology diagram |
+
+**Default format**: MermaidJS  
+**For C4 and formal UML**: PlantUML  
+**Source**: Must be committed alongside rendered output  
+**Size limit**: Max 15 nodes per diagram; split into sub-diagrams if more complex
+
+### When It Applies
+
+Architecture documentation, threat modeling, API design, deployment planning, any artifact with visual communication needs.
+
+---
+
+## agent-deployment
+
+**Priority**: MEDIUM  
+**Full rule**: `@$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/agent-deployment.md`
+
+### What It Enforces
+
+Agent definitions require YAML frontmatter with:
+- `name`: unique identifier
+- `description`: what the agent does
+- `model`: model to use (default or override)
+- `tools`: explicit list of allowed tools
+- `category`: agent type classification
+
+Tool selection guidelines:
+- Research tasks: `Read`, `Grep`, `Glob`, `WebFetch`
+- Code tasks: `Read`, `Write`, `Edit`, `Bash`
+- Orchestration tasks: `Task`, `TodoWrite`, `Read`
+- Mixed: combine as needed, but keep the list minimal
+
+Parallel agent execution requires agent isolation: each agent writes to its own output path to avoid conflicts.
+
+### When It Applies
+
+Creating agent definitions, deploying to multiple providers, selecting tools for new agents.
+
+---
+
+## Quick Reference
+
+| Rule | When It Fires | Key Constraint |
+|------|--------------|----------------|
+| `subagent-scoping` | Delegating tasks | One task per subagent; depth ≤ 2 |
+| `instruction-comprehension` | Every request | Prohibitions before requirements; no drift |
+| `research-before-decision` | Technical decisions | Research → Reason → Act → Verify |
+| `native-ux-tools` | Interactive questions | Use platform-native tools; 1 question/turn |
+| `context-budget` | Parallel spawning (opt-in) | Respect `AIWG_CONTEXT_WINDOW` |
+| `diagram-generation` | Major docs | Required diagrams per artifact type |
+| `agent-deployment` | Agent authoring | YAML frontmatter; explicit tool list |

@@ -25,6 +25,37 @@
   },
   {
     "kind": "frameworks",
+    "name": "media-marketing-kit",
+    "source": "agentic/code/frameworks/media-marketing-kit/docs",
+    "dest": "docs/frameworks/media-marketing-kit",
+    "files": [
+      "overview.md",
+      "quickstart.md"
+    ]
+  },
+  {
+    "kind": "frameworks",
+    "name": "ops-complete",
+    "source": "agentic/code/frameworks/ops-complete/docs",
+    "dest": "docs/frameworks/ops-complete",
+    "files": [
+      "extensions-guide.md",
+      "overview.md",
+      "quickstart.md"
+    ]
+  },
+  {
+    "kind": "frameworks",
+    "name": "research-complete",
+    "source": "agentic/code/frameworks/research-complete/docs",
+    "dest": "docs/frameworks/research-complete",
+    "files": [
+      "overview.md",
+      "quickstart.md"
+    ]
+  },
+  {
+    "kind": "frameworks",
     "name": "sdlc-complete",
     "source": "agentic/code/frameworks/sdlc-complete/docs",
     "dest": "docs/frameworks/sdlc-complete",
@@ -53,6 +84,64 @@
   },
   {
     "kind": "addons",
+    "name": "aiwg-dev",
+    "source": "agentic/code/addons/aiwg-dev/docs",
+    "dest": "docs/addons/aiwg-dev",
+    "files": [
+      "overview.md",
+      "quickstart.md"
+    ]
+  },
+  {
+    "kind": "addons",
+    "name": "aiwg-utils",
+    "source": "agentic/code/addons/aiwg-utils/docs",
+    "dest": "docs/addons/aiwg-utils",
+    "files": [
+      "overview.md",
+      "rules-reference.md"
+    ]
+  },
+  {
+    "kind": "addons",
+    "name": "auto-memory",
+    "source": "agentic/code/addons/auto-memory/docs",
+    "dest": "docs/addons/auto-memory",
+    "files": [
+      "overview.md"
+    ]
+  },
+  {
+    "kind": "addons",
+    "name": "daemon",
+    "source": "agentic/code/addons/daemon/docs",
+    "dest": "docs/addons/daemon",
+    "files": [
+      "configuration-reference.md",
+      "daemon-addon-guide.md",
+      "quickstart.md"
+    ]
+  },
+  {
+    "kind": "addons",
+    "name": "guided-implementation",
+    "source": "agentic/code/addons/guided-implementation/docs",
+    "dest": "docs/addons/guided-implementation",
+    "files": [
+      "overview.md"
+    ]
+  },
+  {
+    "kind": "addons",
+    "name": "prose-integration",
+    "source": "agentic/code/addons/prose-integration/docs",
+    "dest": "docs/addons/prose-integration",
+    "files": [
+      "overview.md"
+    ]
+  },
+  {
+    "kind": "addons",
     "name": "ralph",
     "source": "agentic/code/addons/ralph/docs",
     "dest": "docs/addons/ralph",
@@ -60,7 +149,12 @@
       "agent-persistence-integration.md",
       "best-practices.md",
       "cross-loop-learning.md",
+      "examples/coverage.md",
+      "examples/migration.md",
+      "examples/test-fix-loop.md",
+      "executable-feedback-guide.md",
       "quickstart.md",
+      "reflection-memory-guide.md",
       "troubleshooting.md",
       "when-to-use-ralph.md"
     ]
@@ -77,6 +171,26 @@
       "ralph-integration.md",
       "supervisor-integration.md",
       "taskstore-persistence.md"
+    ]
+  },
+  {
+    "kind": "addons",
+    "name": "testing-quality",
+    "source": "agentic/code/addons/testing-quality/docs",
+    "dest": "docs/addons/testing-quality",
+    "files": [
+      "overview.md",
+      "quickstart.md"
+    ]
+  },
+  {
+    "kind": "addons",
+    "name": "voice-framework",
+    "source": "agentic/code/addons/voice-framework/docs",
+    "dest": "docs/addons/voice-framework",
+    "files": [
+      "overview.md",
+      "quickstart.md"
     ]
   },
   {

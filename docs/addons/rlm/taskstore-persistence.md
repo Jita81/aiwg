@@ -949,11 +949,11 @@ The RLM-TaskStore integration provides:
 
 ## References
 
-- @tools/daemon/task-store.mjs - TaskStore implementation
-- @agentic/code/addons/rlm/schemas/rlm-state.yaml - RLM state schema
-- @agentic/code/addons/rlm/schemas/rlm-task-tree.yaml - Task tree schema
+- @$AIWG_ROOT/tools/daemon/task-store.mjs - TaskStore implementation
+- @$AIWG_ROOT/agentic/code/addons/rlm/schemas/rlm-state.yaml - RLM state schema
+- @$AIWG_ROOT/agentic/code/addons/rlm/schemas/rlm-task-tree.yaml - Task tree schema
 - @.aiwg/requirements/use-cases/UC-IPC-002.md - TaskStore requirements
 - @.aiwg/research/findings/REF-089-rlm.md - RLM research foundation
 - @test/unit/daemon/task-store.test.js - TaskStore test suite
-- @agentic/code/addons/ralph/schemas/checkpoint.yaml - Checkpoint patterns
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/error-handling.yaml - Error recovery
+- @$AIWG_ROOT/agentic/code/addons/ralph/schemas/checkpoint.yaml - Checkpoint patterns
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/error-handling.yaml - Error recovery

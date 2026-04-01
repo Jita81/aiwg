@@ -994,13 +994,13 @@ ralph "task" --strategy rlm --completion "Final set AND output exists"
 
 ## References
 
-- @agentic/code/addons/rlm/agents/rlm-agent.md - RLM agent definition
-- @agentic/code/addons/rlm/schemas/rlm-task-tree.yaml - Task tree structure
-- @agentic/code/addons/rlm/schemas/rlm-state.yaml - State management
-- @agentic/code/addons/ralph/agents/ralph-loop.md - Ralph loop implementation
+- @$AIWG_ROOT/agentic/code/addons/rlm/agents/rlm-agent.md - RLM agent definition
+- @$AIWG_ROOT/agentic/code/addons/rlm/schemas/rlm-task-tree.yaml - Task tree structure
+- @$AIWG_ROOT/agentic/code/addons/rlm/schemas/rlm-state.yaml - State management
+- @$AIWG_ROOT/agentic/code/addons/ralph/agents/ralph-loop.md - Ralph loop implementation
 - @.aiwg/research/findings/REF-089-recursive-language-models.md - Research foundation
-- @.claude/rules/tao-loop.md - TAO loop standardization
-- @tools/daemon/agent-supervisor.mjs - Task routing
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md - TAO loop standardization
+- @$AIWG_ROOT/tools/daemon/agent-supervisor.mjs - Task routing
 - Issue #329 - Ralph-RLM integration epic
 
 ---

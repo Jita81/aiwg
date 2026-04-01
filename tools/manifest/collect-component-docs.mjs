@@ -38,13 +38,23 @@ const VERBOSE = args.includes('--verbose');
 function log(msg) { console.log(msg); }
 function verbose(msg) { if (VERBOSE) console.log(msg); }
 
-/** Walk a directory and return all .md files (non-recursive beyond 1 level). */
-function listDocs(dir) {
+/**
+ * Walk a directory recursively and return all .md files.
+ * Returns objects { name, relPath } where relPath is relative to the docs dir
+ * (e.g. "quickstart.md" or "examples/coverage.md").
+ */
+function listDocs(dir, _relPrefix = '') {
   if (!fs.existsSync(dir)) return [];
-  return fs.readdirSync(dir, { withFileTypes: true })
-    .filter(e => e.isFile() && e.name.endsWith('.md') && !e.name.startsWith('.'))
-    .map(e => e.name)
-    .sort();
+  const results = [];
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (e.name.startsWith('.')) continue;
+    if (e.isDirectory()) {
+      results.push(...listDocs(path.join(dir, e.name), _relPrefix ? `${_relPrefix}/${e.name}` : e.name));
+    } else if (e.isFile() && e.name.endsWith('.md')) {
+      results.push({ name: e.name, relPath: _relPrefix ? `${_relPrefix}/${e.name}` : e.name });
+    }
+  }
+  return results.sort((a, b) => a.relPath.localeCompare(b.relPath));
 }
 
 /** Discover components under agentic/code/{frameworks,addons}/ that have a docs/ dir. */
@@ -79,6 +89,11 @@ function discoverComponents() {
   }
 
   return components;
+}
+
+/** Ensure a directory exists (no-op if already present). */
+function ensureDir(dir) {
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 }
 
 /** Copy a file, creating the target directory if needed. */
@@ -118,17 +133,23 @@ function componentSection(kind, name, parentId) {
     'sdlc-complete': { title: 'SDLC Complete', summary: 'Full lifecycle framework — internal docs and deep guides' },
     'forensics-complete': { title: 'Forensics Complete', summary: 'Digital forensics methodology and tool reference' },
     'media-curator': { title: 'Media Curator', summary: 'Media archive management guides' },
-    'media-marketing-kit': { title: 'Media Marketing Kit', summary: 'Marketing operations framework docs' },
-    'research-complete': { title: 'Research Complete', summary: 'Academic research workflow guides' },
+    'media-marketing-kit': { title: 'Media Marketing Kit', summary: 'Multi-channel campaign management and content operations' },
+    'research-complete': { title: 'Research Complete', summary: 'Academic research workflow with GRADE methodology and FAIR compliance' },
+    'ops-complete': { title: 'Ops Complete', summary: 'Operational infrastructure framework — YAML-native with sys, it, dev, stream extensions' },
     // Addons
     'ralph': { title: 'Ralph Addon', summary: 'Iterative loop execution — quickstart, best practices, troubleshooting' },
     'rlm': { title: 'RLM Addon', summary: 'Recursive Language Model — deployment, multi-provider, integration guides' },
     'agent-persistence': { title: 'Agent Persistence', summary: 'Cross-session agent state and HITL integration' },
-    'aiwg-utils': { title: 'AIWG Utils', summary: 'Core utility addon documentation' },
-    'voice-framework': { title: 'Voice Framework', summary: 'Voice profile documentation' },
+    'aiwg-utils': { title: 'AIWG Utils', summary: 'Core utility rules — subagent scoping, context budget, instruction comprehension' },
+    'aiwg-dev': { title: 'AIWG Dev', summary: 'Developer toolkit — validate-component, dev-doctor, link-check, devkit scaffolding' },
+    'voice-framework': { title: 'Voice Framework', summary: 'Voice profile documentation — four built-in voices, custom profiles, blending' },
+    'testing-quality': { title: 'Testing Quality', summary: 'TDD enforcement, mutation testing, flaky test detection' },
+    'daemon': { title: 'Daemon Addon', summary: 'Persistent background agent — web UI, YAML profiles, scheduled tasks, Telegram' },
+    'auto-memory': { title: 'Auto Memory', summary: 'Automatic memory management — seed templates, memory evolution, cross-session persistence' },
+    'guided-implementation': { title: 'Guided Implementation', summary: 'Controlled iteration loop with escalation on repeated failure' },
+    'prose-integration': { title: 'Prose Integration', summary: 'OpenProse contract-driven execution — five skills, obligation semantics' },
     // Tools
     'ralph-external': { title: 'External Ralph', summary: 'Crash-resilient external loop — snapshot manager and provider API' },
-    'daemon': { title: 'Daemon', summary: 'Daemon subsystem internals and API reference' },
   };
   const meta = titles[name] || { title: titleFromSlug(name), summary: '' };
   return {
@@ -141,33 +162,49 @@ function componentSection(kind, name, parentId) {
 }
 
 /** Section metadata for a single file within a component. */
-function fileSection(kind, name, filename, docsDestDir) {
-  const slug = filename.replace(/\.md$/, '');
-  const filePath = path.join(docsDestDir, filename);
+function fileSection(kind, name, relPath, docsDestDir) {
+  // relPath may be "quickstart.md" or "examples/coverage.md"
+  const slug = relPath.replace(/\.md$/, '');          // e.g. "quickstart" or "examples/coverage"
+  const leafSlug = path.basename(slug);               // e.g. "quickstart" or "coverage"
+  const filePath = path.join(docsDestDir, relPath);
   const summary = summaryFromFile(filePath);
+  // parent is the component group, or a subdir group for nested files
+  const parentId = slug.includes('/') ? `${kind}/${name}/${path.dirname(slug)}` : `${kind}/${name}`;
 
   const titleOverrides = {
+    // General
     'quickstart': 'Quick Start',
+    'overview': 'Overview',
     'best-practices': 'Best Practices',
     'troubleshooting': 'Troubleshooting',
+    'user-guide': 'User Guide',
+    'deployment-guide': 'Deployment Guide',
+    'configuration-reference': 'Configuration Reference',
+    'extensions-guide': 'Extensions Guide',
+    'rules-reference': 'Rules Reference',
+    // Ralph
     'cross-loop-learning': 'Cross-Loop Learning',
     'when-to-use-ralph': 'When to Use Ralph',
     'agent-persistence-integration': 'Agent Persistence Integration',
-    'deployment-guide': 'Deployment Guide',
+    'executable-feedback-guide': 'Executable Feedback Guide',
+    'reflection-memory-guide': 'Reflection & Memory Guide',
+    // RLM
     'multi-provider-guide': 'Multi-Provider Guide',
     'ralph-integration': 'Ralph Integration',
     'supervisor-integration': 'Supervisor Integration',
     'taskstore-persistence': 'TaskStore Persistence',
     'messaging-events': 'Messaging Events',
+    // Agent persistence
     'hitl-integration': 'HITL Integration',
+    // Forensics
     'methodology': 'Methodology',
     'tool-reference': 'Tool Reference',
     'ai-assisted-forensics': 'AI-Assisted Forensics',
     'attack-mapping': 'Attack Mapping',
     'research-guide': 'Research Guide',
-    'overview': 'Overview',
-    'user-guide': 'User Guide',
+    // Media curator
     'standards-reference': 'Standards Reference',
+    // SDLC
     'orchestrator-architecture': 'Orchestrator Architecture',
     'agent-design': 'Agent Design',
     'multi-agent-documentation-pattern': 'Multi-Agent Documentation Pattern',
@@ -179,14 +216,20 @@ function fileSection(kind, name, filename, docsDestDir) {
     'agent-permission-rationale': 'Agent Permission Rationale',
     'flow-cleanup-checklist': 'Flow Cleanup Checklist',
     'simple-language-translations': 'Natural Language Reference',
+    // Daemon addon
+    'daemon-addon-guide': 'Daemon Addon Guide',
+    // Examples (subdir)
+    'coverage': 'Coverage Example',
+    'test-fix-loop': 'Test-Fix Loop Example',
+    'migration': 'Migration Example',
   };
 
   return {
     id: `${kind}/${name}/${slug}`,
-    title: titleOverrides[slug] || titleFromSlug(slug),
+    title: titleOverrides[leafSlug] || titleFromSlug(leafSlug),
     summary,
-    file: `${kind}/${name}/${filename}`,
-    parent: `${kind}/${name}`,
+    file: `${kind}/${name}/${relPath}`,
+    parent: parentId,
   };
 }
 
@@ -222,7 +265,6 @@ function main() {
 
   for (const { kind, name, docsDir, files } of components) {
     const destDir = path.join(DOCS, kind, name);
-    const relDestDir = path.join(kind, name);
 
     log(`\n${kind}/${name} (${files.length} docs)`);
 
@@ -240,25 +282,46 @@ function main() {
       log(`  + section: ${groupId}`);
     }
 
-    for (const filename of files) {
-      const src = path.join(docsDir, filename);
-      const dest = path.join(destDir, filename);
-      const relDest = path.join(relDestDir, filename);
-      const fileId = `${kind}/${name}/${filename.replace(/\.md$/, '')}`;
+    for (const { name: filename, relPath } of files) {
+      const src = path.join(docsDir, relPath);
+      const dest = path.join(destDir, relPath);
+      const fileId = `${kind}/${name}/${relPath.replace(/\.md$/, '')}`;
+
+      // Ensure intermediate subdirectory group sections exist for nested files
+      const relDir = path.dirname(relPath);
+      if (relDir !== '.') {
+        const subdirId = `${kind}/${name}/${relDir}`;
+        if (!existingIds.has(subdirId)) {
+          newSections.push({
+            id: subdirId,
+            title: titleFromSlug(relDir),
+            summary: '',
+            collapsed: true,
+            parent: groupId,
+          });
+          existingIds.add(subdirId);
+          if (!existingOrder.has(subdirId)) {
+            newOrderEntries.push(subdirId);
+            existingOrder.add(subdirId);
+          }
+          log(`  + section: ${subdirId}`);
+        }
+      }
 
       // Copy the file
       if (!DRY_RUN) {
-        copyFile(src, dest);
-        verbose(`  copied: ${relDest}`);
+        ensureDir(path.dirname(dest));
+        fs.copyFileSync(src, dest);
+        verbose(`  copied: ${kind}/${name}/${relPath}`);
         copied++;
       } else {
-        log(`  [copy] ${docsDir}/${filename} → docs/${relDest}`);
+        log(`  [copy] ${src} → docs/${kind}/${name}/${relPath}`);
         copied++;
       }
 
       // Add manifest section if not present
       if (!existingIds.has(fileId)) {
-        const section = fileSection(kind, name, filename, destDir);
+        const section = fileSection(kind, name, relPath, destDir);
         newSections.push(section);
         existingIds.add(fileId);
         if (!existingOrder.has(fileId)) {
@@ -295,7 +358,7 @@ function main() {
       name,
       source: path.relative(ROOT, docsDir),
       dest: `docs/${kind}/${name}`,
-      files,
+      files: files.map(f => f.relPath),
     }));
     fs.writeFileSync(sourcesPath, JSON.stringify(sources, null, 2) + '\n', 'utf8');
     log(`Wrote docs/docs-sources.json (${sources.length} components)`);

@@ -212,7 +212,7 @@ This document serves as the canonical reference for permission tiers. Agent defi
 
 Tier: Analyst
 Permitted Task types: Explore
-See @agentic/code/frameworks/sdlc-complete/docs/agent-permission-tiers.md
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/agent-permission-tiers.md
 ```
 
 ### Cross-Platform
@@ -260,9 +260,9 @@ For platforms without `Task(agent_type)` support, this tier model serves as desi
 ## References
 
 - Claude Code v2.1.33 Release Notes - Task(agent_type) introduction
-- @.claude/rules/agent-fallback.md - Agent fallback patterns
-- @agentic/code/frameworks/sdlc-complete/agents/agent-template.md - Agent definition template
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/agent-capability-matrix.yaml - Capability matching
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/agent-fallback.md - Agent fallback patterns
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/agent-template.md - Agent definition template
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/agent-capability-matrix.yaml - Capability matching
 
 ---
 

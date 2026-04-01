@@ -114,7 +114,7 @@
     "references/REF-003-agentic-development-antipatterns",
     "references/REF-066-mcp-specification-2025",
     "releases",
-    "releases/v2026.3.3-announcement",
+    "releases/v2026.4.0-announcement",
     "releases/v2026.3.2-announcement",
     "releases/v2026.3.1-announcement",
     "releases/v2026.2.15-announcement",
@@ -181,7 +181,45 @@
     "addons/rlm/taskstore-persistence",
     "tools/ralph-external",
     "tools/ralph-external/snapshot-manager-api",
-    "tools/ralph-external/snapshot-manager-usage"
+    "tools/ralph-external/snapshot-manager-usage",
+    "frameworks/media-marketing-kit",
+    "frameworks/media-marketing-kit/overview",
+    "frameworks/media-marketing-kit/quickstart",
+    "frameworks/ops-complete",
+    "frameworks/ops-complete/extensions-guide",
+    "frameworks/ops-complete/overview",
+    "frameworks/ops-complete/quickstart",
+    "frameworks/research-complete",
+    "frameworks/research-complete/overview",
+    "frameworks/research-complete/quickstart",
+    "addons/aiwg-dev",
+    "addons/aiwg-dev/overview",
+    "addons/aiwg-dev/quickstart",
+    "addons/aiwg-utils",
+    "addons/aiwg-utils/overview",
+    "addons/aiwg-utils/rules-reference",
+    "addons/auto-memory",
+    "addons/auto-memory/overview",
+    "addons/daemon",
+    "addons/daemon/configuration-reference",
+    "addons/daemon/daemon-addon-guide",
+    "addons/daemon/quickstart",
+    "addons/guided-implementation",
+    "addons/guided-implementation/overview",
+    "addons/prose-integration",
+    "addons/prose-integration/overview",
+    "addons/ralph/examples",
+    "addons/ralph/examples/coverage",
+    "addons/ralph/examples/migration",
+    "addons/ralph/examples/test-fix-loop",
+    "addons/ralph/executable-feedback-guide",
+    "addons/ralph/reflection-memory-guide",
+    "addons/testing-quality",
+    "addons/testing-quality/overview",
+    "addons/testing-quality/quickstart",
+    "addons/voice-framework",
+    "addons/voice-framework/overview",
+    "addons/voice-framework/quickstart"
   ],
   "sections": [
     {
@@ -775,10 +813,10 @@
       "collapsed": true
     },
     {
-      "id": "releases/v2026.3.3-announcement",
-      "title": "v2026.3.3",
-      "summary": "Latest release",
-      "file": "releases/v2026.3.3-announcement.md",
+      "id": "releases/v2026.4.0-announcement",
+      "title": "v2026.4.0 — Autonomous Systems",
+      "summary": "Major release: corpus architecture, daemon, Mission Control, behaviors, SOUL.md, OpenClaw, Hermes, ops-complete, and more.",
+      "file": "releases/v2026.4.0-announcement.md",
       "parent": "releases"
     },
     {
@@ -1259,6 +1297,272 @@
       "summary": "The Snapshot Manager captures comprehensive state before and after long-running Claude sessions, ena",
       "file": "tools/ralph-external/snapshot-manager-usage.md",
       "parent": "tools/ralph-external"
+    },
+    {
+      "id": "frameworks/media-marketing-kit",
+      "title": "Media Marketing Kit",
+      "summary": "Multi-channel campaign management and content operations",
+      "collapsed": true,
+      "parent": "frameworks"
+    },
+    {
+      "id": "frameworks/media-marketing-kit/overview",
+      "title": "Overview",
+      "summary": "The Media/Marketing Kit (MMK) is a complete campaign management framework for AI-assisted marketing ",
+      "file": "frameworks/media-marketing-kit/overview.md",
+      "parent": "frameworks/media-marketing-kit"
+    },
+    {
+      "id": "frameworks/media-marketing-kit/quickstart",
+      "title": "Quick Start",
+      "summary": "Deploy the MMK framework and run your first campaign workflow in about 15 minutes.",
+      "file": "frameworks/media-marketing-kit/quickstart.md",
+      "parent": "frameworks/media-marketing-kit"
+    },
+    {
+      "id": "frameworks/ops-complete",
+      "title": "Ops Complete",
+      "summary": "Operational infrastructure framework — YAML-native with sys, it, dev, stream extensions",
+      "collapsed": true,
+      "parent": "frameworks"
+    },
+    {
+      "id": "frameworks/ops-complete/extensions-guide",
+      "title": "Extensions Guide",
+      "summary": "The four ops-complete extensions add domain-specific agents, templates, rules, and skills on top of ",
+      "file": "frameworks/ops-complete/extensions-guide.md",
+      "parent": "frameworks/ops-complete"
+    },
+    {
+      "id": "frameworks/ops-complete/overview",
+      "title": "Overview",
+      "summary": "ops-complete is the operational infrastructure layer for AIWG — a framework for AI agents working in",
+      "file": "frameworks/ops-complete/overview.md",
+      "parent": "frameworks/ops-complete"
+    },
+    {
+      "id": "frameworks/ops-complete/quickstart",
+      "title": "Quick Start",
+      "summary": "Deploy the ops-complete framework and write your first validated runbook in about 10 minutes.",
+      "file": "frameworks/ops-complete/quickstart.md",
+      "parent": "frameworks/ops-complete"
+    },
+    {
+      "id": "frameworks/research-complete",
+      "title": "Research Complete",
+      "summary": "Academic research workflow with GRADE methodology and FAIR compliance",
+      "collapsed": true,
+      "parent": "frameworks"
+    },
+    {
+      "id": "frameworks/research-complete/overview",
+      "title": "Overview",
+      "summary": "The Research Framework automates academic research management across an 8-stage workflow: discover p",
+      "file": "frameworks/research-complete/overview.md",
+      "parent": "frameworks/research-complete"
+    },
+    {
+      "id": "frameworks/research-complete/quickstart",
+      "title": "Quick Start",
+      "summary": "Run a literature search and produce AI-grounded paper summaries in about 20 minutes.",
+      "file": "frameworks/research-complete/quickstart.md",
+      "parent": "frameworks/research-complete"
+    },
+    {
+      "id": "addons/aiwg-dev",
+      "title": "AIWG Dev",
+      "summary": "Developer toolkit — validate-component, dev-doctor, link-check, devkit scaffolding",
+      "collapsed": true,
+      "parent": "addons"
+    },
+    {
+      "id": "addons/aiwg-dev/overview",
+      "title": "Overview",
+      "summary": "aiwg-dev is the developer toolkit for contributors building AIWG itself — adding new addons, framewo",
+      "file": "addons/aiwg-dev/overview.md",
+      "parent": "addons/aiwg-dev"
+    },
+    {
+      "id": "addons/aiwg-dev/quickstart",
+      "title": "Quick Start",
+      "summary": "Install the developer toolkit and validate your first component in 5 minutes.",
+      "file": "addons/aiwg-dev/quickstart.md",
+      "parent": "addons/aiwg-dev"
+    },
+    {
+      "id": "addons/aiwg-utils",
+      "title": "AIWG Utils",
+      "summary": "Core utility rules — subagent scoping, context budget, instruction comprehension",
+      "collapsed": true,
+      "parent": "addons"
+    },
+    {
+      "id": "addons/aiwg-utils/overview",
+      "title": "Overview",
+      "summary": "aiwg-utils is the core utility addon bundled with every AIWG installation. It provides seven enforce",
+      "file": "addons/aiwg-utils/overview.md",
+      "parent": "addons/aiwg-utils"
+    },
+    {
+      "id": "addons/aiwg-utils/rules-reference",
+      "title": "Rules Reference",
+      "summary": "Seven enforcement rules deployed with every AIWG installation. These rules apply automatically based",
+      "file": "addons/aiwg-utils/rules-reference.md",
+      "parent": "addons/aiwg-utils"
+    },
+    {
+      "id": "addons/auto-memory",
+      "title": "Auto Memory",
+      "summary": "Automatic memory management — seed templates, memory evolution, cross-session persistence",
+      "collapsed": true,
+      "parent": "addons"
+    },
+    {
+      "id": "addons/auto-memory/overview",
+      "title": "Overview",
+      "summary": "The auto-memory addon provides seed templates for Claude Code's Automatic Memory feature. It bootstr",
+      "file": "addons/auto-memory/overview.md",
+      "parent": "addons/auto-memory"
+    },
+    {
+      "id": "addons/daemon",
+      "title": "Daemon Addon",
+      "summary": "Persistent background agent — web UI, YAML profiles, scheduled tasks, Telegram",
+      "collapsed": true,
+      "parent": "addons"
+    },
+    {
+      "id": "addons/daemon/configuration-reference",
+      "title": "Configuration Reference",
+      "summary": "All daemon configuration lives in .aiwg/daemon.json. This file is created by aiwg daemon-init with d",
+      "file": "addons/daemon/configuration-reference.md",
+      "parent": "addons/daemon"
+    },
+    {
+      "id": "addons/daemon/daemon-addon-guide",
+      "title": "Daemon Addon Guide",
+      "summary": "The daemon addon packages persistent-session capabilities into a single deployable unit. It provides",
+      "file": "addons/daemon/daemon-addon-guide.md",
+      "parent": "addons/daemon"
+    },
+    {
+      "id": "addons/daemon/quickstart",
+      "title": "Quick Start",
+      "summary": "Start the AIWG daemon, enable the Concierge front-end, and access the operator web UI.",
+      "file": "addons/daemon/quickstart.md",
+      "parent": "addons/daemon"
+    },
+    {
+      "id": "addons/guided-implementation",
+      "title": "Guided Implementation",
+      "summary": "Controlled iteration loop with escalation on repeated failure",
+      "collapsed": true,
+      "parent": "addons"
+    },
+    {
+      "id": "addons/guided-implementation/overview",
+      "title": "Overview",
+      "summary": "The guided-implementation addon provides bounded iteration control for autonomous issue-to-code work",
+      "file": "addons/guided-implementation/overview.md",
+      "parent": "addons/guided-implementation"
+    },
+    {
+      "id": "addons/prose-integration",
+      "title": "Prose Integration",
+      "summary": "OpenProse contract-driven execution — five skills, obligation semantics",
+      "collapsed": true,
+      "parent": "addons"
+    },
+    {
+      "id": "addons/prose-integration/overview",
+      "title": "Overview",
+      "summary": "The prose-integration addon provides AIWG tools for working with OpenProse programs — Markdown files",
+      "file": "addons/prose-integration/overview.md",
+      "parent": "addons/prose-integration"
+    },
+    {
+      "id": "addons/ralph/examples",
+      "title": "Examples",
+      "summary": "",
+      "collapsed": true,
+      "parent": "addons/ralph"
+    },
+    {
+      "id": "addons/ralph/examples/coverage",
+      "title": "Coverage Example",
+      "summary": "Iteratively add tests until coverage threshold is met.",
+      "file": "addons/ralph/examples/coverage.md",
+      "parent": "addons/ralph/examples"
+    },
+    {
+      "id": "addons/ralph/examples/migration",
+      "title": "Migration Example",
+      "summary": "Migrate code between formats/versions iteratively.",
+      "file": "addons/ralph/examples/migration.md",
+      "parent": "addons/ralph/examples"
+    },
+    {
+      "id": "addons/ralph/examples/test-fix-loop",
+      "title": "Test-Fix Loop Example",
+      "summary": "Fix failing tests iteratively until all pass.",
+      "file": "addons/ralph/examples/test-fix-loop.md",
+      "parent": "addons/ralph/examples"
+    },
+    {
+      "id": "addons/ralph/executable-feedback-guide",
+      "title": "Executable Feedback Guide",
+      "summary": "Practical guide for implementing the execute-before-return pattern in code-generating agents. Based ",
+      "file": "addons/ralph/executable-feedback-guide.md",
+      "parent": "addons/ralph"
+    },
+    {
+      "id": "addons/ralph/reflection-memory-guide",
+      "title": "Reflection & Memory Guide",
+      "summary": "Comprehensive guide to Ralph's episodic memory system based on the Reflexion framework.",
+      "file": "addons/ralph/reflection-memory-guide.md",
+      "parent": "addons/ralph"
+    },
+    {
+      "id": "addons/testing-quality",
+      "title": "Testing Quality",
+      "summary": "TDD enforcement, mutation testing, flaky test detection",
+      "collapsed": true,
+      "parent": "addons"
+    },
+    {
+      "id": "addons/testing-quality/overview",
+      "title": "Overview",
+      "summary": "The testing-quality addon provides skills for enforcing test-driven development, validating test qua",
+      "file": "addons/testing-quality/overview.md",
+      "parent": "addons/testing-quality"
+    },
+    {
+      "id": "addons/testing-quality/quickstart",
+      "title": "Quick Start",
+      "summary": "Set up TDD enforcement and validate test quality in your project.",
+      "file": "addons/testing-quality/quickstart.md",
+      "parent": "addons/testing-quality"
+    },
+    {
+      "id": "addons/voice-framework",
+      "title": "Voice Framework",
+      "summary": "Voice profile documentation — four built-in voices, custom profiles, blending",
+      "collapsed": true,
+      "parent": "addons"
+    },
+    {
+      "id": "addons/voice-framework/overview",
+      "title": "Overview",
+      "summary": "The voice framework addon provides a profile-based approach to writing consistency. Instead of maint",
+      "file": "addons/voice-framework/overview.md",
+      "parent": "addons/voice-framework"
+    },
+    {
+      "id": "addons/voice-framework/quickstart",
+      "title": "Quick Start",
+      "summary": "Apply your first voice profile to content in about 2 minutes.",
+      "file": "addons/voice-framework/quickstart.md",
+      "parent": "addons/voice-framework"
     }
   ]
 }
