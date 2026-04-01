@@ -94,6 +94,7 @@ function parseArgs() {
     deployCommands: false,
     deploySkills: false,
     deployRules: false,
+    deployBehaviors: false,      // Deploy behaviors (native on openclaw, emulated on others)
     commandsOnly: false,
     skillsOnly: false,
     rulesOnly: false,
@@ -123,6 +124,7 @@ function parseArgs() {
     else if (a === '--deploy-commands') cfg.deployCommands = true;
     else if (a === '--deploy-skills') cfg.deploySkills = true;
     else if (a === '--deploy-rules') cfg.deployRules = true;
+    else if (a === '--deploy-behaviors') cfg.deployBehaviors = true;
     else if (a === '--commands-only') cfg.commandsOnly = true;
     else if (a === '--skills-only') cfg.skillsOnly = true;
     else if (a === '--rules-only') cfg.rulesOnly = true;
@@ -481,6 +483,7 @@ function deepMerge(target, source) {
     deployCommands: cfg.deployCommands,
     deploySkills: cfg.deploySkills,
     deployRules: cfg.deployRules,
+    deployBehaviors: cfg.deployBehaviors,
     commandsOnly: cfg.commandsOnly,
     skillsOnly: cfg.skillsOnly,
     rulesOnly: cfg.rulesOnly,

@@ -1006,10 +1006,340 @@ interface ValidationRules {
 
 ---
 
+## Team Extensions
+
+Multi-agent team compositions that work across all AIWG providers. On Claude Code, teams invoke agents natively. On all other providers, teams are emulated via `aiwg mc` (Mission Control) orchestration.
+
+**Source format:** JSON files in `agentic/code/frameworks/*/teams/`
+**Schema:** `agentic/code/frameworks/sdlc-complete/teams/schema.json`
+**CLI:** `aiwg team run|list|info`
+
+### TeamDefinition
+
+```typescript
+interface TeamDefinition {
+  name: string;                             // Human-readable team name
+  slug: string;                             // CLI identifier (kebab-case)
+  description: string;                      // One-line purpose
+  dispatch?: 'parallel' | 'sequential' | 'consensus';  // Execution mode
+  agents: TeamMember[];                     // 2-8 agents
+  use_cases?: string[];                     // Scenarios where team excels
+  handoffs?: TeamHandoff[];                 // Inter-agent artifact passing
+  sdlc_phases?: string[];                   // Active SDLC phases
+  max_context_agents?: number;              // Context budget limit (2-4)
+  overlap_resolution?: Record<string, string>;  // Capability conflict resolution
+}
+
+interface TeamMember {
+  agent: string;                            // Agent filename without .md
+  role: 'lead' | 'contributor' | 'reviewer' | 'advisor';
+  responsibilities?: string[];
+}
+
+interface TeamHandoff {
+  from: string;                             // Source agent
+  to: string;                               // Target agent
+  artifact: string;                         // What gets passed
+  gate: string;                             // Quality check before handoff
+}
+```
+
+### Provider Routing
+
+| Provider | Native Teams | Fallback |
+|----------|-------------|---------|
+| Claude Code | Native agent dispatch | — |
+| Warp, Copilot, Cursor, Windsurf, OpenCode, Factory, Codex, OpenClaw | — | `aiwg mc` orchestration |
+
+### Built-in Teams
+
+| Slug | Agents | Dispatch | Purpose |
+|------|--------|----------|---------|
+| `api-development` | 4 | sequential | API design and implementation |
+| `full-stack` | 4 | sequential | Full-stack feature delivery |
+| `greenfield` | 4 | sequential | New project kickoff |
+| `maintenance` | 4 | sequential | Code review and bug fixing |
+| `migration` | 4 | sequential | Technology migrations |
+| `sdlc-review` | 4 | parallel | Phase gate validation |
+| `security-review` | 3 | sequential | Security audits |
+
+### Deployment
+
+Teams are deployed as part of `aiwg use <framework>`. Project-local teams can be placed in `.aiwg/teams/<slug>.json` and take precedence over framework teams.
+
+---
+
+## Behavior Extensions (Extended Reference)
+
+Reactive capabilities that combine natural language invocation with event-driven hook subscriptions and shell scripts. Behaviors are what you reach for when a skill is not enough — specifically when the capability needs to react to system events (file writes, build completions, scheduled intervals, session boundaries) rather than waiting for explicit user invocation.
+
+### Behavior vs. Agent vs. Hook vs. Skill
+
+| Dimension | Skill | Hook | Agent | Behavior |
+|-----------|-------|------|-------|----------|
+| **Invoked by** | User NL request | Lifecycle event (automatic) | User or orchestrator | Both — NL request and/or event |
+| **Execution model** | Single request/response | Single event reaction | Autonomous reasoning loop | Persistent reactive capability |
+| **Script support** | No | No | No | Yes — ships with shell scripts |
+| **Structured inputs** | No | No | No | Yes — typed input schema |
+| **Composability** | Implicit | Implicit | Via teams | Explicit `composable_with` manifest |
+| **Mode variants** | — | — | AI-only | `agent` (AI-driven) or `script` (shell) |
+
+Use a **skill** when the user asks for something once. Use a **hook** when you need to intercept a single lifecycle event. Use an **agent** when reasoning and tool use are central. Use a **behavior** when a capability needs to be always-on, reactive to events, and potentially driven by shell scripts.
+
+### BehaviorMetadata (Extended)
+
+```typescript
+interface BehaviorMetadata {
+  type: 'behavior';
+
+  triggerPhrases?: string[];          // NL invocation phrases (same as skills)
+
+  inputs?: BehaviorInput[];           // Structured typed input parameters
+
+  hooks?: Partial<Record<            // Event hook subscriptions
+    BehaviorHookEvent,
+    BehaviorHookAction[]
+  >>;
+
+  scripts?: Record<string, string>;   // Logical name → relative script path
+
+  manifest?: {
+    category?: string;                // Discovery category
+    requires?: {
+      bins?: string[];                // Required system binaries
+      env?: string[];                 // Required environment variables
+    };
+    outputs?: Array<{                 // Declared output paths
+      type: string;
+      path: string;
+    }>;
+    composable_with?: string[];       // Behavior IDs this composes with
+  };
+}
+
+interface BehaviorInput {
+  name: string;
+  type: 'string' | 'number' | 'boolean' | 'enum' | 'path';
+  required?: boolean;
+  description?: string;
+  default?: string | number | boolean;
+  values?: string[];                  // Allowed values for enum type
+}
+
+type BehaviorHookEvent =
+  | 'on_file_write'
+  | 'on_tool_complete'
+  | 'on_schedule'
+  | 'on_commit'
+  | 'on_pr_open'
+  | 'on_deploy'
+  | 'on_session_start'
+  | 'on_session_end';
+
+interface BehaviorHookAction {
+  filter?: string;                    // Glob filter for file-based events
+  tool?: string;                      // Tool name for on_tool_complete
+  cron?: string;                      // Cron expression for on_schedule
+  action: 'run_script' | 'notify' | 'log';
+  script?: string;                    // Script path (relative to behavior directory)
+}
+```
+
+### Two Modes
+
+Behaviors come in two modes, declared at the top of the `BEHAVIOR.md` frontmatter.
+
+#### mode: script (default)
+
+Shell-script-driven behaviors. The behavior ships with one or more shell scripts that execute when hooks fire or when the behavior is invoked by name. The AI is not involved in execution — the scripts run directly.
+
+Use this mode for build monitoring, test watching, scheduled audits, and any capability where deterministic script execution is more appropriate than AI reasoning.
+
+**Example — build-monitor (script mode):**
+
+```yaml
+---
+name: build-monitor
+version: 1.0.0
+description: Track build health by monitoring build tool completions and running scheduled build checks.
+platforms: [openclaw, claude-code]
+
+triggers:
+  - "monitor build"
+  - "check build health"
+
+inputs:
+  - name: command
+    type: string
+    required: false
+    description: Build command to run
+    default: "npm run build"
+
+hooks:
+  on_tool_complete:
+    - tool: build
+      action: run_script
+      script: scripts/post-build-check.sh
+  on_schedule:
+    - cron: "0 */4 * * *"
+      action: run_script
+      script: scripts/scheduled-build.sh
+
+scripts:
+  main: scripts/main.sh
+  post-build-check: scripts/post-build-check.sh
+  scheduled-build: scripts/scheduled-build.sh
+
+manifest:
+  category: build
+  requires:
+    bins: [node]
+  outputs:
+    - type: report
+      path: .aiwg/reports/build/
+  composable_with: [test-watcher]
+---
+```
+
+#### mode: agent
+
+AI-instruction behaviors. Instead of shell scripts, the behavior body is a prompt that instructs the AI directly. The AI reads the BEHAVIOR.md body and acts as specified when triggered. No scripts are required.
+
+Use this mode for interaction-layer behaviors (like the Concierge), routing behaviors, and capabilities where AI judgment and natural language production are central.
+
+**Example — concierge (agent mode, abbreviated):**
+
+```yaml
+---
+name: concierge
+version: 1.0.0
+description: >
+  Persistent front-facing interface for the AIWG daemon. Routes user requests to the
+  correct skill, agent, or flow while maintaining a composed, professional interaction
+  register throughout.
+platforms: [claude-code, openclaw, cursor, warp]
+
+mode: agent
+
+triggers:
+  - session-start
+
+tone:
+  register: professional-warm
+  verbosity: concise
+
+routing:
+  strategy: intent-first
+  fallback: surface-with-context
+  expose_internals: false
+
+memory:
+  session: true
+  cross_session: true
+  store: .aiwg/daemon/concierge-memory.json
+
+hooks:
+  on_session_start:
+    action: activate
+    description: Concierge greets and reads session context on daemon session open.
+
+manifest:
+  category: interaction
+  scope: daemon
+  composable_with: [build-monitor, security-sentinel, test-watcher]
+  outputs:
+    - type: memory
+      path: .aiwg/daemon/concierge-memory.json
+---
+
+# Concierge
+
+You are the AIWG Concierge — the primary front-facing interface for the AIWG persistent daemon.
+[... behavior body instructs the AI ...]
+```
+
+### Lifecycle Phases
+
+| Phase | Description |
+|-------|-------------|
+| **deploy** | `aiwg add-behavior <name>` writes the behavior definition to the target provider directory |
+| **activate** | Daemon loads the behavior and registers its hook subscriptions; NL triggers become available |
+| **execute** | A hook fires (or user invokes by NL), triggering the script or AI instruction body |
+| **deactivate** | Behavior is stopped (`aiwg behavior stop <name>`) and hook subscriptions are removed |
+
+### Provider Support
+
+| Provider | Behaviors | Mode | Notes |
+|----------|-----------|------|-------|
+| **OpenClaw** | Native | script + agent | First provider with native behavior support. Deploys to `~/.openclaw/behaviors/`. Reference implementation. |
+| **Claude Code** | Emulated | agent (via hooks) | Hook events map to Claude Code's `pre-session`, `post-write`, `post-bash` lifecycle hooks. Script mode runs hooks as bash calls. |
+| **Cursor** | Emulated | agent | Hook subscriptions emulated via AIWG daemon event routing. |
+| **Warp** | Emulated | agent | Emulated via daemon. Behaviors appear in `WARP.md` for context loading. |
+| **Copilot** | Emulated | agent | Emulated via daemon. No native hook support. |
+| **Windsurf** | Emulated | agent | Emulated via daemon. No native hook support. |
+| **Factory AI** | Emulated | agent | Emulated via daemon. |
+| **Codex** | Emulated | agent | Emulated via daemon. |
+| **OpenCode** | Emulated | agent | Emulated via daemon. |
+
+On platforms without native hook support, AIWG emulates behavior execution through the daemon's automation engine. The daemon subscribes to equivalent file-system and schedule events and routes them to the behavior's script or AI body. NL triggers work identically across all platforms. Hook-driven execution is the only path where native vs. emulated behavior differs.
+
+### BEHAVIOR.md File Format
+
+Behaviors are defined as a single BEHAVIOR.md file. The frontmatter is machine-readable; the body (below the closing `---`) is the AI instruction content for `mode: agent` behaviors, or human-readable documentation for `mode: script` behaviors.
+
+```
+agentic/code/behaviors/<name>/
+├── BEHAVIOR.md          # Behavior definition (frontmatter + body)
+└── scripts/             # Shell scripts (mode: script only)
+    ├── main.sh
+    └── post-build-check.sh
+```
+
+**Frontmatter fields:**
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `name` | Yes | Behavior identifier (kebab-case) |
+| `version` | Yes | CalVer or semver |
+| `description` | Yes | One-line purpose |
+| `platforms` | Yes | List of supported providers |
+| `mode` | No | `script` (default) or `agent` |
+| `triggers` | No | NL phrases or event names |
+| `inputs` | No | Typed input parameter definitions |
+| `hooks` | No | Event hook subscriptions |
+| `scripts` | No | Logical name → script path map |
+| `tone` | No | Tone profile (agent mode) |
+| `routing` | No | Routing configuration (agent mode) |
+| `memory` | No | Memory persistence configuration |
+| `manifest` | No | Richer metadata: category, requires, outputs, composable_with |
+
+### CLI
+
+```bash
+# Create a new behavior
+aiwg add-behavior <name>
+
+# Deploy behavior to a specific provider
+aiwg add-behavior <name> --provider openclaw
+
+# List active behaviors
+aiwg behavior list
+
+# Run a behavior manually
+aiwg behavior run <name>
+
+# Stop an active behavior
+aiwg behavior stop <name>
+```
+
+---
+
 ## See Also
 
 - [Extension System Overview](overview.md)
 - [Creating Extensions](creating-extensions.md)
+- [Concierge Guide](../concierge-guide.md) — User guide for the agent-mode concierge behavior
+- [Daemon Guide](../daemon-guide.md) — Daemon architecture that behaviors integrate with
 - @src/extensions/types.ts - Full type definitions
 - @.aiwg/architecture/unified-extension-schema.md - Complete schema
 - @docs/cli-reference.md - CLI command reference

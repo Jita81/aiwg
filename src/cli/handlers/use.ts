@@ -286,6 +286,8 @@ function printNextSteps(framework: Framework, provider: string = 'claude'): void
 
 /**
  * Count deployed artifacts in target directories
+ *
+ * @implements #609
  */
 async function countDeployedArtifacts(
   target: string,
@@ -294,6 +296,7 @@ async function countDeployedArtifacts(
   const countMd = async (dir: string): Promise<number> => {
     if (!dir) return 0;
     try {
+      // Support absolute paths (openclaw deploys to home dir)
       const resolvedDir = path.isAbsolute(dir) ? dir : path.join(target, dir);
       const entries = await fs.readdir(resolvedDir);
       return entries.filter(f => f.endsWith('.md')).length;
@@ -509,6 +512,7 @@ export class UseHandler implements CommandHandler {
         skillsPath: paths.skills,
         commandsPath: paths.commands,
         rulesPath: paths.rules,
+        behaviorsPath: paths.behaviors,
         provider,
         cwd: target,
       });

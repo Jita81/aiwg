@@ -377,7 +377,7 @@ export async function scanDeployedSkills(
  * subdirectory. On OpenClaw this is the native format; on other providers behaviors
  * are emulated via hook wrappers or session injection.
  *
- * @param behaviorsPath - Path to deployed behaviors directory
+ * @param behaviorsPath - Path to deployed behaviors directory (e.g., ~/.openclaw/behaviors/)
  * @param provider - Provider platform name
  * @param cwd - Working directory for relative path resolution
  * @returns Array of behavior extensions

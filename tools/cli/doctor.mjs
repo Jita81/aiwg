@@ -177,6 +177,32 @@ async function runDoctor() {
     check('Behaviors', 'info', 'No behaviors deployed (run: aiwg use daemon)');
   }
 
+  // 11. Check .gitignore for AIWG runtime patterns (warning if missing)
+  const AIWG_RUNTIME_PATTERNS = ['.aiwg/working/', '.aiwg/ralph/', '.aiwg/ralph-external/'];
+  const gitignorePath = path.join(process.cwd(), '.gitignore');
+  try {
+    const gitignoreContent = await fs.readFile(gitignorePath, 'utf-8');
+    const lines = gitignoreContent.split('\n').map(l => l.trim());
+    const isCovered = (pattern) => {
+      if (lines.includes(pattern)) return true;
+      if (lines.includes(pattern.replace(/\/$/, ''))) return true;
+      const parts = pattern.split('/').filter(Boolean);
+      for (let i = 1; i < parts.length; i++) {
+        const parent = parts.slice(0, i).join('/') + '/';
+        if (lines.includes(parent) || lines.includes(parent.replace(/\/$/, ''))) return true;
+      }
+      return false;
+    };
+    const missing = AIWG_RUNTIME_PATTERNS.filter(p => !isCovered(p));
+    if (missing.length === 0) {
+      check('.gitignore', 'ok', 'AIWG runtime paths covered');
+    } else {
+      check('.gitignore', 'warn', `Missing AIWG runtime patterns: ${missing.join(', ')} — run "aiwg config gitignore --fix"`);
+    }
+  } catch {
+    // No .gitignore or unreadable — skip silently
+  }
+
   // Print results
   console.log('');
 

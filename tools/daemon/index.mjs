@@ -536,6 +536,7 @@ class DaemonCLI {
         const scope = this.flags.scope;
 
         if (this.isDaemonRunning()) {
+          // Live: query daemon via IPC
           try {
             const client = await createClient(SOCKET_PATH);
             const result = await client.request('memory.show', scope ? { scope } : {});
@@ -573,6 +574,7 @@ class DaemonCLI {
           }
         }
 
+        // Offline clear
         const { MemoryManager } = await import('./memory-manager.mjs');
         const mgr = new MemoryManager();
         try {

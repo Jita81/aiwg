@@ -535,7 +535,7 @@ export class MetadataValidator {
       }
     }
 
-    // Behavior-specific: must declare triggers or trigger in metadata
+    // Behavior-specific validation (#609)
     if (manifest.type === 'behavior') {
       const meta = manifest.metadata as Record<string, unknown> | undefined;
       if (!meta || (!('trigger' in meta) && !('triggers' in meta))) {
@@ -543,6 +543,13 @@ export class MetadataValidator {
           field: 'metadata.trigger',
           message: 'Behavior must declare at least one trigger or triggers array in metadata',
           severity: 'error'
+        });
+      }
+      if (!meta?.scope && !manifest.metadata) {
+        errors.push({
+          field: 'metadata.scope',
+          message: 'Behavior should declare scope (daemon, interactive, or both)',
+          severity: 'warning' as const
         });
       }
     }
