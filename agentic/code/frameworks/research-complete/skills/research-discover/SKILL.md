@@ -98,7 +98,7 @@ This command integrates with the research workflow:
 
 ## References
 
-- @agentic/code/frameworks/research-complete/agents/discovery-agent.md - Discovery Agent
-- @agentic/code/frameworks/research-complete/docs/database-apis.md - Supported databases
-- @src/research/services/discovery-service.ts - Search implementation
+- @$AIWG_ROOT/agentic/code/frameworks/research-complete/agents/discovery-agent.md - Discovery Agent
+- @$AIWG_ROOT/agentic/code/frameworks/research-complete/docs/database-apis.md - Supported databases
+- @$AIWG_ROOT/src/research/services/discovery-service.ts - Search implementation
 - @.aiwg/research/README.md - Research corpus structure

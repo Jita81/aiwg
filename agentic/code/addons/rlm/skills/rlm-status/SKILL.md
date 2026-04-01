@@ -559,11 +559,11 @@ rlm:
 
 ## References
 
-- @agentic/code/addons/rlm/schemas/rlm-state.yaml - RLM state schema
-- @agentic/code/addons/rlm/schemas/rlm-task-tree.yaml - Task tree structure
-- @agentic/code/addons/rlm/schemas/rlm-cost.yaml - Cost tracking schema
-- @agentic/code/addons/rlm/schemas/rlm-trajectory.yaml - Execution trajectory
-- @agentic/code/addons/ralph/schemas/loop-state.yaml - Ralph state reference
-- @agentic/code/addons/ralph/commands/ralph-status.md - Ralph status command
+- @$AIWG_ROOT/agentic/code/addons/rlm/schemas/rlm-state.yaml - RLM state schema
+- @$AIWG_ROOT/agentic/code/addons/rlm/schemas/rlm-task-tree.yaml - Task tree structure
+- @$AIWG_ROOT/agentic/code/addons/rlm/schemas/rlm-cost.yaml - Cost tracking schema
+- @$AIWG_ROOT/agentic/code/addons/rlm/schemas/rlm-trajectory.yaml - Execution trajectory
+- @$AIWG_ROOT/agentic/code/addons/ralph/schemas/loop-state.yaml - Ralph state reference
+- @$AIWG_ROOT/agentic/code/addons/ralph/commands/ralph-status.md - Ralph status command
 - @.aiwg/research/findings/REF-089-recursive-language-models.md - RLM research foundation
 - @.claude/rules/tao-loop.md - TAO loop structure underlying RLM

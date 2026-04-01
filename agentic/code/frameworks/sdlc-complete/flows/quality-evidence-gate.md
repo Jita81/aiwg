@@ -183,10 +183,10 @@ flow:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/flows/gate-criteria-by-phase.md - Base gate criteria
-- @agentic/code/frameworks/sdlc-complete/agents/quality-assessor.md - Quality Assessor
-- @agentic/code/frameworks/sdlc-complete/agents/citation-verifier.md - Citation Verifier
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/flows/gate-criteria-by-phase.md - Base gate criteria
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/quality-assessor.md - Quality Assessor
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/citation-verifier.md - Citation Verifier
 - @.aiwg/research/docs/grade-assessment-guide.md - GRADE methodology
-- @agentic/code/frameworks/sdlc-complete/schemas/research/quality-dimensions.yaml - Quality schema
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/quality-dimensions.yaml - Quality schema
 - @.claude/rules/citation-policy.md - Citation policy
 - @.claude/rules/hitl-gates.md - HITL gate rules

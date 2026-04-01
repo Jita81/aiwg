@@ -132,6 +132,6 @@ If the user's intent is ambiguous:
 
 ## References
 
-- @src/cli/handlers/mc.ts — Mission Control command handler
-- @docs/cli-reference.md — CLI reference
-- @agentic/code/frameworks/sdlc-complete/rules/self-maintenance.md — Self-maintenance rule
+- @$AIWG_ROOT/src/cli/handlers/mc.ts — Mission Control command handler
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/self-maintenance.md — Self-maintenance rule

@@ -554,11 +554,11 @@ This story is complete when:
 
 ## Related Templates
 
-- @agentic/code/frameworks/sdlc-complete/templates/management/epic-card.md - Parent epic for this story
-- @agentic/code/frameworks/sdlc-complete/templates/management/product-backlog-template.md - Story lives in backlog
-- @agentic/code/frameworks/sdlc-complete/templates/management/sprint-backlog-template.md - Story committed to sprint
-- @agentic/code/frameworks/sdlc-complete/templates/test/test-case-card.md - Tests derived from acceptance criteria
-- @agentic/code/frameworks/sdlc-complete/templates/implementation/task-slice-card.md - Tasks broken down from this story
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/management/epic-card.md - Parent epic for this story
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/management/product-backlog-template.md - Story lives in backlog
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/management/sprint-backlog-template.md - Story committed to sprint
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/test/test-case-card.md - Tests derived from acceptance criteria
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/implementation/task-slice-card.md - Tasks broken down from this story
 
 ## Quality Gates
 

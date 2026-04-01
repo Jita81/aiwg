@@ -366,7 +366,7 @@ via the AIWG daemon.
 
 ## References
 
-- @docs/cli-reference.md — Complete CLI command reference
-- @agentic/code/providers/capability-matrix.yaml — Provider capability matrix (canonical)
-- @agentic/code/frameworks/sdlc-complete/rules/self-maintenance.md — Self-maintenance rule
-- @docs/simple-language-translations.md — Natural language patterns
+- @$AIWG_ROOT/docs/cli-reference.md — Complete CLI command reference
+- @$AIWG_ROOT/agentic/code/providers/capability-matrix.yaml — Provider capability matrix (canonical)
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/self-maintenance.md — Self-maintenance rule
+- @$AIWG_ROOT/docs/simple-language-translations.md — Natural language patterns

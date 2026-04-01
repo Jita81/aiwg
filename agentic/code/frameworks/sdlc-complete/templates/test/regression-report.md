@@ -428,11 +428,11 @@ Based on trend analysis, the following improvements are recommended:
 
 ## Related Templates and References
 
-- @agentic/code/frameworks/sdlc-complete/templates/test/regression-register.md - Track all regressions
-- @agentic/code/frameworks/sdlc-complete/templates/test/defect-card.md - Individual defect tracking
-- @agentic/code/frameworks/sdlc-complete/templates/test/test-evaluation-summary-template.md - Overall test results
-- @agentic/code/frameworks/sdlc-complete/templates/test/regression-test-set-card.md - Regression test suite
-- @agentic/code/frameworks/sdlc-complete/commands/regression-analyze.md - Generate this report (if available)
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/test/regression-register.md - Track all regressions
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/test/defect-card.md - Individual defect tracking
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/test/test-evaluation-summary-template.md - Overall test results
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/test/regression-test-set-card.md - Regression test suite
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/regression-analyze.md - Generate this report (if available)
 
 ## Automation Notes
 

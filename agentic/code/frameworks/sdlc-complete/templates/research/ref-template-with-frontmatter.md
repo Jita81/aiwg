@@ -1,6 +1,6 @@
 ---
 # Research Document Frontmatter
-# Schema: @agentic/code/frameworks/sdlc-complete/schemas/research/frontmatter-schema.yaml
+# Schema: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/frontmatter-schema.yaml
 # Issue: #105
 
 ref_id: "REF-XXX"

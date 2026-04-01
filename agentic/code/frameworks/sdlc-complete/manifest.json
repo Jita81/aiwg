@@ -26,16 +26,72 @@
   },
   "memory": {
     "creates": [
-      { "path": ".aiwg/requirements/", "description": "User stories, use cases, NFRs" },
-      { "path": ".aiwg/architecture/", "description": "SAD, ADRs, diagrams" },
-      { "path": ".aiwg/planning/",     "description": "Phase plans, iteration plans" },
-      { "path": ".aiwg/risks/",        "description": "Risk register, mitigations" },
-      { "path": ".aiwg/testing/",      "description": "Test strategy, test plans, test results" },
-      { "path": ".aiwg/security/",     "description": "Threat models, security gates" },
-      { "path": ".aiwg/deployment/",   "description": "Deployment plans, runbooks" }
+      {
+        "path": ".aiwg/requirements/",
+        "description": "User stories, use cases, NFRs"
+      },
+      {
+        "path": ".aiwg/architecture/",
+        "description": "SAD, ADRs, diagrams"
+      },
+      {
+        "path": ".aiwg/planning/",
+        "description": "Phase plans, iteration plans"
+      },
+      {
+        "path": ".aiwg/risks/",
+        "description": "Risk register, mitigations"
+      },
+      {
+        "path": ".aiwg/testing/",
+        "description": "Test strategy, test plans, test results"
+      },
+      {
+        "path": ".aiwg/security/",
+        "description": "Threat models, security gates"
+      },
+      {
+        "path": ".aiwg/deployment/",
+        "description": "Deployment plans, runbooks"
+      },
+      {
+        "path": ".aiwg/intake/",
+        "description": "Project intake documents: forms, vision, stakeholder requests, solution profiles"
+      },
+      {
+        "path": ".aiwg/patterns/",
+        "description": "AI behavior pattern catalogs (laziness, anti-patterns)"
+      },
+      {
+        "path": ".aiwg/incidents/",
+        "description": "Incident reports and post-mortems"
+      },
+      {
+        "path": ".aiwg/regression/",
+        "description": "Regression tracking records and root cause analysis"
+      },
+      {
+        "path": ".aiwg/archive/",
+        "description": "Phase completion archives for artifact preservation"
+      },
+      {
+        "path": ".aiwg/management/",
+        "description": "Project management artifacts (risk lists, status trackers)"
+      },
+      {
+        "path": ".aiwg/ux/",
+        "description": "UX artifacts: wireframes, research, email templates"
+      },
+      {
+        "path": ".aiwg/compliance/",
+        "description": "Compliance documentation (GDPR, PCI DSS, SOC2)"
+      }
     ],
     "normalizedFiles": [
-      { "path": ".aiwg/AIWG.md", "description": "Project context entry point — current phase, architecture summary, installed frameworks" }
+      {
+        "path": ".aiwg/AIWG.md",
+        "description": "Project context entry point — current phase, architecture summary, installed frameworks"
+      }
     ]
   }
 }

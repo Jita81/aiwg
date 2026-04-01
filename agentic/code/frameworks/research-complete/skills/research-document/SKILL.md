@@ -173,8 +173,8 @@ Avoids:
 
 ## References
 
-- @agentic/code/frameworks/research-complete/agents/documentation-agent.md - Documentation Agent
-- @src/research/services/documentation-service.ts - Documentation implementation
-- @agentic/code/frameworks/research-complete/templates/finding-template.md - Finding template
-- @agentic/code/addons/voice-framework/voices/technical-authority.md - Voice profile
+- @$AIWG_ROOT/agentic/code/frameworks/research-complete/agents/documentation-agent.md - Documentation Agent
+- @$AIWG_ROOT/src/research/services/documentation-service.ts - Documentation implementation
+- @$AIWG_ROOT/agentic/code/frameworks/research-complete/templates/finding-template.md - Finding template
+- @$AIWG_ROOT/agentic/code/addons/voice-framework/voices/technical-authority.md - Voice profile
 - @.claude/rules/citation-policy.md - Citation requirements

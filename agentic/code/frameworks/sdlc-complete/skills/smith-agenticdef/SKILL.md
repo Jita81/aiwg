@@ -208,7 +208,7 @@ Catalogs:
 
 ## References
 
-- @docs/smithing/agentic-smiths.md - Agentic Smiths documentation
-- @agentic/code/frameworks/sdlc-complete/agents/agentsmith.md - AgentSmith agent
-- @agentic/code/frameworks/sdlc-complete/agents/skillsmith.md - SkillSmith agent
-- @agentic/code/frameworks/sdlc-complete/agents/commandsmith.md - CommandSmith agent
+- @$AIWG_ROOT/docs/smithing/agentic-smiths.md - Agentic Smiths documentation
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/agentsmith.md - AgentSmith agent
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/skillsmith.md - SkillSmith agent
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/commandsmith.md - CommandSmith agent

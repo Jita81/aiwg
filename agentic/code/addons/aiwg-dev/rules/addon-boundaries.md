@@ -26,8 +26,8 @@ A developer writes an agent that references `@.aiwg/requirements/UC-001.md`. The
 
 | Directory | Role | Ships to users? | How to reference |
 |-----------|------|-----------------|-----------------|
-| `agentic/code/addons/<name>/` | Framework source | YES via `aiwg use` | `@agentic/code/addons/<name>/...` |
-| `agentic/code/frameworks/<name>/` | Framework source | YES via `aiwg use` | `@agentic/code/frameworks/<name>/...` |
+| `agentic/code/addons/<name>/` | Framework source | YES via `aiwg use` | `@$AIWG_ROOT/agentic/code/addons/<name>/...` |
+| `agentic/code/frameworks/<name>/` | Framework source | YES via `aiwg use` | `@$AIWG_ROOT/agentic/code/frameworks/<name>/...` |
 | `src/` | CLI and MCP source | YES via npm package | N/A (compiled) |
 | `.aiwg/` | Project output (AIWG's own development) | NO | Only within this repo |
 | `.claude/` | Deployment target | NO (overwritten) | Do not author here |
@@ -106,8 +106,8 @@ Is this intended for AIWG users to have after running `aiwg use`?
 
 ## References
 
-- @agentic/code/addons/aiwg-dev/rules/skill-placement.md — Deployment target vs source
-- @docs/development/aiwg-development-guide.md — Source vs output distinction (full treatment)
+- @$AIWG_ROOT/agentic/code/addons/aiwg-dev/rules/skill-placement.md — Deployment target vs source
+- @$AIWG_ROOT/docs/development/aiwg-development-guide.md — Source vs output distinction (full treatment)
 - `CLAUDE.md` — The `.aiwg/` Boundary section
 
 ---

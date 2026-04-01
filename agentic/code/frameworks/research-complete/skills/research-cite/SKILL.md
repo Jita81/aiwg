@@ -193,8 +193,8 @@ When writing documentation:
 
 ## References
 
-- @agentic/code/frameworks/research-complete/agents/citation-agent.md - Citation Agent
-- @src/research/services/citation-service.ts - Citation formatting
+- @$AIWG_ROOT/agentic/code/frameworks/research-complete/agents/citation-agent.md - Citation Agent
+- @$AIWG_ROOT/src/research/services/citation-service.ts - Citation formatting
 - @.claude/rules/citation-policy.md - Citation policy requirements
-- @agentic/code/frameworks/sdlc-complete/schemas/research/frontmatter-schema.yaml - Source metadata
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/frontmatter-schema.yaml - Source metadata
 - @.aiwg/research/docs/grade-assessment-guide.md - GRADE levels

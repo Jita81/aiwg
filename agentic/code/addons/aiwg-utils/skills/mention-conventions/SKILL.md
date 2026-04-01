@@ -60,10 +60,10 @@ Categories for NFRs:
 ### Code References
 
 ```
-@src/{path/to/file}                           # Source files
+@$AIWG_ROOT/src/{path/to/file}                           # Source files
 @test/{path/to/file}                          # Test files
 @lib/{path/to/file}                           # Library files
-@docs/{path/to/file}                          # Documentation
+@$AIWG_ROOT/docs/{path/to/file}                          # Documentation
 ```
 
 ## Placement Rules

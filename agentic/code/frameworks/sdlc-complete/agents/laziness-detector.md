@@ -727,13 +727,13 @@ When operating within Ralph iteration loops:
 4. **On detection**: Trigger PAUSE→DIAGNOSE→ADAPT→RETRY protocol
 5. **On escalation**: Hand off to human with full context
 
-See @agentic/code/addons/ralph/schemas/iteration-analytics.yaml for iteration tracking.
+See @$AIWG_ROOT/agentic/code/addons/ralph/schemas/iteration-analytics.yaml for iteration tracking.
 
 ## References
 
 - @.aiwg/research/findings/agentic-laziness-research.md - Comprehensive research compilation
 - @.aiwg/patterns/laziness-patterns.yaml - Complete pattern catalog
-- @src/hooks/laziness-detection.ts - Hook implementation
+- @$AIWG_ROOT/src/hooks/laziness-detection.ts - Hook implementation
 - @.claude/rules/executable-feedback.md - Test execution requirements
 - @.claude/rules/actionable-feedback.md - Feedback quality standards
 - @.aiwg/intake/agent-persistence-solution-profile.md - Solution design
@@ -746,11 +746,11 @@ See @agentic/code/addons/ralph/schemas/iteration-analytics.yaml for iteration tr
 
 After detecting avoidance patterns or generating reports, create provenance records per @.claude/rules/provenance-tracking.md:
 
-1. **Create provenance record** - Use @agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml format
+1. **Create provenance record** - Use @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml format
 2. **Record Entity** - Detection report path as URN (`urn:aiwg:artifact:<path>`) with content hash
 3. **Record Activity** - Type (`detection` for pattern identification, `blocking` for write prevention) with timestamps
 4. **Record Agent** - This agent (`urn:aiwg:agent:laziness-detector`) with tool version
 5. **Document derivations** - Link detection reports to source diffs and pattern catalog as `wasDerivedFrom`
 6. **Save record** - Write to `.aiwg/research/provenance/records/<artifact-name>.prov.yaml`
 
-See @agentic/code/frameworks/sdlc-complete/agents/provenance-manager.md for the Provenance Manager agent.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/provenance-manager.md for the Provenance Manager agent.

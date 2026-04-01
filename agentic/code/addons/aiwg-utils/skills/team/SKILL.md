@@ -199,8 +199,8 @@ If the team name is ambiguous:
 
 ## References
 
-- @src/cli/handlers/team.ts — Team command handler
-- @agentic/code/frameworks/sdlc-complete/teams/ — Built-in team definitions
-- @agentic/code/frameworks/sdlc-complete/teams/manifest.json — Team manifest
-- @agentic/code/frameworks/sdlc-complete/teams/schema.json — Team definition schema
-- @docs/cli-reference.md — CLI reference
+- @$AIWG_ROOT/src/cli/handlers/team.ts — Team command handler
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/teams/ — Built-in team definitions
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/teams/manifest.json — Team manifest
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/teams/schema.json — Team definition schema
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

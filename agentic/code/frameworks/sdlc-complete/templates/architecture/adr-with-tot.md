@@ -243,10 +243,10 @@ This option scored **XX/100** against evaluation criteria, exceeding the minimum
 
 - **Template Type:** architecture-adr
 - **SDLC Phase:** Elaboration, Construction
-- **Primary Agent:** @agentic/code/frameworks/sdlc-complete/agents/architecture-designer.md
+- **Primary Agent:** @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/architecture-designer.md
 - **Related Templates:**
-  - @agentic/code/frameworks/sdlc-complete/templates/architecture/software-architecture-doc.md
-  - @agentic/code/frameworks/sdlc-complete/templates/requirements/nfr-module.md
+  - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/architecture/software-architecture-doc.md
+  - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/requirements/nfr-module.md
 - **Version:** 2.0.0
 - **Last Updated:** 2026-01-25
 - **Change Summary:** Added Tree of Thoughts evaluation methodology per issue #97

@@ -122,6 +122,6 @@ To test this skill:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/commands/intake-wizard.md - Primary intake command
-- @agentic/code/frameworks/sdlc-complete/commands/intake-from-codebase.md - Codebase intake command
-- @agentic/code/frameworks/sdlc-complete/commands/intake-start.md - Intake validation command
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/intake-wizard.md - Primary intake command
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/intake-from-codebase.md - Codebase intake command
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/intake-start.md - Intake validation command

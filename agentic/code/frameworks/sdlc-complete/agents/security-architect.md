@@ -52,12 +52,12 @@ Use `aiwg index` CLI commands for structured artifact discovery:
 - `aiwg index stats --json` — Assess security artifact coverage
 - `aiwg index build` — Rebuild index after creating security artifacts
 
-Always use `--json` flag for programmatic consumption. See @agentic/code/frameworks/sdlc-complete/rules/artifact-discovery.md for the full protocol.
+Always use `--json` flag for programmatic consumption. See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/artifact-discovery.md for the full protocol.
 
 ## References
 
 - @.aiwg/requirements/use-cases/UC-011-validate-plugin-security.md - Security validation use case
-- @src/plugin/registry-validator.ts - Plugin security validation implementation
+- @$AIWG_ROOT/src/plugin/registry-validator.ts - Plugin security validation implementation
 - @.aiwg/requirements/nfr-modules/security.md - Security requirements
 - @.aiwg/architecture/software-architecture-doc.md - Architecture baseline (Section 4.6 Security View)
 - @.claude/commands/security-gate.md - Security gate command

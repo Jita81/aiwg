@@ -154,6 +154,6 @@ aiwg validate-metadata --json
 
 ## References
 
-- @src/cli/handlers/utilities.ts — Command handler
-- @docs/cli-reference.md — CLI reference
-- @src/extensions/types.ts — Extension type definitions and schema
+- @$AIWG_ROOT/src/cli/handlers/utilities.ts — Command handler
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference
+- @$AIWG_ROOT/src/extensions/types.ts — Extension type definitions and schema

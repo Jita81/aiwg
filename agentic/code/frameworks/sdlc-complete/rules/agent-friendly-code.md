@@ -308,9 +308,9 @@ Before writing or modifying code:
 - Codified Context (Vasilopoulos, Feb 2026) — arxiv:2602.20478
 - Long-Running AI Agents (Zylos, Jan 2026) — Task duration correlates with file size
 - Context Engineering for Coding Agents (Fowler, 2025) — Structured context improves agent performance
-- @agentic/code/frameworks/sdlc-complete/rules/anti-laziness.md
-- @agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md
-- @agentic/code/frameworks/sdlc-complete/rules/agent-generation-guardrails.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/anti-laziness.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/agent-generation-guardrails.md
 
 ---
 

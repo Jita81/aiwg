@@ -211,7 +211,7 @@ If the session scope is unclear:
 
 ## References
 
-- @src/cli/handlers/subcommands.ts — Metrics tokens handler
-- @src/metrics/token-counter.ts — Token counting, MetaGPT baseline constants (REF-013)
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/token-efficiency.yaml — Token efficiency schema
-- @docs/cli-reference.md — CLI reference
+- @$AIWG_ROOT/src/cli/handlers/subcommands.ts — Metrics tokens handler
+- @$AIWG_ROOT/src/metrics/token-counter.ts — Token counting, MetaGPT baseline constants (REF-013)
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/token-efficiency.yaml — Token efficiency schema
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

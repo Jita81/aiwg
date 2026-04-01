@@ -770,8 +770,8 @@ export const authMiddleware = async (req, res, next) => {
 
 ## References
 
-- Templates: @agentic/code/frameworks/sdlc-complete/templates/issue-comments/
-- Related: @agentic/code/frameworks/sdlc-complete/commands/issue-sync.md, @agentic/code/frameworks/sdlc-complete/commands/issue-close.md
+- Templates: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/issue-comments/
+- Related: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/issue-sync.md, @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/issue-close.md
 - MCP tools: Gitea issue management
 - GitHub CLI: `gh issue comment`
 

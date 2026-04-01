@@ -184,7 +184,7 @@ metagpt_pattern: [sequential | parallel | iterative]
 **Required @-mentions**:
 - @.aiwg/[upstream-artifact].md - [Relationship]
 - @.aiwg/[context-artifact].md - [Relationship]
-- @src/[implementation].ts - [If applicable]
+- @$AIWG_ROOT/src/[implementation].ts - [If applicable]
 - @test/[test-file].ts - [If applicable]
 ```
 
@@ -363,9 +363,9 @@ Consider updating stakeholders on completion:
 ## References
 
 - @.aiwg/research/docs/sop-encoding-guide.md - How to encode SOPs
-- @docs/references/REF-013-metagpt-multi-agent-framework.md - MetaGPT research basis
-- @agentic/code/frameworks/sdlc-complete/agents/manifest.json - Available agents
-- @agentic/code/frameworks/sdlc-complete/templates/flow-patterns/requirements-sop-example.md - Concrete example
+- @$AIWG_ROOT/docs/references/REF-013-metagpt-multi-agent-framework.md - MetaGPT research basis
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/manifest.json - Available agents
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/flow-patterns/requirements-sop-example.md - Concrete example
 
 ## Metadata
 

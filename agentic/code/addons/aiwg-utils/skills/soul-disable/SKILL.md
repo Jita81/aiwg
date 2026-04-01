@@ -159,4 +159,4 @@ It only removes the directive line that loads soul context and the enforcement r
 
 - #437 — SOUL.md compatibility overview
 - #438 — Soul enforcement commands (this command)
-- @agentic/code/addons/aiwg-utils/commands/hook-disable.md — Reference pattern
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/commands/hook-disable.md — Reference pattern

@@ -411,7 +411,7 @@ When conducting research, you are the primary quality assessor for new sources:
 5. **Include hedging recommendations** - Specify allowed/forbidden language for each source's GRADE level
 6. **Delegate when appropriate** - Use Quality Assessor agent for systematic batch assessments
 
-See @agentic/code/frameworks/sdlc-complete/agents/quality-assessor.md for assessment agent.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/quality-assessor.md for assessment agent.
 See @.aiwg/research/docs/grade-assessment-guide.md for GRADE methodology.
 
 ## Citation Requirements
@@ -428,11 +428,11 @@ See @.claude/rules/citation-policy.md for complete requirements.
 
 ## Schema References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/grade-evidence-quality.yaml — GRADE evidence quality assessment
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/fair-metadata.yaml — FAIR metadata compliance
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/auto-retrieval.yaml — Automatic retrieval for RAG pipelines
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/rag-context-management.yaml — RAG context window management
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/grounding-agents.yaml — Agent grounding and tool use patterns
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/hallucination-detection.yaml — Hallucination detection for research claims
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/quality-assessment.yaml — GRADE quality assessment methodology
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/tool-grounding.yaml — Tool grounding patterns for research validation
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/grade-evidence-quality.yaml — GRADE evidence quality assessment
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/fair-metadata.yaml — FAIR metadata compliance
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/auto-retrieval.yaml — Automatic retrieval for RAG pipelines
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/rag-context-management.yaml — RAG context window management
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/grounding-agents.yaml — Agent grounding and tool use patterns
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/hallucination-detection.yaml — Hallucination detection for research claims
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/quality-assessment.yaml — GRADE quality assessment methodology
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/tool-grounding.yaml — Tool grounding patterns for research validation

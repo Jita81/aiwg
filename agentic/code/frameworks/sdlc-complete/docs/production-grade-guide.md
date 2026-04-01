@@ -150,7 +150,7 @@ Claude Code 2.0.43 fixed @-mention loading for nested files. AIWG leverages this
 @.aiwg/security/controls/{id}.md              # Controls
 
 # Code
-@src/{path}                                    # Source
+@$AIWG_ROOT/src/{path}                                    # Source
 @test/{path}                                   # Tests
 ```
 

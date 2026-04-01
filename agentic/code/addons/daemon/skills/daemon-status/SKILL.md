@@ -111,6 +111,6 @@ Last shutdown: clean (SIGTERM)
 
 ## References
 
-- @docs/daemon-guide.md — Daemon architecture and operations
-- @tools/daemon/daemon-main.mjs — Daemon implementation
-- @tools/ralph-external/daemon-supervisor.mjs — Agent supervisor
+- @$AIWG_ROOT/docs/daemon-guide.md — Daemon architecture and operations
+- @$AIWG_ROOT/tools/daemon/daemon-main.mjs — Daemon implementation
+- @$AIWG_ROOT/tools/ralph-external/daemon-supervisor.mjs — Agent supervisor

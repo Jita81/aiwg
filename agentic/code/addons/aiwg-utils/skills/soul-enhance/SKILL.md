@@ -218,7 +218,7 @@ If a voice profile exists, `soul-enhance` cross-references it to ensure consiste
 
 ## References
 
-- @agentic/code/addons/aiwg-utils/skills/soul-validate/SKILL.md — Validation (used internally)
-- @agentic/code/addons/aiwg-utils/skills/soul-create/SKILL.md — Creation skill
-- @docs/soul-md-guide.md — Integration guide
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/skills/soul-validate/SKILL.md — Validation (used internally)
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/skills/soul-create/SKILL.md — Creation skill
+- @$AIWG_ROOT/docs/soul-md-guide.md — Integration guide
 - #437 — SOUL.md compatibility issue (Phase 2)

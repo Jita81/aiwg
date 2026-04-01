@@ -292,8 +292,8 @@ Before completing a Ralph loop:
 
 ## References
 
-- @agentic/code/addons/ralph/schemas/iteration-analytics.yaml - Iteration tracking
-- @agentic/code/frameworks/sdlc-complete/schemas/research/quality-dimensions.yaml - Quality scoring
+- @$AIWG_ROOT/agentic/code/addons/ralph/schemas/iteration-analytics.yaml - Iteration tracking
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/quality-dimensions.yaml - Quality scoring
 - @.aiwg/research/findings/REF-015-self-refine.md - Research foundation
 - #168 - Implementation issue
 

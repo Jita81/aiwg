@@ -428,8 +428,8 @@ Generate scheduled reports:
 
 ## References
 
-- @agentic/code/frameworks/research-complete/agents/workflow-agent.md - Status monitoring
-- @src/research/services/status-service.ts - Health check implementation
+- @$AIWG_ROOT/agentic/code/frameworks/research-complete/agents/workflow-agent.md - Status monitoring
+- @$AIWG_ROOT/src/research/services/status-service.ts - Health check implementation
 - @.aiwg/research/fixity-manifest.json - Integrity tracking
 - @.aiwg/research/README.md - Corpus structure
 - @.claude/rules/citation-policy.md - Policy compliance

@@ -185,6 +185,6 @@ This may indicate a configuration issue.
 
 ## References
 
-- Agent: @agentic/code/addons/uat-mcp/agents/uat-planner.md
-- Template: @agentic/code/addons/uat-mcp/templates/uat-phase.md
-- Schema: @agentic/code/addons/uat-mcp/schemas/uat-plan.yaml
+- Agent: @$AIWG_ROOT/agentic/code/addons/uat-mcp/agents/uat-planner.md
+- Template: @$AIWG_ROOT/agentic/code/addons/uat-mcp/templates/uat-phase.md
+- Schema: @$AIWG_ROOT/agentic/code/addons/uat-mcp/schemas/uat-plan.yaml

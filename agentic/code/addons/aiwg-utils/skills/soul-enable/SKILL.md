@@ -246,5 +246,5 @@ Soul already enabled for Claude Code
 
 - #437 — SOUL.md compatibility overview
 - #438 — Soul enforcement commands (this command)
-- @agentic/code/addons/aiwg-utils/rules/soul-enforcement.md — Enforcement rule template
-- @agentic/code/addons/aiwg-utils/commands/hook-enable.md — Reference pattern
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/soul-enforcement.md — Enforcement rule template
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/commands/hook-enable.md — Reference pattern

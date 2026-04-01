@@ -112,7 +112,7 @@ Before citing any paper:
 
 All frontmatter MUST conform to:
 ```
-@agentic/code/frameworks/sdlc-complete/schemas/research/frontmatter-schema.yaml
+@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/frontmatter-schema.yaml
 ```
 
 ## Fixity Verification
@@ -132,7 +132,7 @@ Verification protocol:
 ### When Creating Research Documents
 
 Agents MUST:
-1. Use template: `@agentic/code/frameworks/sdlc-complete/templates/research/ref-template-with-frontmatter.md`
+1. Use template: `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/research/ref-template-with-frontmatter.md`
 2. Populate all required frontmatter fields
 3. Compute PDF checksum if PDF available
 4. Validate against schema before saving
@@ -160,8 +160,8 @@ Before saving a research document:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/research/frontmatter-schema.yaml - Frontmatter schema
-- @agentic/code/frameworks/sdlc-complete/schemas/research/fixity-manifest.yaml - Fixity schema
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/frontmatter-schema.yaml - Frontmatter schema
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/fixity-manifest.yaml - Fixity schema
 - @.aiwg/research/findings/REF-056-fair-principles.md - FAIR research
 - @.aiwg/research/docs/grade-assessment-guide.md - GRADE process
 - #105 - Frontmatter issue

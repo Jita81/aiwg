@@ -179,7 +179,7 @@ Warnings:
 
 ## References
 
-- @agentic/code/addons/aiwg-dev/rules/component-completeness.md — Completeness requirements per artifact type
-- @agentic/code/addons/aiwg-dev/rules/skill-placement.md — Placement violation detection
-- @agentic/code/addons/aiwg-dev/rules/addon-boundaries.md — .aiwg/ reference detection
-- @agentic/code/addons/aiwg-dev/skills/validate-component/SKILL.md — Per-component validation
+- @$AIWG_ROOT/agentic/code/addons/aiwg-dev/rules/component-completeness.md — Completeness requirements per artifact type
+- @$AIWG_ROOT/agentic/code/addons/aiwg-dev/rules/skill-placement.md — Placement violation detection
+- @$AIWG_ROOT/agentic/code/addons/aiwg-dev/rules/addon-boundaries.md — .aiwg/ reference detection
+- @$AIWG_ROOT/agentic/code/addons/aiwg-dev/skills/validate-component/SKILL.md — Per-component validation

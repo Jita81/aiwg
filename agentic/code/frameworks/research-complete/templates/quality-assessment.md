@@ -552,7 +552,7 @@ Priority: #1 and #2 (directly affect AIWG production use)
 - @.aiwg/research/findings/REF-XXX.md - Literature note
 - @.claude/rules/citation-policy.md - GRADE-based citation language
 - @.claude/rules/research-metadata.md - Baseline quality by source type
-- @agentic/code/frameworks/research-complete/schemas/grade-schema.yaml - GRADE assessment schema
+- @$AIWG_ROOT/agentic/code/frameworks/research-complete/schemas/grade-schema.yaml - GRADE assessment schema
 
 ## Template Usage Notes
 
@@ -588,9 +588,9 @@ Per @.claude/rules/citation-policy.md
 
 - **Template Type:** research-quality-assessment
 - **Framework:** research-complete
-- **Primary Agent:** @agentic/code/frameworks/research-complete/agents/quality-agent.md
+- **Primary Agent:** @$AIWG_ROOT/agentic/code/frameworks/research-complete/agents/quality-agent.md
 - **Related Templates:**
-  - @agentic/code/frameworks/research-complete/templates/literature-note.md
-  - @agentic/code/frameworks/research-complete/templates/extraction.yaml
+  - @$AIWG_ROOT/agentic/code/frameworks/research-complete/templates/literature-note.md
+  - @$AIWG_ROOT/agentic/code/frameworks/research-complete/templates/extraction.yaml
 - **Version:** 1.0.0
 - **Last Updated:** 2026-02-03

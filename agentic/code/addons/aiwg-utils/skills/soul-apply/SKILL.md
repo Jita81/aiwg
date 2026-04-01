@@ -161,8 +161,8 @@ If not, the soul may be too vague — recommend `/soul-enhance`.
 
 ## References
 
-- @agentic/code/addons/voice-framework/skills/voice-apply/SKILL.md — Voice application (complementary)
-- @agentic/code/addons/aiwg-utils/rules/soul-enforcement.md — Passive enforcement rule
-- @agentic/code/addons/aiwg-utils/skills/soul-create/SKILL.md — Soul creation
-- @docs/soul-md-guide.md — Integration guide
+- @$AIWG_ROOT/agentic/code/addons/voice-framework/skills/voice-apply/SKILL.md — Voice application (complementary)
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/soul-enforcement.md — Passive enforcement rule
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/skills/soul-create/SKILL.md — Soul creation
+- @$AIWG_ROOT/docs/soul-md-guide.md — Integration guide
 - #437 — SOUL.md compatibility issue (Phase 2)

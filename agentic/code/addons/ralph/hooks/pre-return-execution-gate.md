@@ -84,6 +84,6 @@ hook:
 ## References
 
 - @.claude/rules/executable-feedback.md - Feedback rules
-- @agentic/code/addons/ralph/schemas/debug-memory.yaml - Memory schema
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/executable-feedback.yaml - Workflow schema
+- @$AIWG_ROOT/agentic/code/addons/ralph/schemas/debug-memory.yaml - Memory schema
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/executable-feedback.yaml - Workflow schema
 - @.aiwg/research/findings/REF-013-metagpt.md - Research foundation

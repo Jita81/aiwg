@@ -96,6 +96,6 @@ Apply these principles to every response:
 
 ## References
 
-- @agentic/code/addons/daemon/behaviors/concierge.behavior.md — Behavior definition
-- @agentic/code/addons/daemon/rules/daemon-interaction.md — Interaction rules
-- @docs/daemon-guide.md — Daemon architecture
+- @$AIWG_ROOT/agentic/code/addons/daemon/behaviors/concierge.behavior.md — Behavior definition
+- @$AIWG_ROOT/agentic/code/addons/daemon/rules/daemon-interaction.md — Interaction rules
+- @$AIWG_ROOT/docs/daemon-guide.md — Daemon architecture

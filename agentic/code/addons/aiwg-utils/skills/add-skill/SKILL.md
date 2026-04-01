@@ -217,7 +217,7 @@ aiwg add-skill requirement-tracer --to sdlc-complete
 
 ## References
 
-- @agentic/code/addons/aiwg-utils/skills/devkit-create-skill/SKILL.md — Devkit equivalent (interactive design)
-- @src/cli/handlers/scaffolding.ts — CLI handler implementation
-- @docs/cli-reference.md — Full CLI reference
-- @agentic/code/addons/aiwg-utils/skills/ — Example skill definitions
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/skills/devkit-create-skill/SKILL.md — Devkit equivalent (interactive design)
+- @$AIWG_ROOT/src/cli/handlers/scaffolding.ts — CLI handler implementation
+- @$AIWG_ROOT/docs/cli-reference.md — Full CLI reference
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/skills/ — Example skill definitions

@@ -28,7 +28,7 @@ When generating tests, back-reference the source:
 
 ```typescript
 /**
- * @source @src/path/to/implementation.ts
+ * @source @$AIWG_ROOT/src/path/to/implementation.ts
  * @requirement @.aiwg/requirements/use-cases/UC-XXX.md
  */
 ```
@@ -41,7 +41,7 @@ When generating requirements, architecture, or other SDLC docs, include Referenc
 ## References
 
 - @.aiwg/requirements/user-stories.md - Source requirements
-- @src/module/implementation.ts - Implementation
+- @$AIWG_ROOT/src/module/implementation.ts - Implementation
 - @test/unit/module.test.ts - Test coverage
 ```
 
@@ -53,7 +53,7 @@ When generating agent definitions, include References section:
 ## References
 
 - @.aiwg/requirements/use-cases/UC-XXX.md - Primary use case
-- @src/relevant/module.ts - Implementation this agent works with
+- @$AIWG_ROOT/src/relevant/module.ts - Implementation this agent works with
 - @.claude/commands/related-command.md - Related slash command
 ```
 
@@ -78,8 +78,8 @@ Use semantic tags to indicate relationship type:
 | `@architecture` | Architectural context | `@architecture @.aiwg/architecture/sad.md` |
 | `@nfr` | Non-functional requirement | `@nfr @.aiwg/requirements/nfr-modules/security.md` |
 | `@tests` | Test coverage location | `@tests @test/unit/module.test.ts` |
-| `@source` | Source code for this test | `@source @src/module.ts` |
-| `@depends` | Dependencies | `@depends @src/utils/helper.ts` |
+| `@source` | Source code for this test | `@source @$AIWG_ROOT/src/module.ts` |
+| `@depends` | Dependencies | `@depends @$AIWG_ROOT/src/utils/helper.ts` |
 | `@agent` | Related agent | `@agent @.claude/agents/test-engineer.md` |
 | `@command` | Related command | `@command @.claude/commands/generate-tests.md` |
 
@@ -96,7 +96,7 @@ When creating references, add the reverse link when practical:
 **Backward**: Test → Source
 ```typescript
 // test/unit/auth/login.test.ts
-/** @source @src/auth/login.ts */
+/** @source @$AIWG_ROOT/src/auth/login.ts */
 ```
 
 ## Validation

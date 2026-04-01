@@ -173,15 +173,15 @@ When creating agent definitions that require API access:
    - Token loaded within heredoc scope only
    - Never exposed in logs or command history
    - Automatically cleaned up after execution
-   - See @agentic/code/frameworks/sdlc-complete/docs/token-security.md
+   - See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/token-security.md
    ```
 
 3. **References MUST include security documentation**:
    ```markdown
    ## References
 
-   - @agentic/code/frameworks/sdlc-complete/docs/token-security.md
-   - @agentic/code/addons/security/secure-token-load.md
+   - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/token-security.md
+   - @$AIWG_ROOT/agentic/code/addons/security/secure-token-load.md
    ```
 
 ## Command/Skill Requirements
@@ -309,16 +309,16 @@ There are NO exceptions to these rules. All token handling must follow secure pa
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/docs/token-security.md - Comprehensive security documentation
-- @agentic/code/addons/security/secure-token-load.md - Pattern library
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/token-security.md - Comprehensive security documentation
+- @$AIWG_ROOT/agentic/code/addons/security/secure-token-load.md - Pattern library
 - @~/.claude/CLAUDE.md - Token file locations and API patterns
 
 ## Questions
 
 If unsure about token security:
 
-1. Consult @agentic/code/frameworks/sdlc-complete/docs/token-security.md
-2. Use @agentic/code/addons/security/secure-token-load.md patterns
+1. Consult @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/token-security.md
+2. Use @$AIWG_ROOT/agentic/code/addons/security/secure-token-load.md patterns
 3. Default to most restrictive pattern (heredoc with inline load)
 4. When in doubt, ask before implementing
 

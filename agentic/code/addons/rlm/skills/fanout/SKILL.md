@@ -188,8 +188,8 @@ If the user's intent is ambiguous:
 
 ## References
 
-- @agentic/code/addons/rlm/skills/chunk/SKILL.md — Produce the chunk manifest fanout reads
-- @agentic/code/addons/rlm/skills/rlm-search/SKILL.md — Full pipeline (prep + fanout + synthesize)
-- @agentic/code/addons/aiwg-utils/rules/context-budget.md — Parallel budget constraints
-- @agentic/code/addons/aiwg-utils/rules/subagent-scoping.md — Subagent isolation rules
-- @agentic/code/addons/rlm/schemas/rlm-chunk-manifest.yaml — Manifest schema
+- @$AIWG_ROOT/agentic/code/addons/rlm/skills/chunk/SKILL.md — Produce the chunk manifest fanout reads
+- @$AIWG_ROOT/agentic/code/addons/rlm/skills/rlm-search/SKILL.md — Full pipeline (prep + fanout + synthesize)
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/context-budget.md — Parallel budget constraints
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md — Subagent isolation rules
+- @$AIWG_ROOT/agentic/code/addons/rlm/schemas/rlm-chunk-manifest.yaml — Manifest schema

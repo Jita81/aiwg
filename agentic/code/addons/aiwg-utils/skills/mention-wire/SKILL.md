@@ -48,7 +48,7 @@ Detect relationships using heuristics:
 | Pattern | Inferred @-mention | Confidence |
 |---------|-------------------|------------|
 | File in `src/auth/` | `@.aiwg/requirements/UC-*-auth*.md` | 85% |
-| File named `*test*.ts` | `@src/{corresponding-source}.ts` | 92% |
+| File named `*test*.ts` | `@$AIWG_ROOT/src/{corresponding-source}.ts` | 92% |
 | Comment `// UC-001` | `@.aiwg/requirements/UC-001.md` | 95% |
 | Comment `// ADR-005` | `@.aiwg/architecture/adrs/ADR-005*.md` | 90% |
 | JSDoc `@implements` | Parse and validate | 98% |
@@ -63,7 +63,7 @@ src/services/auth/login.ts (confidence: 85%)
   + @.aiwg/architecture/adrs/ADR-005-jwt-strategy.md (comment: "JWT")
 
 test/integration/auth.test.ts (confidence: 92%)
-  + @src/services/auth/login.ts (test-to-source)
+  + @$AIWG_ROOT/src/services/auth/login.ts (test-to-source)
   + @.aiwg/requirements/UC-003-user-auth.md (inherited from source)
 ```
 

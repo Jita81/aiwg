@@ -611,9 +611,8 @@ gh issue list --milestone "v2.0" --state open
 
 ## References
 
-- Templates: @agentic/code/frameworks/sdlc-complete/templates/issue-comments/
-- Related commands: @agentic/code/frameworks/sdlc-complete/commands/issue-close.md, @agentic/code/frameworks/sdlc-complete/commands/issue-comment.md
-- Configuration: @.aiwg/config.yaml
+- Templates: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/issue-comments/
+- Related commands: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/issue-close.md, @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/issue-comment.md
 - MCP tools: Gitea issue management
 - Git hooks: Post-commit integration
 

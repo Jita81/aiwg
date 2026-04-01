@@ -360,7 +360,7 @@ Test failure investigation is an analysis process, not a binary pass/fail decisi
 
 All detection patterns stored in:
 ```
-@agentic/code/addons/persistence/patterns/avoidance-catalog.yaml
+@$AIWG_ROOT/agentic/code/addons/persistence/patterns/avoidance-catalog.yaml
 ```
 
 **Pattern Categories**:
@@ -721,8 +721,8 @@ Before completing any code task:
 - @.claude/rules/executable-feedback.md - Executable feedback rules
 - @.claude/rules/actionable-feedback.md - Actionable feedback rules
 - @.claude/rules/tao-loop.md - TAO loop standardization
-- @agentic/code/addons/persistence/patterns/avoidance-catalog.yaml - Pattern catalog
-- @agentic/code/addons/ralph/schemas/reflection-memory.json - Reflection memory schema
+- @$AIWG_ROOT/agentic/code/addons/persistence/patterns/avoidance-catalog.yaml - Pattern catalog
+- @$AIWG_ROOT/agentic/code/addons/ralph/schemas/reflection-memory.json - Reflection memory schema
 
 ---
 

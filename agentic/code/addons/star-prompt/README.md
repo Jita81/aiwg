@@ -111,6 +111,6 @@ To test the star prompt:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/commands/intake-wizard.md - Example integration
-- @agentic/code/frameworks/sdlc-complete/commands/intake-from-codebase.md - Example integration
-- @agentic/code/frameworks/sdlc-complete/commands/intake-start.md - Example integration
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/intake-wizard.md - Example integration
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/intake-from-codebase.md - Example integration
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/intake-start.md - Example integration

@@ -111,7 +111,7 @@ Users can install but cannot update, causing confusion and support burden.
 
 ## References
 
-- @docs/contributing/versioning.md - Full versioning documentation
+- @$AIWG_ROOT/docs/contributing/versioning.md - Full versioning documentation
 - @CLAUDE.md - Release Documentation Requirements
 - [Semantic Versioning](https://semver.org/) - No leading zeros rule
 

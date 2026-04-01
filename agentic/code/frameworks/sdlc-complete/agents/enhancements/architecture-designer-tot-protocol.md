@@ -1,7 +1,7 @@
 # Architecture Designer: Tree of Thoughts Enhancement
 
 **Enhancement Version:** 1.0.0
-**Base Agent:** @agentic/code/frameworks/sdlc-complete/agents/architecture-designer.md
+**Base Agent:** @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/architecture-designer.md
 **Research Basis:** REF-020 Tree of Thoughts (Yao et al., 2023, NeurIPS)
 **Issue:** #97
 **Status:** Active
@@ -326,7 +326,7 @@ Re-evaluate this decision if:
 
 The Architecture Designer agent uses the ToT-enhanced ADR template:
 
-**Template Location:** `@agentic/code/frameworks/sdlc-complete/templates/architecture/adr-with-tot.md`
+**Template Location:** `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/architecture/adr-with-tot.md`
 
 **Key Sections Populated:**
 
@@ -673,8 +673,8 @@ Track ToT decision effectiveness:
 
 - **Research Paper:** @.aiwg/research/paper-analysis/REF-020-tree-of-thoughts.md
 - **Workflow Guide:** @.aiwg/research/docs/tot-decision-workflow.md
-- **ADR Template:** @agentic/code/frameworks/sdlc-complete/templates/architecture/adr-with-tot.md
-- **Base Agent:** @agentic/code/frameworks/sdlc-complete/agents/architecture-designer.md
+- **ADR Template:** @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/architecture/adr-with-tot.md
+- **Base Agent:** @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/architecture-designer.md
 - **NFR Modules:** @.aiwg/requirements/nfr-modules/
 - **Software Architecture Doc:** @.aiwg/architecture/software-architecture-doc.md
 

@@ -334,6 +334,6 @@ Recommended next steps:
 
 ## References
 
-- @docs/development/file-placement-guide.md - Correct file placement workflow
-- @agentic/code/addons/aiwg-utils/commands/aiwg-regenerate.md - Context file regeneration
-- @docs/CLI_USAGE.md - Full CLI documentation
+- @$AIWG_ROOT/docs/development/file-placement-guide.md - Correct file placement workflow
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/commands/aiwg-regenerate.md - Context file regeneration
+- @$AIWG_ROOT/docs/CLI_USAGE.md - Full CLI documentation

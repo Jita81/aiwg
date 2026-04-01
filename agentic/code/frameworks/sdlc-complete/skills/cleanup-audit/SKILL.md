@@ -215,7 +215,7 @@ Output as JSON:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/agents/dead-code-analyzer.md
-- @agentic/code/frameworks/sdlc-complete/skills/cleanup-audit/SKILL.md
-- @agentic/code/frameworks/sdlc-complete/rules/agent-friendly-code.md
-- @agentic/code/frameworks/sdlc-complete/rules/anti-laziness.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/dead-code-analyzer.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/cleanup-audit/SKILL.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/agent-friendly-code.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/anti-laziness.md

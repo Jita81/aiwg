@@ -390,7 +390,7 @@ When `--interactive` is specified, ask strategic questions before regenerating:
 
 **Native UX tool preference**: For each question, use the platform's native interaction tool if available (e.g., `AskUserQuestion` in Claude Code). This provides a proper input UI rather than plain text output. If no native tool is available, fall back to formatted markdown with clear options. Ask one question per interaction turn.
 
-See `@agentic/code/addons/aiwg-utils/rules/native-ux-tools.md` for the full pattern.
+See `@$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/native-ux-tools.md` for the full pattern.
 
 ## Error Handling
 

@@ -221,6 +221,6 @@ Recommended Next Action:
 
 ## References
 
-- @agentic/code/frameworks/forensics-complete/agents/forensics-orchestrator.md - Orchestrator
-- @agentic/code/frameworks/forensics-complete/commands/forensics-investigate.md - Full workflow
-- @agentic/code/frameworks/forensics-complete/commands/forensics-report.md - Report generation
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/agents/forensics-orchestrator.md - Orchestrator
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/commands/forensics-investigate.md - Full workflow
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/commands/forensics-report.md - Report generation

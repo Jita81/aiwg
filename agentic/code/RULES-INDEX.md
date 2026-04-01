@@ -9,8 +9,8 @@ Scan component indexes to find relevant rules; load the full rule file via @-lin
 
 | Component | Type | Rules | Index |
 |-----------|------|-------|-------|
-| sdlc-complete | framework | 33 | @agentic/code/frameworks/sdlc-complete/rules/RULES-INDEX.md |
-| aiwg-utils | addon (core) | 7 | @agentic/code/addons/aiwg-utils/rules/RULES-INDEX.md |
+| sdlc-complete | framework | 33 | @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/RULES-INDEX.md |
+| aiwg-utils | addon (core) | 7 | @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/RULES-INDEX.md |
 
 **Total**: 40 rules across 2 components
 

@@ -416,4 +416,4 @@ The Discography Analyst feeds structured YAML to downstream agents:
 ---
 
 *Part of the AIWG Media Curator Framework*
-*See @agentic/code/frameworks/media-curator/README.md for complete framework documentation*
+*See @$AIWG_ROOT/agentic/code/frameworks/media-curator/README.md for complete framework documentation*

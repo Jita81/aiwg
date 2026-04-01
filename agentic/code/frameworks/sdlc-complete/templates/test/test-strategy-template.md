@@ -353,7 +353,7 @@ Before finalizing this test strategy:
 
 ## Related Templates
 
-- @agentic/code/frameworks/sdlc-complete/templates/test/master-test-plan-template.md - Detailed test plan
-- @agentic/code/frameworks/sdlc-complete/templates/test/iteration-test-plan-template.md - Sprint-level testing
-- @agentic/code/frameworks/sdlc-complete/templates/test/test-case-card.md - Individual test cases
-- @agentic/code/frameworks/sdlc-complete/templates/management/quality-assurance-plan-template.md - Overall quality approach
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/test/master-test-plan-template.md - Detailed test plan
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/test/iteration-test-plan-template.md - Sprint-level testing
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/test/test-case-card.md - Individual test cases
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/management/quality-assurance-plan-template.md - Overall quality approach

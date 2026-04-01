@@ -1122,16 +1122,16 @@ _Completed: 2026-02-09 10:03:00 UTC_
 
 ## References
 
-- `@tools/messaging/index.mjs` — Messaging hub implementation
-- `@tools/messaging/types.mjs` — Event topic definitions
-- `@tools/messaging/event-bus.mjs` — EventBus pub/sub system
-- `@tools/messaging/message-formatter.mjs` — Event formatting logic
-- `@tools/messaging/adapters/slack.mjs` — Slack adapter
-- `@tools/messaging/adapters/discord.mjs` — Discord adapter
-- `@tools/messaging/adapters/telegram.mjs` — Telegram adapter
-- `@agentic/code/addons/rlm/schemas/rlm-task-tree.yaml` — Task tree schema
-- `@agentic/code/addons/rlm/schemas/rlm-cost.yaml` — Cost tracking schema
-- `@agentic/code/addons/rlm/manifest.json` — RLM addon manifest
+- `@$AIWG_ROOT/tools/messaging/index.mjs` — Messaging hub implementation
+- `@$AIWG_ROOT/tools/messaging/types.mjs` — Event topic definitions
+- `@$AIWG_ROOT/tools/messaging/event-bus.mjs` — EventBus pub/sub system
+- `@$AIWG_ROOT/tools/messaging/message-formatter.mjs` — Event formatting logic
+- `@$AIWG_ROOT/tools/messaging/adapters/slack.mjs` — Slack adapter
+- `@$AIWG_ROOT/tools/messaging/adapters/discord.mjs` — Discord adapter
+- `@$AIWG_ROOT/tools/messaging/adapters/telegram.mjs` — Telegram adapter
+- `@$AIWG_ROOT/agentic/code/addons/rlm/schemas/rlm-task-tree.yaml` — Task tree schema
+- `@$AIWG_ROOT/agentic/code/addons/rlm/schemas/rlm-cost.yaml` — Cost tracking schema
+- `@$AIWG_ROOT/agentic/code/addons/rlm/manifest.json` — RLM addon manifest
 - `@.aiwg/architecture/adrs/ADR-messaging-bot-mode.md` — Messaging architecture
 
 ---

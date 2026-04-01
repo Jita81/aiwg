@@ -247,7 +247,7 @@ Wire @-mentions for traceability:
 - @.aiwg/architecture/adr/ADR-`id`.md - Related architectural decision
 - @.aiwg/requirements/use-cases/UC-`id`.md - Use case affected by risk
 - @.aiwg/management/risk-list.md - Risk register
-- @src/path/to/mitigation-code.ts - Mitigation implementation
+- @$AIWG_ROOT/src/path/to/mitigation-code.ts - Mitigation implementation
 
 ## Agent Notes
 
@@ -260,6 +260,6 @@ Wire @-mentions for traceability:
 
 ## Related Templates
 
-- @agentic/code/frameworks/sdlc-complete/templates/management/risk-list-template.md - Risk register
-- @agentic/code/frameworks/sdlc-complete/templates/management/risk-management-plan-template.md - Overall risk strategy
-- @agentic/code/frameworks/sdlc-complete/templates/governance/risk-acceptance-template.md - Formal risk acceptance
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/management/risk-list-template.md - Risk register
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/management/risk-management-plan-template.md - Overall risk strategy
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/governance/risk-acceptance-template.md - Formal risk acceptance

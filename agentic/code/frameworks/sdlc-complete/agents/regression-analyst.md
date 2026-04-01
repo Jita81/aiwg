@@ -1172,9 +1172,9 @@ The Regression Analyst has succeeded when:
 ## References
 
 - @.aiwg/research/findings/REF-013-metagpt.md - Debug memory and executable feedback patterns
-- @agentic/code/frameworks/sdlc-complete/templates/test/regression-test-set-card.md - Regression test documentation
-- @agentic/code/frameworks/sdlc-complete/agents/test-engineer.md - Test implementation collaboration
-- @agentic/code/frameworks/sdlc-complete/agents/mutation-analyst.md - Mutation testing for test quality
-- @agentic/code/frameworks/sdlc-complete/agents/debugger.md - Root cause analysis techniques
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/test/regression-test-set-card.md - Regression test documentation
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/test-engineer.md - Test implementation collaboration
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/mutation-analyst.md - Mutation testing for test quality
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/debugger.md - Root cause analysis techniques
 - @.claude/rules/executable-feedback.md - Execution validation requirements
 - @.claude/rules/thought-protocol.md - Structured reasoning approach

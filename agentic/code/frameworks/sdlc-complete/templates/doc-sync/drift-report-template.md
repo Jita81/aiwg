@@ -153,4 +153,4 @@ These need human judgment:
 
 - Previous sync: {last_sync_date}
 - Sync state: `.aiwg/.last-doc-sync`
-- Command: @agentic/code/frameworks/sdlc-complete/commands/doc-sync.md
+- Command: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/doc-sync.md

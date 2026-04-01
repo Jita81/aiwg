@@ -482,9 +482,9 @@ One of the following events:
 - @.aiwg/requirements/user-stories/US-AUTH-001.md - User login story
 
 **Implementation**:
-- @src/auth/AuthenticationService.ts - Implementation of authentication logic
-- @src/auth/SessionManager.ts - Session creation and management
-- @src/middleware/AuthMiddleware.ts - Authentication middleware for protected routes
+- @$AIWG_ROOT/src/auth/AuthenticationService.ts - Implementation of authentication logic
+- @$AIWG_ROOT/src/auth/SessionManager.ts - Session creation and management
+- @$AIWG_ROOT/src/middleware/AuthMiddleware.ts - Authentication middleware for protected routes
 
 **Testing**:
 - @test/integration/auth/authentication.test.ts - Integration tests for auth flow

@@ -612,19 +612,19 @@ ln -s /tmp/research-papers/sources/pdfs/paper.pdf .aiwg/research/sources/pdfs/RE
 
 After acquiring papers, create provenance records per @.claude/rules/provenance-tracking.md:
 
-1. **Create provenance record** using @agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml format
+1. **Create provenance record** using @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml format
 2. **Record Entity** - PDF file as URN with checksum
 3. **Record Activity** - Download activity with source URL and timestamp
 4. **Record Agent** - This agent with API versions used
 5. **Document derivations** - Link to discovery search results
 6. **Save record** to `.aiwg/research/provenance/records/`
 
-See @agentic/code/frameworks/sdlc-complete/agents/provenance-manager.md for Provenance Manager agent.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/provenance-manager.md for Provenance Manager agent.
 
 ## References
 
-- @.aiwg/flows/research-framework/elaboration/agents/acquisition-agent-spec.md - Agent specification
-- @.aiwg/flows/research-framework/elaboration/use-cases/UC-RF-002-acquire-research-source.md - Primary use case
+- @$AIWG_ROOT/agentic/code/frameworks/research-complete/elaboration/agents/acquisition-agent-spec.md - Agent specification
+- @$AIWG_ROOT/agentic/code/frameworks/research-complete/elaboration/use-cases/UC-RF-002-acquire-research-source.md - Primary use case
 - @.claude/rules/thought-protocol.md - Thought type definitions
 - @.claude/rules/tao-loop.md - TAO loop integration
 - @.aiwg/research/findings/REF-018-react.md - ReAct methodology research

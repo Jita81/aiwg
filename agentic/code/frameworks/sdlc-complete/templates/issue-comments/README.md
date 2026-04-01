@@ -363,9 +363,8 @@ Templates populate from:
 
 ## References
 
-- Commands: @agentic/code/frameworks/sdlc-complete/commands/issue-sync.md, @agentic/code/frameworks/sdlc-complete/commands/issue-close.md, @agentic/code/frameworks/sdlc-complete/commands/issue-comment.md
-- Skills: @agentic/code/frameworks/sdlc-complete/skills/issue-auto-sync/SKILL.md
-- Configuration: @.aiwg/config.yaml
+- Commands: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/issue-sync.md, @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/issue-close.md, @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/issue-comment.md
+- Skills: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/issue-auto-sync/SKILL.md
 
 ## Example Workflow
 

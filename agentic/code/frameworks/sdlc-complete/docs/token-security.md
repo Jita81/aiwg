@@ -347,7 +347,7 @@ Before deploying any automation that uses tokens:
 ## References
 
 - @~/.claude/CLAUDE.md - Global token configuration
-- @agentic/code/addons/security/secure-token-load.md - Token loading skill
+- @$AIWG_ROOT/agentic/code/addons/security/secure-token-load.md - Token loading skill
 - @.claude/rules/token-security.md - Enforcement rules
 - [Gitea API Documentation](https://docs.gitea.io/en-us/api-usage/)
 - [GitHub Token Security](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github)

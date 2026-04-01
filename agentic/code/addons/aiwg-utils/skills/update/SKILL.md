@@ -157,6 +157,6 @@ If the request is ambiguous between update and sync:
 
 ## References
 
-- @src/cli/handlers/utilities.ts — Update command handler (updateHandler)
-- @src/update/checker.mjs — npm/git update check logic
-- @docs/cli-reference.md — CLI reference
+- @$AIWG_ROOT/src/cli/handlers/utilities.ts — Update command handler (updateHandler)
+- @$AIWG_ROOT/src/update/checker.mjs — npm/git update check logic
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

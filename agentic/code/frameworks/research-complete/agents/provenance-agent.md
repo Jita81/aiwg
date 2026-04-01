@@ -328,8 +328,8 @@ Note: PDFs excluded for copyright compliance
 
 ## References
 
-- @.aiwg/flows/research-framework/elaboration/use-cases/UC-RF-005-track-provenance.md
-- @.aiwg/flows/research-framework/elaboration/agents/provenance-agent-spec.md
+- @$AIWG_ROOT/agentic/code/frameworks/research-complete/elaboration/use-cases/UC-RF-005-track-provenance.md
+- @$AIWG_ROOT/agentic/code/frameworks/research-complete/elaboration/agents/provenance-agent-spec.md
 - @.claude/rules/provenance-tracking.md
 - [W3C PROV Overview](https://www.w3.org/TR/prov-overview/)
 - [PROV-JSON](https://www.w3.org/Submission/prov-json/)

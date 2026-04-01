@@ -32,6 +32,14 @@ These paths are normalized per the `memory.creates` declarations in framework ma
 | `.aiwg/testing/` | sdlc-complete | Test strategy, test plans |
 | `.aiwg/security/` | sdlc-complete | Threat models, security gates |
 | `.aiwg/deployment/` | sdlc-complete | Deployment plans, runbooks |
+| `.aiwg/intake/` | sdlc-complete | Project intake documents |
+| `.aiwg/patterns/` | sdlc-complete | AI behavior pattern catalogs |
+| `.aiwg/incidents/` | sdlc-complete | Incident reports and post-mortems |
+| `.aiwg/regression/` | sdlc-complete | Regression tracking records |
+| `.aiwg/archive/` | sdlc-complete | Phase completion archives |
+| `.aiwg/management/` | sdlc-complete | Project management artifacts |
+| `.aiwg/ux/` | sdlc-complete | UX artifacts: wireframes, research, templates |
+| `.aiwg/compliance/` | sdlc-complete | Compliance documentation |
 | `.aiwg/research/` | research-complete | Research artifacts |
 | `.aiwg/forensics/` | forensics-complete | Digital forensics artifacts |
 
@@ -84,33 +92,54 @@ When a new framework or addon creates `.aiwg/` paths, it MUST add those paths to
 
 Do not maintain a static allowlist document. The normalized contract is computed from `memory.creates` across all installed manifests. `validate-component` and `dev-doctor` read manifests to determine the allowlist dynamically.
 
+## AIWG Install-Path References (`@$AIWG_ROOT/`)
+
+Skills and agents often need to cross-reference other AIWG-installed files (rules, schemas, templates, agent definitions). Use the `@$AIWG_ROOT/` prefix for all such references:
+
+```
+@$AIWG_ROOT/agentic/code/addons/aiwg-dev/rules/addon-boundaries.md
+@$AIWG_ROOT/src/extensions/types.ts
+@$AIWG_ROOT/docs/development/aiwg-dir-reference-contract.md
+```
+
+`$AIWG_ROOT` resolves to the AIWG install root. Any environment variable can be used as a corpus token with the same `@$TOKEN/path` syntax — define tokens in `.env` at the project root.
+
+| Context | `$AIWG_ROOT` resolves to |
+|---------|--------------------------|
+| AIWG dev repo | Repository root (`.`) |
+| npm global install | `$(npm root -g)/aiwg` |
+| Custom install | `$AIWG_ROOT` env var (if set explicitly) |
+
 ## Broader Linking Contract
 
-The same principle applies to other `@`-reference patterns in distributable skills:
-
-| Pattern | Rule |
-|---------|------|
-| `@.aiwg/<normalized-path>` | ALLOWED — declared in `memory.creates` |
-| `@.aiwg/<repo-local-path>` | FORBIDDEN — Tier 3, only exists in this repo |
-| `@.claude/<path>` | FORBIDDEN — deployment target, overwritten by `aiwg sync` |
-| `@agentic/code/<path>` | ALLOWED — exists wherever AIWG is installed |
-| Relative paths | Valid within the same component directory |
-| Cross-addon refs | Valid if the required addon is declared in `requires` |
+| Pattern | Classification | Valid? |
+|---------|---------------|--------|
+| `@$AIWG_ROOT/<path>` | AIWG core file (install-relative) | YES |
+| `@$TOKEN/<path>` (registered env var) | Custom corpus token | YES |
+| `@.aiwg/<normalized-path>` | Project memory (Tier 1/2, in `memory.creates`) | YES |
+| `@.aiwg/<repo-local-path>` | Repo-local only | NO — silently fails in user projects |
+| `@.claude/<path>` | Deployment target | NO — overwritten by `aiwg sync` |
+| `@agentic/code/<path>` | Bare AIWG core ref (legacy) | NO — use `@$AIWG_ROOT/agentic/code/` |
+| `@src/<path>` | Bare AIWG core ref (legacy) | NO — use `@$AIWG_ROOT/src/` |
+| `@docs/<path>` | Bare AIWG core ref (legacy) | NO — use `@$AIWG_ROOT/docs/` |
+| `@tools/<path>` | Bare AIWG core ref (legacy) | NO — use `@$AIWG_ROOT/tools/` |
+| Within-component relative | Local ref | YES — valid within component dir |
 
 ## Detection
 
-`validate-component` and `dev-doctor` (Section 4) implement this check:
+`validate-component`, `dev-doctor` (Section 4), and `link-check` implement the full classification:
 
-1. Find all `@.aiwg/` references in the file(s) under review
-2. Load `memory.creates` from all installed manifests to build the normalized allowlist
-3. For each reference, check if the path starts with a Tier 1 or Tier 2 normalized prefix
-4. Flag any reference that does not match a normalized path
+1. Find all `@<path>` references in the file(s) under review
+2. Classify per the table above
+3. For `@.aiwg/` refs: load `memory.creates` from all installed manifests; check against allowlist
+4. For `@$TOKEN/` refs: check if TOKEN is set in the environment
+5. Report PASS/FAIL/WARN per reference with specific remediation
 
 ## References
 
-- @agentic/code/addons/aiwg-dev/rules/addon-boundaries.md — Source vs project output boundary
-- @src/extensions/types.ts — `MemoryFootprint` type definition
-- @docs/development/aiwg-dir-reference-contract.md — Full reference contract document
+- @$AIWG_ROOT/agentic/code/addons/aiwg-dev/rules/addon-boundaries.md — Source vs project output boundary
+- @$AIWG_ROOT/src/extensions/types.ts — `MemoryFootprint` type definition
+- @$AIWG_ROOT/docs/development/aiwg-dir-reference-contract.md — Full reference contract document
 
 ---
 

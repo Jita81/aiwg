@@ -315,7 +315,7 @@ Before releasing a template:
 ## References
 
 - @.aiwg/research/findings/REF-006-cognitive-load-theory.md - Research foundation
-- @agentic/code/frameworks/sdlc-complete/templates/ - Template location
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/ - Template location
 - @.aiwg/planning/current-phase.txt - Current phase detection
 - #188 - Phase-based revelation issue
 - #189 - Worked examples issue

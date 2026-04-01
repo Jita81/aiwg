@@ -253,7 +253,7 @@ The following templates MUST include reasoning sections:
 ## References
 
 - @.aiwg/research/findings/REF-016-chain-of-thought.md - CoT research
-- @agentic/code/frameworks/sdlc-complete/templates/ - Templates to update
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/ - Templates to update
 - @.aiwg/research/synthesis/topic-03-cognitive-scaffolding.md - Cognitive patterns
 - #157 - Implementation issue
 

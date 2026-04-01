@@ -566,19 +566,19 @@ discovery_agent:
 
 After generating search results or gap reports, create provenance records per @.claude/rules/provenance-tracking.md:
 
-1. **Create provenance record** using @agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml format
+1. **Create provenance record** using @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml format
 2. **Record Entity** - Search results as URN with query hash
 3. **Record Activity** - Search execution with API version and parameters
 4. **Record Agent** - This agent with semantic scholar API version
 5. **Save record** to `.aiwg/research/provenance/records/`
 
-See @agentic/code/frameworks/sdlc-complete/agents/provenance-manager.md for Provenance Manager agent.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/provenance-manager.md for Provenance Manager agent.
 
 ## References
 
-- @.aiwg/flows/research-framework/elaboration/agents/discovery-agent-spec.md - Agent specification
-- @.aiwg/flows/research-framework/elaboration/use-cases/UC-RF-001-discover-research-papers.md - Primary use case
-- @.aiwg/flows/research-framework/elaboration/use-cases/UC-RF-009-perform-gap-analysis.md - Gap analysis use case
+- @$AIWG_ROOT/agentic/code/frameworks/research-complete/elaboration/agents/discovery-agent-spec.md - Agent specification
+- @$AIWG_ROOT/agentic/code/frameworks/research-complete/elaboration/use-cases/UC-RF-001-discover-research-papers.md - Primary use case
+- @$AIWG_ROOT/agentic/code/frameworks/research-complete/elaboration/use-cases/UC-RF-009-perform-gap-analysis.md - Gap analysis use case
 - @.claude/rules/thought-protocol.md - Thought type definitions
 - @.claude/rules/tao-loop.md - TAO loop integration
 - @.aiwg/research/findings/REF-018-react.md - ReAct methodology research

@@ -147,8 +147,8 @@ This provides: artifact counts by phase and type, tag distribution, dependency g
 
 ## References
 
-- @src/artifacts/cli.ts — CLI router
-- @src/artifacts/query-engine.ts — Query implementation
-- @src/artifacts/dep-graph.ts — Dependency graph
-- @src/artifacts/stats.ts — Statistics
-- @src/artifacts/index-builder.ts — Index builder
+- @$AIWG_ROOT/src/artifacts/cli.ts — CLI router
+- @$AIWG_ROOT/src/artifacts/query-engine.ts — Query implementation
+- @$AIWG_ROOT/src/artifacts/dep-graph.ts — Dependency graph
+- @$AIWG_ROOT/src/artifacts/stats.ts — Statistics
+- @$AIWG_ROOT/src/artifacts/index-builder.ts — Index builder

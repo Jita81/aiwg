@@ -92,7 +92,7 @@ hook:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/agents/provenance-manager.md - Provenance Manager agent
-- @agentic/code/frameworks/sdlc-complete/commands/provenance-validate.md - Validation command
-- @agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml - PROV record schema
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/provenance-manager.md - Provenance Manager agent
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/provenance-validate.md - Validation command
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml - PROV record schema
 - @.claude/rules/provenance-tracking.md - Provenance tracking rules

@@ -804,9 +804,9 @@ aiwg baseline update functional-baseline \
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/skills/regression-baseline/SKILL.md
-- @agentic/code/frameworks/sdlc-complete/skills/regression-metrics/SKILL.md
-- @agentic/code/frameworks/sdlc-complete/skills/regression-report/SKILL.md
-- @agentic/code/frameworks/sdlc-complete/agents/devops-engineer.md
-- @agentic/code/frameworks/sdlc-complete/agents/test-architect.md
-- @agentic/code/frameworks/sdlc-complete/agents/reliability-engineer.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/regression-baseline/SKILL.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/regression-metrics/SKILL.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/regression-report/SKILL.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/devops-engineer.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/test-architect.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/reliability-engineer.md

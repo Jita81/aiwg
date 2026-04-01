@@ -47,10 +47,10 @@ Use `aiwg index` CLI commands for structured artifact discovery:
 - `aiwg index stats --json` — Get project health metrics
 - `aiwg index deps <path> --json` — Check artifact dependencies
 
-Always use `--json` flag for programmatic consumption. See @agentic/code/frameworks/sdlc-complete/rules/artifact-discovery.md for the full protocol.
+Always use `--json` flag for programmatic consumption. See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/artifact-discovery.md for the full protocol.
 
 ## Schema References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/auto-retrieval.yaml — Automatic retrieval for RAG pipelines
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/rag-context-management.yaml — RAG context window management
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/artifact-indexing.yaml — Artifact index and digest format
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/auto-retrieval.yaml — Automatic retrieval for RAG pipelines
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/rag-context-management.yaml — RAG context window management
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/artifact-indexing.yaml — Artifact index and digest format

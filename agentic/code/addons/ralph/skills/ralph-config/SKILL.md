@@ -297,6 +297,6 @@ Check that the .aiwg/ralph/ directory is writable:
 
 ## References
 
-- @src/cli/handlers/ralph.ts — Ralph CLI handler (config parsing)
-- @tools/ralph-external/README.md — External loop architecture
-- @agentic/code/addons/ralph/README.md — Ralph documentation
+- @$AIWG_ROOT/src/cli/handlers/ralph.ts — Ralph CLI handler (config parsing)
+- @$AIWG_ROOT/tools/ralph-external/README.md — External loop architecture
+- @$AIWG_ROOT/agentic/code/addons/ralph/README.md — Ralph documentation

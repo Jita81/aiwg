@@ -182,7 +182,7 @@ Consider running /soul-validate and /soul-enhance before enabling.
 
 ## References
 
-- @agentic/code/addons/aiwg-utils/skills/soul-create/SKILL.md — Soul creation
-- @agentic/code/addons/aiwg-utils/commands/soul-enable.md — Soul enforcement
-- @docs/soul-md-guide.md — SOUL.md integration guide
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/skills/soul-create/SKILL.md — Soul creation
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/commands/soul-enable.md — Soul enforcement
+- @$AIWG_ROOT/docs/soul-md-guide.md — SOUL.md integration guide
 - #437 — SOUL.md compatibility issue

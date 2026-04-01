@@ -721,9 +721,9 @@ ralph:
 
 ## Related
 
-- `@agentic/code/addons/ralph/schemas/shared-patterns.yaml` - Pattern schema
-- `@agentic/code/addons/ralph/schemas/cross-task-memory.yaml` - Cross-task memory
-- `@agentic/code/addons/ralph/docs/cross-loop-learning.md` - Full documentation
+- `@$AIWG_ROOT/agentic/code/addons/ralph/schemas/shared-patterns.yaml` - Pattern schema
+- `@$AIWG_ROOT/agentic/code/addons/ralph/schemas/cross-task-memory.yaml` - Cross-task memory
+- `@$AIWG_ROOT/agentic/code/addons/ralph/docs/cross-loop-learning.md` - Full documentation
 - `.aiwg/research/paper-analysis/REF-013-aiwg-analysis.md` - MetaGPT research
 - `ralph` skill - Iterative loop executor
 - `agent-loop` skill - Detects iterative loop requests

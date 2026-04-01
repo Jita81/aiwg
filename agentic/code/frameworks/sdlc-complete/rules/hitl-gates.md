@@ -155,7 +155,7 @@ presentation:
 
 All gates MUST conform to:
 ```
-@agentic/code/frameworks/sdlc-complete/schemas/flows/hitl-gate.yaml
+@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/hitl-gate.yaml
 ```
 
 ## SDLC Phase Gates
@@ -306,9 +306,9 @@ Before configuring a gate:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/hitl-gate.yaml - Schema definition
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/hitl-gate.yaml - Schema definition
 - @.aiwg/research/findings/REF-057-agent-laboratory.md - Research paper
-- @agentic/code/frameworks/sdlc-complete/flows/ - Flow implementations
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/flows/ - Flow implementations
 - #96 - Implementation issue
 
 ---

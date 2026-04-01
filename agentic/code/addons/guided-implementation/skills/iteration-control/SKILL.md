@@ -184,10 +184,9 @@ FOR EACH task:
 
 ## Traceability
 
-- @implements @.aiwg/features/guided-implementation/README.md
 - @research @.aiwg/research/REF-004-magis-multi-agent-issue-resolution.md
 
 ## References
 
 - @.aiwg/working/guided-impl-analysis/SYNTHESIS.md
-- @agentic/code/addons/aiwg-utils/prompts/reliability/resilience.md
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/prompts/reliability/resilience.md

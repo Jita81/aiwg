@@ -366,7 +366,7 @@ aiwg ticket-migrate --from github --to jira
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/commands/issue-create.md - Create ticket command
-- @agentic/code/frameworks/sdlc-complete/commands/issue-update.md - Update ticket command
-- @agentic/code/frameworks/sdlc-complete/commands/issue-list.md - List tickets command
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/issue-create.md - Create ticket command
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/issue-update.md - Update ticket command
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/issue-list.md - List tickets command
 - @~/.config/gitea/token - Gitea authentication token (user-specific)

@@ -786,12 +786,12 @@ if (metadata.depth >= maxDepth) {
 
 ## References
 
-- @tools/daemon/agent-supervisor.mjs - Agent Supervisor implementation
-- @agentic/code/addons/rlm/agents/rlm-agent.md - RLM agent definition
-- @agentic/code/addons/rlm/commands/rlm-query.md - Single sub-call command
-- @agentic/code/addons/rlm/commands/rlm-batch.md - Batch parallel command
-- @agentic/code/addons/rlm/schemas/rlm-task-tree.yaml - Task tree schema
-- @tools/daemon/task-store.mjs - Persistent task state
+- @$AIWG_ROOT/tools/daemon/agent-supervisor.mjs - Agent Supervisor implementation
+- @$AIWG_ROOT/agentic/code/addons/rlm/agents/rlm-agent.md - RLM agent definition
+- @$AIWG_ROOT/agentic/code/addons/rlm/commands/rlm-query.md - Single sub-call command
+- @$AIWG_ROOT/agentic/code/addons/rlm/commands/rlm-batch.md - Batch parallel command
+- @$AIWG_ROOT/agentic/code/addons/rlm/schemas/rlm-task-tree.yaml - Task tree schema
+- @$AIWG_ROOT/tools/daemon/task-store.mjs - Persistent task state
 - @.aiwg/research/findings/REF-089-recursive-language-models.md - RLM research
 - @.claude/rules/subagent-scoping.md - Subagent context minimization
 - Issue #323 - Supervisor integration implementation

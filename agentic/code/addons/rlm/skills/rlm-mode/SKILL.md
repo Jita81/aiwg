@@ -481,8 +481,8 @@ Which scope did you have in mind?
 - `/rlm-query` command - recursive information extraction
 - `/rlm-batch` command - parallel batch processing
 - `/rlm-summarize` command - hierarchical summarization
-- `@agentic/code/addons/rlm/schemas/rlm-config.yaml` - RLM configuration schema
-- `@agentic/code/addons/rlm/docs/rlm-architecture.md` - RLM system design
+- `@$AIWG_ROOT/agentic/code/addons/rlm/schemas/rlm-config.yaml` - RLM configuration schema
+- `@$AIWG_ROOT/agentic/code/addons/rlm/docs/rlm-architecture.md` - RLM system design
 - `@.aiwg/research/findings/REF-087-recursive-decomposition.md` - Decomposition research
 
 ## Version History

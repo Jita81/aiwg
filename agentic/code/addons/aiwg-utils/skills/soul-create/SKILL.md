@@ -154,7 +154,7 @@ Next steps:
 
 ## References
 
-- @agentic/code/addons/voice-framework/skills/voice-create/SKILL.md — Voice creation (parallel pattern)
-- @agentic/code/addons/aiwg-utils/commands/soul-enable.md — Enable enforcement
-- @docs/soul-md-guide.md — SOUL.md integration guide
+- @$AIWG_ROOT/agentic/code/addons/voice-framework/skills/voice-create/SKILL.md — Voice creation (parallel pattern)
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/commands/soul-enable.md — Enable enforcement
+- @$AIWG_ROOT/docs/soul-md-guide.md — SOUL.md integration guide
 - #437 — SOUL.md compatibility issue

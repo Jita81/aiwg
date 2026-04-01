@@ -37,7 +37,7 @@ When invoked, this command:
    - Validate log file integrity against acquisition checksums
 
 2. **Load Sigma Rules**
-   - Load rules from `@agentic/code/frameworks/forensics-complete/sigma/`
+   - Load rules from `@$AIWG_ROOT/agentic/code/frameworks/forensics-complete/sigma/`
    - Filter by `--rules` selection or severity threshold
    - Resolve rule dependencies and required fields
    - Report rules skipped due to missing log sources
@@ -174,7 +174,7 @@ large-outbound-transfer     HIGH      Exfiltration       Unusually large outboun
 
 ## References
 
-- @agentic/code/frameworks/forensics-complete/agents/log-analyst.md - Log Analyst
-- @agentic/code/frameworks/forensics-complete/sigma/ - Sigma rule library
-- @agentic/code/frameworks/forensics-complete/commands/forensics-ioc.md - IOC extraction from findings
-- @agentic/code/frameworks/forensics-complete/commands/forensics-timeline.md - Timeline correlation
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/agents/log-analyst.md - Log Analyst
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/sigma/ - Sigma rule library
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/commands/forensics-ioc.md - IOC extraction from findings
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/commands/forensics-timeline.md - Timeline correlation

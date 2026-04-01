@@ -95,9 +95,9 @@ This rule applies to all AIWG deployment targets:
 
 ## References
 
-- @agentic/code/addons/aiwg-dev/rules/addon-boundaries.md — Source vs output boundary
-- @docs/development/aiwg-development-guide.md — Full contributor guide
-- @docs/extensions/creating-extensions.md — Extension creation walkthrough
+- @$AIWG_ROOT/agentic/code/addons/aiwg-dev/rules/addon-boundaries.md — Source vs output boundary
+- @$AIWG_ROOT/docs/development/aiwg-development-guide.md — Full contributor guide
+- @$AIWG_ROOT/docs/extensions/creating-extensions.md — Extension creation walkthrough
 
 ---
 

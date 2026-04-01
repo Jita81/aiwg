@@ -83,7 +83,7 @@ metagpt_pattern: sequential
 
 **Available Tools**:
 - Web search for competitive analysis
-- Document templates from @agentic/code/frameworks/sdlc-complete/templates/requirements/
+- Document templates from @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/requirements/
 
 **Constraints**:
 - MUST NOT specify technical implementation details (defer to Technical Designer)
@@ -667,10 +667,10 @@ Track these metrics to validate effectiveness:
 ## References
 
 - @.aiwg/research/docs/sop-encoding-guide.md - SOP encoding principles
-- @docs/references/REF-013-metagpt-multi-agent-framework.md - MetaGPT research
-- @agentic/code/frameworks/sdlc-complete/templates/requirements/use-case-spec-template.md - Use case template
-- @agentic/code/frameworks/sdlc-complete/templates/requirements/vision-template.md - Vision document template
-- @agentic/code/frameworks/sdlc-complete/agents/requirements-specialist.md - Agent definition
+- @$AIWG_ROOT/docs/references/REF-013-metagpt-multi-agent-framework.md - MetaGPT research
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/requirements/use-case-spec-template.md - Use case template
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/requirements/vision-template.md - Vision document template
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/requirements-specialist.md - Agent definition
 
 ## Metadata
 

@@ -108,7 +108,7 @@ aiwg version
 
 ## References
 
-- @src/cli/handlers/version.ts — Version command handler
-- @src/channel/manager.mjs — Channel and version resolution logic
-- @docs/cli-reference.md — CLI reference
-- @docs/contributing/versioning.md — CalVer format details
+- @$AIWG_ROOT/src/cli/handlers/version.ts — Version command handler
+- @$AIWG_ROOT/src/channel/manager.mjs — Channel and version resolution logic
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference
+- @$AIWG_ROOT/docs/contributing/versioning.md — CalVer format details

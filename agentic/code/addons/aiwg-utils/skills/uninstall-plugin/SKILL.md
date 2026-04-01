@@ -121,5 +121,5 @@ If the plugin name is ambiguous or not clearly installed:
 
 ## References
 
-- @src/cli/handlers/utilities.ts — Command handler
-- @docs/cli-reference.md — CLI reference
+- @$AIWG_ROOT/src/cli/handlers/utilities.ts — Command handler
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

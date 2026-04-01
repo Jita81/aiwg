@@ -864,10 +864,9 @@ Cannot create ticket.
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/config/issueing-config.md - Configuration schema
-- @agentic/code/frameworks/sdlc-complete/commands/issue-update.md - Update ticket command
-- @agentic/code/frameworks/sdlc-complete/commands/issue-list.md - List tickets command
-- @agentic/code/frameworks/sdlc-complete/commands/regression-check.md - Regression detection command
-- @agentic/code/frameworks/sdlc-complete/agents/regression-analyst.md - Regression analysis agent
-- @.aiwg/config.yaml - Project ticketing configuration
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/config/issueing-config.md - Configuration schema
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/issue-update.md - Update ticket command
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/issue-list.md - List tickets command
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/regression-check.md - Regression detection command
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/regression-analyst.md - Regression analysis agent
 - @CLAUDE.md - User ticketing configuration

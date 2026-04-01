@@ -176,6 +176,6 @@ If a time window is ambiguous:
 
 ## References
 
-- @src/cli/handlers/subcommands.ts — Cost history handler
-- @src/metrics/token-counter.ts — Token counting and MetaGPT baseline (REF-013)
-- @docs/cli-reference.md — CLI reference
+- @$AIWG_ROOT/src/cli/handlers/subcommands.ts — Cost history handler
+- @$AIWG_ROOT/src/metrics/token-counter.ts — Token counting and MetaGPT baseline (REF-013)
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

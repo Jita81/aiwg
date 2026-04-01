@@ -206,7 +206,7 @@ aiwg add-agent threat-modeler --to sdlc-complete --template complex
 
 ## References
 
-- @agentic/code/addons/aiwg-utils/skills/devkit-create-agent/SKILL.md — Devkit equivalent (interactive design)
-- @src/cli/handlers/scaffolding.ts — CLI handler implementation
-- @docs/cli-reference.md — Full CLI reference
-- @agentic/code/frameworks/sdlc-complete/agents/ — Example agent definitions
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/skills/devkit-create-agent/SKILL.md — Devkit equivalent (interactive design)
+- @$AIWG_ROOT/src/cli/handlers/scaffolding.ts — CLI handler implementation
+- @$AIWG_ROOT/docs/cli-reference.md — Full CLI reference
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/ — Example agent definitions

@@ -324,7 +324,7 @@ Before using tokens in any automation:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/docs/token-security.md - Comprehensive security documentation
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/token-security.md - Comprehensive security documentation
 - @~/.claude/CLAUDE.md - Token file locations and conventions
 - @.claude/rules/token-security.md - Enforcement rules
 - [Gitea API Docs](https://docs.gitea.io/en-us/api-usage/)

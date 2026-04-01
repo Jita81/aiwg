@@ -19,7 +19,7 @@ When invoked, analyze the research corpus and report on its health:
    - Count provenance records in `.aiwg/research/provenance/records/`
 
 2. **Frontmatter Completeness**
-   - Check each source for required frontmatter per @agentic/code/frameworks/sdlc-complete/schemas/research/frontmatter-schema.yaml
+   - Check each source for required frontmatter per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/frontmatter-schema.yaml
    - Report sources missing: ref_id, title, authors, year, DOI, key_findings
    - Calculate completeness percentage
 
@@ -56,7 +56,7 @@ When invoked, analyze the research corpus and report on its health:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/research/frontmatter-schema.yaml - Frontmatter requirements
-- @agentic/code/frameworks/sdlc-complete/schemas/research/fixity-manifest.yaml - Fixity verification
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/frontmatter-schema.yaml - Frontmatter requirements
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/fixity-manifest.yaml - Fixity verification
 - @.claude/rules/research-metadata.md - Research metadata rules
-- @agentic/code/frameworks/sdlc-complete/agents/citation-verifier.md - Citation Verifier agent
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/citation-verifier.md - Citation Verifier agent

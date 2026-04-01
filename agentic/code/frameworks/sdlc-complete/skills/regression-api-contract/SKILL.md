@@ -925,9 +925,9 @@ consumer_contracts:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/testing/regression.yaml
-- @agentic/code/frameworks/sdlc-complete/agents/api-designer.md
-- @agentic/code/frameworks/sdlc-complete/skills/regression-baseline/SKILL.md
-- @agentic/code/frameworks/sdlc-complete/skills/regression-bisect/SKILL.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/testing/regression.yaml
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/api-designer.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/regression-baseline/SKILL.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/regression-bisect/SKILL.md
 - @.aiwg/research/findings/REF-013-metagpt.md
 - @.claude/rules/executable-feedback.md

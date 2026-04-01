@@ -323,8 +323,8 @@ For each agent definition:
 ## References
 
 - @.aiwg/research/findings/REF-022-autogen.md - Research foundation
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/agent-pubsub.yaml - Event-driven activation
-- @agentic/code/frameworks/sdlc-complete/agents/ - Agent definitions
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/agent-pubsub.yaml - Event-driven activation
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/ - Agent definitions
 - #174 - Implementation issue
 
 ---

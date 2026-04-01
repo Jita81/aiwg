@@ -76,7 +76,7 @@ This guide explains the implementation.
 ## References
 
 - @.aiwg/requirements/use-cases/UC-104-provenance.md - Source requirement
-- @agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml - Schema specification
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml - Schema specification
 - @.claude/rules/mention-wiring.md - Wiring conventions
 
 ## Overview
@@ -103,7 +103,7 @@ export class ProvenanceTracker {
  * Provenance tracking implementation
  *
  * @implements @.aiwg/requirements/use-cases/UC-104-provenance.md
- * @schema @agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml
+ * @schema @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml
  * @tests @test/unit/provenance/tracker.test.ts
  */
 export class ProvenanceTracker {
@@ -118,7 +118,7 @@ AND update requirement document:
 
 ### Implementation
 
-- @src/provenance/tracker.ts - Core implementation
+- @$AIWG_ROOT/src/provenance/tracker.ts - Core implementation
 - @test/unit/provenance/tracker.test.ts - Test coverage
 ```
 
@@ -259,7 +259,7 @@ derived_from:
 /**
  * @file ProvenanceTracker.ts
  * @implements @.aiwg/requirements/use-cases/UC-104-provenance.md
- * @schema @agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml
+ * @schema @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml
  * @tests @test/unit/provenance/tracker.test.ts
  * @created 2026-01-25T19:30:00Z
  * @agent urn:aiwg:agent:software-implementer
@@ -276,7 +276,7 @@ derived_from:
 ```typescript
 /**
  * @file ProvenanceTracker.test.ts
- * @source @src/provenance/tracker.ts
+ * @source @$AIWG_ROOT/src/provenance/tracker.ts
  * @requirement @.aiwg/requirements/use-cases/UC-104-provenance.md
  * @created 2026-01-25T19:31:00Z
  * @agent urn:aiwg:agent:test-engineer
@@ -402,7 +402,7 @@ All exceptions MUST be documented in `.aiwg/research/provenance/docs/exceptions.
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml - PROV record schema
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml - PROV record schema
 - @.aiwg/research/provenance/docs/provenance-guide.md - Detailed guidance
 - @.aiwg/research/provenance/examples/artifact-creation.yaml - Example record
 - @.claude/rules/mention-wiring.md - @-mention wiring patterns

@@ -43,6 +43,6 @@ plans, monitor progress, manage risks, and keep stakeholders informed.
 
 ## Schema References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/hitl-gate.yaml — Human-in-the-loop gate definitions for phase transitions
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/hitl-cost-tracking.yaml — HITL cost tracking and efficiency measurement
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/agent-pubsub.yaml — Subscription-based agent activation and event routing
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/hitl-gate.yaml — Human-in-the-loop gate definitions for phase transitions
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/hitl-cost-tracking.yaml — HITL cost tracking and efficiency measurement
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/agent-pubsub.yaml — Subscription-based agent activation and event routing

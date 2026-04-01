@@ -42,11 +42,11 @@ Use `aiwg index` CLI commands for structured artifact discovery and traceability
 - `aiwg index stats --json` — Check orphaned artifacts (no connections = traceability gap)
 - `aiwg index build` — Rebuild index to ensure traceability data is current
 
-Always use `--json` flag for programmatic consumption. See @agentic/code/frameworks/sdlc-complete/rules/artifact-discovery.md for the full protocol.
+Always use `--json` flag for programmatic consumption. See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/artifact-discovery.md for the full protocol.
 
 ## Schema References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/fair-extensions.yaml — FAIR principle extensions for traceability
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/citation-integrity.yaml — Citation integrity policy enforcement
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/fair-metadata.yaml — FAIR metadata compliance
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/citation-verification.yaml — Automated citation verification pipeline
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/fair-extensions.yaml — FAIR principle extensions for traceability
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/citation-integrity.yaml — Citation integrity policy enforcement
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/fair-metadata.yaml — FAIR metadata compliance
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/citation-verification.yaml — Automated citation verification pipeline

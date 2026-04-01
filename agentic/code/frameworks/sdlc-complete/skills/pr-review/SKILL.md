@@ -178,7 +178,7 @@ See full report: [regression-2026-01-25T15-30-00Z.md]
 
 **Integration with Regression Analyst**:
 
-For deep regression analysis or complex regressions, escalate to @agentic/code/frameworks/sdlc-complete/agents/regression-analyst.md for:
+For deep regression analysis or complex regressions, escalate to @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/regression-analyst.md for:
 - Root cause analysis
 - Regression pattern identification
 - Fix recommendations
@@ -261,8 +261,8 @@ After completing review:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/commands/regression-check.md - Regression detection command
-- @agentic/code/frameworks/sdlc-complete/agents/regression-analyst.md - Deep regression analysis agent
-- @agentic/code/frameworks/sdlc-complete/schemas/testing/regression.yaml - Regression detection schema
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/regression-check.md - Regression detection command
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/regression-analyst.md - Deep regression analysis agent
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/testing/regression.yaml - Regression detection schema
 - @.claude/rules/executable-feedback.md - Executable feedback loop implementation
 - @.claude/rules/test-first-development.md - Test-first principles

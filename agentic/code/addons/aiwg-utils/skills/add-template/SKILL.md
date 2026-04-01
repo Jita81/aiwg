@@ -217,7 +217,7 @@ aiwg add-template threat-model --to sdlc-complete --category security
 
 ## References
 
-- @src/cli/handlers/scaffolding.ts — CLI handler implementation
-- @docs/cli-reference.md — Full CLI reference
-- @agentic/code/frameworks/sdlc-complete/templates/ — Example templates
-- @agentic/code/addons/aiwg-utils/skills/devkit-create-skill/SKILL.md — Related scaffolding pattern
+- @$AIWG_ROOT/src/cli/handlers/scaffolding.ts — CLI handler implementation
+- @$AIWG_ROOT/docs/cli-reference.md — Full CLI reference
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/ — Example templates
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/skills/devkit-create-skill/SKILL.md — Related scaffolding pattern

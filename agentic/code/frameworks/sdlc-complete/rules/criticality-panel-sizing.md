@@ -262,7 +262,7 @@ override_log:
 
 ## Integration with Ensemble Review
 
-This criticality system integrates with `@agentic/code/frameworks/sdlc-complete/schemas/flows/ensemble-review.yaml`:
+This criticality system integrates with `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/ensemble-review.yaml`:
 
 1. **Pattern Selection**: Criticality determines which review pattern to use
 2. **Panel Sizing**: Panel size scales with criticality
@@ -291,7 +291,7 @@ After completing ensemble review:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/ensemble-review.yaml - Ensemble review patterns
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/ensemble-review.yaml - Ensemble review patterns
 - @.aiwg/research/findings/REF-017-self-consistency.md - Research foundation
 - @.aiwg/research/synthesis/topic-05-verification.md - Verification patterns
 - #161 - Implementation issue

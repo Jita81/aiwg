@@ -654,5 +654,5 @@ Proceed? (y/n)
 - RLM methodology: Retrieval, Long-form thinking, Multi-step
 - Parallel fan-out pattern for chunked processing
 - @.aiwg/rlm/ - RLM batch results directory
-- @agentic/code/addons/rlm/docs/batch-processing.md - Detailed batch patterns
-- @agentic/code/addons/rlm/schemas/batch-config.yaml - Batch configuration schema
+- @$AIWG_ROOT/agentic/code/addons/rlm/docs/batch-processing.md - Detailed batch patterns
+- @$AIWG_ROOT/agentic/code/addons/rlm/schemas/batch-config.yaml - Batch configuration schema

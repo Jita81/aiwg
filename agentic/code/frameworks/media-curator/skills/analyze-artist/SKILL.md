@@ -99,7 +99,7 @@ curl "https://musicbrainz.org/ws/2/artist/?query=artist:Twenty%20One%20Pilots&fm
 4. Detect narrative arcs and concept album sequences
 5. Establish era boundaries with supporting evidence
 
-**Detection Signals** (see @agentic/code/frameworks/media-curator/agents/discography-analyst.md for complete signal taxonomy):
+**Detection Signals** (see @$AIWG_ROOT/agentic/code/frameworks/media-curator/agents/discography-analyst.md for complete signal taxonomy):
 - Musical evolution (genre tags, production style)
 - Contextual changes (label, location, collaborators)
 - Narrative markers (artist statements, concept albums)
@@ -556,10 +556,10 @@ Proceed? (y/n):
 
 ## See Also
 
-- **Discography Analyst Agent**: @agentic/code/frameworks/media-curator/agents/discography-analyst.md
-- **Media Curator Framework**: @agentic/code/frameworks/media-curator/README.md
-- **Collection Planner Command**: @agentic/code/frameworks/media-curator/commands/plan-collection.md
-- **Catalog Organizer Command**: @agentic/code/frameworks/media-curator/commands/organize-catalog.md
+- **Discography Analyst Agent**: @$AIWG_ROOT/agentic/code/frameworks/media-curator/agents/discography-analyst.md
+- **Media Curator Framework**: @$AIWG_ROOT/agentic/code/frameworks/media-curator/README.md
+- **Collection Planner Command**: @$AIWG_ROOT/agentic/code/frameworks/media-curator/commands/plan-collection.md
+- **Catalog Organizer Command**: @$AIWG_ROOT/agentic/code/frameworks/media-curator/commands/organize-catalog.md
 - **MusicBrainz API Documentation**: https://musicbrainz.org/doc/MusicBrainz_API
 - **Discogs API Documentation**: https://www.discogs.com/developers
 

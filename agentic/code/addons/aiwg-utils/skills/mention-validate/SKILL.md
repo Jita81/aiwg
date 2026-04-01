@@ -46,7 +46,7 @@ Broken Mentions:
     @.aiwg/requirements/NFR-PERF-005.md → NOT FOUND
 
   test/integration/api.test.ts:12
-    @src/services/api-old.ts → NOT FOUND (deleted?)
+    @$AIWG_ROOT/src/services/api-old.ts → NOT FOUND (deleted?)
 
 Summary: 3 broken mentions in 3 files
 ```

@@ -117,5 +117,5 @@ Found 3 artifacts about "authentication":
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/rules/artifact-discovery.md — Agent protocol rules
-- @src/artifacts/cli.ts — CLI implementation
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/artifact-discovery.md — Agent protocol rules
+- @$AIWG_ROOT/src/artifacts/cli.ts — CLI implementation

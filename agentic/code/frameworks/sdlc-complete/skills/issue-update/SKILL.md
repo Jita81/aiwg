@@ -753,8 +753,7 @@ Cannot update ticket.
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/config/issueing-config.md - Configuration schema
-- @agentic/code/frameworks/sdlc-complete/commands/issue-create.md - Create ticket command
-- @agentic/code/frameworks/sdlc-complete/commands/issue-list.md - List tickets command
-- @.aiwg/config.yaml - Project ticketing configuration
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/config/issueing-config.md - Configuration schema
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/issue-create.md - Create ticket command
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/issue-list.md - List tickets command
 - @CLAUDE.md - User ticketing configuration

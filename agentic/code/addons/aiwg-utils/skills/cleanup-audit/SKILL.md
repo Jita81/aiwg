@@ -361,6 +361,6 @@ Targeted export audit for the CLI subtree only. Fast enough to run after each fe
 
 ## References
 
-- @src/cli/handlers/utilities.ts — Cleanup audit command handler
-- @agentic/code/addons/aiwg-utils/skills/manifest.json — Skills manifest (audited by manifests type)
-- @docs/cli-reference.md — CLI reference for this command
+- @$AIWG_ROOT/src/cli/handlers/utilities.ts — Cleanup audit command handler
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/skills/manifest.json — Skills manifest (audited by manifests type)
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for this command

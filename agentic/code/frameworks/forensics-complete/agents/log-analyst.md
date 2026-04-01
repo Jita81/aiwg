@@ -331,6 +331,6 @@ grep "185.220.101.47\|91.108.4.12" auth.log | grep -E "Accepted|opened"
 
 - NIST SP 800-86: Guide to Integrating Forensic Techniques into Incident Response (Section 3.3)
 - MITRE ATT&CK Framework: https://attack.mitre.org
-- @agentic/code/frameworks/forensics-complete/docs/investigation-workflow.md
-- @agentic/code/frameworks/forensics-complete/skills/sysops-forensics.md
-- @agentic/code/frameworks/forensics-complete/templates/log-analysis-findings.md
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/docs/investigation-workflow.md
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/skills/sysops-forensics.md
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/templates/log-analysis-findings.md

@@ -598,9 +598,9 @@ This orchestration succeeds when:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/flows/ — Phase flow templates
-- @agentic/code/frameworks/sdlc-complete/templates/ — Artifact templates used in each phase
-- @agentic/code/frameworks/sdlc-complete/agents/ — Agent catalog for agent dispatch
-- @src/cli/handlers/sdlc-accelerate.ts — Command handler
-- @docs/cli-reference.md — CLI reference entry for this command
-- @agentic/code/addons/ralph/skills/ralph/SKILL.md — Ralph loop pattern (used in doc generation refinement)
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/flows/ — Phase flow templates
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/ — Artifact templates used in each phase
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/ — Agent catalog for agent dispatch
+- @$AIWG_ROOT/src/cli/handlers/sdlc-accelerate.ts — Command handler
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference entry for this command
+- @$AIWG_ROOT/agentic/code/addons/ralph/skills/ralph/SKILL.md — Ralph loop pattern (used in doc generation refinement)

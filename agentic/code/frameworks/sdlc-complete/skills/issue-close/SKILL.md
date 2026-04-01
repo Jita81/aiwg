@@ -491,7 +491,7 @@ Update AIWG artifacts with completion status:
 
 - Implements: @.aiwg/requirements/UC-017.md ✅ Completed
 - Related issue: #17 (Closed: {date})
-- Implementation: @src/issue-sync.ts
+- Implementation: @$AIWG_ROOT/src/issue-sync.ts
 - Tests: @test/unit/issue-sync.test.ts
 ```
 
@@ -622,8 +622,8 @@ Implemented in commit abc123. Tests passing. Docs updated. Ready to deploy.
 
 ## References
 
-- Template: `@agentic/code/frameworks/sdlc-complete/templates/issue-comments/task-completed.md`
-- Related: @agentic/code/frameworks/sdlc-complete/commands/issue-sync.md, @agentic/code/frameworks/sdlc-complete/commands/issue-comment.md
+- Template: `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/issue-comments/task-completed.md`
+- Related: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/issue-sync.md, @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/issue-comment.md
 - MCP tools: Gitea issue management
 - GitHub CLI: `gh issue close`
 

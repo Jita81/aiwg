@@ -238,6 +238,6 @@ Resume with: /uat-execute {plan_path} --resume-from 6
 
 ## References
 
-- Agent: @agentic/code/addons/uat-mcp/agents/uat-executor.md
-- Schema: @agentic/code/addons/uat-mcp/schemas/uat-result.yaml
-- Template: @agentic/code/addons/uat-mcp/templates/uat-executor-guide.md
+- Agent: @$AIWG_ROOT/agentic/code/addons/uat-mcp/agents/uat-executor.md
+- Schema: @$AIWG_ROOT/agentic/code/addons/uat-mcp/schemas/uat-result.yaml
+- Template: @$AIWG_ROOT/agentic/code/addons/uat-mcp/templates/uat-executor-guide.md

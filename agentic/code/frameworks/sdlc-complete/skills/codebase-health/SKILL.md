@@ -265,7 +265,7 @@ codebase_health:
 
 ## Integration
 
-- References: @agentic/code/frameworks/sdlc-complete/rules/agent-friendly-code.md (threshold definitions)
+- References: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/agent-friendly-code.md (threshold definitions)
 - Complements: `/decompose-file` (remediation for identified violations)
 - Complements: `/complexity-gate` (CI enforcement)
 - Related: `project-health-check` (project-level metrics, not code structure)

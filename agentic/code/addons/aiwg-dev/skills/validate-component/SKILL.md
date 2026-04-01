@@ -50,7 +50,7 @@ You check a single AIWG component — a skill, agent, or CLI command — for com
    - Check: Skill name listed in `manifest.json` `skills` array
    - Check: File lives in `agentic/code/` (not in a provider deployment directory)
    - If SKILL.md contains `executedViaSkillRunner: true` reference: check for circular CLI call pattern
-   - **`.aiwg/` reference check**: scan for `@.aiwg/` patterns; for each found, verify the path is normalized (Tier 1: `.aiwg/AIWG.md` or `.aiwg/frameworks/`, or Tier 2: declared in any installed manifest's `memory.creates`); flag non-normalized refs
+   - **Full link classification check** (see Link Classification below)
 
    **For an Agent**:
    - Read the agent `.md` file
@@ -62,7 +62,27 @@ You check a single AIWG component — a skill, agent, or CLI command — for com
    - Find parent addon's `manifest.json`
    - Check: Agent listed in `manifest.json` `agents` array
    - Check: File lives in `agentic/code/`
-   - **`.aiwg/` reference check**: same as for skills — scan for `@.aiwg/` patterns and flag non-normalized refs
+   - **Full link classification check** (see Link Classification below)
+
+   **Link Classification** (applies to all component types):
+
+   Extract every `@<path>` reference from the file and classify:
+
+   | Pattern | Result | Message |
+   |---------|--------|---------|
+   | `@$AIWG_ROOT/<path>` | PASS | AIWG core ref (install-relative) |
+   | `@$TOKEN/<path>` — TOKEN set in env | PASS | Registered corpus token |
+   | `@$TOKEN/<path>` — TOKEN NOT in env | WARN | `env var TOKEN not set; add to .env or export` |
+   | `@.aiwg/<path>` — path in Tier 1/2 allowlist | PASS | Normalized project memory |
+   | `@.aiwg/<path>` — not in any `memory.creates` | FAIL | `non-normalized .aiwg/ path — repo-local only` |
+   | `@.claude/<path>` | FAIL | `deployment target — forbidden in distributable source` |
+   | `@agentic/code/<path>` | WARN | `legacy bare ref — migrate to @$AIWG_ROOT/agentic/code/` |
+   | `@src/<path>` | WARN | `legacy bare ref — migrate to @$AIWG_ROOT/src/` |
+   | `@docs/<path>` | WARN | `legacy bare ref — migrate to @$AIWG_ROOT/docs/` |
+   | `@tools/<path>` | WARN | `legacy bare ref — migrate to @$AIWG_ROOT/tools/` |
+   | Relative path within component | PASS | Local ref |
+
+   Build the Tier 2 allowlist by reading all `manifest.json` files in `agentic/code/` and collecting `memory.creates[*].path` values. Combine with Tier 1 (`.aiwg/AIWG.md`, `.aiwg/frameworks/`).
 
    **For a CLI Command**:
    - Read `src/extensions/commands/definitions.ts`
@@ -176,8 +196,8 @@ Required actions:
 
 ## References
 
-- @agentic/code/addons/aiwg-dev/rules/component-completeness.md — Full completeness requirements
-- @agentic/code/addons/aiwg-dev/rules/skill-placement.md — Placement requirements
-- @agentic/code/addons/aiwg-dev/rules/no-circular-skill-calls.md — Circular call detection
-- @agentic/code/addons/aiwg-dev/rules/aiwg-dir-reference-contract.md — Normalized .aiwg/ path contract
-- @src/extensions/commands/definitions.ts — Command definition registry
+- @$AIWG_ROOT/agentic/code/addons/aiwg-dev/rules/component-completeness.md — Full completeness requirements
+- @$AIWG_ROOT/agentic/code/addons/aiwg-dev/rules/skill-placement.md — Placement requirements
+- @$AIWG_ROOT/agentic/code/addons/aiwg-dev/rules/no-circular-skill-calls.md — Circular call detection
+- @$AIWG_ROOT/agentic/code/addons/aiwg-dev/rules/aiwg-dir-reference-contract.md — Normalized .aiwg/ path contract
+- @$AIWG_ROOT/src/extensions/commands/definitions.ts — Command definition registry

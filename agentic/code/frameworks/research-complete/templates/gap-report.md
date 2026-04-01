@@ -570,9 +570,9 @@ Rationale:
 
 - **Template Type:** research-gap-analysis
 - **Framework:** research-complete
-- **Primary Agent:** @agentic/code/frameworks/research-complete/agents/discovery-agent.md
+- **Primary Agent:** @$AIWG_ROOT/agentic/code/frameworks/research-complete/agents/discovery-agent.md
 - **Related Templates:**
-  - @agentic/code/frameworks/research-complete/templates/literature-note.md
-  - @agentic/code/frameworks/research-complete/templates/extraction.yaml
+  - @$AIWG_ROOT/agentic/code/frameworks/research-complete/templates/literature-note.md
+  - @$AIWG_ROOT/agentic/code/frameworks/research-complete/templates/extraction.yaml
 - **Version:** 1.0.0
 - **Last Updated:** 2026-02-03

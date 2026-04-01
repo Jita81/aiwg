@@ -145,6 +145,6 @@ If the user's intent is ambiguous:
 
 ## References
 
-- @src/cli/handlers/runtime-info.ts — Runtime info handler
-- @docs/cli-reference.md — CLI reference (runtime-info section)
-- @agentic/code/addons/aiwg-utils/rules/agent-deployment.md — Provider routing context
+- @$AIWG_ROOT/src/cli/handlers/runtime-info.ts — Runtime info handler
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference (runtime-info section)
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/agent-deployment.md — Provider routing context

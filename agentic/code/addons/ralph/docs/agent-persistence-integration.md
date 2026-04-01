@@ -1017,11 +1017,11 @@ To enable persistence for existing Ralph installations:
 
 ### Schemas
 
-- `@agentic/code/addons/ralph/hooks/persistence-hooks.yaml` - Hook definitions
-- `@agentic/code/addons/ralph/schemas/persistence-extension.yaml` - State extension schema
-- `@agentic/code/addons/ralph/schemas/loop-state.yaml` - Base loop state schema
-- `@agentic/code/addons/ralph/schemas/checkpoint.yaml` - Checkpoint schema
-- `@agentic/code/addons/ralph/schemas/iteration-analytics.yaml` - Iteration analytics
+- `@$AIWG_ROOT/agentic/code/addons/ralph/hooks/persistence-hooks.yaml` - Hook definitions
+- `@$AIWG_ROOT/agentic/code/addons/ralph/schemas/persistence-extension.yaml` - State extension schema
+- `@$AIWG_ROOT/agentic/code/addons/ralph/schemas/loop-state.yaml` - Base loop state schema
+- `@$AIWG_ROOT/agentic/code/addons/ralph/schemas/checkpoint.yaml` - Checkpoint schema
+- `@$AIWG_ROOT/agentic/code/addons/ralph/schemas/iteration-analytics.yaml` - Iteration analytics
 
 ### Requirements
 

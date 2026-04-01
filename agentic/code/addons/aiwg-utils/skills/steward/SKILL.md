@@ -154,6 +154,6 @@ If the user's intent is ambiguous:
 
 ## References
 
-- @src/cli/handlers/steward.ts — Steward command handler
-- @agentic/code/providers/capability-matrix.yaml — Authoritative capability matrix
-- @docs/cli-reference.md — CLI reference
+- @$AIWG_ROOT/src/cli/handlers/steward.ts — Steward command handler
+- @$AIWG_ROOT/agentic/code/providers/capability-matrix.yaml — Authoritative capability matrix
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

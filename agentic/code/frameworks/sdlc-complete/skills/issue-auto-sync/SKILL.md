@@ -641,7 +641,6 @@ between git commits and issue trackers.
 
 ## References
 
-- Commands: @agentic/code/frameworks/sdlc-complete/commands/issue-sync.md, @agentic/code/frameworks/sdlc-complete/commands/issue-close.md
-- Templates: @agentic/code/frameworks/sdlc-complete/templates/issue-comments/
-- Configuration: @.aiwg/config.yaml
+- Commands: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/issue-sync.md, @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/issue-close.md
+- Templates: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/issue-comments/
 - MCP tools: Gitea issue management

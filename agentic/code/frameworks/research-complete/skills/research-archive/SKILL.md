@@ -284,8 +284,8 @@ All archives undergo validation:
 
 ## References
 
-- @agentic/code/frameworks/research-complete/agents/archival-agent.md - Archival Agent
-- @src/research/services/archival-service.ts - Archival implementation
+- @$AIWG_ROOT/agentic/code/frameworks/research-complete/agents/archival-agent.md - Archival Agent
+- @$AIWG_ROOT/src/research/services/archival-service.ts - Archival implementation
 - @.aiwg/research/fixity-manifest.json - Checksum tracking
 - @.aiwg/research/archives/README.md - Archival procedures
 - https://tools.ietf.org/html/rfc8493 - BagIt specification

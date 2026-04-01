@@ -234,6 +234,6 @@ Produce `target-profile.md` in the investigation artifacts directory with the fo
 ## References
 
 - NIST SP 800-86: Guide to Integrating Forensic Techniques into Incident Response (Section 3.1 — Identification)
-- @agentic/code/frameworks/forensics-complete/docs/investigation-workflow.md
-- @agentic/code/frameworks/forensics-complete/skills/sysops-forensics.md
-- @agentic/code/frameworks/forensics-complete/templates/target-profile.md
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/docs/investigation-workflow.md
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/skills/sysops-forensics.md
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/templates/target-profile.md

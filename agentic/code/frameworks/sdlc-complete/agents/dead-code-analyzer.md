@@ -185,6 +185,6 @@ src/plugins/custom-handler.ts:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/rules/agent-friendly-code.md
-- @agentic/code/frameworks/sdlc-complete/rules/anti-laziness.md
-- @agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/agent-friendly-code.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/anti-laziness.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md

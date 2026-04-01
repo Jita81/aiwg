@@ -453,7 +453,7 @@ Next Steps:
 
 ## References
 
-- @agentic/code/frameworks/research-complete/agents/workflow-agent.md - Gap analysis
-- @src/research/services/gap-analysis-service.ts - Gap detection implementation
+- @$AIWG_ROOT/agentic/code/frameworks/research-complete/agents/workflow-agent.md - Gap analysis
+- @$AIWG_ROOT/src/research/services/gap-analysis-service.ts - Gap detection implementation
 - @.aiwg/research/README.md - Corpus structure and targets
 - @.aiwg/research/reports/ - Generated gap analysis reports

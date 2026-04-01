@@ -257,9 +257,9 @@ Usage:
 
 ## References
 
-- @src/cli/handlers/ralph.ts — Ralph CLI handler
-- @tools/ralph-external/memory-manager.mjs — Memory storage and retrieval
-- @tools/ralph-external/lib/semantic-memory.mjs — Semantic memory layer
-- @tools/ralph-external/lib/memory-retrieval.mjs — Memory query logic
-- @tools/ralph-external/lib/memory-promotion.mjs — Cross-task memory promotion
-- @agentic/code/addons/ralph/README.md — Ralph documentation
+- @$AIWG_ROOT/src/cli/handlers/ralph.ts — Ralph CLI handler
+- @$AIWG_ROOT/tools/ralph-external/memory-manager.mjs — Memory storage and retrieval
+- @$AIWG_ROOT/tools/ralph-external/lib/semantic-memory.mjs — Semantic memory layer
+- @$AIWG_ROOT/tools/ralph-external/lib/memory-retrieval.mjs — Memory query logic
+- @$AIWG_ROOT/tools/ralph-external/lib/memory-promotion.mjs — Cross-task memory promotion
+- @$AIWG_ROOT/agentic/code/addons/ralph/README.md — Ralph documentation

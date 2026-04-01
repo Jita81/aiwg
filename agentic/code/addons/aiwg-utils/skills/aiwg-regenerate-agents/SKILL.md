@@ -350,6 +350,6 @@ AGENTS.md serves as a fallback for platforms without dedicated context files:
 
 ## References
 
-- Base Template: @agentic/code/frameworks/sdlc-complete/templates/regenerate-base.md
-- Vendor Detection: @agentic/code/frameworks/sdlc-complete/docs/vendor-detection.md
+- Base Template: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/regenerate-base.md
+- Vendor Detection: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/vendor-detection.md
 - @implements @.aiwg/requirements/use-cases/UC-019-regenerate-vendor-specific.md

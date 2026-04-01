@@ -174,11 +174,11 @@ Use `aiwg index` CLI commands for structured artifact discovery:
 - `aiwg index stats --json` — Assess testing coverage across the project
 - `aiwg index build` — Rebuild index after creating test artifacts
 
-Always use `--json` flag for programmatic consumption. See @agentic/code/frameworks/sdlc-complete/rules/artifact-discovery.md for the full protocol.
+Always use `--json` flag for programmatic consumption. See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/artifact-discovery.md for the full protocol.
 
 ## Schema References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/sdlc-output-schemas.yaml — Standardized SDLC output formats
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/quality-scoring.yaml — Quality scoring dimensions and formulas
-- @agentic/code/addons/ralph/schemas/actionable-feedback.yaml — Structured actionable feedback for test result reporting
-- @agentic/code/frameworks/sdlc-complete/schemas/research/lats-evaluation.yaml — LATS hybrid value function for test coverage evaluation
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/sdlc-output-schemas.yaml — Standardized SDLC output formats
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/quality-scoring.yaml — Quality scoring dimensions and formulas
+- @$AIWG_ROOT/agentic/code/addons/ralph/schemas/actionable-feedback.yaml — Structured actionable feedback for test result reporting
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/lats-evaluation.yaml — LATS hybrid value function for test coverage evaluation

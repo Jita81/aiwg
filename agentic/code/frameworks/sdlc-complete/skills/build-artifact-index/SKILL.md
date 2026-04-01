@@ -58,6 +58,6 @@ Report total artifacts indexed, coverage by phase, and any orphaned artifacts.
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/rules/artifact-discovery.md — Agent protocol rules
-- @agentic/code/frameworks/sdlc-complete/skills/artifact-lookup/SKILL.md — Query skill
-- @src/artifacts/cli.ts — CLI implementation
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/artifact-discovery.md — Agent protocol rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/artifact-lookup/SKILL.md — Query skill
+- @$AIWG_ROOT/src/artifacts/cli.ts — CLI implementation

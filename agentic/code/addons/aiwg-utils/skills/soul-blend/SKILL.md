@@ -114,7 +114,7 @@ Blend SDLC agent souls to create cross-functional agents:
 
 ## References
 
-- @agentic/code/addons/voice-framework/skills/voice-blend/SKILL.md — Voice blending (parallel pattern)
-- @agentic/code/addons/aiwg-utils/skills/soul-create/SKILL.md — Soul creation
-- @docs/soul-md-guide.md — Integration guide
+- @$AIWG_ROOT/agentic/code/addons/voice-framework/skills/voice-blend/SKILL.md — Voice blending (parallel pattern)
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/skills/soul-create/SKILL.md — Soul creation
+- @$AIWG_ROOT/docs/soul-md-guide.md — Integration guide
 - #437 — SOUL.md compatibility issue (Phase 3)

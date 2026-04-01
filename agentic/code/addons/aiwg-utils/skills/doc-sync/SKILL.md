@@ -374,7 +374,7 @@ Reads `.aiwg/reports/doc-sync-last-run.json`, determines 12 files changed since 
 
 ## References
 
-- @src/cli/handlers/utilities.ts — Doc sync command handler
-- @docs/cli-reference.md — CLI reference (primary doc target)
-- @docs/extensions/overview.md — Extension system docs (audited by extension auditor)
-- @agentic/code/addons/aiwg-utils/skills/ralph/SKILL.md — Ralph loop pattern used in Phase 5
+- @$AIWG_ROOT/src/cli/handlers/utilities.ts — Doc sync command handler
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference (primary doc target)
+- @$AIWG_ROOT/docs/extensions/overview.md — Extension system docs (audited by extension auditor)
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/skills/ralph/SKILL.md — Ralph loop pattern used in Phase 5

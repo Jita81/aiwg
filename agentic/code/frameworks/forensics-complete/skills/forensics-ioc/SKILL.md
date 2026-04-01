@@ -164,7 +164,7 @@ STIX bundle: .aiwg/forensics/ioc/stix-bundle.json
 
 ## References
 
-- @agentic/code/frameworks/forensics-complete/agents/ioc-analyst.md - IOC Analyst
-- @agentic/code/frameworks/forensics-complete/templates/ioc-register.md - Register template
-- @agentic/code/frameworks/forensics-complete/commands/forensics-report.md - Include IOCs in report
-- @agentic/code/frameworks/forensics-complete/commands/forensics-timeline.md - Timeline correlation
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/agents/ioc-analyst.md - IOC Analyst
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/templates/ioc-register.md - Register template
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/commands/forensics-report.md - Include IOCs in report
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/commands/forensics-timeline.md - Timeline correlation

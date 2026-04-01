@@ -435,8 +435,8 @@ Generated files:
 
 ## References
 
-- @docs/references/REF-013-metagpt-multi-agent-framework.md - Executable feedback pattern
+- @$AIWG_ROOT/docs/references/REF-013-metagpt-multi-agent-framework.md - Executable feedback pattern
 - @.claude/rules/executable-feedback.md - Feedback loop implementation rules
-- @agentic/code/frameworks/sdlc-complete/templates/test/regression-test-set-card.md - Regression test template
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/test/regression-test-set-card.md - Regression test template
 - @.aiwg/testing/ - Test artifacts location
 - @.claude/rules/test-first-development.md - Test-first principles

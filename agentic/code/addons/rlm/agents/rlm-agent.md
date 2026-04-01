@@ -835,10 +835,10 @@ Artifacts:
 
 ## Schema References
 
-- @agentic/code/addons/rlm/schemas/rlm-task-state.yaml - Task state tracking
-- @agentic/code/addons/rlm/schemas/rlm-config.yaml - Configuration options
-- @agentic/code/addons/rlm/schemas/rlm-trajectory.yaml - Execution trajectory format
-- @agentic/code/addons/rlm/schemas/cost-tracking.yaml - Sub-call cost tracking
+- @$AIWG_ROOT/agentic/code/addons/rlm/schemas/rlm-task-state.yaml - Task state tracking
+- @$AIWG_ROOT/agentic/code/addons/rlm/schemas/rlm-config.yaml - Configuration options
+- @$AIWG_ROOT/agentic/code/addons/rlm/schemas/rlm-trajectory.yaml - Execution trajectory format
+- @$AIWG_ROOT/agentic/code/addons/rlm/schemas/cost-tracking.yaml - Sub-call cost tracking
 
 ## References
 
@@ -846,8 +846,8 @@ Artifacts:
 - @.claude/rules/research-before-decision.md - Environment-first pattern validation
 - @.claude/rules/subagent-scoping.md - Delegation depth limits
 - @.claude/rules/tao-loop.md - Structurally equivalent to RLM REPL loop
-- @agentic/code/addons/ralph/agents/ralph-loop.md - Iterative execution framework
-- @tools/daemon/agent-supervisor.mjs - Task routing to RLM agent
-- @tools/daemon/task-store.mjs - Persistent state management
+- @$AIWG_ROOT/agentic/code/addons/ralph/agents/ralph-loop.md - Iterative execution framework
+- @$AIWG_ROOT/tools/daemon/agent-supervisor.mjs - Task routing to RLM agent
+- @$AIWG_ROOT/tools/daemon/task-store.mjs - Persistent state management
 - Issue #321 - AIWG RLM Addon Epic
 - Issue #322 - Core RLM addon implementation

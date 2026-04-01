@@ -267,7 +267,7 @@ Gates SHOULD support:
 
 - @.aiwg/research/findings/REF-057-agent-laboratory.md - Oversight effectiveness
 - @.claude/rules/hitl-gates.md - Gate rules
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/error-handling.yaml - Error recovery
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/error-handling.yaml - Error recovery
 - #139 - Implementation issue
 
 ---

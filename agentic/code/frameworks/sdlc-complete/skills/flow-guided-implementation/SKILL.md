@@ -232,12 +232,11 @@ Current: Task 3, waiting for test fix
 
 ## Traceability
 
-- @implements @.aiwg/features/guided-implementation/README.md
 - @research @.aiwg/research/REF-004-magis-multi-agent-issue-resolution.md
-- @skill @agentic/code/addons/guided-implementation/skills/iteration-control/SKILL.md
+- @skill @$AIWG_ROOT/agentic/code/addons/guided-implementation/skills/iteration-control/SKILL.md
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/agents/software-implementer.md
-- @agentic/code/frameworks/sdlc-complete/agents/code-reviewer.md
-- @agentic/code/frameworks/sdlc-complete/agents/debugger.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/software-implementer.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/code-reviewer.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/debugger.md

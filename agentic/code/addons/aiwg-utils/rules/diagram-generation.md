@@ -121,6 +121,6 @@ This rule applies to all agents that generate documentation artifacts. Key integ
 ## References
 
 - #430 — Elevate diagram generation to standard utility
-- @agentic/code/frameworks/sdlc-complete/templates/ — Artifact templates
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/ — Artifact templates
 - MermaidJS documentation: https://mermaid.js.org/
 - PlantUML C4 model: https://github.com/plantuml-stdlib/C4-PlantUML

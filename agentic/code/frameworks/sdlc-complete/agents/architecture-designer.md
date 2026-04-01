@@ -138,10 +138,9 @@ When making architectural decisions, use the ToT exploration protocol:
 4. **Document in ADR** - Use ToT-enhanced ADR template with backtracking triggers
 
 **Protocol References:**
-- @agentic/code/frameworks/sdlc-complete/agents/enhancements/architecture-designer-tot-protocol.md - Full protocol
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/tree-of-thought.yaml - ToT workflow schema
-- @.aiwg/flows/docs/tot-architecture-guide.md - Architecture evaluation guide
-- @agentic/code/frameworks/sdlc-complete/templates/architecture/adr-with-tot.md - ADR template with ToT
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/enhancements/architecture-designer-tot-protocol.md - Full protocol
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/tree-of-thought.yaml - ToT workflow schema
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/architecture/adr-with-tot.md - ADR template with ToT
 
 **Default:** All ADR creation uses ToT protocol unless explicitly skipped.
 
@@ -154,7 +153,7 @@ When iterating on architectural decisions:
 3. **Generate reflection** after each architecture review cycle
 4. **Track decision patterns** - which criteria weightings produce best outcomes
 
-See @agentic/code/addons/ralph/schemas/reflection-memory.json for schema.
+See @$AIWG_ROOT/agentic/code/addons/ralph/schemas/reflection-memory.json for schema.
 
 ## GRADE Quality Enforcement
 
@@ -166,7 +165,7 @@ When making architecture decisions backed by research evidence:
 4. **Use quality-appropriate language** - ADR "Decision" sections must use GRADE-compliant hedging
 5. **Quality gate compliance** - All ADRs must pass quality-evidence-gate checks before phase transition
 
-See @agentic/code/frameworks/sdlc-complete/agents/quality-assessor.md for assessment agent.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/quality-assessor.md for assessment agent.
 See @.aiwg/research/docs/grade-assessment-guide.md for GRADE methodology.
 
 ## Usage Examples
@@ -1010,11 +1009,11 @@ services:
 
 After generating or modifying any artifact (SAD, ADRs, diagrams, architecture documents), create a provenance record per @.claude/rules/provenance-tracking.md:
 
-1. **Create provenance record** - Use @agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml format
+1. **Create provenance record** - Use @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml format
 2. **Record Entity** - The artifact path as URN (`urn:aiwg:artifact:<path>`) with content hash
 3. **Record Activity** - Type (`generation` for new designs, `modification` for revisions) with timestamps
 4. **Record Agent** - This agent (`urn:aiwg:agent:architecture-designer`) with tool version
 5. **Document derivations** - Link architecture artifacts to requirements, research, and constraints as `wasDerivedFrom`
 6. **Save record** - Write to `.aiwg/research/provenance/records/<artifact-name>.prov.yaml`
 
-See @agentic/code/frameworks/sdlc-complete/agents/provenance-manager.md for the Provenance Manager agent.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/provenance-manager.md for the Provenance Manager agent.

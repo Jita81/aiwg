@@ -726,11 +726,11 @@ aiwg rlm-query "task" --provider claude --sub-provider claude
 
 ## References
 
-- @agentic/code/addons/rlm/manifest.json - Default configuration
-- @agentic/code/addons/rlm/agents/rlm-agent.md - RLM agent definition
-- @agentic/code/frameworks/sdlc-complete/config/models.json - Model mappings
+- @$AIWG_ROOT/agentic/code/addons/rlm/manifest.json - Default configuration
+- @$AIWG_ROOT/agentic/code/addons/rlm/agents/rlm-agent.md - RLM agent definition
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/config/models.json - Model mappings
 - @.aiwg/research/findings/REF-089-recursive-language-models.md - Research foundation
-- @docs/integrations/codex-quickstart.md - OpenAI Codex setup
+- @$AIWG_ROOT/docs/integrations/codex-quickstart.md - OpenAI Codex setup
 - @.aiwg/planning/codex-integration-plan.md - Codex integration details
 - Issue #325 - Multi-provider RLM support
 

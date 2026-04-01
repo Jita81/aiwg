@@ -305,8 +305,8 @@ ReAct Loop:
 **AIWG Components Affected:**
 - @.claude/rules/tao-loop.md - Core loop structure
 - @.claude/rules/thought-protocol.md - Thought type taxonomy
-- @agentic/code/addons/ralph/schemas/iteration-analytics.yaml - Logging format
-- All tool-using agents in @agentic/code/frameworks/sdlc-complete/agents/
+- @$AIWG_ROOT/agentic/code/addons/ralph/schemas/iteration-analytics.yaml - Logging format
+- All tool-using agents in @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/
 -->
 
 **Implementation Status:**
@@ -381,7 +381,7 @@ Need to investigate: How does TAO scale to 10+ iteration loops in Ralph? Does re
 - @.aiwg/research/sources/[PDF-filename].pdf - Original paper
 - @.aiwg/research/fixity-manifest.json - PDF checksum record
 - @.aiwg/research/provenance/records/REF-XXX.prov.yaml - Provenance record
-- @agentic/code/frameworks/research-complete/schemas/frontmatter-schema.yaml - Metadata schema
+- @$AIWG_ROOT/agentic/code/frameworks/research-complete/schemas/frontmatter-schema.yaml - Metadata schema
 
 ## Template Usage Notes
 
@@ -406,9 +406,9 @@ Need to investigate: How does TAO scale to 10+ iteration loops in Ralph? Does re
 
 - **Template Type:** research-literature-note
 - **Framework:** research-complete
-- **Primary Agent:** @agentic/code/frameworks/research-complete/agents/discovery-agent.md
+- **Primary Agent:** @$AIWG_ROOT/agentic/code/frameworks/research-complete/agents/discovery-agent.md
 - **Related Templates:**
-  - @agentic/code/frameworks/research-complete/templates/summary.md
-  - @agentic/code/frameworks/research-complete/templates/extraction.yaml
+  - @$AIWG_ROOT/agentic/code/frameworks/research-complete/templates/summary.md
+  - @$AIWG_ROOT/agentic/code/frameworks/research-complete/templates/extraction.yaml
 - **Version:** 1.0.0
 - **Last Updated:** 2026-02-03

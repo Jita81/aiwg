@@ -187,7 +187,7 @@ Only audits files changed since last sync.
 
 ## References
 
-- @src/extensions/commands/definitions.ts — Command definitions source of truth
-- @docs/cli-reference.md — CLI reference documentation
+- @$AIWG_ROOT/src/extensions/commands/definitions.ts — Command definitions source of truth
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference documentation
 - @CLAUDE.md — Project-level documentation
-- @agentic/code/frameworks/sdlc-complete/skills/manifest.json — Skills catalog
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/manifest.json — Skills catalog

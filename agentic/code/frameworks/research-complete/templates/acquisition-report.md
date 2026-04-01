@@ -550,7 +550,7 @@ Before marking acquisition complete:
 - @.aiwg/research/fixity-manifest.json - Fixity tracking
 - @.aiwg/research/provenance/records/REF-XXX.prov.yaml - Provenance
 - @.claude/rules/research-metadata.md - Metadata requirements
-- @agentic/code/frameworks/research-complete/schemas/acquisition-schema.yaml - Schema
+- @$AIWG_ROOT/agentic/code/frameworks/research-complete/schemas/acquisition-schema.yaml - Schema
 
 ## Template Usage Notes
 
@@ -587,9 +587,9 @@ Before marking acquisition complete:
 
 - **Template Type:** research-acquisition-report
 - **Framework:** research-complete
-- **Primary Agent:** @agentic/code/frameworks/research-complete/agents/acquisition-agent.md
+- **Primary Agent:** @$AIWG_ROOT/agentic/code/frameworks/research-complete/agents/acquisition-agent.md
 - **Related Templates:**
-  - @agentic/code/frameworks/research-complete/templates/literature-note.md
-  - @agentic/code/frameworks/research-complete/templates/provenance-record.yaml
+  - @$AIWG_ROOT/agentic/code/frameworks/research-complete/templates/literature-note.md
+  - @$AIWG_ROOT/agentic/code/frameworks/research-complete/templates/provenance-record.yaml
 - **Version:** 1.0.0
 - **Last Updated:** 2026-02-03

@@ -117,6 +117,6 @@ These rules do NOT apply to:
 
 ## References
 
-- @agentic/code/addons/daemon/behaviors/concierge.behavior.md — Concierge behavior
-- @agentic/code/addons/daemon/agents/concierge.md — Concierge agent
-- @agentic/code/addons/voice-framework/ — Voice/tone system
+- @$AIWG_ROOT/agentic/code/addons/daemon/behaviors/concierge.behavior.md — Concierge behavior
+- @$AIWG_ROOT/agentic/code/addons/daemon/agents/concierge.md — Concierge agent
+- @$AIWG_ROOT/agentic/code/addons/voice-framework/ — Voice/tone system

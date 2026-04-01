@@ -292,8 +292,8 @@ Rationale: Single study, no comparison available
 
 ## References
 
-- @agentic/code/frameworks/research-complete/agents/quality-agent.md - Quality Assessment Agent
-- @src/research/services/quality-service.ts - GRADE implementation
+- @$AIWG_ROOT/agentic/code/frameworks/research-complete/agents/quality-agent.md - Quality Assessment Agent
+- @$AIWG_ROOT/src/research/services/quality-service.ts - GRADE implementation
 - @.aiwg/research/docs/grade-assessment-guide.md - GRADE methodology
-- @agentic/code/frameworks/sdlc-complete/schemas/research/quality-dimensions.yaml - Quality schema
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/quality-dimensions.yaml - Quality schema
 - @.claude/rules/citation-policy.md - Hedging language requirements

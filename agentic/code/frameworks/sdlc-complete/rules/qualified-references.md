@@ -69,8 +69,8 @@ These rules extend @-mentions with relationship qualifiers to enable semantic na
 ```markdown
 ## References
 - @implements @.aiwg/requirements/use-cases/UC-001.md
-- @tests @src/auth/login.ts
-- @depends @src/utils/helpers.ts
+- @tests @$AIWG_ROOT/src/auth/login.ts
+- @depends @$AIWG_ROOT/src/utils/helpers.ts
 ```
 
 ### Rule 2: Maintain Bidirectional Consistency
@@ -88,13 +88,13 @@ When creating a qualified reference, the inverse should exist:
 **Requirement** (`.aiwg/requirements/use-cases/UC-AUTH-001.md`):
 ```markdown
 ## Implementation
-- @implemented-by @src/auth/login.ts
+- @implemented-by @$AIWG_ROOT/src/auth/login.ts
 ```
 
 **Test** (`test/unit/auth/login.test.ts`):
 ```typescript
 /**
- * @tests @src/auth/login.ts
+ * @tests @$AIWG_ROOT/src/auth/login.ts
  */
 ```
 
@@ -104,13 +104,13 @@ When creating a qualified reference, the inverse should exist:
 
 ```markdown
 # Valid formats
-@implements @src/module.ts
-@tests @src/auth/login.ts:42      # With line number
-@depends @src/utils/helpers.ts#function  # With anchor
+@implements @$AIWG_ROOT/src/module.ts
+@tests @$AIWG_ROOT/src/auth/login.ts:42      # With line number
+@depends @$AIWG_ROOT/src/utils/helpers.ts#function  # With anchor
 
 # Invalid
 @implements src/module.ts         # Missing @
-implements @src/module.ts         # Missing @ on qualifier
+implements @$AIWG_ROOT/src/module.ts         # Missing @ on qualifier
 ```
 
 ### Rule 4: Query Patterns
@@ -122,10 +122,10 @@ Qualified references enable semantic queries:
 grep -r "@implements @.aiwg/requirements/UC-001" src/
 
 # Find all tests for a file
-grep -r "@tests @src/auth/login.ts" test/
+grep -r "@tests @$AIWG_ROOT/src/auth/login.ts" test/
 
 # Find all dependencies
-grep -r "@depends @src/utils/" src/
+grep -r "@depends @$AIWG_ROOT/src/utils/" src/
 ```
 
 ## Agent Integration
@@ -137,7 +137,7 @@ Agents SHOULD add qualified references:
 ```typescript
 /**
  * @implements @.aiwg/requirements/use-cases/UC-XXX.md
- * @depends @src/utils/validation.ts
+ * @depends @$AIWG_ROOT/src/utils/validation.ts
  */
 export function validateInput(input: unknown): boolean {
   // ...
@@ -150,7 +150,7 @@ Agents SHOULD reference source:
 
 ```typescript
 /**
- * @tests @src/auth/validate.ts
+ * @tests @$AIWG_ROOT/src/auth/validate.ts
  * @requirement @.aiwg/requirements/use-cases/UC-AUTH-001.md
  */
 describe('validateInput', () => {
@@ -167,7 +167,7 @@ Agents SHOULD track implementations:
 
 | Component | Status | Reference |
 |-----------|--------|-----------|
-| Backend | Complete | @implemented-by @src/auth/login.ts |
+| Backend | Complete | @implemented-by @$AIWG_ROOT/src/auth/login.ts |
 | Frontend | Pending | - |
 ```
 
@@ -197,7 +197,7 @@ Existing @-mentions without qualifiers remain valid but are candidates for enhan
 
 - @.aiwg/research/findings/REF-056-fair-principles.md - FAIR research
 - @.claude/rules/mention-wiring.md - Base mention rules
-- @agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml - PROV integration
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml - PROV integration
 - #116 - Implementation issue
 
 ---

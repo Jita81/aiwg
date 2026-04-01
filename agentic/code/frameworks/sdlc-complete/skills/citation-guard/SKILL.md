@@ -75,6 +75,6 @@ This skill uses:
 ## References
 
 - @.claude/rules/citation-policy.md - Citation policy rules
-- @agentic/code/frameworks/sdlc-complete/agents/citation-verifier.md - Citation Verifier agent
-- @agentic/code/frameworks/sdlc-complete/schemas/research/hallucination-detection.yaml - Detection patterns
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/citation-verifier.md - Citation Verifier agent
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/hallucination-detection.yaml - Detection patterns
 - @.aiwg/research/docs/grade-assessment-guide.md - GRADE methodology

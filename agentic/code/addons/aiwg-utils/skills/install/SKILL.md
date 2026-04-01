@@ -107,5 +107,5 @@ If the user's intent is ambiguous:
 
 ## References
 
-- @src/cli/handlers/install.ts — Install command handler
-- @docs/cli-reference.md — CLI reference
+- @$AIWG_ROOT/src/cli/handlers/install.ts — Install command handler
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

@@ -137,6 +137,6 @@ testing-quality/
 
 - @.aiwg/planning/testing-tools-recommendations-referenced.md
 - @.aiwg/requirements/nfr-modules/testing.md
-- @agentic/code/frameworks/sdlc-complete/agents/test-engineer.md
-- @agentic/code/frameworks/sdlc-complete/agents/test-architect.md
-- @agentic/code/frameworks/sdlc-complete/agents/mutation-analyst.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/test-engineer.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/test-architect.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/mutation-analyst.md

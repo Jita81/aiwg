@@ -174,7 +174,7 @@ If the user's intent is ambiguous:
 
 ## References
 
-- @src/cli/handlers/subcommands.ts — Reproducibility validate command handler
-- @docs/cli-reference.md — CLI reference
-- @agentic/code/addons/aiwg-utils/skills/execution-mode/SKILL.md — Set execution mode to reduce variance before validating
-- @agentic/code/addons/aiwg-utils/skills/snapshot/SKILL.md — Capture state before running validation
+- @$AIWG_ROOT/src/cli/handlers/subcommands.ts — Reproducibility validate command handler
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/skills/execution-mode/SKILL.md — Set execution mode to reduce variance before validating
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/skills/snapshot/SKILL.md — Capture state before running validation

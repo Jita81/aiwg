@@ -290,8 +290,8 @@ User: "actually, abort that and just fix the login bug"
 - `ralph-status` skill - check loop progress
 - `ralph-resume` skill - continue interrupted loops
 - `ralph-abort` skill - abort active loops
-- `@agentic/code/addons/ralph/schemas/loop-registry.yaml` - Registry schema
-- `@agentic/code/addons/ralph/schemas/loop-state.yaml` - Loop state schema
+- `@$AIWG_ROOT/agentic/code/addons/ralph/schemas/loop-registry.yaml` - Registry schema
+- `@$AIWG_ROOT/agentic/code/addons/ralph/schemas/loop-state.yaml` - Loop state schema
 - `@.aiwg/research/findings/REF-086-cognitive-load-limits.md` - Concurrency research
 
 ## Version History

@@ -126,6 +126,6 @@ With `--dry-run`: detect entry point, show planned phases with commands to invok
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/accelerate-state.yaml
-- @agentic/code/frameworks/sdlc-complete/templates/management/construction-ready-brief-template.md
-- @agentic/code/frameworks/sdlc-complete/skills/sdlc-accelerate/SKILL.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/accelerate-state.yaml
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/management/construction-ready-brief-template.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/sdlc-accelerate/SKILL.md

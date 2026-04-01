@@ -93,6 +93,6 @@ hook:
 ## References
 
 - @.claude/rules/citation-policy.md - Citation policy rules
-- @agentic/code/frameworks/sdlc-complete/agents/citation-verifier.md - Verifier agent
-- @agentic/code/frameworks/sdlc-complete/schemas/research/hallucination-detection.yaml - Detection schema
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/citation-verifier.md - Verifier agent
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/hallucination-detection.yaml - Detection schema
 - @.aiwg/research/docs/grade-assessment-guide.md - GRADE levels

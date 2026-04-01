@@ -844,7 +844,7 @@ When creating requirements that reference research or evidence:
 4. **Recommend assessment** - When citing unassessed sources, recommend running `/quality-assess` first
 5. **Include quality context** - Add evidence quality notes to requirement justifications
 
-See @agentic/code/frameworks/sdlc-complete/agents/quality-assessor.md for assessment agent.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/quality-assessor.md for assessment agent.
 See @.aiwg/research/docs/grade-assessment-guide.md for GRADE methodology.
 
 ## Artifact Index Integration
@@ -856,7 +856,7 @@ Use `aiwg index` CLI commands for structured artifact discovery:
 - `aiwg index deps <path> --json` — Check what depends on a requirement before modifying it
 - `aiwg index build` — Rebuild index after creating or modifying requirements
 
-Always use `--json` flag for programmatic consumption. See @agentic/code/frameworks/sdlc-complete/rules/artifact-discovery.md for the full protocol.
+Always use `--json` flag for programmatic consumption. See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/artifact-discovery.md for the full protocol.
 
 ## Citation Requirements
 

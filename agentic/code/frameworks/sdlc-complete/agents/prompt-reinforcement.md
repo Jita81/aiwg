@@ -806,7 +806,7 @@ This agent implements patterns from multiple research sources:
 
 After generating reinforcement directives or configuration files, create provenance records per @.claude/rules/provenance-tracking.md:
 
-1. **Create provenance record** - Use @agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml format
+1. **Create provenance record** - Use @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml format
 2. **Record Entity** - The directive or config as URN with content hash
 3. **Record Activity** - Type `generation` with timestamps
 4. **Record Agent** - This agent `urn:aiwg:agent:prompt-reinforcement` with tool version
@@ -838,7 +838,7 @@ Reinforcement injection is complete when:
 ### Research
 
 - @.aiwg/research/findings/agentic-laziness-research.md - Comprehensive laziness research
-- @docs/references/REF-015-self-refine-iterative-refinement.md - Self-Refine late-loop degradation
+- @$AIWG_ROOT/docs/references/REF-015-self-refine-iterative-refinement.md - Self-Refine late-loop degradation
 - REF-072: Anthropic inoculation prompting (emergent misalignment)
 - REF-074: LLMs as lazy learners (shortcut exploitation)
 
@@ -864,6 +864,6 @@ Reinforcement injection is complete when:
 
 ### Schema References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/execution-mode.yaml - Execution modes
-- @agentic/code/addons/ralph/schemas/iteration-analytics.yaml - Iteration tracking
-- @agentic/code/addons/ralph/schemas/actionable-feedback.yaml - Feedback format
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/execution-mode.yaml - Execution modes
+- @$AIWG_ROOT/agentic/code/addons/ralph/schemas/iteration-analytics.yaml - Iteration tracking
+- @$AIWG_ROOT/agentic/code/addons/ralph/schemas/actionable-feedback.yaml - Feedback format

@@ -795,8 +795,8 @@ ci_integration:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/testing/regression.yaml
-- @agentic/code/frameworks/sdlc-complete/skills/regression-baseline/SKILL.md
-- @agentic/code/frameworks/sdlc-complete/skills/regression-report/SKILL.md
-- @agentic/code/frameworks/sdlc-complete/agents/test-engineer.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/testing/regression.yaml
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/regression-baseline/SKILL.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/regression-report/SKILL.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/test-engineer.md
 - @.claude/rules/executable-feedback.md

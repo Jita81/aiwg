@@ -652,9 +652,9 @@ From REF-089 Appendix B, important limitations to be aware of:
 - @.claude/rules/research-before-decision.md - Complementary research patterns
 - @.claude/rules/subagent-scoping.md - Context limits for delegation
 - @.claude/rules/tao-loop.md - TAO loop integration with RLM patterns
-- @tools/ralph-external/ - Ralph loop implementation
-- @tools/daemon/agent-supervisor.mjs - Agent orchestration
-- @tools/daemon/task-store.mjs - Persistent state (REPL variables)
+- @$AIWG_ROOT/tools/ralph-external/ - Ralph loop implementation
+- @$AIWG_ROOT/tools/daemon/agent-supervisor.mjs - Agent orchestration
+- @$AIWG_ROOT/tools/daemon/task-store.mjs - Persistent state (REPL variables)
 
 ---
 

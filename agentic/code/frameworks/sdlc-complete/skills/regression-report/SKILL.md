@@ -718,7 +718,7 @@ aggregation_config:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/test/regression-report-schema.yaml
-- @agentic/code/frameworks/sdlc-complete/templates/regression/incident-report.md
-- @agentic/code/frameworks/sdlc-complete/agents/technical-writer.md
-- @agentic/code/frameworks/sdlc-complete/agents/metrics-analyst.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/test/regression-report-schema.yaml
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/regression/incident-report.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/technical-writer.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/metrics-analyst.md

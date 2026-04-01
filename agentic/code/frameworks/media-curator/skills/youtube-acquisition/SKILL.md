@@ -824,6 +824,6 @@ yt-dlp -f "best[ext=mp4]/best" \
 
 ## See Also
 
-- Source Discoverer Agent: `@agentic/code/frameworks/media-curator/agents/source-discoverer.md`
-- find-sources Command: `@agentic/code/frameworks/media-curator/commands/find-sources.md`
-- Queue Manager Agent: `@agentic/code/frameworks/media-curator/agents/queue-manager.md`
+- Source Discoverer Agent: `@$AIWG_ROOT/agentic/code/frameworks/media-curator/agents/source-discoverer.md`
+- find-sources Command: `@$AIWG_ROOT/agentic/code/frameworks/media-curator/commands/find-sources.md`
+- Queue Manager Agent: `@$AIWG_ROOT/agentic/code/frameworks/media-curator/agents/queue-manager.md`

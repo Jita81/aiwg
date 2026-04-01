@@ -475,5 +475,5 @@ Example call:
 
 ## Schema References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/mcp-extensions.yaml — MCP server extension patterns
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/mcp-research-resources.yaml — MCP research resource integration
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/mcp-extensions.yaml — MCP server extension patterns
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/mcp-research-resources.yaml — MCP research resource integration

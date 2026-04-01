@@ -157,7 +157,7 @@ Voice-to-soul conversion is inherently incomplete — a voice profile captures *
 
 ## References
 
-- @agentic/code/addons/voice-framework/voices/templates/ — Built-in voice profiles
-- @agentic/code/addons/voice-framework/schemas/voice-profile.schema.json — Voice profile schema
-- @docs/soul-md-guide.md — Integration guide
+- @$AIWG_ROOT/agentic/code/addons/voice-framework/voices/templates/ — Built-in voice profiles
+- @$AIWG_ROOT/agentic/code/addons/voice-framework/schemas/voice-profile.schema.json — Voice profile schema
+- @$AIWG_ROOT/docs/soul-md-guide.md — Integration guide
 - #437 — SOUL.md compatibility issue (Phase 2)

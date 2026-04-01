@@ -42,4 +42,4 @@ When invoked, perform quick citation check:
 
 - @.claude/rules/citation-policy.md - Citation policy
 - @.aiwg/research/docs/grade-assessment-guide.md - GRADE guide
-- @agentic/code/frameworks/sdlc-complete/agents/citation-verifier.md - Verifier agent
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/citation-verifier.md - Verifier agent

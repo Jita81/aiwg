@@ -47,7 +47,7 @@ src/services/auth/login.ts
   L5:  ML001 @.aiwg/architecture/adrs/ADR-999.md does not exist
 
 test/integration/auth.test.ts
-  L2:  ML003 @auth/login.ts should be @src/auth/login.ts (auto-fixable)
+  L2:  ML003 @auth/login.ts should be @$AIWG_ROOT/src/auth/login.ts (auto-fixable)
 
 .aiwg/architecture/software-architecture-doc.md
   L45: ML008 References @.aiwg/requirements/UC-005.md but no back-reference
@@ -75,7 +75,7 @@ Fix: Correct case to match filesystem
 ### ML003: Missing Prefix
 
 ```
-Warning: @auth/login.ts should be @src/auth/login.ts
+Warning: @auth/login.ts should be @$AIWG_ROOT/src/auth/login.ts
 Fix: Add appropriate prefix
 ```
 

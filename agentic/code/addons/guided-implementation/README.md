@@ -103,7 +103,6 @@ guided-implementation/
 | Artifact | Location |
 |----------|----------|
 | Issue | https://git.integrolabs.net/roctinam/ai-writing-guide/issues/1 |
-| Feature Spec | @.aiwg/features/guided-implementation/README.md |
 | Research | @.aiwg/research/REF-004-magis-multi-agent-issue-resolution.md |
-| Flow Command | @agentic/code/frameworks/sdlc-complete/commands/flow-guided-implementation.md |
+| Flow Command | @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/flow-guided-implementation.md |
 | Analysis | @.aiwg/working/guided-impl-analysis/SYNTHESIS.md |

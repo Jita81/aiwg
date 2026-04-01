@@ -261,6 +261,6 @@ This skill uses:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/rules/agent-friendly-code.md — Thresholds triggering chunker use
-- @agentic/code/frameworks/sdlc-complete/skills/decompose-file/SKILL.md — Permanent splitting
-- @agentic/code/frameworks/sdlc-complete/commands/codebase-health.md — File size scanning
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/agent-friendly-code.md — Thresholds triggering chunker use
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/decompose-file/SKILL.md — Permanent splitting
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/codebase-health.md — File size scanning

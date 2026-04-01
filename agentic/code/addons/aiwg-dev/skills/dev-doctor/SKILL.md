@@ -74,30 +74,56 @@ For each file found in a provider directory:
 - If no source found: flag as a potential placement violation (note: some files like `CLAUDE.md`, `settings.json`, `.gitignore` are intentionally in provider directories and are not violations)
 - Skills, agents, commands, and rule files with no `agentic/code/` source are violations
 
-### Section 4: `.aiwg/` Reference Check (Contract-Based)
+### Section 4: `@file` Reference Check (Full Classification)
 
-Normalized `.aiwg/` references are allowed — they give skills project context when deployed. Only **non-normalized** references (repo-local paths) must be flagged.
+All `@file` references in distributable skills and agents are checked against the full linking contract. Three categories of violations are reported:
 
-**Step 1**: Collect all `@.aiwg/` references across `agentic/code/`:
+**Step 1**: Build the Tier 2 normalized allowlist from installed manifests:
+- Read all `manifest.json` files in `agentic/code/`
+- Collect all `memory.creates[*].path` values
+- Combine with Tier 1: `.aiwg/AIWG.md`, `.aiwg/frameworks/`
+
+**Step 2**: Scan for `.aiwg/` violations (Section 4a):
 
 ```bash
 grep -rn "@\.aiwg/" agentic/code/ --include="*.md"
 ```
 
-**Step 2**: Build the normalized allowlist from installed manifests:
-- Tier 1 (always present): `.aiwg/AIWG.md`, `.aiwg/frameworks/`
-- Tier 2 (framework-specific): all `path` values from `memory.creates` in framework/addon manifests
+For each ref found: check against allowlist.
+- Starts with a Tier 1/2 prefix → PASS
+- Not in allowlist → FAIL (repo-local path)
 
-**Step 3**: For each reference found, check if it starts with a normalized prefix:
-- If YES → PASS (normalized reference)
-- If NO → FAIL (repo-local path, will silently fail in user projects)
+**Step 3**: Scan for bare AIWG-core refs (Section 4b — legacy migration):
 
-**Report format for flagged refs**:
+```bash
+grep -rn "@agentic/code/\|@src/\|@docs/\|@tools/" agentic/code/ --include="*.md"
 ```
-SECTION 4 — .aiwg/ Reference Check
-  PASS  agentic/code/frameworks/sdlc-complete/agents/...  @.aiwg/requirements/ (normalized)
-  FAIL  agentic/code/frameworks/sdlc-complete/agents/...  @.aiwg/planning/issue-driven-ralph-loop-design.md
+
+Each match → WARN: `legacy bare ref — migrate to @$AIWG_ROOT/<path>`
+
+**Step 4**: Scan for forbidden deployment-target refs (Section 4c):
+
+```bash
+grep -rn "@\.claude/" agentic/code/ --include="*.md"
+```
+
+Each match → FAIL: `deployment target ref — forbidden in distributable source`
+
+**Report format**:
+```
+SECTION 4 — @file Reference Check
+
+  4a — .aiwg/ References
+  PASS  sdlc-complete/agents/requirements-analyst.md  @.aiwg/requirements/ (normalized)
+  FAIL  my-addon/skills/my-skill.md  @.aiwg/planning/my-design.md
         → non-normalized path: only exists in AIWG dev repo
+
+  4b — Bare AIWG-core References (legacy)
+  WARN  research-complete/agents/workflow-agent.md  @agentic/code/frameworks/research-complete/...
+        → migrate to @$AIWG_ROOT/agentic/code/...
+
+  4c — Deployment-Target References (forbidden)
+  (none)
 ```
 
 ### Section 5: TypeScript Compilation
@@ -154,11 +180,12 @@ SECTION 2 — Orphan Detection
 SECTION 3 — Placement Violations
   PASS  no placement violations found
 
-SECTION 4 — .aiwg/ References
-  PASS  agentic/code/frameworks/sdlc-complete/agents/requirements-analyst.md
-        @.aiwg/requirements/ (normalized — sdlc-complete memory.creates)
-  FAIL  agentic/code/addons/my-addon/skills/my-skill.md
-        @.aiwg/planning/issue-driven-ralph-loop-design.md (non-normalized, repo-local)
+SECTION 4 — @file References
+  4a .aiwg/ refs:   PASS (all normalized)
+  4b bare AIWG refs: WARN — 2 legacy refs (migrate to @$AIWG_ROOT/)
+  4c .claude/ refs: PASS (none found)
+  WARN  agentic/code/addons/my-addon/skills/my-skill.md
+        @agentic/code/... → migrate to @$AIWG_ROOT/agentic/code/...
 
 SECTION 5 — TypeScript Compilation
   PASS  tsc --noEmit: 0 errors
@@ -251,10 +278,10 @@ All deployed files have corresponding source in agentic/code/.
 
 ## References
 
-- @agentic/code/addons/aiwg-dev/rules/skill-placement.md — Placement violation definitions
-- @agentic/code/addons/aiwg-dev/rules/no-circular-skill-calls.md — Circular call detection
-- @agentic/code/addons/aiwg-dev/rules/component-completeness.md — Completeness requirements
-- @agentic/code/addons/aiwg-dev/rules/addon-boundaries.md — Source vs project output boundary
-- @agentic/code/addons/aiwg-dev/rules/aiwg-dir-reference-contract.md — Normalized .aiwg/ reference contract
-- @agentic/code/addons/aiwg-dev/skills/validate-addon/SKILL.md — Per-addon validation
-- @tools/cli/doctor.mjs — Runtime doctor (end-user installation health, not dev structure)
+- @$AIWG_ROOT/agentic/code/addons/aiwg-dev/rules/skill-placement.md — Placement violation definitions
+- @$AIWG_ROOT/agentic/code/addons/aiwg-dev/rules/no-circular-skill-calls.md — Circular call detection
+- @$AIWG_ROOT/agentic/code/addons/aiwg-dev/rules/component-completeness.md — Completeness requirements
+- @$AIWG_ROOT/agentic/code/addons/aiwg-dev/rules/addon-boundaries.md — Source vs project output boundary
+- @$AIWG_ROOT/agentic/code/addons/aiwg-dev/rules/aiwg-dir-reference-contract.md — Normalized .aiwg/ reference contract
+- @$AIWG_ROOT/agentic/code/addons/aiwg-dev/skills/validate-addon/SKILL.md — Per-addon validation
+- @$AIWG_ROOT/tools/cli/doctor.mjs — Runtime doctor (end-user installation health, not dev structure)

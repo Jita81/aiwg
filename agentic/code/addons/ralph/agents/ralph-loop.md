@@ -293,18 +293,18 @@ If the same reflection appears 3+ consecutive times, the loop is stuck. Response
 
 ## Schema References
 
-- @agentic/code/addons/ralph/schemas/reflection-memory.json — Episodic reflection memory schema (REF-021)
-- @agentic/code/addons/ralph/schemas/cross-task-memory.yaml — Cross-task learning patterns with Ω presets
+- @$AIWG_ROOT/agentic/code/addons/ralph/schemas/reflection-memory.json — Episodic reflection memory schema (REF-021)
+- @$AIWG_ROOT/agentic/code/addons/ralph/schemas/cross-task-memory.yaml — Cross-task learning patterns with Ω presets
 - @.aiwg/ralph/reflections/index.yaml — Auto-populated reflection index
-- @.aiwg/ralph/docs/reflection-memory-guide.md — Comprehensive reflection memory guide
+- @$AIWG_ROOT/agentic/code/addons/ralph/docs/reflection-memory-guide.md — Comprehensive reflection memory guide
 
 ## References
 
 - @.aiwg/ralph/ - Ralph workspace and state
-- @agentic/code/addons/ralph/docs/ - User documentation
-- @agentic/code/addons/ralph/commands/ralph-reflect.md — View and manage reflections
-- @agentic/code/addons/ralph/skills/reflection-injection/SKILL.md — Auto-inject past reflections
-- @agentic/code/addons/ralph/hooks/post-iteration-reflect.md — Generate reflections after iterations
-- @agentic/code/addons/ralph/templates/self-reflection-prompt.md — Prompt template for reflection injection
+- @$AIWG_ROOT/agentic/code/addons/ralph/docs/ - User documentation
+- @$AIWG_ROOT/agentic/code/addons/ralph/commands/ralph-reflect.md — View and manage reflections
+- @$AIWG_ROOT/agentic/code/addons/ralph/skills/reflection-injection/SKILL.md — Auto-inject past reflections
+- @$AIWG_ROOT/agentic/code/addons/ralph/hooks/post-iteration-reflect.md — Generate reflections after iterations
+- @$AIWG_ROOT/agentic/code/addons/ralph/templates/self-reflection-prompt.md — Prompt template for reflection injection
 - @.aiwg/research/findings/REF-021-reflexion.md — Research foundation
 - Original methodology: Ralph Wiggum - iteration beats perfection

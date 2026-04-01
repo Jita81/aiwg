@@ -345,8 +345,8 @@ External researchers can replicate findings using:
 
 ## References
 
-- @.aiwg/flows/research-framework/elaboration/use-cases/UC-RF-007-archive-research-artifacts.md
-- @.aiwg/flows/research-framework/elaboration/agents/archival-agent-spec.md
+- @$AIWG_ROOT/agentic/code/frameworks/research-complete/elaboration/use-cases/UC-RF-007-archive-research-artifacts.md
+- @$AIWG_ROOT/agentic/code/frameworks/research-complete/elaboration/agents/archival-agent-spec.md
 - @.claude/rules/provenance-tracking.md
 - [OAIS Reference Model (ISO 14721)](https://www.iso.org/standard/57284.html)
 - [PREMIS Data Dictionary](https://www.loc.gov/standards/premis/)

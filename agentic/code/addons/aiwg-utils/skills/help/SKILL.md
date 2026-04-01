@@ -89,5 +89,5 @@ aiwg help
 
 ## References
 
-- @src/cli/handlers/help.ts — Help command handler
-- @docs/cli-reference.md — Full CLI reference with all 50 commands
+- @$AIWG_ROOT/src/cli/handlers/help.ts — Help command handler
+- @$AIWG_ROOT/docs/cli-reference.md — Full CLI reference with all 50 commands

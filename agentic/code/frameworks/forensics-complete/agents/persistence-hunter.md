@@ -593,6 +593,6 @@ cat /etc/cron.d/php-update
 
 - MITRE ATT&CK Persistence Tactic: https://attack.mitre.org/tactics/TA0003/
 - NIST SP 800-86: Section 3.3 — Examination
-- @agentic/code/frameworks/forensics-complete/docs/investigation-workflow.md
-- @agentic/code/frameworks/forensics-complete/skills/sysops-forensics.md
-- @agentic/code/frameworks/forensics-complete/templates/persistence-findings.md
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/docs/investigation-workflow.md
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/skills/sysops-forensics.md
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/templates/persistence-findings.md

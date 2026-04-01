@@ -290,7 +290,7 @@ Report: .aiwg/forensics/reports/forensic-report.md
 
 ## References
 
-- @agentic/code/frameworks/forensics-complete/agents/forensics-orchestrator.md - Orchestrator
-- @agentic/code/frameworks/forensics-complete/agents/manifest.json - All agent definitions
-- @agentic/code/frameworks/forensics-complete/commands/forensics-report.md - Report generation
-- @agentic/code/frameworks/forensics-complete/commands/forensics-status.md - Status monitoring
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/agents/forensics-orchestrator.md - Orchestrator
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/agents/manifest.json - All agent definitions
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/commands/forensics-report.md - Report generation
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/commands/forensics-status.md - Status monitoring

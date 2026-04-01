@@ -333,6 +333,6 @@ reasons:
 
 ## Integration Points
 
-- **@agentic/code/frameworks/media-curator/agents/download-orchestrator.md** - Receives assessment results, decides download/skip
-- **@agentic/code/frameworks/media-curator/skills/quality-filtering.md** - Implements scoring heuristics and thresholds
-- **@agentic/code/frameworks/media-curator/tools/ffprobe-wrapper.md** - Provides metadata extraction for post-download analysis
+- **@$AIWG_ROOT/agentic/code/frameworks/media-curator/agents/download-orchestrator.md** - Receives assessment results, decides download/skip
+- **@$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/quality-filtering.md** - Implements scoring heuristics and thresholds
+- **@$AIWG_ROOT/agentic/code/frameworks/media-curator/tools/ffprobe-wrapper.md** - Provides metadata extraction for post-download analysis

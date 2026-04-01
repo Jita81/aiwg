@@ -304,7 +304,7 @@ Before completing any TAO loop:
 ## References
 
 - @.claude/rules/thought-protocol.md - Six thought types
-- @agentic/code/addons/ralph/schemas/iteration-analytics.yaml - Iteration tracking
+- @$AIWG_ROOT/agentic/code/addons/ralph/schemas/iteration-analytics.yaml - Iteration tracking
 - @.aiwg/research/findings/REF-018-react.md - ReAct research
 - @.aiwg/research/synthesis/topic-04-tool-grounding.md - Tool grounding
 - #162 - Implementation issue

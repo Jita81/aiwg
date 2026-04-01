@@ -138,6 +138,6 @@ If the user's intent is ambiguous:
 
 ## References
 
-- @src/cli/handlers/subcommands.ts — Skills subcommand handler
-- @docs/cli-reference.md — CLI reference (skills section)
-- @agentic/code/addons/aiwg-utils/skills/ — Installed skills directory
+- @$AIWG_ROOT/src/cli/handlers/subcommands.ts — Skills subcommand handler
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference (skills section)
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/skills/ — Installed skills directory

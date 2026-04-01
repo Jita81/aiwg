@@ -1,7 +1,7 @@
 # Agent Permission Tier Rationale
 
 **Version**: 1.0.0
-**Parent Document**: @agentic/code/frameworks/sdlc-complete/docs/agent-permission-tiers.md
+**Parent Document**: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/agent-permission-tiers.md
 
 ## Purpose
 
@@ -249,7 +249,7 @@ This would require runtime support and audit logging.
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/docs/agent-permission-tiers.md - Tier definitions
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/agent-permission-tiers.md - Tier definitions
 - @.aiwg/research/findings/REF-013-metagpt.md - Executable feedback pattern
 - @.claude/rules/executable-feedback.md - Execution requirements for code agents
 - Claude Code v2.1.33 Release Notes - Task(agent_type) introduction

@@ -540,6 +540,6 @@ aiwg download-queue --input yt.yaml --format best
 
 ## See Also
 
-- Source Discoverer Agent: `@agentic/code/frameworks/media-curator/agents/source-discoverer.md`
-- YouTube Acquisition Skill: `@agentic/code/frameworks/media-curator/skills/youtube-acquisition.md`
-- Queue Manager Agent: `@agentic/code/frameworks/media-curator/agents/queue-manager.md`
+- Source Discoverer Agent: `@$AIWG_ROOT/agentic/code/frameworks/media-curator/agents/source-discoverer.md`
+- YouTube Acquisition Skill: `@$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/youtube-acquisition.md`
+- Queue Manager Agent: `@$AIWG_ROOT/agentic/code/frameworks/media-curator/agents/queue-manager.md`

@@ -311,7 +311,7 @@ Track unresolved questions or decisions:
 Wire @-mentions for traceability:
 
 - @.aiwg/architecture/software-architecture-doc.md - Architecture context
-- @src/auth/login.ts - Implementation (when complete)
+- @$AIWG_ROOT/src/auth/login.ts - Implementation (when complete)
 - @test/integration/auth/login.test.ts - Test coverage
 - @.aiwg/requirements/nfr-modules/security.md - Security requirements
 - @.aiwg/requirements/nfr-modules/performance.md - Performance requirements
@@ -339,6 +339,6 @@ Before marking this use case as complete:
 
 ## Related Templates
 
-- @agentic/code/frameworks/sdlc-complete/templates/requirements/user-story-card.md - For Agile user stories
-- @agentic/code/frameworks/sdlc-complete/templates/test/use-case-test-card.md - Test cases derived from use case
-- @agentic/code/frameworks/sdlc-complete/templates/analysis-design/use-case-realization-template.md - Design realization
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/requirements/user-story-card.md - For Agile user stories
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/test/use-case-test-card.md - Test cases derived from use case
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/analysis-design/use-case-realization-template.md - Design realization

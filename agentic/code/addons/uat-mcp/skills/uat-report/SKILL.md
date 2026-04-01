@@ -186,6 +186,6 @@ Report generated with available data.
 
 ## References
 
-- Schema: @agentic/code/addons/uat-mcp/schemas/uat-result.yaml
-- Schema: @agentic/code/addons/uat-mcp/schemas/uat-coverage.yaml
-- Template: @agentic/code/addons/uat-mcp/templates/uat-report.md
+- Schema: @$AIWG_ROOT/agentic/code/addons/uat-mcp/schemas/uat-result.yaml
+- Schema: @$AIWG_ROOT/agentic/code/addons/uat-mcp/schemas/uat-coverage.yaml
+- Template: @$AIWG_ROOT/agentic/code/addons/uat-mcp/templates/uat-report.md

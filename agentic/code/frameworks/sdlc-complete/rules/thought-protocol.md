@@ -49,7 +49,7 @@ For each step, express your thinking using appropriate thought types:
 - Use: Before making technical decisions, when encountering unfamiliar APIs/patterns, before choosing an approach
 - Example: "Research: I need to find out how this project handles token refresh before I modify the auth middleware"
 - Triggers: Search, read, grep, glob, or web search actions — NOT code modifications
-- See: @agentic/code/addons/aiwg-utils/rules/research-before-decision.md
+- See: @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md
 
 **Progress Thought** 📊
 - Format: "Progress: So far I have completed [items]"
@@ -295,11 +295,11 @@ After completing tasks, verify:
 ## References
 
 - @.aiwg/research/findings/REF-018-react.md - ReAct research
-- @agentic/code/frameworks/sdlc-complete/agents/ - Agent definitions
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/ - Agent definitions
 - @.aiwg/research/synthesis/topic-04-tool-grounding.md - Tool grounding
 - @.claude/rules/reasoning-sections.md - Reasoning patterns
-- @agentic/code/addons/aiwg-utils/rules/research-before-decision.md - Research enforcement
-- @agentic/code/addons/aiwg-utils/rules/instruction-comprehension.md - Instruction following
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md - Research enforcement
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/instruction-comprehension.md - Instruction following
 - #158 - Implementation issue
 
 ---

@@ -1184,14 +1184,14 @@ recovery_session:
 - @.aiwg/architecture/decisions/ADR-AP-002-rule-enforcement-strategy.md - Recovery protocol design
 - @.aiwg/requirements/use-cases/UC-AP-004-enforce-recovery-protocol.md - Recovery requirements
 - @.aiwg/patterns/laziness-patterns.yaml - Avoidance pattern catalog
-- @agentic/code/frameworks/sdlc-complete/agents/laziness-detector.md - Detection agent
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/laziness-detector.md - Detection agent
 - @.claude/rules/executable-feedback.md - Test execution requirements
 - @.claude/rules/actionable-feedback.md - Feedback quality standards
 - @.claude/rules/hitl-gates.md - Human gate patterns
 - @.claude/rules/thought-protocol.md - Thought type definitions
 - @.claude/rules/tao-loop.md - TAO loop integration
 - @.claude/rules/conversable-agent-interface.md - Agent interface specification
-- @agentic/code/addons/ralph/schemas/recovery-session.yaml - Recovery session schema
+- @$AIWG_ROOT/agentic/code/addons/ralph/schemas/recovery-session.yaml - Recovery session schema
 - REF-057: Agent Laboratory (HITL effectiveness)
 - REF-015: Self-Refine (recovery importance)
 - REF-002: LLM Failures (recovery capability predictor)
@@ -1200,11 +1200,11 @@ recovery_session:
 
 After coordinating recovery sessions, create provenance records per @.claude/rules/provenance-tracking.md:
 
-1. **Create provenance record** - Use @agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml format
+1. **Create provenance record** - Use @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml format
 2. **Record Entity** - Recovery session report as URN (`urn:aiwg:artifact:.aiwg/persistence/recoveries/{id}.yaml`)
 3. **Record Activity** - Type (`recovery_coordination`) with all PDARE stage timestamps
 4. **Record Agent** - This agent (`urn:aiwg:agent:recovery-orchestrator`) with model version
 5. **Document derivations** - Link recovery reports to detection signals (`wasDerivedFrom`) and task context
 6. **Save record** - Write to `.aiwg/research/provenance/records/recovery-{session-id}.prov.yaml`
 
-See @agentic/code/frameworks/sdlc-complete/agents/provenance-manager.md for the Provenance Manager agent.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/provenance-manager.md for the Provenance Manager agent.

@@ -77,8 +77,8 @@ Every template includes extensive inline examples showing:
 ### Schema Compliance
 
 YAML templates conform to schemas:
-- `extraction.yaml` → `@agentic/code/frameworks/research-complete/schemas/extraction-schema.yaml`
-- `provenance-record.yaml` → `@agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml`
+- `extraction.yaml` → `@$AIWG_ROOT/agentic/code/frameworks/research-complete/schemas/extraction-schema.yaml`
+- `provenance-record.yaml` → `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml`
 
 ## Template Selection Guide
 
@@ -189,9 +189,9 @@ Before completing any artifact from these templates:
 
 ## References
 
-- **Framework README**: `@agentic/code/frameworks/research-complete/README.md`
-- **Agents**: `@agentic/code/frameworks/research-complete/agents/`
-- **Schemas**: `@agentic/code/frameworks/sdlc-complete/schemas/research/`
+- **Framework README**: `@$AIWG_ROOT/agentic/code/frameworks/research-complete/README.md`
+- **Agents**: `@$AIWG_ROOT/agentic/code/frameworks/research-complete/agents/`
+- **Schemas**: `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/`
 
 ### Rules
 - `@.claude/rules/progressive-disclosure.md` - Template structure

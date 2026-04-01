@@ -310,6 +310,6 @@ Before MCPSmith can operate, verify:
 
 ## References
 
-- MCPSmith agent: `@agentic/code/frameworks/sdlc-complete/agents/mcpsmith.md`
+- MCPSmith agent: `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/mcpsmith.md`
 - MCP tool catalog: `.aiwg/smiths/mcpsmith/catalog.yaml`
-- ToolSmith (sibling): `@agentic/code/frameworks/sdlc-complete/agents/toolsmith-dynamic.md`
+- ToolSmith (sibling): `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/toolsmith-dynamic.md`

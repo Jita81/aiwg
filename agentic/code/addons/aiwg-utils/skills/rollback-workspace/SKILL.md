@@ -173,6 +173,6 @@ If the user's intent is ambiguous:
 
 ## References
 
-- @src/cli/handlers/workspace.ts — `rollback-workspace` command handler
-- @docs/cli-reference.md — CLI reference
-- @agentic/code/addons/aiwg-utils/skills/migrate-workspace/SKILL.md — The migration this reverses
+- @$AIWG_ROOT/src/cli/handlers/workspace.ts — `rollback-workspace` command handler
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/skills/migrate-workspace/SKILL.md — The migration this reverses

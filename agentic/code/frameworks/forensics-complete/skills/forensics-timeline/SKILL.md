@@ -155,7 +155,7 @@ Output: .aiwg/forensics/timeline/incident-timeline.md
 
 ## References
 
-- @agentic/code/frameworks/forensics-complete/agents/timeline-builder.md - Timeline Builder
-- @agentic/code/frameworks/forensics-complete/templates/timeline-template.md - Timeline format
-- @agentic/code/frameworks/forensics-complete/commands/forensics-ioc.md - IOC extraction
-- @agentic/code/frameworks/forensics-complete/commands/forensics-report.md - Report generation
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/agents/timeline-builder.md - Timeline Builder
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/templates/timeline-template.md - Timeline format
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/commands/forensics-ioc.md - IOC extraction
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/commands/forensics-report.md - Report generation

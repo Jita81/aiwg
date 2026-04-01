@@ -90,12 +90,12 @@ Idea → Inception → Elaboration → Construction (iterative) → Transition �
 
 ## Schema References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/agent-selection.yaml — UCT-based agent selection for task routing
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/semantic-agent-discovery.yaml — Capability-based agent discovery
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/moe-agent-routing.yaml — Mixture-of-Experts agent routing
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/uct-agent-selection.yaml — UCT algorithm for agent selection scoring
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/sdlc-output-schemas.yaml — Standardized SDLC output formats
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/hitl-gate.yaml — Human-in-the-loop gate definitions for phase transitions
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/hitl-cost-tracking.yaml — HITL cost tracking and efficiency measurement
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/agent-pubsub.yaml — Subscription-based agent activation and event routing
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/agent-capability-matrix.yaml — Agent capability matching for fallback routing
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/agent-selection.yaml — UCT-based agent selection for task routing
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/semantic-agent-discovery.yaml — Capability-based agent discovery
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/moe-agent-routing.yaml — Mixture-of-Experts agent routing
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/uct-agent-selection.yaml — UCT algorithm for agent selection scoring
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/sdlc-output-schemas.yaml — Standardized SDLC output formats
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/hitl-gate.yaml — Human-in-the-loop gate definitions for phase transitions
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/hitl-cost-tracking.yaml — HITL cost tracking and efficiency measurement
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/agent-pubsub.yaml — Subscription-based agent activation and event routing
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/agent-capability-matrix.yaml — Agent capability matching for fallback routing

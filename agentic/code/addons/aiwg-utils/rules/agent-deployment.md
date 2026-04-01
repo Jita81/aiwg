@@ -23,11 +23,11 @@ These rules apply when working with agent definitions and multi-provider deploym
 
 **SDLC Framework Agents** (`agentic/code/frameworks/sdlc-complete/agents/`):
 - 64 specialized agents covering all SDLC phases
-- See `@agentic/code/frameworks/sdlc-complete/agents/manifest.json` for complete list
+- See `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/manifest.json` for complete list
 
 **Marketing Agents** (`agentic/code/frameworks/media-marketing-kit/agents/`):
 - 37 marketing-focused agents covering campaign lifecycle
-- See `@agentic/code/frameworks/media-marketing-kit/agents/manifest.json` for complete list
+- See `@$AIWG_ROOT/agentic/code/frameworks/media-marketing-kit/agents/manifest.json` for complete list
 
 ## Multi-Provider Support
 

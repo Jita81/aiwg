@@ -343,7 +343,7 @@ Wire @-mentions for traceability:
 
 - @.aiwg/requirements/use-cases/UC-XXX.md - Driving requirement
 - @.aiwg/architecture/software-architecture-doc.md - Architecture context
-- @src/path/to/implementation.ts - Implementation (when applicable)
+- @$AIWG_ROOT/src/path/to/implementation.ts - Implementation (when applicable)
 - @.aiwg/requirements/nfr-modules/performance.md - Performance requirements
 - @.aiwg/requirements/nfr-modules/security.md - Security requirements
 
@@ -393,6 +393,6 @@ Wire @-mentions for traceability:
 
 ## Related Templates
 
-- @agentic/code/frameworks/sdlc-complete/templates/analysis-design/software-architecture-doc-template.md - Overall architecture
-- @agentic/code/frameworks/sdlc-complete/templates/governance/decision-matrix-template.md - Multi-criteria decision analysis
-- @agentic/code/frameworks/sdlc-complete/templates/management/risk-card.md - Risk tracking
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/analysis-design/software-architecture-doc-template.md - Overall architecture
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/governance/decision-matrix-template.md - Multi-criteria decision analysis
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/management/risk-card.md - Risk tracking

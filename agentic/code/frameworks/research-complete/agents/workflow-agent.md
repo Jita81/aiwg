@@ -409,6 +409,6 @@ Metrics:
 
 ## References
 
-- @.aiwg/flows/research-framework/elaboration/use-cases/UC-RF-008-execute-research-workflow.md
-- @.aiwg/flows/research-framework/elaboration/agents/workflow-agent-spec.md
+- @$AIWG_ROOT/agentic/code/frameworks/research-complete/elaboration/use-cases/UC-RF-008-execute-research-workflow.md
+- @$AIWG_ROOT/agentic/code/frameworks/research-complete/elaboration/agents/workflow-agent-spec.md
 - @.claude/rules/thought-protocol.md

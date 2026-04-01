@@ -295,7 +295,7 @@ Install: pip install mccabe            (Python)
 
 ## Integration
 
-- References: @agentic/code/frameworks/sdlc-complete/rules/agent-friendly-code.md (threshold definitions)
+- References: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/agent-friendly-code.md (threshold definitions)
 - Complements: `/codebase-health` (diagnostic dashboard vs. pass/fail gate)
 - Complements: `/decompose-file` (remediation for violations)
 - Pattern from: `tdd-enforce` skill (pre-commit hook integration)

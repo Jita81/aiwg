@@ -482,6 +482,6 @@ aiwg media-curator gap-report --format markdown > GAPS.md
 
 ## See Also
 
-- `@agentic/code/frameworks/media-curator/skills/catalog-generation.md` - Replacing GAP-NOTEs with catalogs
-- `@agentic/code/frameworks/media-curator/skills/archive-organization.md` - Directory structure conventions
+- `@$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/catalog-generation.md` - Replacing GAP-NOTEs with catalogs
+- `@$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/archive-organization.md` - Directory structure conventions
 - Issue #81 (gitea) - Original field testing that discovered this pattern

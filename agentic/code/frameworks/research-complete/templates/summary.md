@@ -177,7 +177,7 @@ Baselines included GPT-4 direct generation, best-of-k sampling, and CoT promptin
 **Implemented:**
 - @.claude/rules/actionable-feedback.md - Structured feedback schema
 - @.claude/rules/best-output-selection.md - Non-monotonic quality handling
-- @agentic/code/addons/ralph/schemas/actionable-feedback.yaml - Feedback format
+- @$AIWG_ROOT/agentic/code/addons/ralph/schemas/actionable-feedback.yaml - Feedback format
 
 **Key Design Decisions Informed:**
 1. Ralph loops prioritize feedback quality over iteration count
@@ -302,7 +302,7 @@ Generate an improved version that addresses all feedback points.
 - @.aiwg/research/sources/[PDF-filename].pdf - Original paper
 - @.claude/rules/actionable-feedback.md - AIWG implementation
 - @.claude/rules/best-output-selection.md - Non-monotonic handling
-- @agentic/code/addons/ralph/schemas/actionable-feedback.yaml - Schema
+- @$AIWG_ROOT/agentic/code/addons/ralph/schemas/actionable-feedback.yaml - Schema
 - @.aiwg/research/findings/REF-015-self-refine.md - Literature note
 
 ## Template Usage Notes
@@ -334,9 +334,9 @@ Generate an improved version that addresses all feedback points.
 
 - **Template Type:** research-summary
 - **Framework:** research-complete
-- **Primary Agent:** @agentic/code/frameworks/research-complete/agents/discovery-agent.md
+- **Primary Agent:** @$AIWG_ROOT/agentic/code/frameworks/research-complete/agents/discovery-agent.md
 - **Related Templates:**
-  - @agentic/code/frameworks/research-complete/templates/literature-note.md
-  - @agentic/code/frameworks/research-complete/templates/extraction.yaml
+  - @$AIWG_ROOT/agentic/code/frameworks/research-complete/templates/literature-note.md
+  - @$AIWG_ROOT/agentic/code/frameworks/research-complete/templates/extraction.yaml
 - **Version:** 1.0.0
 - **Last Updated:** 2026-02-03

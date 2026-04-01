@@ -549,6 +549,6 @@ approval_config:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/test/baseline-schema.yaml
-- @agentic/code/frameworks/sdlc-complete/commands/baseline-create.md
-- @agentic/code/frameworks/sdlc-complete/agents/test-engineer.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/test/baseline-schema.yaml
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/baseline-create.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/test-engineer.md

@@ -218,6 +218,3 @@ When asked for a capability (not a specific tool):
 
 ## References
 
-- @.aiwg/smiths/toolsmith/runtime.json - Available tools catalog
-- @.aiwg/smiths/toolsmith/index.json - Tool search index
-- @.aiwg/smiths/toolsmith/tools/ - Cached specifications

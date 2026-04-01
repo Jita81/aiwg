@@ -343,7 +343,7 @@ TTL: 86400 seconds (24 hours)
 
 **Auth Middleware Library** (Node.js example):
 ```typescript
-// @src/middleware/auth.ts
+// @$AIWG_ROOT/src/middleware/auth.ts
 export async function authenticateRequest(req: Request): Promise<User> {
   const token = extractToken(req); // From header or cookie
   const claims = verifyJWT(token); // Verify signature
@@ -499,9 +499,9 @@ This decision should be reviewed if:
 - @.aiwg/security/controls/CTRL-002-session-management.md - Session management control
 
 **Implementation**:
-- @src/auth/JWTService.ts - JWT generation and verification
-- @src/auth/SessionManager.ts - Redis session storage
-- @src/middleware/AuthMiddleware.ts - Authentication middleware
+- @$AIWG_ROOT/src/auth/JWTService.ts - JWT generation and verification
+- @$AIWG_ROOT/src/auth/SessionManager.ts - Redis session storage
+- @$AIWG_ROOT/src/middleware/AuthMiddleware.ts - Authentication middleware
 
 **Research**:
 - [RFC 7519 - JSON Web Token (JWT)](https://tools.ietf.org/html/rfc7519)

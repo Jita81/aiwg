@@ -318,11 +318,11 @@ When alerts triggered:
 
 ## Related Templates and References
 
-- @agentic/code/frameworks/sdlc-complete/templates/test/regression-report.md - Periodic analysis reports
-- @agentic/code/frameworks/sdlc-complete/templates/test/defect-card.md - Individual regression details
-- @agentic/code/frameworks/sdlc-complete/templates/test/regression-test-set-card.md - Regression test suites
-- @agentic/code/frameworks/sdlc-complete/templates/test/test-evaluation-summary-template.md - Test cycle summaries
-- @agentic/code/frameworks/sdlc-complete/commands/regression-track.md - Update register (if available)
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/test/regression-report.md - Periodic analysis reports
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/test/defect-card.md - Individual regression details
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/test/regression-test-set-card.md - Regression test suites
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/test/test-evaluation-summary-template.md - Test cycle summaries
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/regression-track.md - Update register (if available)
 
 ## Register Maintenance
 

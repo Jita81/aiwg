@@ -127,7 +127,7 @@ hook:
 ## References
 
 - @.claude/rules/citation-policy.md - Citation policy rules (Rule 6: GRADE hedging)
-- @agentic/code/frameworks/sdlc-complete/agents/quality-assessor.md - Quality Assessor agent
-- @agentic/code/frameworks/sdlc-complete/agents/citation-verifier.md - Citation Verifier agent
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/quality-assessor.md - Quality Assessor agent
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/citation-verifier.md - Citation Verifier agent
 - @.aiwg/research/docs/grade-assessment-guide.md - GRADE methodology
-- @agentic/code/frameworks/sdlc-complete/hooks/post-write-citation-check.md - Post-write citation hook
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/hooks/post-write-citation-check.md - Post-write citation hook

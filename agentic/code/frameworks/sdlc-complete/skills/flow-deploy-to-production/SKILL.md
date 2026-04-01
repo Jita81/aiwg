@@ -565,7 +565,7 @@ regression_detected:
        - Decision: PASS | FAIL
        - Blockers (if FAIL): {list regression details}
 
-       Use schema: @agentic/code/frameworks/sdlc-complete/schemas/flows/regression-gate.yaml
+       Use schema: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/regression-gate.yaml
 
        Output: .aiwg/deployment/regression-gate-staging.md
 
@@ -630,7 +630,7 @@ regression_detected:
 
        Output: .aiwg/deployment/regression-impact-assessment-staging.md
 
-       See: @agentic/code/frameworks/sdlc-complete/agents/regression-analyst.md
+       See: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/regression-analyst.md
        """
    )
    ```
@@ -1031,7 +1031,7 @@ regression_detected:
        - Decision: PASS | FAIL
        - Severity: {CRITICAL | HIGH | MEDIUM | LOW}
 
-       Use schema: @agentic/code/frameworks/sdlc-complete/schemas/flows/regression-gate.yaml
+       Use schema: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/regression-gate.yaml
 
        Output: .aiwg/deployment/regression-gate-production.md
 
@@ -1805,13 +1805,13 @@ This orchestration succeeds when:
 - `flows/gate-criteria-by-phase.md` (Transition section)
 
 **Schemas**:
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/regression-gate.yaml - Regression gate format
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/regression-gate.yaml - Regression gate format
 
 **Commands**:
-- @agentic/code/frameworks/sdlc-complete/commands/regression-check.md - Regression detection command
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/regression-check.md - Regression detection command
 
 **Agents**:
-- @agentic/code/frameworks/sdlc-complete/agents/regression-analyst.md - Regression analysis agent
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/regression-analyst.md - Regression analysis agent
 
 **Multi-Agent Pattern**:
 - `docs/multi-agent-documentation-pattern.md`

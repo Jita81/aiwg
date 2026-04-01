@@ -31,7 +31,7 @@ When invoked, perform automated paper acquisition:
    - Determine source type (journal, conference, preprint)
 
 4. **Generate Frontmatter**
-   - Create YAML frontmatter per @agentic/code/frameworks/sdlc-complete/schemas/research/frontmatter-schema.yaml
+   - Create YAML frontmatter per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/frontmatter-schema.yaml
    - Assign REF-XXX identifier
    - Calculate PDF checksum (SHA-256)
    - Set initial GRADE baseline from source type
@@ -145,8 +145,8 @@ source:
 
 ## References
 
-- @agentic/code/frameworks/research-complete/agents/acquisition-agent.md - Acquisition Agent
-- @src/research/services/acquisition-service.ts - Download implementation
-- @agentic/code/frameworks/sdlc-complete/schemas/research/frontmatter-schema.yaml - Metadata format
+- @$AIWG_ROOT/agentic/code/frameworks/research-complete/agents/acquisition-agent.md - Acquisition Agent
+- @$AIWG_ROOT/src/research/services/acquisition-service.ts - Download implementation
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/frontmatter-schema.yaml - Metadata format
 - @.aiwg/research/fixity-manifest.json - Checksum tracking
 - @.claude/rules/provenance-tracking.md - Provenance requirements

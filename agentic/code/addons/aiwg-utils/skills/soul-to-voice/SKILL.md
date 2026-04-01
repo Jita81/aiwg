@@ -193,7 +193,7 @@ Voice profiles are saved to:
 
 ## References
 
-- @agentic/code/addons/voice-framework/schemas/voice-profile.schema.json — Voice profile schema
-- @agentic/code/addons/voice-framework/voices/templates/ — Built-in voice profiles
-- @docs/soul-md-guide.md — Integration guide
+- @$AIWG_ROOT/agentic/code/addons/voice-framework/schemas/voice-profile.schema.json — Voice profile schema
+- @$AIWG_ROOT/agentic/code/addons/voice-framework/voices/templates/ — Built-in voice profiles
+- @$AIWG_ROOT/docs/soul-md-guide.md — Integration guide
 - #437 — SOUL.md compatibility issue (Phase 2)

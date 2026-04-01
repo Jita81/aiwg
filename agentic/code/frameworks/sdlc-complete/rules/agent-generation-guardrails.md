@@ -271,9 +271,9 @@ Before writing any code:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/rules/agent-friendly-code.md — Threshold definitions
-- @agentic/code/frameworks/sdlc-complete/rules/anti-laziness.md — Don't skip the hard work
-- @agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md — Test after splitting
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/agent-friendly-code.md — Threshold definitions
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/anti-laziness.md — Don't skip the hard work
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md — Test after splitting
 
 ---
 

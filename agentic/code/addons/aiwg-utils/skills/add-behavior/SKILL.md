@@ -229,6 +229,6 @@ aiwg add-behavior ts-lint-on-save --to sdlc-complete --interactive
 
 ## References
 
-- @src/cli/handlers/scaffolding.ts — CLI handler implementation
-- @docs/cli-reference.md — Full CLI reference
-- @agentic/code/addons/aiwg-utils/skills/devkit-create-skill/SKILL.md — Related skill scaffolding pattern
+- @$AIWG_ROOT/src/cli/handlers/scaffolding.ts — CLI handler implementation
+- @$AIWG_ROOT/docs/cli-reference.md — Full CLI reference
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/skills/devkit-create-skill/SKILL.md — Related skill scaffolding pattern

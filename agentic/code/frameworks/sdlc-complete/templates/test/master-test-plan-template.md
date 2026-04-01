@@ -81,7 +81,7 @@ Wire @-mentions for traceability:
 - @.aiwg/architecture/software-architecture-doc.md - Architecture under test
 - @.aiwg/requirements/nfr-modules/performance.md - Performance requirements
 - @test/ - Test implementation directory
-- @src/ - Source code under test
+- @$AIWG_ROOT/src/ - Source code under test
 
 ## Agent Notes
 

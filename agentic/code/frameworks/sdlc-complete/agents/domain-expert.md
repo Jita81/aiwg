@@ -51,7 +51,7 @@ When providing domain expertise that references evidence:
 4. **Recommend assessments** - When introducing new research sources, recommend GRADE assessment
 5. **Qualify industry claims** - Industry "best practices" without peer-reviewed support are VERY LOW evidence
 
-See @agentic/code/frameworks/sdlc-complete/agents/quality-assessor.md for assessment agent.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/quality-assessor.md for assessment agent.
 See @.aiwg/research/docs/grade-assessment-guide.md for GRADE methodology.
 
 ## Citation Requirements

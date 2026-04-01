@@ -140,7 +140,7 @@ If the user's intent is ambiguous:
 
 ## References
 
-- @src/cli/handlers/daemon.ts — Daemon command handler
-- @docs/daemon-guide.md — Full daemon documentation including session launch
-- @docs/messaging-guide.md — Messaging integration (Telegram, Slack) configuration
-- @docs/cli-reference.md — CLI reference
+- @$AIWG_ROOT/src/cli/handlers/daemon.ts — Daemon command handler
+- @$AIWG_ROOT/docs/daemon-guide.md — Full daemon documentation including session launch
+- @$AIWG_ROOT/docs/messaging-guide.md — Messaging integration (Telegram, Slack) configuration
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

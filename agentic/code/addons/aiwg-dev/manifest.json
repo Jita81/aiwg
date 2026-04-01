@@ -3,14 +3,21 @@
   "type": "addon",
   "name": "AIWG Developer Tools",
   "version": "2026.4.0",
-  "description": "Developer tooling for building AIWG itself and AIWG addons/frameworks. Not for end users — install explicitly with `aiwg use aiwg-dev`.",
+  "description": "Developer tooling for building AIWG itself and AIWG addons/frameworks. Not for end users \u2014 install explicitly with `aiwg use aiwg-dev`.",
   "core": false,
   "autoInstall": false,
   "devOnly": true,
   "author": "AIWG Contributors",
   "license": "MIT",
   "repository": "https://github.com/jmagly/aiwg",
-  "keywords": ["aiwg", "development", "validation", "contributor", "devtools", "scaffolding"],
+  "keywords": [
+    "aiwg",
+    "development",
+    "validation",
+    "contributor",
+    "devtools",
+    "scaffolding"
+  ],
   "entry": {
     "rules": "rules/",
     "skills": "skills/"
@@ -49,6 +56,7 @@
     "devkit-create-command",
     "devkit-create-skill",
     "devkit-validate",
-    "devkit-test"
+    "devkit-test",
+    "link-check"
   ]
 }

@@ -79,7 +79,7 @@ Describe the architectural baseline, including views, decisions, and rationale t
     - **Component Diagram** (required): Show internal components of the primary container(s).
     - Include MermaidJS or PlantUML source in fenced code blocks. Commit source alongside any rendered images.
     - Each diagram should answer a specific architectural question (e.g., "What are the system boundaries?" or "How do containers communicate?").
-    - See @agentic/code/addons/aiwg-utils/rules/diagram-generation.md for tool selection guidance.
+    - See @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/diagram-generation.md for tool selection guidance.
 13. **Appendices**
     - ADR references, glossary terms, additional supporting material.
 

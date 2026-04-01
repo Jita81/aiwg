@@ -145,7 +145,7 @@ Press `Ctrl+C` while attached.
 
 ## References
 
-- @src/cli/handlers/ralph.ts — Ralph handler (attachToLoopOutput)
-- @src/cli/handlers/ralph-launcher.ts — Loop launcher and state management
-- @agentic/code/addons/ralph/README.md — Ralph documentation
-- @tools/ralph-external/README.md — External loop architecture
+- @$AIWG_ROOT/src/cli/handlers/ralph.ts — Ralph handler (attachToLoopOutput)
+- @$AIWG_ROOT/src/cli/handlers/ralph-launcher.ts — Loop launcher and state management
+- @$AIWG_ROOT/agentic/code/addons/ralph/README.md — Ralph documentation
+- @$AIWG_ROOT/tools/ralph-external/README.md — External loop architecture

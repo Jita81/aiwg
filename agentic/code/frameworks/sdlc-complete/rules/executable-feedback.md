@@ -333,8 +333,8 @@ Before returning code:
 ## References
 
 - @.aiwg/research/findings/REF-013-metagpt.md - Research paper
-- @agentic/code/addons/ralph/schemas/debug-memory.yaml - Debug memory schema
-- @agentic/code/frameworks/sdlc-complete/agents/test-engineer.md - Test Engineer agent
+- @$AIWG_ROOT/agentic/code/addons/ralph/schemas/debug-memory.yaml - Debug memory schema
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/test-engineer.md - Test Engineer agent
 - #101 - Implementation issue
 
 ---

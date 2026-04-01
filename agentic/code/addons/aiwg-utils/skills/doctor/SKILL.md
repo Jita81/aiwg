@@ -126,6 +126,6 @@ If the user mentions a specific symptom before triggering doctor:
 
 ## References
 
-- @src/cli/handlers/utilities.ts — Doctor command handler (doctorHandler)
-- @tools/cli/doctor.mjs — Health check implementation
-- @docs/cli-reference.md — CLI reference
+- @$AIWG_ROOT/src/cli/handlers/utilities.ts — Doctor command handler (doctorHandler)
+- @$AIWG_ROOT/tools/cli/doctor.mjs — Health check implementation
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

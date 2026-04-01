@@ -118,7 +118,7 @@ The overall verdict must align with feedback items:
 
 All feedback MUST conform to:
 ```
-@agentic/code/addons/ralph/schemas/actionable-feedback.yaml
+@$AIWG_ROOT/agentic/code/addons/ralph/schemas/actionable-feedback.yaml
 ```
 
 ## Integration with Ralph Loop
@@ -204,9 +204,9 @@ Track these metrics for continuous improvement:
 
 ## References
 
-- @agentic/code/addons/ralph/schemas/actionable-feedback.yaml - Schema definition
+- @$AIWG_ROOT/agentic/code/addons/ralph/schemas/actionable-feedback.yaml - Schema definition
 - @.aiwg/research/findings/REF-015-self-refine.md - Research paper summary
-- @agentic/code/addons/ralph/schemas/reflection-memory.json - Reflexion memory schema
+- @$AIWG_ROOT/agentic/code/addons/ralph/schemas/reflection-memory.json - Reflexion memory schema
 - #95 - Implementation issue
 
 ---

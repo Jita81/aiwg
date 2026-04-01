@@ -61,7 +61,7 @@ When a tracked artifact is created or modified:
    - Create Relationships (wasGeneratedBy, wasAssociatedWith, wasDerivedFrom)
 
 4. **Validate and save**
-   - Validate against `@agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml`
+   - Validate against `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml`
    - Save to `.aiwg/research/provenance/records/<artifact-name>.prov.yaml`
    - Update provenance index
 
@@ -156,8 +156,8 @@ skill:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/agents/provenance-manager.md - Provenance Manager agent
-- @agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml - PROV record schema
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/provenance-manager.md - Provenance Manager agent
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml - PROV record schema
 - @.aiwg/research/provenance/docs/provenance-guide.md - Provenance guide
 - @.claude/rules/provenance-tracking.md - Provenance tracking rules
 - @.claude/rules/mention-wiring.md - @-mention wiring patterns

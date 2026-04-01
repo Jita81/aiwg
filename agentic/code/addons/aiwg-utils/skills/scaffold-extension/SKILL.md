@@ -208,7 +208,7 @@ aiwg scaffold-extension github-actions --to sdlc-complete \
 
 ## References
 
-- @agentic/code/addons/aiwg-utils/skills/devkit-create-extension/SKILL.md — Devkit equivalent (interactive design)
-- @src/cli/handlers/scaffolding.ts — CLI handler implementation
-- @docs/cli-reference.md — Full CLI reference
-- @agentic/code/frameworks/sdlc-complete/extensions/ — Existing extension examples
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/skills/devkit-create-extension/SKILL.md — Devkit equivalent (interactive design)
+- @$AIWG_ROOT/src/cli/handlers/scaffolding.ts — CLI handler implementation
+- @$AIWG_ROOT/docs/cli-reference.md — Full CLI reference
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/extensions/ — Existing extension examples

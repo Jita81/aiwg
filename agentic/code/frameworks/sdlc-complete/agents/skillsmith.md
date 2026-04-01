@@ -254,7 +254,5 @@ Registered in catalog with tags: [transformation, json, yaml, format]
 
 ## References
 
-- @.aiwg/smiths/agentic-definition.yaml - Platform capabilities
-- @.aiwg/smiths/skillsmith/catalog.yaml - Skill registry
-- @docs/smithing/agentic-smiths.md - Full documentation
-- @agentic/code/addons/voice-framework/skills/ - Example skill structure
+- @$AIWG_ROOT/docs/smithing/agentic-smiths.md - Full documentation
+- @$AIWG_ROOT/agentic/code/addons/voice-framework/skills/ - Example skill structure

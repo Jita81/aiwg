@@ -330,5 +330,5 @@ Warning: Some commands may require elevated permissions:
 
 ## References
 
-- ToolSmith agent: `@agentic/code/frameworks/sdlc-complete/agents/toolsmith-dynamic.md`
+- ToolSmith agent: `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/toolsmith-dynamic.md`
 - Tool catalog: `.aiwg/smiths/toolsmith/catalog.yaml`

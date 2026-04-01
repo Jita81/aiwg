@@ -968,9 +968,9 @@ describe('Authentication Security', () => {
 
 ## Schema References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/quality-scoring.yaml — Quality scoring dimensions and formulas
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/quality-assurance.yaml — Quality assurance and hallucination detection
-- @agentic/code/addons/ralph/schemas/actionable-feedback.yaml — Structured actionable feedback format for review findings
-- @agentic/code/frameworks/sdlc-complete/schemas/research/lats-evaluation.yaml — LATS hybrid value function for artifact quality assessment
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/ensemble-review.yaml — Ensemble review patterns and panel sizing
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/quality-assessment.yaml — GRADE quality assessment methodology
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/quality-scoring.yaml — Quality scoring dimensions and formulas
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/quality-assurance.yaml — Quality assurance and hallucination detection
+- @$AIWG_ROOT/agentic/code/addons/ralph/schemas/actionable-feedback.yaml — Structured actionable feedback format for review findings
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/lats-evaluation.yaml — LATS hybrid value function for artifact quality assessment
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/ensemble-review.yaml — Ensemble review patterns and panel sizing
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/quality-assessment.yaml — GRADE quality assessment methodology

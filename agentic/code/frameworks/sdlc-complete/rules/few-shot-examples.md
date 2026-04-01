@@ -380,8 +380,8 @@ When reviewing agent examples:
 ## References
 
 - @.aiwg/research/findings/REF-019-toolformer.md - Research foundation
-- @agentic/code/frameworks/sdlc-complete/agents/ - Agent definitions
-- @agentic/code/frameworks/sdlc-complete/docs/agent-examples.md - Example catalog
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/ - Agent definitions
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/agent-examples.md - Example catalog
 - #193 - Implementation issue
 
 ---

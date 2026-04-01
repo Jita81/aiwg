@@ -220,8 +220,8 @@ Before releasing critical workflow outputs:
 
 - @.aiwg/research/findings/REF-058-r-lam.md - R-LAM research
 - @.claude/rules/reproducibility.md - Base reproducibility rules
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/execution-mode.yaml - Mode configuration
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/execution-snapshot.yaml - Snapshot format
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/execution-mode.yaml - Mode configuration
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/execution-snapshot.yaml - Snapshot format
 - #125 - Implementation issue
 
 ---

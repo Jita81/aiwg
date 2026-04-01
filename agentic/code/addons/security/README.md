@@ -20,7 +20,7 @@ The Security addon provides patterns, documentation, and enforcement rules for s
 
 | Location | Purpose |
 |----------|---------|
-| `@agentic/code/frameworks/sdlc-complete/docs/token-security.md` | Comprehensive token security guide |
+| `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/token-security.md` | Comprehensive token security guide |
 | `@.claude/rules/token-security.md` | Enforcement rules for agents |
 | `@~/.claude/CLAUDE.md` | Global token configuration |
 
@@ -104,8 +104,8 @@ EOF
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/docs/token-security.md
-- @agentic/code/addons/security/secure-token-load.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/token-security.md
+- @$AIWG_ROOT/agentic/code/addons/security/secure-token-load.md
 ```
 
 ## Validation
@@ -132,7 +132,7 @@ Planned additions to this addon:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/docs/token-security.md - Full documentation
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/token-security.md - Full documentation
 - @.claude/rules/token-security.md - Enforcement rules
 - [OWASP API Security Top 10](https://owasp.org/www-project-api-security/)
 - [NIST 800-63B Digital Identity Guidelines](https://pages.nist.gov/800-63-3/sp800-63b.html)
@@ -141,7 +141,7 @@ Planned additions to this addon:
 
 For security questions or to report vulnerabilities:
 
-- **Documentation**: @agentic/code/frameworks/sdlc-complete/docs/token-security.md
+- **Documentation**: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/token-security.md
 - **Issues**: https://github.com/jmagly/aiwg/issues
 - **Security**: security@integrolabs.net (for vulnerability reports)
 

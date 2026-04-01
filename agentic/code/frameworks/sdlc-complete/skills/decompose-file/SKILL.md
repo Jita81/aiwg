@@ -274,8 +274,8 @@ This skill uses:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/rules/agent-friendly-code.md — Threshold definitions
-- @agentic/code/frameworks/sdlc-complete/rules/agent-generation-guardrails.md — Runtime guardrails
-- @agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md — Test after changes
-- @agentic/code/frameworks/sdlc-complete/commands/codebase-health.md — Identifies candidates
-- @agentic/code/frameworks/sdlc-complete/skills/code-chunker/SKILL.md — Navigate large files before splitting
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/agent-friendly-code.md — Threshold definitions
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/agent-generation-guardrails.md — Runtime guardrails
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md — Test after changes
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/codebase-health.md — Identifies candidates
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/code-chunker/SKILL.md — Navigate large files before splitting

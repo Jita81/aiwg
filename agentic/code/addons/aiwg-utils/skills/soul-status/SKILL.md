@@ -168,4 +168,4 @@ With `--verbose`, include additional detail:
 
 - #437 — SOUL.md compatibility overview
 - #438 — Soul enforcement commands (this command)
-- @agentic/code/addons/aiwg-utils/commands/hook-status.md — Reference pattern
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/commands/hook-status.md — Reference pattern

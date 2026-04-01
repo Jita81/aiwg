@@ -141,6 +141,6 @@ If the user's intent is ambiguous:
 
 ## References
 
-- @src/cli/handlers/run.ts — `run` command handler
-- @docs/cli-reference.md — CLI reference
-- @agentic/code/addons/aiwg-utils/skills/init/SKILL.md — Registering scripts via init
+- @$AIWG_ROOT/src/cli/handlers/run.ts — `run` command handler
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/skills/init/SKILL.md — Registering scripts via init

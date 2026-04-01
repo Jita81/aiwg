@@ -52,7 +52,6 @@ Suggestions:
   1. Run: /tot-decide "[decision context]"
   2. Or add to ADR: `tot_skip: true` with reason
 
-Learn more: @.aiwg/flows/docs/tot-architecture-guide.md
 =========================================================
 ```
 
@@ -74,8 +73,7 @@ hook:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/tree-of-thought.yaml - ToT schema
-- @.aiwg/flows/docs/tot-architecture-guide.md - Guide
-- @agentic/code/frameworks/sdlc-complete/commands/tot-decide.md - ToT command
-- @agentic/code/frameworks/sdlc-complete/skills/tot-exploration/SKILL.md - ToT skill
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/tree-of-thought.yaml - ToT schema
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/tot-decide.md - ToT command
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/tot-exploration/SKILL.md - ToT skill
 - @.aiwg/research/findings/REF-020-tree-of-thoughts.md - Research foundation

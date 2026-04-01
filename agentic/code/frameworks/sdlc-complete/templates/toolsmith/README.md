@@ -124,4 +124,4 @@ For tools that don't fit the CLI template (e.g., language runtimes, APIs):
 
 - @.aiwg/architecture/decisions/ADR-014-toolsmith-feature-architecture.md
 - @.aiwg/architecture/toolsmith-implementation-spec.md
-- @agentic/code/frameworks/sdlc-complete/agents/toolsmith-provider.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/toolsmith-provider.md

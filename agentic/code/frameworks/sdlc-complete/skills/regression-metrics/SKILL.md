@@ -534,6 +534,6 @@ alerts:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/metrics/regression-metrics-schema.yaml
-- @agentic/code/frameworks/sdlc-complete/agents/metrics-analyst.md
-- @agentic/code/frameworks/sdlc-complete/commands/metrics-dashboard.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/metrics/regression-metrics-schema.yaml
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/metrics-analyst.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/metrics-dashboard.md

@@ -214,10 +214,10 @@ echo "Exit: $?"
 
 ## References
 
-- @src/cli/handlers/ralph.ts — Ralph CLI handler
-- @src/cli/handlers/ralph-launcher.ts — External loop launcher
-- @tools/ralph-external/README.md — External loop architecture
-- @tools/ralph-external/orchestrator.mjs — Loop orchestration engine
-- @tools/ralph-external/state-manager.mjs — State persistence layer
-- @tools/ralph-external/session-launcher.mjs — AI session launcher
-- @agentic/code/addons/ralph/README.md — Ralph documentation
+- @$AIWG_ROOT/src/cli/handlers/ralph.ts — Ralph CLI handler
+- @$AIWG_ROOT/src/cli/handlers/ralph-launcher.ts — External loop launcher
+- @$AIWG_ROOT/tools/ralph-external/README.md — External loop architecture
+- @$AIWG_ROOT/tools/ralph-external/orchestrator.mjs — Loop orchestration engine
+- @$AIWG_ROOT/tools/ralph-external/state-manager.mjs — State persistence layer
+- @$AIWG_ROOT/tools/ralph-external/session-launcher.mjs — AI session launcher
+- @$AIWG_ROOT/agentic/code/addons/ralph/README.md — Ralph documentation

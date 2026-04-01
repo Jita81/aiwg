@@ -139,7 +139,7 @@ If the user's intent is ambiguous:
 
 ## References
 
-- @src/cli/handlers/daemon.ts — Behavior command handler
-- @docs/cli-reference.md — CLI reference
-- @agentic/code/addons/aiwg-utils/rules/agent-deployment.md — Agent deployment rule
-- @docs/development/aiwg-development-guide.md — Source vs output boundary (behaviors are source artifacts in `agentic/code/*/behaviors/`)
+- @$AIWG_ROOT/src/cli/handlers/daemon.ts — Behavior command handler
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/agent-deployment.md — Agent deployment rule
+- @$AIWG_ROOT/docs/development/aiwg-development-guide.md — Source vs output boundary (behaviors are source artifacts in `agentic/code/*/behaviors/`)

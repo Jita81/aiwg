@@ -147,6 +147,6 @@ Next Steps:
 
 ## References
 
-- @agentic/code/frameworks/forensics-complete/agents/recon-agent.md - Recon Agent
-- @agentic/code/frameworks/forensics-complete/templates/system-profile.md - Profile template
-- @agentic/code/frameworks/forensics-complete/commands/forensics-triage.md - Next stage
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/agents/recon-agent.md - Recon Agent
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/templates/system-profile.md - Profile template
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/commands/forensics-triage.md - Next stage

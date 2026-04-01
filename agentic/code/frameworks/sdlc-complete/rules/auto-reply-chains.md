@@ -371,7 +371,7 @@ Before enabling auto-reply chains:
 
 - @.aiwg/research/findings/REF-022-autogen.md - Research foundation
 - @.claude/rules/conversable-agent-interface.md - Agent interface
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/agent-pubsub.yaml - Event-driven activation
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/agent-pubsub.yaml - Event-driven activation
 - #183 - Implementation issue
 
 ---

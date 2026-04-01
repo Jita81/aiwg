@@ -250,7 +250,7 @@ Profiles select a pre-configured subset of checks tuned for a specific investiga
 
 ## References
 
-- @agentic/code/frameworks/forensics-complete/agents/triage-agent.md - Triage Agent
-- @agentic/code/frameworks/forensics-complete/templates/triage-report.md - Report template
-- @agentic/code/frameworks/forensics-complete/commands/forensics-acquire.md - Evidence acquisition
-- @agentic/code/frameworks/forensics-complete/commands/forensics-investigate.md - Full investigation
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/agents/triage-agent.md - Triage Agent
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/templates/triage-report.md - Report template
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/commands/forensics-acquire.md - Evidence acquisition
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/commands/forensics-investigate.md - Full investigation

@@ -804,7 +804,7 @@ Before completing any progress tracking task:
 - @.claude/rules/thought-protocol.md - Six thought types
 - @.claude/rules/conversable-agent-interface.md - Agent interface requirements
 - @.claude/rules/few-shot-examples.md - Example quality standards
-- @agentic/code/addons/ralph/schemas/iteration-analytics.yaml - Metrics schema
+- @$AIWG_ROOT/agentic/code/addons/ralph/schemas/iteration-analytics.yaml - Metrics schema
 - @.aiwg/research/findings/REF-076-production-challenges.md - Infinite loop detection
 - @.aiwg/research/findings/REF-058-r-lam.md - Reproducibility and checkpoints
 

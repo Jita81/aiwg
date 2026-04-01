@@ -342,14 +342,14 @@ See @.aiwg/research/findings/REF-018-react.md for research foundation.
 
 After generating or modifying any artifact (inline citations, bibliography, claims index), create a provenance record per @.claude/rules/provenance-tracking.md:
 
-1. **Create provenance record** - Use @agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml format
+1. **Create provenance record** - Use @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml format
 2. **Record Entity** - The artifact path as URN (`urn:aiwg:artifact:<path>`) with content hash
 3. **Record Activity** - Type (`citation_insertion`, `bibliography_update`) with timestamps
 4. **Record Agent** - This agent (`urn:aiwg:agent:citation-agent`) with tool version
 5. **Document derivations** - Link citations to sources (`@source`) and claims (`@claim`) as `wasDerivedFrom`
 6. **Save record** - Write to `.aiwg/research/provenance/records/<artifact-name>.prov.yaml`
 
-See @agentic/code/frameworks/research-complete/agents/provenance-agent.md for the Provenance Agent.
+See @$AIWG_ROOT/agentic/code/frameworks/research-complete/agents/provenance-agent.md for the Provenance Agent.
 
 ## Few-Shot Examples
 
@@ -645,8 +645,8 @@ digraph CitationNetwork {
 
 ## References
 
-- @.aiwg/flows/research-framework/elaboration/use-cases/UC-RF-004-integrate-citations.md
-- @.aiwg/flows/research-framework/elaboration/agents/citation-agent-spec.md
+- @$AIWG_ROOT/agentic/code/frameworks/research-complete/elaboration/use-cases/UC-RF-004-integrate-citations.md
+- @$AIWG_ROOT/agentic/code/frameworks/research-complete/elaboration/agents/citation-agent-spec.md
 - @.claude/rules/citation-policy.md
 - @.claude/rules/provenance-tracking.md
 - @.claude/rules/thought-protocol.md

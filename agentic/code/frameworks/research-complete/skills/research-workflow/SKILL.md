@@ -481,8 +481,8 @@ Execute:
 
 ## References
 
-- @agentic/code/frameworks/research-complete/agents/workflow-agent.md - Workflow Agent
-- @agentic/code/frameworks/research-complete/workflows/ - Workflow definitions
-- @src/research/services/workflow-service.ts - Workflow orchestration
+- @$AIWG_ROOT/agentic/code/frameworks/research-complete/agents/workflow-agent.md - Workflow Agent
+- @$AIWG_ROOT/agentic/code/frameworks/research-complete/workflows/ - Workflow definitions
+- @$AIWG_ROOT/src/research/services/workflow-service.ts - Workflow orchestration
 - @.aiwg/research/workflows/ - Workflow state and logs
 - @.claude/rules/hitl-gates.md - Human gate patterns

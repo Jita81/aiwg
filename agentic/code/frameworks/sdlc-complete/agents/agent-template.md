@@ -13,7 +13,7 @@ tools: <TOOLS>
 
 **Permitted Task Types**: <Explore | Explore, Bash | Unrestricted>
 
-See @agentic/code/frameworks/sdlc-complete/docs/agent-permission-tiers.md for tier definitions.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/agent-permission-tiers.md for tier definitions.
 
 ## Purpose
 
@@ -90,7 +90,7 @@ Agents can receive dynamic context via PreToolUse hooks with `additionalContext`
 - Bash hooks: Inject environment checks, safety gates
 - Read hooks: Inject analysis frameworks for the content type
 
-See @docs/mcp-auto-mode-guide.md for MCP-specific patterns.
+See @$AIWG_ROOT/docs/mcp-auto-mode-guide.md for MCP-specific patterns.
 
 ### Quality Gate Hooks (#289)
 
@@ -144,7 +144,7 @@ Large tool outputs (>30KB) are saved to disk files instead of truncated. Agents 
 ```
 
 This is critical for Ralph loops where test output drives iteration decisions.
-See @docs/task-management-integration.md for task output patterns.
+See @$AIWG_ROOT/docs/task-management-integration.md for task output patterns.
 
 ## Skills and Commands (#288)
 
@@ -167,7 +167,7 @@ Use the following context:
 
 ## Schema References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/<RELEVANT_SCHEMA>.yaml
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/<RELEVANT_SCHEMA>.yaml
 
 ## Few-Shot Examples
 

@@ -18,9 +18,8 @@ When invoked, perform structured Tree of Thoughts exploration for architecture d
    - Load existing architectural constraints from `.aiwg/architecture/`
 
 2. **Load ToT Protocol**
-   - Reference @agentic/code/frameworks/sdlc-complete/schemas/flows/tree-of-thought.yaml for workflow schema
-   - Reference @.aiwg/flows/docs/tot-architecture-guide.md for evaluation patterns
-   - Reference @agentic/code/frameworks/sdlc-complete/agents/enhancements/architecture-designer-tot-protocol.md for agent protocol
+   - Reference @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/tree-of-thought.yaml for workflow schema
+   - Reference @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/enhancements/architecture-designer-tot-protocol.md for agent protocol
 
 3. **Define Evaluation Criteria**
    - Extract criteria from NFRs (scalability, security, performance, maintainability)
@@ -38,7 +37,7 @@ When invoked, perform structured Tree of Thoughts exploration for architecture d
    - Identify clear winner or close calls requiring stakeholder input
 
 6. **Generate ADR**
-   - Use @agentic/code/frameworks/sdlc-complete/templates/architecture/adr-with-tot.md template
+   - Use @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/architecture/adr-with-tot.md template
    - Document all alternatives with scores
    - Record decision rationale and trade-offs accepted
    - Include backtracking triggers (conditions for re-evaluation)
@@ -116,9 +115,8 @@ ADR saved: .aiwg/architecture/adr-auth-approach.md
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/tree-of-thought.yaml - ToT workflow schema
-- @.aiwg/flows/docs/tot-architecture-guide.md - Architecture evaluation guide
-- @agentic/code/frameworks/sdlc-complete/agents/enhancements/architecture-designer-tot-protocol.md - Agent enhancement
-- @agentic/code/frameworks/sdlc-complete/templates/architecture/adr-with-tot.md - ADR template
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/tree-of-thought.yaml - ToT workflow schema
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/enhancements/architecture-designer-tot-protocol.md - Agent enhancement
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/architecture/adr-with-tot.md - ADR template
 - @.aiwg/research/findings/REF-020-tree-of-thoughts.md - Research foundation
 - @.claude/rules/reasoning-sections.md - Reasoning requirements

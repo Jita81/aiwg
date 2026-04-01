@@ -429,9 +429,9 @@ Before completing HITL-gated workflows:
 ## References
 
 - @.aiwg/research/findings/REF-057-agent-laboratory.md - Research foundation
-- @tools/ralph-external/ - Ralph implementation
+- @$AIWG_ROOT/tools/ralph-external/ - Ralph implementation
 - @.aiwg/ralph/ - Ralph state tracking
-- @agentic/code/frameworks/sdlc-complete/docs/orchestrator-architecture.md - Workflow integration
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/orchestrator-architecture.md - Workflow integration
 - #199 - Human gate UI issue
 - #200 - Draft-then-edit pattern issue
 

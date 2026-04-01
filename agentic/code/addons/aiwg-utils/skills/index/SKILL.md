@@ -145,6 +145,6 @@ If the user's intent is ambiguous:
 
 ## References
 
-- @src/cli/handlers/subcommands.ts — Index subcommand handler
-- @docs/cli-reference.md — CLI reference (index section)
-- @agentic/code/frameworks/sdlc-complete/README.md — SDLC artifact structure
+- @$AIWG_ROOT/src/cli/handlers/subcommands.ts — Index subcommand handler
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference (index section)
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/README.md — SDLC artifact structure

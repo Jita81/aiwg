@@ -123,6 +123,6 @@ Agent: Starting phase transition orchestration.
 
 ## References
 
-- @docs/cli-reference.md — Complete CLI command reference
-- @agentic/code/agents/aiwg-steward.md — Steward agent definition
-- @agentic/code/skills/mission-control/SKILL.md — Mission Control skill
+- @$AIWG_ROOT/docs/cli-reference.md — Complete CLI command reference
+- @$AIWG_ROOT/agentic/code/agents/aiwg-steward.md — Steward agent definition
+- @$AIWG_ROOT/agentic/code/skills/mission-control/SKILL.md — Mission Control skill

@@ -374,6 +374,6 @@ evidence_items:
 - NIST SP 800-86: Guide to Integrating Forensic Techniques into Incident Response (Section 3.2 — Collection)
 - ISO/IEC 27037:2012: Digital Evidence — Identification, Collection, Acquisition, and Preservation
 - RFC 3227: Guidelines for Evidence Collection and Archiving
-- @agentic/code/frameworks/forensics-complete/docs/investigation-workflow.md
-- @agentic/code/frameworks/forensics-complete/templates/evidence-manifest.yaml
-- @agentic/code/frameworks/forensics-complete/templates/custody-log.yaml
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/docs/investigation-workflow.md
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/templates/evidence-manifest.yaml
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/templates/custody-log.yaml

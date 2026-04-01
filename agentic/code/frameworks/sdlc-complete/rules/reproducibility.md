@@ -207,10 +207,10 @@ Before workflow completion:
 ## References
 
 - @.aiwg/research/findings/REF-058-r-lam.md - R-LAM research
-- @agentic/code/addons/ralph/schemas/checkpoint.yaml - Checkpoint schema
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/execution-mode.yaml - Mode schema
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/execution-snapshot.yaml - Snapshot schema
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/error-handling.yaml - Error recovery
+- @$AIWG_ROOT/agentic/code/addons/ralph/schemas/checkpoint.yaml - Checkpoint schema
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/execution-mode.yaml - Mode schema
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/execution-snapshot.yaml - Snapshot schema
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/error-handling.yaml - Error recovery
 - #112, #113, #114, #115 - Implementation issues
 
 ---

@@ -245,11 +245,11 @@ This:
 This command uses the `tdd-enforce` skill from the testing-quality addon:
 
 ```
-@agentic/code/addons/testing-quality/skills/tdd-enforce/
+@$AIWG_ROOT/agentic/code/addons/testing-quality/skills/tdd-enforce/
 ```
 
 ## References
 
 - @.aiwg/requirements/nfr-modules/testing.md
-- @agentic/code/frameworks/sdlc-complete/agents/test-architect.md
-- @agentic/code/addons/testing-quality/skills/tdd-enforce/SKILL.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/test-architect.md
+- @$AIWG_ROOT/agentic/code/addons/testing-quality/skills/tdd-enforce/SKILL.md

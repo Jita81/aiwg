@@ -438,6 +438,6 @@ gcloud logging read \
 
 - RFC 3227: Guidelines for Evidence Collection and Archiving (Section 2.1 — Volatility Order)
 - NIST SP 800-86: Section 3.2 — Collection Phase
-- @agentic/code/frameworks/forensics-complete/docs/investigation-workflow.md
-- @agentic/code/frameworks/forensics-complete/skills/sysops-forensics.md
-- @agentic/code/frameworks/forensics-complete/templates/triage-findings.md
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/docs/investigation-workflow.md
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/skills/sysops-forensics.md
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/templates/triage-findings.md

@@ -448,7 +448,7 @@ All other factual claims require either:
 - @.aiwg/research/quality-assessment.md - GRADE methodology for evidence quality
 - @.aiwg/research/sources/ - Research corpus directory
 - @.aiwg/research/TODO.md - Research gaps and planned literature reviews
-- @agentic/code/addons/voice-framework/docs/authenticity-markers.md - Balancing authority with honesty
+- @$AIWG_ROOT/agentic/code/addons/voice-framework/docs/authenticity-markers.md - Balancing authority with honesty
 
 ## Questions
 
