@@ -74,15 +74,31 @@ For each file found in a provider directory:
 - If no source found: flag as a potential placement violation (note: some files like `CLAUDE.md`, `settings.json`, `.gitignore` are intentionally in provider directories and are not violations)
 - Skills, agents, commands, and rule files with no `agentic/code/` source are violations
 
-### Section 4: `.aiwg/` Reference Check
+### Section 4: `.aiwg/` Reference Check (Contract-Based)
 
-Search all files under `agentic/code/` for `@.aiwg/` path references:
+Normalized `.aiwg/` references are allowed — they give skills project context when deployed. Only **non-normalized** references (repo-local paths) must be flagged.
+
+**Step 1**: Collect all `@.aiwg/` references across `agentic/code/`:
 
 ```bash
-grep -r "@\.aiwg/" agentic/code/ --include="*.md" -l
+grep -rn "@\.aiwg/" agentic/code/ --include="*.md"
 ```
 
-Any file containing a `@.aiwg/` reference is flagged. These references only resolve inside the AIWG repository — they are invisible to users who install AIWG.
+**Step 2**: Build the normalized allowlist from installed manifests:
+- Tier 1 (always present): `.aiwg/AIWG.md`, `.aiwg/frameworks/`
+- Tier 2 (framework-specific): all `path` values from `memory.creates` in framework/addon manifests
+
+**Step 3**: For each reference found, check if it starts with a normalized prefix:
+- If YES → PASS (normalized reference)
+- If NO → FAIL (repo-local path, will silently fail in user projects)
+
+**Report format for flagged refs**:
+```
+SECTION 4 — .aiwg/ Reference Check
+  PASS  agentic/code/frameworks/sdlc-complete/agents/...  @.aiwg/requirements/ (normalized)
+  FAIL  agentic/code/frameworks/sdlc-complete/agents/...  @.aiwg/planning/issue-driven-ralph-loop-design.md
+        → non-normalized path: only exists in AIWG dev repo
+```
 
 ### Section 5: TypeScript Compilation
 
@@ -139,8 +155,10 @@ SECTION 3 — Placement Violations
   PASS  no placement violations found
 
 SECTION 4 — .aiwg/ References
-  FAIL  agentic/code/frameworks/sdlc-complete/agents/requirements-analyst.md
-        contains @.aiwg/requirements/UC-001.md reference (line 34)
+  PASS  agentic/code/frameworks/sdlc-complete/agents/requirements-analyst.md
+        @.aiwg/requirements/ (normalized — sdlc-complete memory.creates)
+  FAIL  agentic/code/addons/my-addon/skills/my-skill.md
+        @.aiwg/planning/issue-driven-ralph-loop-design.md (non-normalized, repo-local)
 
 SECTION 5 — TypeScript Compilation
   PASS  tsc --noEmit: 0 errors
@@ -156,9 +174,9 @@ Overall: FAIL — 2 issues found
 Blocking issues:
   1. [Section 2] aiwg-utils/skills/soul-blend/SKILL.md missing
      Action: Create the SKILL.md or remove soul-blend from manifest.json
-  2. [Section 4] @.aiwg/ reference in requirements-analyst.md
-     Action: Replace @.aiwg/requirements/UC-001.md with an agentic/code/ path
-             or remove the reference if it is project-local only
+  2. [Section 4] non-normalized @.aiwg/ reference in my-addon/skills/my-skill.md
+     Action: Either remove the reference, replace it with a normalized path,
+             or add the path to the framework's memory.creates in manifest.json
 
 Notes:
   - UAT (`npm run uat`) not run — run before tagging a release
@@ -236,6 +254,7 @@ All deployed files have corresponding source in agentic/code/.
 - @agentic/code/addons/aiwg-dev/rules/skill-placement.md — Placement violation definitions
 - @agentic/code/addons/aiwg-dev/rules/no-circular-skill-calls.md — Circular call detection
 - @agentic/code/addons/aiwg-dev/rules/component-completeness.md — Completeness requirements
-- @agentic/code/addons/aiwg-dev/rules/addon-boundaries.md — .aiwg/ reference rules
+- @agentic/code/addons/aiwg-dev/rules/addon-boundaries.md — Source vs project output boundary
+- @agentic/code/addons/aiwg-dev/rules/aiwg-dir-reference-contract.md — Normalized .aiwg/ reference contract
 - @agentic/code/addons/aiwg-dev/skills/validate-addon/SKILL.md — Per-addon validation
 - @tools/cli/doctor.mjs — Runtime doctor (end-user installation health, not dev structure)

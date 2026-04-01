@@ -25,7 +25,8 @@
     "skill-placement",
     "no-circular-skill-calls",
     "component-completeness",
-    "addon-boundaries"
+    "addon-boundaries",
+    "aiwg-dir-reference-contract"
   ],
   "commands": [
     "devkit-create-addon",

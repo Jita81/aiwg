@@ -67,17 +67,24 @@ If you are generating SDLC artifacts for developing AIWG — requirements docume
 .aiwg/planning/iteration-7.md           ← correct for project artifact
 ```
 
-### Rule 3: No `.aiwg/` References in Deployable Artifacts
+### Rule 3: Only Reference Normalized `.aiwg/` Paths in Deployable Artifacts
 
-Agent definitions, skill definitions, and command definitions in `agentic/code/` MUST NOT reference files in `.aiwg/` via `@.aiwg/...` paths. Those paths only resolve inside this repository.
+Agent and skill definitions in `agentic/code/` may reference `.aiwg/` paths — this is how skills gain project-specific context when deployed. However, only **normalized paths** (declared in a framework's `memory.creates` or guaranteed by `aiwg init`) may be referenced. Repo-local paths silently fail in user projects.
 
-**FORBIDDEN** (in any file under `agentic/code/`):
+**FORBIDDEN** (repo-local paths, only exist in this repository):
 ```
-@.aiwg/requirements/UC-001.md
-@.aiwg/flows/schemas/flow-schema.yaml
+@.aiwg/planning/issue-driven-ralph-loop-design.md
+@.aiwg/architecture/adr-rules-index-hierarchy.md
 ```
 
-**REQUIRED**: Reference `agentic/code/` paths, or document that the reference is project-specific and must be substituted by the user.
+**ALLOWED** (normalized paths, guaranteed in user projects):
+```
+@.aiwg/AIWG.md                  ← Tier 1, always present
+@.aiwg/requirements/             ← Tier 2, present when sdlc-complete installed
+@.aiwg/research/                 ← Tier 2, present when research-complete installed
+```
+
+See `aiwg-dir-reference-contract.md` for the full normalized path list and detection guidance.
 
 ### Rule 4: Deployment Targets Are Not Authoring Locations
 

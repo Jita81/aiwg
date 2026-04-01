@@ -23,5 +23,19 @@
     "strategy": "index-with-links",
     "rulesIndex": "rules/RULES-INDEX.md",
     "deployIndexOnly": true
+  },
+  "memory": {
+    "creates": [
+      { "path": ".aiwg/requirements/", "description": "User stories, use cases, NFRs" },
+      { "path": ".aiwg/architecture/", "description": "SAD, ADRs, diagrams" },
+      { "path": ".aiwg/planning/",     "description": "Phase plans, iteration plans" },
+      { "path": ".aiwg/risks/",        "description": "Risk register, mitigations" },
+      { "path": ".aiwg/testing/",      "description": "Test strategy, test plans, test results" },
+      { "path": ".aiwg/security/",     "description": "Threat models, security gates" },
+      { "path": ".aiwg/deployment/",   "description": "Deployment plans, runbooks" }
+    ],
+    "normalizedFiles": [
+      { "path": ".aiwg/AIWG.md", "description": "Project context entry point — current phase, architecture summary, installed frameworks" }
+    ]
   }
 }

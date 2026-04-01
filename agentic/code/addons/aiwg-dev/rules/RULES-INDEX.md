@@ -4,7 +4,7 @@ Contributor-focused rules for building AIWG addons, frameworks, skills, agents, 
 
 ---
 
-## AIWG Developer Tools Rules (4 rules — active with aiwg-dev addon)
+## AIWG Developer Tools Rules (5 rules — active with aiwg-dev addon)
 
 ### HIGH
 
@@ -26,9 +26,14 @@ Contributor-focused rules for building AIWG addons, frameworks, skills, agents, 
 **Full rule**: @agentic/code/addons/aiwg-dev/rules/component-completeness.md
 
 #### addon-boundaries
-**Summary**: `agentic/code/` is framework source that ships to users via `aiwg use`. `.aiwg/` is project-local output for the AIWG project's own development — it does NOT ship. Never put framework artifacts in `.aiwg/` (they become invisible to the installer) and never reference `@.aiwg/` paths from deployable artifacts (those paths only resolve inside this repository). The decision guide: "Is this for AIWG users? → agentic/code/. Is this a project artifact? → .aiwg/."
+**Summary**: `agentic/code/` is framework source that ships to users via `aiwg use`. `.aiwg/` is project-local output for the AIWG project's own development — it does NOT ship. Never put framework artifacts in `.aiwg/`. Skills may reference normalized `.aiwg/` paths (declared in `memory.creates`), but never repo-local paths. The decision guide: "Is this for AIWG users? → agentic/code/. Is this a project artifact? → .aiwg/."
 **When to apply**: Adding schemas, templates, or process documents, writing agent/skill definitions that reference local files, any time you are unsure whether content is framework source or project output
 **Full rule**: @agentic/code/addons/aiwg-dev/rules/addon-boundaries.md
+
+#### aiwg-dir-reference-contract
+**Summary**: Skills and agents in `agentic/code/` may only `@`-reference `.aiwg/` paths that are normalized — declared in a component's `memory.creates` (Tier 2) or guaranteed by `aiwg init` (Tier 1: `.aiwg/AIWG.md`, `.aiwg/frameworks/registry.json`). Repo-local paths (specific files only in the AIWG dev repo) silently fail in user projects. The contract is manifest-derived: when a new framework creates `.aiwg/` paths, declare them in `memory.creates`. Validate with `grep -rn "@\.aiwg/" agentic/code/` and cross-check against installed manifests.
+**When to apply**: Writing skills or agents that reference `.aiwg/` paths, adding a new framework that creates `.aiwg/` artifacts, reviewing distributable skills for link correctness
+**Full rule**: @agentic/code/addons/aiwg-dev/rules/aiwg-dir-reference-contract.md
 
 ---
 
@@ -41,11 +46,13 @@ Contributor-focused rules for building AIWG addons, frameworks, skills, agents, 
 | **Setting `executedViaSkillRunner: true`** | no-circular-skill-calls |
 | **Creating or extending an addon** | skill-placement, component-completeness, addon-boundaries |
 | **Adding schemas or templates** | addon-boundaries |
+| **Writing agent/skill `.aiwg/` references** | aiwg-dir-reference-contract |
+| **Adding a new framework with `.aiwg/` paths** | aiwg-dir-reference-contract, addon-boundaries |
 | **Writing agent definitions** | addon-boundaries, skill-placement |
 | **Onboarding as a contributor** | skill-placement, addon-boundaries |
 | **Pre-PR checklist** | component-completeness, skill-placement |
 
 ---
 
-*Generated from aiwg-dev manifest.json — 4 rules*
+*Generated from aiwg-dev manifest.json — 5 rules*
 *Full rule files: @agentic/code/addons/aiwg-dev/rules/*

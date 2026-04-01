@@ -42,5 +42,18 @@
     "total_skills": 19,
     "total_rules": 4,
     "status": "active"
+  },
+  "memory": {
+    "creates": [
+      { "path": ".aiwg/forensics/",            "description": "Forensics root directory" },
+      { "path": ".aiwg/forensics/profiles/",   "description": "Target profiles" },
+      { "path": ".aiwg/forensics/plans/",      "description": "Investigation plans" },
+      { "path": ".aiwg/forensics/evidence/",   "description": "Acquired evidence and images" },
+      { "path": ".aiwg/forensics/findings/",   "description": "Analysis findings" },
+      { "path": ".aiwg/forensics/timelines/",  "description": "Event timelines" },
+      { "path": ".aiwg/forensics/iocs/",       "description": "Indicators of compromise" },
+      { "path": ".aiwg/forensics/reports/",    "description": "Forensic reports" },
+      { "path": ".aiwg/forensics/sigma/",      "description": "Sigma detection rules" }
+    ]
   }
 }

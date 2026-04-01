@@ -16,5 +16,10 @@
   "commands": [],
   "skills": [],
   "templates": [],
-  "flows": []
+  "flows": [],
+  "memory": {
+    "creates": [
+      { "path": ".aiwg/{{id}}/", "description": "{{name}} artifacts" }
+    ]
+  }
 }

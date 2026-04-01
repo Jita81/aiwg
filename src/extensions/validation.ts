@@ -105,6 +105,22 @@ export const DeploymentConfigSchema = z.object({
 });
 
 /**
+ * A single .aiwg/ path entry in a memory footprint
+ */
+export const MemoryPathSchema = z.object({
+  path: z.string().min(1, 'Memory path is required'),
+  description: z.string().min(1, 'Memory path description is required'),
+});
+
+/**
+ * .aiwg/ memory footprint declaration
+ */
+export const MemoryFootprintSchema = z.object({
+  creates: z.array(MemoryPathSchema).optional(),
+  normalizedFiles: z.array(MemoryPathSchema).optional(),
+});
+
+/**
  * Deprecation information
  */
 export const DeprecationSchema = z.object({
@@ -446,6 +462,7 @@ export const ExtensionSchema = z.object({
   bugs: z.string().url().optional(),
   documentation: z.record(z.string()).optional(),
   researchCompliance: z.record(z.array(z.string())).optional(),
+  memory: MemoryFootprintSchema.optional(),
 
   // Type-Specific Data
   metadata: ExtensionMetadataSchema,

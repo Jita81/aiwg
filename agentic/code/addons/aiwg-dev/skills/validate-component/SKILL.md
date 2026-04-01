@@ -50,6 +50,7 @@ You check a single AIWG component — a skill, agent, or CLI command — for com
    - Check: Skill name listed in `manifest.json` `skills` array
    - Check: File lives in `agentic/code/` (not in a provider deployment directory)
    - If SKILL.md contains `executedViaSkillRunner: true` reference: check for circular CLI call pattern
+   - **`.aiwg/` reference check**: scan for `@.aiwg/` patterns; for each found, verify the path is normalized (Tier 1: `.aiwg/AIWG.md` or `.aiwg/frameworks/`, or Tier 2: declared in any installed manifest's `memory.creates`); flag non-normalized refs
 
    **For an Agent**:
    - Read the agent `.md` file
@@ -61,6 +62,7 @@ You check a single AIWG component — a skill, agent, or CLI command — for com
    - Find parent addon's `manifest.json`
    - Check: Agent listed in `manifest.json` `agents` array
    - Check: File lives in `agentic/code/`
+   - **`.aiwg/` reference check**: same as for skills — scan for `@.aiwg/` patterns and flag non-normalized refs
 
    **For a CLI Command**:
    - Read `src/extensions/commands/definitions.ts`
@@ -84,6 +86,7 @@ You check a single AIWG component — a skill, agent, or CLI command — for com
      FAIL  no examples section found
      PASS  listed in manifest.json
      FAIL  not in agentic/code/ (found in .claude/skills/ — placement violation)
+     WARN  @.aiwg/planning/my-design.md is not a normalized path (repo-local only)
 
    Result: FAIL — 2 issues found
 
@@ -176,4 +179,5 @@ Required actions:
 - @agentic/code/addons/aiwg-dev/rules/component-completeness.md — Full completeness requirements
 - @agentic/code/addons/aiwg-dev/rules/skill-placement.md — Placement requirements
 - @agentic/code/addons/aiwg-dev/rules/no-circular-skill-calls.md — Circular call detection
+- @agentic/code/addons/aiwg-dev/rules/aiwg-dir-reference-contract.md — Normalized .aiwg/ path contract
 - @src/extensions/commands/definitions.ts — Command definition registry

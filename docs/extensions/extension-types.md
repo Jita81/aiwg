@@ -470,6 +470,24 @@ interface FrameworkMetadata {
 }
 ```
 
+### memory field (optional, top-level)
+
+Frameworks that create `.aiwg/` paths should declare them in a top-level `memory` field. This makes those paths "normalized" — safe to reference from skills and agents. See [`.aiwg/` Reference Contract](../development/aiwg-dir-reference-contract.md) for full details.
+
+```typescript
+// In manifest.json (top-level, alongside id/type/name)
+memory?: {
+  creates?: Array<{
+    path: string;        // e.g., ".aiwg/requirements/"
+    description: string; // e.g., "User stories, use cases, NFRs"
+  }>;
+  normalizedFiles?: Array<{
+    path: string;        // e.g., ".aiwg/AIWG.md"
+    description: string; // e.g., "Project context entry point"
+  }>;
+}
+```
+
 ### Example
 
 ```typescript

@@ -19,5 +19,18 @@
       "working",
       "archive"
     ]
+  },
+  "memory": {
+    "creates": [
+      { "path": ".aiwg/research/",            "description": "Research root directory" },
+      { "path": ".aiwg/research/workflows/",   "description": "Active research workflow state" },
+      { "path": ".aiwg/research/reports/",     "description": "Generated research reports" },
+      { "path": ".aiwg/research/findings/",    "description": "Research finding notes (REF-NNN.md)" },
+      { "path": ".aiwg/research/sources/",     "description": "Source documents and PDFs" },
+      { "path": ".aiwg/research/archives/",    "description": "Archival artifacts" },
+      { "path": ".aiwg/research/synthesis/",   "description": "Synthesis and gap analysis" },
+      { "path": ".aiwg/research/provenance/",  "description": "W3C PROV provenance records" },
+      { "path": ".aiwg/research/knowledge/",   "description": "Knowledge base and lit notes" }
+    ]
   }
 }

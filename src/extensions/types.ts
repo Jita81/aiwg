@@ -99,6 +99,45 @@ export interface PlatformCompatibility {
 }
 
 /**
+ * A single .aiwg/ path entry in a memory footprint declaration
+ */
+export interface MemoryPath {
+  /** Path relative to project root — always under .aiwg/ */
+  path: string;
+  /** Human-readable description of what this path contains */
+  description: string;
+}
+
+/**
+ * Declares what .aiwg/ paths a component creates when deployed
+ *
+ * Skills and agents can safely reference any path listed in `creates` from
+ * an installed component — those paths are guaranteed to exist after deployment.
+ *
+ * @see docs/development/aiwg-dir-reference-contract.md
+ */
+export interface MemoryFootprint {
+  /**
+   * Directories and files this component creates or populates in .aiwg/
+   *
+   * Skills may safely reference any path listed here.
+   *
+   * @example [{ "path": ".aiwg/requirements/", "description": "User stories, use cases, NFRs" }]
+   */
+  creates?: MemoryPath[];
+
+  /**
+   * Specific files with documented schemas that skills can depend on
+   *
+   * These are primary context injection points — they have a defined structure
+   * that skills can rely on.
+   *
+   * @example [{ "path": ".aiwg/AIWG.md", "description": "Project context entry point" }]
+   */
+  normalizedFiles?: MemoryPath[];
+}
+
+/**
  * Deployment configuration
  */
 export interface DeploymentConfig {
@@ -330,6 +369,15 @@ export interface Extension {
    * Links to research best practices and archetypes.
    */
   researchCompliance?: Record<string, string[]>;
+
+  /**
+   * .aiwg/ memory footprint declaration
+   *
+   * Declares what .aiwg/ paths this component creates when deployed.
+   * Skills can safely @-reference any path declared in memory.creates.
+   * Used by validate-component and dev-doctor to check link correctness.
+   */
+  memory?: MemoryFootprint;
 
   // ============================================
   // Type-Specific Data (Discriminated Union)
