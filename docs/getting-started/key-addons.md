@@ -216,8 +216,10 @@ Breaks the implementation into phases, validates each phase before proceeding, a
 aiwg use ralph              # Al iterative loops
 aiwg use rlm                # Recursive language models
 aiwg use writing            # Voice framework + writing quality
-aiwg use all                # Everything
+aiwg use all                # All frameworks and addons (auto-discovers all addons except devOnly ones)
 ```
+
+Individual `aiwg use <addon>` calls remain valid for targeted installs. `aiwg use all` auto-discovers every addon in `agentic/code/addons/` and deploys them all, skipping only those marked `devOnly` in their manifest (currently only `aiwg-dev`).
 
 Or install specific addons:
 

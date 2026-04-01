@@ -65,7 +65,7 @@ These paths exist in the AIWG development repository but are NOT guaranteed in u
 
 | Path | Why It Exists Here |
 |------|--------------------|
-| `.aiwg/planning/issue-driven-ralph-loop-design.md` | Design doc for this feature, AIWG dev repo only |
+| `.aiwg/planning/issue-driven-al-loop-design.md` | Design doc for this feature, AIWG dev repo only |
 | `.aiwg/architecture/adr-rules-index-hierarchy.md` | ADR for this project's rules structure |
 | Any specific file not created by `aiwg init` or framework deployment | Project artifact, not framework output |
 
@@ -84,7 +84,7 @@ Check requirements in @.aiwg/requirements/.
 
 ```markdown
 # WRONG — this file only exists in the AIWG dev repo
-See @.aiwg/planning/issue-driven-ralph-loop-design.md for design rationale.
+See @.aiwg/planning/issue-driven-al-loop-design.md for design rationale.
 ```
 
 ### Declaring dependencies for Tier 2 paths

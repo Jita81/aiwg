@@ -232,7 +232,7 @@ aiwg use <framework|addon>
 
 **Arguments:**
 - `<framework>` - Framework name: `sdlc`, `marketing`, `writing`, `all`
-- `<addon>` - Addon name: `rlm`
+- `<addon>` - Addon name: any addon in `agentic/code/addons/` (e.g., `rlm`, `ralph`, `ring-methodology`)
 
 **Options:**
 - `--provider <name>` - Target platform (claude, copilot, factory, cursor, windsurf, warp, codex, opencode, hermes, openclaw, local)
@@ -262,7 +262,7 @@ aiwg use sdlc --provider copilot
 # Deploy marketing framework
 aiwg use marketing
 
-# Deploy all frameworks
+# Deploy all frameworks and addons (auto-discovers all addons in agentic/code/addons/ except those marked devOnly)
 aiwg use all
 
 # Deploy RLM addon (recursive context decomposition)
