@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Build correlated event timeline from multiple sources
 commandHint:
   argumentHint: "<findings-path> [--window start/end] [--sources logs|network|process|all] [--mitre]"

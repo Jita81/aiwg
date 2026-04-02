@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Export media collection to platform-specific formats (Plex, Jellyfin, MPD, mobile, archival)
 commandHint:
   argumentHint: --profile <plex|jellyfin|mpd|mobile|archival> <collection_path> <output_path> [--max-size <GB>] [--transcode]

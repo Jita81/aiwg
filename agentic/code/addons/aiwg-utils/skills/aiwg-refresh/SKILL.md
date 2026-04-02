@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Update AIWG CLI and redeploy frameworks/tools to current project without leaving the session
 ---
 

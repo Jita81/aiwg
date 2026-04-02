@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Orchestrate change control workflow with baseline management, impact assessment, CCB review, and communication
 commandHint:
   argumentHint: [change-type] [change-id] [project-directory] [--guidance "text"] [--interactive]

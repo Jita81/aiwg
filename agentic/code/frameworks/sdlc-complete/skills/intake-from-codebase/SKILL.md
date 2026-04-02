@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Scan existing codebase and generate intake documents by analyzing code, dependencies, and infrastructure. Accepts optional guidance text to tailor analysis.
 commandHint:
   argumentHint: <codebase-directory> [--interactive] [--output .aiwg/intake/] [--guidance "context"]

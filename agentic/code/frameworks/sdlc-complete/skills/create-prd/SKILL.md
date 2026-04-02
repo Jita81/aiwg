@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Create a Product Requirements Document (PRD) for a product feature
 commandHint:
   argumentHint: "<feature description> [output-path] [--interactive] [--guidance "text"]"

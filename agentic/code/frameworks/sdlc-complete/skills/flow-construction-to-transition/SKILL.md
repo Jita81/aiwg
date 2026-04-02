@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Orchestrate Construction→Transition phase transition with IOC validation, production deployment, and operational handover
 commandHint:
   argumentHint: [project-directory] [--guidance "text"] [--interactive]

@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Migrate existing CLAUDE.md full-injection to the AIWG.md hook file architecture
 commandHint:
   argumentHint: "[--provider <name>] [--all] [--dry-run] [--no-backup] [--force]"

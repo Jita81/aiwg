@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Regenerate AGENTS.md with vendor-neutral content for multi-platform support
 ---
 

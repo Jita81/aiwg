@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Execute a UAT plan against live MCP connections, tracking pass/fail per test and filing issues on failure
 commandHint:
   argumentHint: <plan_path> [--mode mcp] [--execution-mode quick|standard|full] [--dry-run] [--no-issues] [--resume-from <phase>]

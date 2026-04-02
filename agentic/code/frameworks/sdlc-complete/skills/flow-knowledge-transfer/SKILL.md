@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Orchestrate Knowledge Transfer flow with assessment, documentation, shadowing, validation, and handover
 commandHint:
   argumentHint: <from-member> <to-member> [domain] [--guidance "text"] [--interactive]

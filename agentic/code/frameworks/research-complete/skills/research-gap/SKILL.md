@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Analyze gaps in research coverage
 commandHint:
   argumentHint: "[topic] [--suggest-queries] [--export markdown]"

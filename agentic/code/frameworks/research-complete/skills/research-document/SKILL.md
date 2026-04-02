@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Generate summaries and literature notes from research papers
 commandHint:
   argumentHint: "[REF-XXX] [--depth brief|standard|comprehensive]"

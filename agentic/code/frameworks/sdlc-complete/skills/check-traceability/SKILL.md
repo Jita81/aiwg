@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Verify links from use cases and requirements to design, code, tests, and releases
 commandHint:
   argumentHint: <path-to-traceability-csv> [--interactive] [--guidance "text"]

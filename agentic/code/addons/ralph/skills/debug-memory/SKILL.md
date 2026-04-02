@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Query and manage the executable feedback debug memory
 commandHint:
   category: code-quality

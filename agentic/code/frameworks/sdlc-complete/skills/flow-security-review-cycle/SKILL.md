@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Orchestrate continuous security validation, threat modeling, vulnerability management, and security gate enforcement across SDLC phases
 commandHint:
   argumentHint: [project-directory] [--iteration N] [--guidance "text"] [--interactive]

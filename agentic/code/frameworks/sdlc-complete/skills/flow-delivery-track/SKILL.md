@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Orchestrate Delivery Track flow with test-driven development, quality gates, and iteration assessment
 commandHint:
   argumentHint: <iteration-number> [project-directory] [--guidance "text"] [--interactive]

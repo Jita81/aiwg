@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Evaluate architectural decisions using Tree of Thoughts exploration
 commandHint:
   category: architecture-quality

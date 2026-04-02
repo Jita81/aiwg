@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Execute tests on generated code and iterate until passing
 commandHint:
   category: code-quality

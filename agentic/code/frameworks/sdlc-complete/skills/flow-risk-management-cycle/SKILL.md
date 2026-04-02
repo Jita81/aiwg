@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Orchestrate continuous risk identification, assessment, tracking, and retirement across SDLC phases
 commandHint:
   argumentHint: [project-directory] [--iteration N] [--guidance "text"] [--interactive]

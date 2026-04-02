@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Query provenance chains to trace artifact derivation and impact
 commandHint:
   category: provenance

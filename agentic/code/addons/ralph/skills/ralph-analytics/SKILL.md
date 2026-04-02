@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Show analytics and metrics from agent loop execution history
 commandHint:
   category: ralph

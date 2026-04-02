@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Create, update, list, or run scheduled remote agents (triggers) that execute on a cron schedule
 commandHint:
   argumentHint: "create|list|delete [--name <name>] [--cron <expr>] [--task <prompt>] [--provider <provider>]"

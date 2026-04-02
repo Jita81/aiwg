@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Generate a SOUL.md from an existing AIWG voice profile
 commandHint:
   argumentHint: "<voice-profile-name> [--output <path>] [--interactive]"

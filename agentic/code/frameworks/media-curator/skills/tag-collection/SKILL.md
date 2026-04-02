@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Apply metadata tags, embed artwork, and organize media files with consistent naming
 commandHint:
   argumentHint: <collection_path> [--artist <name>] [--dry-run] [--artwork-dir <path>] [--force]

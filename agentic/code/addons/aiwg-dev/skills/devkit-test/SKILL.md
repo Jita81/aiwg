@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Auto-fix discoverable issues
 ---
 

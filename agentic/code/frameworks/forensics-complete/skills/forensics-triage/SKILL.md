@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Quick triage investigation following RFC 3227 volatility order
 commandHint:
   argumentHint: "<target> [--output path] [--scope network|process|all]"

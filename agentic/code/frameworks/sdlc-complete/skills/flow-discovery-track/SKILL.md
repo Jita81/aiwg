@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Orchestrate Discovery Track flow to prepare validated requirements and designs one iteration ahead of delivery
 commandHint:
   argumentHint: <iteration-number> [project-directory] [--guidance "text"] [--interactive]

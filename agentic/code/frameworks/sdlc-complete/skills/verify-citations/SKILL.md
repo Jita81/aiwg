@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Verify all citations in a document against the research corpus
 commandHint:
   category: research-quality

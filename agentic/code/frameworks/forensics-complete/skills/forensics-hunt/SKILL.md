@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Threat hunt using Sigma rules against log sources
 commandHint:
   argumentHint: "[--rules rule-id,...|all] [--target host] [--logs-path path] [--output path]"

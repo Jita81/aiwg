@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Orchestrate systematic retrospective cycle with structured feedback collection, improvement tracking, and action item management
 commandHint:
   argumentHint: [retrospective-type] [iteration-number] [project-directory] [--guidance "text"] [--interactive]

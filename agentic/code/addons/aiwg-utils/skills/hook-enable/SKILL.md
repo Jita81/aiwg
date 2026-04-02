@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Enable the AIWG context hook in platform context files without re-deploying
 commandHint:
   argumentHint: "[--provider claude|warp|copilot|cursor|factory|windsurf|opencode|codex] [--all]"

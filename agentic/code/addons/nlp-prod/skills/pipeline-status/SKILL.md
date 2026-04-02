@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Show status overview of all LLM inference pipelines in the current project
 commandHint:
   argumentHint: "[--json]"

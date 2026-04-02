@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Generate deployment configurations (Docker, Kubernetes) for the current project
 ---
 

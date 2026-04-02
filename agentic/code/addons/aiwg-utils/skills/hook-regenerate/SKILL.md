@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Rebuild AIWG hook files from currently installed framework manifests
 commandHint:
   argumentHint: "[--provider <name>] [--all] [--dry-run] [--verbose]"

@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Create a new ticket/issue with configurable backend (Gitea, GitHub, Jira, Linear, or local files)
 commandHint:
   argumentHint: <title> [description] [--provider NAME --labels "label1,label2" --assignee USER --check-regression]

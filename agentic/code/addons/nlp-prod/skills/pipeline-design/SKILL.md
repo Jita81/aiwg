@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Interactive LLM inference pipeline design — elicits requirements, recommends pattern, scaffolds production-ready artifacts
 commandHint:
   argumentHint: "<use-case-description> [--pattern <pattern>] [--language python|typescript] [--volume N] [--interactive]"

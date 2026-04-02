@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Check a file for citation quality and GRADE compliance
 commandHint:
   category: research-quality

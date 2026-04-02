@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Disable soul enforcement without deleting SOUL.md or soul files
 commandHint:
   argumentHint: "[--provider claude|warp|copilot|cursor|factory|windsurf|opencode|codex] [--all]"

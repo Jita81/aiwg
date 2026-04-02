@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Build a Proof of Concept (PoC) to validate technical feasibility and retire architectural risks
 commandHint:
   argumentHint: <feature-or-risk-to-validate> [--scope minimal|standard|comprehensive --interactive --guidance "text"]

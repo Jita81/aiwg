@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Generate system definition file for ToolSmith with tested OS commands
 commandHint:
   argumentHint: [--categories <list>] [--output <path>] [--verify-only] [--update --interactive --guidance "text"]

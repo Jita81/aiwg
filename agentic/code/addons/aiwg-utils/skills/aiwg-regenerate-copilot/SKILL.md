@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Regenerate copilot-instructions.md for GitHub Copilot with vendor-specific content only
 ---
 

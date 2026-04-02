@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Clean up .aiwg/working/ by promoting, archiving, or deleting temporary files
 ---
 

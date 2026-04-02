@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Disable the AIWG context hook without uninstalling AIWG or deleting hook files
 commandHint:
   argumentHint: "[--provider claude|warp|copilot|cursor|factory|windsurf|opencode|codex] [--all]"

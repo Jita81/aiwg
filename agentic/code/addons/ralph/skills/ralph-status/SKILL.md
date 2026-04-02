@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Check status of current or previous agent loop
 commandHint:
   argumentHint: [--verbose] [--latest] [--all --interactive --guidance "text"]

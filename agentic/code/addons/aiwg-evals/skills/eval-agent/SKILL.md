@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Run evaluation tests against an agent to assess quality and archetype resistance
 ---
 

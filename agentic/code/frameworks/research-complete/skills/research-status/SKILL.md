@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Show research corpus health and statistics
 commandHint:
   argumentHint: "[--detailed] [--problems-only] [--export json]"

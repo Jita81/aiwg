@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Enable interactive question mode
 commandHint:
   argumentHint: "[--project-type value] [--intake-directory value] [--interactive value] [--guidance "text"] [--interactive]"

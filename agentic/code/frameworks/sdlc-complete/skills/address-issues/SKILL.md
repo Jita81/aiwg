@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Address open issues using issue-thread-driven agent loops with 2-way human-AI collaboration
 commandHint:
   argumentHint: <issue_numbers...> [--filter "status:open label:bug"] [--all-open] [--max-cycles N] [--provider gitea|github] [--interactive] [--guidance "text"] [--branch-per-issue]

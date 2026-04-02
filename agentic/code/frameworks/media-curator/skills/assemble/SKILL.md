@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Assemble media into thematic compilations, concert films, era playlists, and narrative experiences
 commandHint:
   argumentHint: --type <narrative|concert|era|documentary|playlist> --name "<name>" --collection <path> [--output <path>]

@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Generate an aggregate agent quality report from evaluation results, showing scores, regressions, and recommendations
 ---
 

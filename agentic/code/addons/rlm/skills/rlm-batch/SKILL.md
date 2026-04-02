@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Parallel fan-out processing - spawn multiple sub-agents for chunked context processing
 commandHint:
   argumentHint: "<glob-pattern> <sub-prompt>" [--model <model>] [--output-dir <dir>] [--aggregate <strategy>] [--max-parallel <n>]

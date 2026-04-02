@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 ---
 
 # /flow-guided-implementation

@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Assess source quality using GRADE methodology
 commandHint:
   argumentHint: "[REF-XXX] [--update-frontmatter] [--output yaml|markdown]"

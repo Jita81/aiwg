@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 name: Archive Acquisition
 description: Patterns for acquiring content from Internet Archive and archival sources
 category: media-curator

@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Orchestrate Elaboration→Construction phase transition with iteration planning, team scaling, and full-scale development kickoff
 commandHint:
   argumentHint: [project-directory] [--guidance "text"] [--interactive]

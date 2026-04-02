@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Show investigation status dashboard
 commandHint:
   argumentHint: "[--investigation id] [--detailed] [--all] [--format markdown|json]"

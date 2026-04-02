@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Display @-mention naming conventions and placement rules
 ---
 

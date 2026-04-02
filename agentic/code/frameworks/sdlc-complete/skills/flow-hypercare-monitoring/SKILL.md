@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Orchestrate hypercare monitoring period with 24/7 support, SLO tracking, and rapid issue response
 commandHint:
   argumentHint: [hypercare-duration-days] [project-directory] [--guidance "text"] [--interactive]

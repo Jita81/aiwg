@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Query provenance chains and artifact relationships
 commandHint:
   argumentHint: "[REF-XXX or artifact-path] [--query what-derives|what-cites|history]"

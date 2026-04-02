@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: List and filter tickets/issues from configured backend
 commandHint:
   argumentHint: [--status STATE --label LABEL --assignee USER --limit NUM --format table|json|markdown]

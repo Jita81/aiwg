@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Generate or complete marketing intake forms (campaign-intake, brand-profile, option-matrix) with interactive questioning and optional guidance
 commandHint:
   argumentHint: <campaign-description|--complete> [--interactive] [--guidance "context"] [intake-directory=.aiwg/marketing/intake]

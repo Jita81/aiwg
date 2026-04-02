@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Generate troubleshooting documentation
 commandHint:
   argumentHint: 1. **System Overview and Architecture** [--interactive] [--guidance "text"]

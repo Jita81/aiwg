@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Execute iterative task loop until completion criteria are met - iteration beats perfection
 commandHint:
   argumentHint: "<task>" --completion "<criteria>" [--max-iterations N] [--timeout M] [--interactive --guidance "text"]

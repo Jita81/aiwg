@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Project directory path (default current directory)
 commandHint:
   argumentHint: "<project-name> [--asset-type type] [--guidance \"text\"] [--interactive]"

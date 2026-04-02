@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Regenerate CLAUDE.md for Claude Code with hook file architecture
 ---
 

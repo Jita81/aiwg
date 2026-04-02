@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Update existing project CLAUDE.md with latest AIWG orchestration guidance
 commandHint:
   argumentHint: [project-directory --interactive --guidance "text"]

@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Regenerate OpenCode context file (.opencode/context.md) with AIWG framework content
 commandHint:
   argumentHint: "[--no-backup] [--dry-run] [--full-inject] [--migrate]"

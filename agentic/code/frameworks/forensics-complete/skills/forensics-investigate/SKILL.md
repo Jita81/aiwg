@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Full multi-agent investigation workflow
 commandHint:
   argumentHint: "<target> [--scope triage|full|targeted-ssh|container|cloud] [--skip-stage stage]"

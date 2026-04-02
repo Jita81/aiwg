@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Orchestrate Team Onboarding flow with pre-boarding, training, buddy assignment, and 30/60/90 day check-ins
 commandHint:
   argumentHint: <team-member-name> [role] [start-date] [--guidance "text"] [--interactive]

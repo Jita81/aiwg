@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Comma-separated phase names
 ---
 

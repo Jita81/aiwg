@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 ---
 
 # Summarize Transcript or Meeting

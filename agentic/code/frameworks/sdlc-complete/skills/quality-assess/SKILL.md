@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Perform GRADE quality assessment on a research source
 commandHint:
   category: research-quality

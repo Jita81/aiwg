@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Package research artifacts for long-term archival
 commandHint:
   argumentHint: "[REF-XXX or --all] [--format bagit|zip|tar] [--verify]"

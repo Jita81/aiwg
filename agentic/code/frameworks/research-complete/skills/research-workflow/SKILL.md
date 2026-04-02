@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Execute multi-stage research workflows
 commandHint:
   argumentHint: "[workflow-name] [--input parameters] [--stage n]"

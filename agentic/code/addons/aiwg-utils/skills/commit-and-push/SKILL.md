@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Create a well-formatted git commit and push to remote repository
 commandHint:
   argumentHint: [commit-message-summary --interactive --guidance "text"]

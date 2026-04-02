@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Orchestrate compliance validation workflow with requirements mapping, audit evidence collection, gap analysis, remediation tracking, and attestation
 commandHint:
   argumentHint: <compliance-framework> [project-directory] [--guidance "text"] [--interactive]

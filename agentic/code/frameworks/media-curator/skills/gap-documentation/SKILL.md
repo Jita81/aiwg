@@ -1,3 +1,7 @@
+---
+platforms: [all]
+---
+
 # GAP-NOTE Documentation Skill
 
 A systematic approach to documenting missing content in media archives using standardized gap markers that guide acquisition, measure completeness, and enable parallel collection workflows.

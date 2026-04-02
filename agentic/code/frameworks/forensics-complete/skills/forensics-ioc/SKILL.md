@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Extract and enrich indicators of compromise
 commandHint:
   argumentHint: "<findings-path> [--enrich] [--stix] [--output path] [--format markdown|json|stix]"

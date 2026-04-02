@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 name: Metadata Tagging
 description: opustags and ffmpeg patterns for applying metadata to audio and video files
 category: media-curator

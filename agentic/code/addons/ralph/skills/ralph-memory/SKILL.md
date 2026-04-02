@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Manage Al semantic memory entries — list, query, and clear lessons learned across loop iterations
 commandHint:
   argumentHint: "<list|query|clear> [--loop-id <id>] [--query <text>] [--since <date>]"

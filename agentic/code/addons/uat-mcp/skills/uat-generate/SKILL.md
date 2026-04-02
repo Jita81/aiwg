@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Discover MCP tools and generate a phased UAT plan with agent-executable test specifications
 commandHint:
   argumentHint: [--mode mcp] [--server <name>] [--output <path>] [--execution-mode quick|standard|full] [--interactive]

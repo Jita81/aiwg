@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Synchronize documentation and code to eliminate drift with parallel audit, auto-fix, and Al refinement
 commandHint:
   argumentHint: <direction> [--interactive --guidance "text" --scope "path" --dry-run --parallel N --incremental --verbose --no-commit --max-iterations N]

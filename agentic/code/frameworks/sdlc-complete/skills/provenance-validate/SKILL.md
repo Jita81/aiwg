@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Validate provenance records and chains for completeness and consistency
 commandHint:
   category: provenance

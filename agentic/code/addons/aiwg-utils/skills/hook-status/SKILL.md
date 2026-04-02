@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Show AIWG hook state across all installed providers
 commandHint:
   argumentHint: "[--provider <name>] [--verbose]"

@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Build target system profile via SSH or cloud API enumeration
 commandHint:
   argumentHint: "<target> [--output path] [--deep] [--cloud aws|azure|gcp]"

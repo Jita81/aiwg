@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Regenerate .cursorrules for Cursor with preserved team directives
 ---
 

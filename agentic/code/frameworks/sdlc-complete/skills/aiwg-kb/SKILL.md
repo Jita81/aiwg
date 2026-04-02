@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Search AIWG knowledge base for help, documentation, and troubleshooting
 commandHint:
   argumentHint: "<topic> [--interactive] [--guidance "text"]"

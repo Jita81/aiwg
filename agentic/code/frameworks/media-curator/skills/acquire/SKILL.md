@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Download media from discovered sources with format selection and progress tracking
 commandHint:
   argumentHint: --plan <sources.yaml> | --url <URL> [--format audio|video|best] [--output <dir>] [--parallel N]

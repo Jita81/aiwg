@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Resume an interrupted agent loop from last checkpoint
 commandHint:
   argumentHint: [--max-iterations N] [--timeout M --interactive --guidance "text"]

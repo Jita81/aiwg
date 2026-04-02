@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Enable soul enforcement by wiring SOUL.md into platform context files and deploying the enforcement rule
 commandHint:
   argumentHint: "[--provider claude|warp|copilot|cursor|factory|windsurf|opencode|codex] [--all] [--agents]"

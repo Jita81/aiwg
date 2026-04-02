@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Generate provenance coverage dashboard and statistics
 commandHint:
   category: provenance

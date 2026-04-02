@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Conduct comprehensive PR review from multiple perspectives (PM, Developer, QA, Security)
 commandHint:
   argumentHint: <pr_link_or_number> [--interactive] [--guidance "text"] [--regression-gate] [--allow-regression]

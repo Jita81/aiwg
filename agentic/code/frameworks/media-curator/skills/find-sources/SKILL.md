@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Discover and rank media sources across platforms for an artist or specific content
 commandHint:
   argumentHint: "<artist>" [--scope complete|album:NAME|era:NAME|track:NAME] [--tier 1-4] [--output sources.yaml]

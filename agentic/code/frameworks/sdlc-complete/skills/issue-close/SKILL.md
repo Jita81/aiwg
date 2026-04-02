@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Mark an issue as complete with comprehensive summary and verification
 commandHint:
   argumentHint: <issue_number> [--reason <text>] [--no-verify] [--link-artifacts]

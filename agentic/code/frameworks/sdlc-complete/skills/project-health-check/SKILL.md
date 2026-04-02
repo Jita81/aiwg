@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Analyze overall project health and metrics
 commandHint:
   allowedTools: Bash(git *), Bash(gh *), Bash(npm *)

@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Generate UAT completion report with tool coverage matrix, pass/fail metrics, and regression detection
 commandHint:
   argumentHint: <results_path> [--format markdown|json|table] [--compare <previous_results>] [--output <path>]

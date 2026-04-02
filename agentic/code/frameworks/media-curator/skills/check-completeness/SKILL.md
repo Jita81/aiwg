@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Analyze collection completeness against canonical discography and generate prioritized gap report
 commandHint:
   argumentHint: "<artist>" [--collection <path>] [--gaps-only] [--priority high|medium|low|all] [--output report.yaml]

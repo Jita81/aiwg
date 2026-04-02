@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Generate forensic investigation report
 commandHint:
   argumentHint: "<forensics-path> [--format triage|full|executive] [--output path]"

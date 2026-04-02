@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Orchestrate continuous performance optimization with baseline establishment, bottleneck identification, optimization implementation, load testing, and SLO validation
 commandHint:
   argumentHint: [trigger] [component] [project-directory] [--guidance "text"] [--interactive]

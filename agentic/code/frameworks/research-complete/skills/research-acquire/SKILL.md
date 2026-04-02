@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Download research papers and extract metadata
 commandHint:
   argumentHint: "[DOI or arXiv ID] [--output path] [--extract-text]"

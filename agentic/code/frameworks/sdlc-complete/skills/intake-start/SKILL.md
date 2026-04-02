@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Ingest the Project Intake Form and kick off Concept → Inception with agent assignments, accepts optional guidance to tailor process
 commandHint:
   argumentHint: <path-to-intake-folder-or-form> [--guidance "context" --interactive]

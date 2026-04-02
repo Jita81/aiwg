@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Abort a running agent loop and optionally revert changes
 commandHint:
   argumentHint: [--keep-changes] [--revert] [--force --interactive --guidance "text"]

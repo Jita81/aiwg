@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Format citations and generate bibliographies
 commandHint:
   argumentHint: "[REF-XXX] [--format inline|bibtex|reference] [--page n]"

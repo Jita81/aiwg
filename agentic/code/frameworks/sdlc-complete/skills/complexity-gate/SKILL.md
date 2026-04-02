@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: CI-friendly complexity enforcement gate returning pass/fail results for pipeline integration
 commandHint:
   argumentHint: [path] [--max-loc N] [--max-complexity N] [--max-depth N] [--format json|text] [--changed-only] [--baseline file] [--save-baseline]

@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Configure and run the isolated eval loop pattern — generate, evaluate, refine until pass threshold met
 commandHint:
   argumentHint: "<pipeline-dir> [--threshold 0.85] [--max-attempts 3] [--interactive]"

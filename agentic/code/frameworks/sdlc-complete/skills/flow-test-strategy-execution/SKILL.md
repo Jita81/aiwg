@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Orchestrate comprehensive test strategy with test suite execution, coverage validation, defect triage, and regression analysis
 commandHint:
   argumentHint: <test-level> [target-component] [project-directory] [--guidance "text"] [--interactive]

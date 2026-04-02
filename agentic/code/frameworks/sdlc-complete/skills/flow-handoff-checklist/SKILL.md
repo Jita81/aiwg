@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Orchestrate handoff validation between SDLC phases and tracks (Discovery→Delivery, Delivery→Ops, phase transitions)
 commandHint:
   argumentHint: <from-phase> <to-phase> [project-directory] [--guidance "text"] [--interactive]

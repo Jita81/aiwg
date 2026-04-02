@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Update existing ticket/issue with status changes, comments, or field updates
 commandHint:
   argumentHint: <ticket-id> [--status STATUS --comment "text" --assignee USER --labels "label1,label2" --priority LEVEL]

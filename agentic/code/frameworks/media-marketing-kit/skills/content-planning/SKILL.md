@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Project directory path (default current directory)
 commandHint:
   argumentHint: "<planning-period> [--content-focus value] [--project-directory value] [--guidance "text"] [--interactive]"

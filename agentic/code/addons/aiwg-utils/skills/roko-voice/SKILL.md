@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 ---
 
 # Transform Text to ROKO Voice

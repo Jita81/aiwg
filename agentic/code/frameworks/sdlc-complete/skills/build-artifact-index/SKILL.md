@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Build or rebuild the SDLC artifact index for agent-navigable discovery
 commandHint:
   argumentHint: [--force] [--verbose] [--interactive] [--guidance "text"]

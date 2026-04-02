@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 name: Cover Art Embedding
 description: Patterns for finding, processing, and embedding cover artwork into media files
 category: media-curator

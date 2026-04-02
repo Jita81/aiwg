@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Search for research papers across academic databases
 commandHint:
   argumentHint: "[search query] [--source database] [--limit n]"

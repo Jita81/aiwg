@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Crash-resilient external loop with state persistence and CI/CD integration
 commandHint:
   argumentHint: "\"<objective>\" --completion \"<criteria>\" [--max-iterations N] [--timeout M] [--provider <p>] [--no-commit] [--branch <name>] [--quiet]"

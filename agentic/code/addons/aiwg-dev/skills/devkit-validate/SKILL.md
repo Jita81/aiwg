@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Validate addon, framework, or extension structure and manifest
 ---
 

@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Automatically detect and update linked issues based on commits, artifacts, and task events
 commandHint:
   argumentHint: [--commit <sha>] [--scan-recent <count>] [--artifact <path>] [--dry-run]

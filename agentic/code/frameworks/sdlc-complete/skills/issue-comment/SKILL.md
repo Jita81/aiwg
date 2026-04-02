@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Add structured comments to issues using templates for progress, feedback, or blockers
 commandHint:
   argumentHint: <issue_number> --type <progress|feedback|blocker|custom> [--content <text>]

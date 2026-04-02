@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Compare current behavior against baseline to detect regressions
 commandHint:
   argumentHint: "[--baseline <branch|tag|commit|timestamp>] [--scope <full|module|changed-files>] [--format <summary|detailed|json>] [--bug-report <path>]"

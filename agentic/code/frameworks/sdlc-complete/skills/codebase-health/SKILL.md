@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Scan source code and report agent-readiness metrics with actionable recommendations
 commandHint:
   argumentHint: [path] [--threshold N] [--error-threshold N] [--format text|json|markdown] [--include glob] [--exclude glob] [--ci]

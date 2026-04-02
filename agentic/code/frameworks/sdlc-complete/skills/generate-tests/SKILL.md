@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Generate comprehensive test suite for $ARGUMENTS following project testing conventions and best practices.
 commandHint:
   argumentHint: "Specify test generation options [--interactive] [--guidance "text"]"

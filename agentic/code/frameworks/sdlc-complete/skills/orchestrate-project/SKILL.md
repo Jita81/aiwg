@@ -1,4 +1,5 @@
 ---
+platforms: [all]
 description: Plan iterations, delegate to SDLC agents, and compile iteration status
 commandHint:
   argumentHint: <docs/sdlc/artifacts/project> [--interactive] [--guidance "text"]
