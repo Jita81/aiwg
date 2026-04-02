@@ -2,7 +2,8 @@
 name: venv-manager
 description: Create, manage, and validate Python virtual environments. Use for project isolation and dependency management.
 tools: Read, Write, Bash
-platforms: [claude-code, hermes, openclaw]
+platforms: [all]
+
 ---
 
 # Virtual Environment Manager Skill

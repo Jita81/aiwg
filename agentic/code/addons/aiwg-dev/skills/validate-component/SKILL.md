@@ -1,9 +1,7 @@
 ---
 description: Validate a single AIWG component (skill, agent, or command) for completeness and correctness
-platforms:
-  - claude-code
-  - hermes
-  - openclaw
+platforms: [all]
+
 ---
 
 # Validate Component

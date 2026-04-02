@@ -2,7 +2,8 @@
 name: uat-mode
 description: Detect requests for UAT generation, execution, or reporting and invoke the appropriate UAT command
 version: 1.0.0
-platforms: [claude-code, hermes, openclaw]
+platforms: [all]
+
 ---
 
 # UAT Mode

@@ -182,10 +182,11 @@ function transformToCodexSkill(skillDir) {
   const skillName = path.basename(skillDir);
   const content = fs.readFileSync(skillPath, 'utf8');
 
-  // Platform filtering: only enforce when filterByPlatform is enabled.
-  // Legacy skills have incomplete platform lists; enabling this prematurely
-  // would skip skills that should deploy to codex. Enable after source cleanup.
-  // if (!skillMatchesProvider(content, 'codex')) { return null; }
+  // Platform filtering: skip skills with explicit restrictions that exclude codex.
+  // Skills using platforms: [all] (the standard token) always pass this check.
+  if (!skillMatchesProvider(content, 'codex')) {
+    return null;
+  }
 
   const parsed = parseSkillContent(content, skillName);
 
@@ -210,10 +211,11 @@ function transformToCodexSkill(skillDir) {
     description += '...';
   }
 
-  // Build Codex skill format
+  // Build Codex skill format — include platforms: [codex] so deployed skills are self-describing
   const codexContent = `---
 name: "${yamlDoubleQuoted(name)}"
 description: "${yamlDoubleQuoted(description)}"
+platforms: [codex]
 ---
 
 ${body.trim()}

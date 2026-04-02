@@ -205,28 +205,51 @@ export function skillMatchesProvider(content, provider) {
 }
 
 /**
- * Strip the platforms: field from a SKILL.md frontmatter block.
- * Deployed copies don't need it — it's a source-side restriction hint.
+ * Inject the target platform name into a SKILL.md frontmatter block.
+ *
+ * Source skills use platforms: [all] as a deployment token.
+ * At deploy time this function replaces [all] with [<targetPlatform>] so
+ * each deployed copy accurately reflects where it was installed.
+ *
+ * Explicit restriction lists (not [all]) are preserved as-is.
+ * If no platforms: field is present, one is added.
  */
-export function stripPlatformsFromContent(content) {
+export function injectPlatformInContent(content, targetPlatform) {
+  if (!targetPlatform) return content;
+
   const fmMatch = content.match(/^(---\n)([\s\S]*?)(\n---\n?)([\s\S]*)$/);
   if (!fmMatch) return content;
 
   const [, open, fm, close, body] = fmMatch;
 
-  // Remove inline: platforms: [...]
-  let cleaned = fm.replace(/^platforms:\s*\[[^\]]*\]\n?/m, '');
+  const injected = `platforms: [${targetPlatform}]`;
 
-  // Remove multi-line block:
-  // platforms:
-  //   - a
-  //   - b
-  cleaned = cleaned.replace(/^platforms:\s*\n(?:[ \t]+-[ \t]+\S[^\n]*\n?)*/m, '');
+  // Case 1: inline [all] token → replace with target platform
+  let updated = fm.replace(/^platforms:\s*\[all\]\n?/m, injected + '\n');
+  if (updated !== fm) return open + updated + close + body;
 
-  // Remove bare: platforms:
-  cleaned = cleaned.replace(/^platforms:\s*\n?/m, '');
+  // Case 2: inline explicit restriction (not [all]) → leave as-is, do not inject
+  if (/^platforms:\s*\[(?!all\])[^\]]+\]/m.test(fm)) {
+    return content;
+  }
 
-  return open + cleaned + close + body;
+  // Case 3: multi-line list → replace entire block with injected value
+  updated = fm.replace(/^platforms:\s*\n(?:[ \t]+-[ \t]+\S[^\n]*\n?)*/m, injected + '\n');
+  if (updated !== fm) return open + updated + close + body;
+
+  // Case 4: bare `platforms:` with no value → replace
+  updated = fm.replace(/^platforms:\s*$/m, injected);
+  if (updated !== fm) return open + updated + close + body;
+
+  // Case 5: no platforms: field at all → insert after the first frontmatter line
+  const fmLines = fm.split('\n');
+  fmLines.splice(1, 0, injected);
+  return open + fmLines.join('\n') + close + body;
+}
+
+/** @deprecated Use injectPlatformInContent instead */
+export function stripPlatformsFromContent(content) {
+  return injectPlatformInContent(content, null);
 }
 
 /**
@@ -461,30 +484,23 @@ export function deploySoulCompanions(soulFiles, destDir, opts) {
 /**
  * Deploy a skill directory (copy recursively).
  *
- * Platform filtering (opt-in via opts.filterByPlatform):
- *   - If the skill's SKILL.md has no platforms: field → deploy to all providers
- *   - If platforms: [all] → deploy to all providers
- *   - If explicit list → only deploy if opts.provider is in the list
- *   - platforms: is always stripped from the deployed copy (source-side hint only)
- *
- * NOTE: opts.filterByPlatform defaults to false until source skill files have been
- * updated to use platforms: [all] for universal skills. Enabling it prematurely
- * would skip skills that have incomplete legacy platform lists.
+ * Platform handling (controlled by opts.provider):
+ *   - If the skill's SKILL.md has platforms: [all] → deploy to all, inject [provider] in deployed copy
+ *   - If no platforms: field → deploy to all, inject [provider] in deployed copy
+ *   - If explicit restriction list → only deploy if opts.provider is in the list; keep list in deployed copy
  */
 export function deploySkillDir(skillDir, destDir, opts) {
-  const { force = false, dryRun = false, provider, filterByPlatform = false } = opts;
+  const { force = false, dryRun = false, provider } = opts;
   const verbose = opts.verbose === true;
   const skillName = path.basename(skillDir);
 
-  // Platform filtering: only enforced when explicitly enabled
-  if (filterByPlatform && provider) {
-    const skillMdPath = path.join(skillDir, 'SKILL.md');
-    if (fs.existsSync(skillMdPath)) {
-      const skillContent = fs.readFileSync(skillMdPath, 'utf8');
-      if (!skillMatchesProvider(skillContent, provider)) {
-        if (verbose) console.log(`skip (platform restricted): ${skillName}`);
-        return;
-      }
+  // Check SKILL.md for explicit platform restriction before deploying anything
+  const skillMdPath = path.join(skillDir, 'SKILL.md');
+  if (provider && fs.existsSync(skillMdPath)) {
+    const skillContent = fs.readFileSync(skillMdPath, 'utf8');
+    if (!skillMatchesProvider(skillContent, provider)) {
+      if (verbose) console.log(`skip (platform restricted): ${skillName}`);
+      return;
     }
   }
 
@@ -503,9 +519,10 @@ export function deploySkillDir(skillDir, destDir, opts) {
       } else {
         let srcContent = fs.readFileSync(srcPath, 'utf8');
 
-        // Strip platforms: from SKILL.md — deployed copies don't need it
-        if (entry.name === 'SKILL.md') {
-          srcContent = stripPlatformsFromContent(srcContent);
+        // Inject target platform into SKILL.md — replaces [all] token with [provider-name]
+        if (entry.name === 'SKILL.md' && provider) {
+          const platformName = PROVIDER_TO_PLATFORM[provider] || provider;
+          srcContent = injectPlatformInContent(srcContent, platformName);
         }
 
         if (fs.existsSync(destPath)) {

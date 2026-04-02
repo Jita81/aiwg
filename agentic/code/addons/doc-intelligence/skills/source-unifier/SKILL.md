@@ -2,7 +2,8 @@
 name: source-unifier
 description: Merge multiple documentation sources (docs, GitHub, PDF) with conflict detection. Use when combining docs + code for complete skill coverage.
 tools: Read, Write, Bash, Glob, Grep
-platforms: [claude-code, hermes, openclaw]
+platforms: [all]
+
 ---
 
 # Source Unifier Skill

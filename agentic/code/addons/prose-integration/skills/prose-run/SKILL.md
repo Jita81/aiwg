@@ -2,7 +2,8 @@
 name: prose-run
 description: Execute an OpenProse program within the current AIWG session, following the two-phase model (Forme wiring + Prose VM execution)
 version: 0.1.0
-platforms: [claude-code, hermes, openclaw]
+platforms: [all]
+
 ---
 
 # Prose Run Skill

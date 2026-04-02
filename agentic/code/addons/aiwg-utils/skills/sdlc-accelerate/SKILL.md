@@ -6,10 +6,8 @@ commandHint:
   model: opus
   category: orchestration
   orchestration: true
-platforms:
-  - claude-code
-  - hermes
-  - openclaw
+platforms: [all]
+
 ---
 
 # SDLC Accelerate

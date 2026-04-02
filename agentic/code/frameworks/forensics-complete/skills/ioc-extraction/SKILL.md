@@ -2,7 +2,8 @@
 name: ioc-extraction
 description: "Extract, classify, deduplicate, and enrich IOCs from investigation artifacts; map to STIX 2.1 observables"
 tools: Bash, Read, Write, Glob, Grep
-platforms: [claude-code, hermes, openclaw]
+platforms: [all]
+
 ---
 
 # ioc-extraction

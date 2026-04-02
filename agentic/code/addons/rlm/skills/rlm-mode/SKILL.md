@@ -2,7 +2,8 @@
 name: rlm-mode
 description: Detect requests for recursive decomposition and large-scale operations that benefit from RLM processing
 version: 1.0.0
-platforms: [claude-code, hermes, openclaw]
+platforms: [all]
+
 ---
 
 # RLM Mode Skill

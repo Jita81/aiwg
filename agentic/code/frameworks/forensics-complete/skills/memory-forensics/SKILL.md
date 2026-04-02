@@ -2,7 +2,8 @@
 name: memory-forensics
 description: "Volatility 3 memory forensics workflows covering acquisition with LiME and WinPmem, and structured analysis using Volatility 3 plugin reference"
 tools: Bash, Read, Write, Glob, Grep
-platforms: [claude-code, hermes, openclaw]
+platforms: [all]
+
 ---
 
 # memory-forensics

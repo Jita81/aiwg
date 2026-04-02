@@ -2,7 +2,8 @@
 name: sigma-hunting
 description: "Apply Sigma rules against log sources for threat hunting; convert rules to Elasticsearch, Splunk, and grep queries"
 tools: Bash, Read, Write, Glob, Grep
-platforms: [claude-code, hermes, openclaw]
+platforms: [all]
+
 ---
 
 # sigma-hunting

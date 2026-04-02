@@ -1,9 +1,7 @@
 ---
 description: Validate an entire AIWG addon package for completeness and release readiness
-platforms:
-  - claude-code
-  - hermes
-  - openclaw
+platforms: [all]
+
 ---
 
 # Validate Addon

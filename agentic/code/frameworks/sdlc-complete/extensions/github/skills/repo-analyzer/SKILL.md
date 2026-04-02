@@ -2,7 +2,8 @@
 name: repo-analyzer
 description: Analyze GitHub repositories for structure, documentation, dependencies, and contribution patterns. Use for codebase understanding and health assessment.
 tools: Read, Write, Bash, Glob, Grep
-platforms: [claude-code, hermes, openclaw]
+platforms: [all]
+
 ---
 
 # Repository Analyzer Skill

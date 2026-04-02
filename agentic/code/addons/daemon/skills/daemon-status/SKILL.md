@@ -10,7 +10,8 @@ triggers:
   - "show daemon"
   - "check daemon"
   - "daemon info"
-platforms: [claude-code, openclaw, warp]
+platforms: [all]
+
 ---
 
 # Daemon Status Skill

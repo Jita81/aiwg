@@ -7,7 +7,8 @@ capabilities:
   - pattern_extraction
   - pattern_injection
   - cross_loop_learning
-platforms: [claude-code, hermes, openclaw]
+platforms: [all]
+
 ---
 
 # Cross-Task Learner Skill

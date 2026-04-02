@@ -1,7 +1,8 @@
 ---
 name: issue-driven-al
 description: Orchestrates issue-driven agent loops that post cycle status to issue threads and incorporate human feedback in each cycle.
-platforms: [claude-code, openclaw]
+platforms: [all]
+
 ---
 
 # Issue-Driven Agent Loop Skill

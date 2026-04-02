@@ -5,10 +5,8 @@ commandHint:
   allowedTools: Bash, Read, Write, Glob, Grep
   category: utilities
   orchestration: false
-platforms:
-  - claude-code
-  - hermes
-  - openclaw
+platforms: [all]
+
 ---
 
 # Cleanup Audit

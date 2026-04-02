@@ -2,7 +2,8 @@
 name: tdd-enforce
 description: Configure TDD enforcement via pre-commit hooks and CI coverage gates. Use when setting up test-first development workflow, adding coverage gates, or enforcing TDD practices.
 version: 1.0.0
-platforms: [claude-code, hermes, openclaw]
+platforms: [all]
+
 ---
 
 # TDD Enforce Skill

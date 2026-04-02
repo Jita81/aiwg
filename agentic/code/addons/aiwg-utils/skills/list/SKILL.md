@@ -1,8 +1,6 @@
 ---
-platforms:
-  - claude-code
-  - hermes
-  - openclaw
+platforms: [all]
+
 ---
 
 # AIWG List

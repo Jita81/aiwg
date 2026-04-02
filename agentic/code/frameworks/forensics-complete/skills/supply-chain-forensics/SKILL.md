@@ -2,7 +2,8 @@
 name: supply-chain-forensics
 description: "SBOM analysis, build pipeline forensics, and dependency verification covering package integrity, build reproducibility, and CI/CD pipeline tampering"
 tools: Bash, Read, Write, Glob, Grep
-platforms: [claude-code, hermes, openclaw]
+platforms: [all]
+
 ---
 
 # supply-chain-forensics

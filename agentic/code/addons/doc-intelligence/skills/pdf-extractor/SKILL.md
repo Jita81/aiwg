@@ -2,7 +2,8 @@
 name: pdf-extractor
 description: Extract text, tables, and images from PDF files. Use when converting PDF documentation, manuals, or reports to searchable text.
 tools: Read, Write, Bash
-platforms: [claude-code, hermes, openclaw]
+platforms: [all]
+
 ---
 
 # PDF Extractor Skill

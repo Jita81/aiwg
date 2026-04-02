@@ -1,5 +1,6 @@
 ---
-platforms: [claude-code, hermes, openclaw]
+platforms: [all]
+
 ---
 
 # Workspace Health Check Skill

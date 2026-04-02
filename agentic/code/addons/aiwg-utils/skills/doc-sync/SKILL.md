@@ -5,10 +5,8 @@ commandHint:
   allowedTools: Task, Read, Write, Bash, Glob, Grep, Edit
   category: utilities
   orchestration: true
-platforms:
-  - claude-code
-  - hermes
-  - openclaw
+platforms: [all]
+
 ---
 
 # Doc Sync

@@ -1,5 +1,6 @@
 ---
-platforms: [claude-code, openclaw]
+platforms: [all]
+
 ---
 
 # regression-api-contract

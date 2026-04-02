@@ -2,7 +2,8 @@
 name: target-profiling
 description: "Research and build a target system profile via SSH — discovers OS, services, users, network baseline, and security stack"
 tools: Bash, Read, Write, Glob, Grep
-platforms: [claude-code, hermes, openclaw]
+platforms: [all]
+
 ---
 
 # target-profiling

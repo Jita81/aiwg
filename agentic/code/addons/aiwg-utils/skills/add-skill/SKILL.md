@@ -1,8 +1,6 @@
 ---
-platforms:
-  - claude-code
-  - hermes
-  - openclaw
+platforms: [all]
+
 ---
 
 # Add Skill
@@ -79,10 +77,7 @@ The generated file needs these sections populated:
 
 ```markdown
 ---
-platforms:
-  - claude-code
-  - hermes
-  - openclaw
+platforms: [all]
 ---
 
 # Skill Name
