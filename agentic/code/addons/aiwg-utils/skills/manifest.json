@@ -77,6 +77,11 @@
       "name": "aiwg-guide",
       "description": "Contextual AIWG help — explains current version features, answers how-to questions, routes live queries to the steward",
       "triggers": ["what's new", "what changed", "how do I", "help with aiwg", "explain feature", "what is", "aiwg guide"]
+    },
+    {
+      "name": "new-project",
+      "description": "Scaffold a new AIWG-managed project with .aiwg/ directory structure, starter CLAUDE.md, and framework registry",
+      "triggers": ["new project", "create project", "start a new project", "set up aiwg for my project", "bootstrap project", "create aiwg project", "scaffold project"]
     }
   ],
   "usage": "These skills are consumed by framework-specific skills and can be invoked directly for utility operations."
