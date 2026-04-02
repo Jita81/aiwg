@@ -3,7 +3,7 @@ platforms: [all]
 name: issue-planner
 description: Research-grounded SDLC issue planner. Given an objective, dispatches parallel research agents, generates the supporting SDLC doc corpus, then files prioritized, cross-referenced issues and awaits human review before work begins.
 commandHint:
-  argumentHint: "<objective> [--interactive] [--dry-run] [--guidance \"text\"] [--provider gitea|github|local]"
+  argumentHint: "<objective> [--interactive] [--dry-run] [--guidance \"text\"] [--provider gitea|github|local] [--induct-research <target>]"
   allowedTools: Read, Write, Glob, Grep, Bash, Agent, mcp__gitea__issue_write, mcp__gitea__issue_read, mcp__gitea__list_issues, WebSearch, WebFetch
   model: sonnet
   category: planning
@@ -52,6 +52,49 @@ Skip the parallel research pass and go straight to SDLC doc generation. Use when
 
 ### `--phase` (optional)
 Target SDLC phase for artifact generation (`inception` | `elaboration` | `construction` | `transition`). Determines which templates are used and which gate criteria are checked.
+
+### `--induct-research <target>` (optional)
+After research synthesis, extract all discovered references and file tracking tasks to induct them into a research repository. Can also be set via `AIWG_RESEARCH_REPO` environment variable.
+
+**Target formats:**
+
+| Format | Example | Behavior |
+|--------|---------|----------|
+| File path | `--induct-research .aiwg/research/queue/` | Creates one Markdown task file per reference in the specified directory |
+| URI | `--induct-research https://git.integrolabs.net/roctinam/research` | Infers the system from the URL (Gitea, GitHub, Jira, etc.) and files issues via the appropriate API or MCP tool |
+| Named MCP service | `--induct-research gitea` | Uses the named MCP service directly (e.g. `mcp__gitea__issue_write`) |
+| Named MCP service | `--induct-research codehound` | Uses Hound MCP to register references in the Hound search index |
+
+**Env var fallback:** If `AIWG_RESEARCH_REPO` is set, `--induct-research` is implied with the env var value as the target. Explicit flag overrides the env var.
+
+**What gets inducted:** Every external URL, paper, RFC, repo, or specification surfaced during Phase 1 research — one tracking task per reference.
+
+**Induction task body template:**
+
+```markdown
+## Reference Induction
+
+**Source**: <URL or file path>
+**Surfaced by**: issue-planner research phase for "<objective>"
+**Research stream**: <best-practices | current-state | vendor-docs>
+
+## Relevance Summary
+<One paragraph from the research agent explaining why this reference matters>
+
+## Suggested Priority
+<high | medium | low> — <rationale>
+
+## Induction Checklist
+- [ ] Read and annotate full source
+- [ ] Extract key insights as Zettelkasten notes
+- [ ] Cross-reference with existing corpus
+- [ ] Tag with topic taxonomy
+- [ ] Mark inducted in research queue
+
+## Links
+- Objective: <top-level planning objective this was surfaced for>
+- Research file: @.aiwg/working/issue-planner/research-<stream>.md
+```
 
 ---
 
@@ -132,6 +175,37 @@ Synthesis output (`.aiwg/working/issue-planner/research-synthesis.md`):
 - Identified risks and unknowns
 - Technology/approach decisions surfaced by research
 - Open questions requiring human input
+
+---
+
+### Phase 2b: Research Induction Queue (if `--induct-research` or `AIWG_RESEARCH_REPO` set)
+
+Extract all external references discovered across the three research streams and queue them for induction.
+
+**Steps:**
+
+1. **Collect references** — scan all three research output files for external URLs, paper titles, RFC numbers, repo links, and named specifications
+2. **Deduplicate** — remove references already present in the target repository (if queryable)
+3. **Resolve target** — determine filing method from the provided target:
+   - **File path**: write `.md` task files to the directory (create if needed)
+   - **URI**: detect host (Gitea domain → `mcp__gitea__issue_write`, GitHub → `gh issue create`, Jira → REST API)
+   - **Named MCP service**: call the service's write tool directly
+4. **File one induction task per reference** using the standard induction body template
+5. **Report** induction summary before proceeding to Phase 3
+
+```
+⏳ Research induction queue...
+  Found 12 references across 3 research streams
+  Target: gitea (roctinam/research)
+  Filing induction tasks...
+  ✓ Filed #301: RFC 9110 HTTP Semantics
+  ✓ Filed #302: "Designing Data-Intensive Applications" (Kleppmann)
+  ✓ Filed #303: github.com/expressjs/express
+  ... (9 more)
+✓ Induction queue: 12 tasks filed
+```
+
+If `--dry-run` is set, list the references that would be inducted without filing.
 
 ---
 
@@ -407,6 +481,48 @@ This order ensures `address-issues` can make forward progress without hitting de
 
 ---
 
+### Example 5: Research Induction — Named MCP Service
+
+**User**: "Plan out distributed tracing support. Induct any research you find into our Gitea research repo."
+
+**Extracted**: `--induct-research gitea`
+
+**Flow**:
+1. Research pass discovers: OpenTelemetry spec, Jaeger docs, Zipkin paper, "Dapper" Google paper, 3 GitHub repos
+2. Phase 2b files 7 induction tasks to the configured Gitea research repo (`mcp__gitea__issue_write`)
+3. Each task includes source URL, relevance summary, and induction checklist
+4. Continues to Phase 3 (SDLC corpus) → Phase 4 (issues) → Phase 5 (approval)
+
+**Sample induction task filed:**
+```
+#301 [induct] OpenTelemetry Specification v1.35
+Surfaced during: distributed tracing support planning
+Stream: vendor-docs
+Priority: high — this is the canonical standard we'll implement
+```
+
+---
+
+### Example 6: Research Induction — File Path
+
+**User**: "Plan WebAuthn support. Save any references you find to `.aiwg/research/queue/`"
+
+**Extracted**: `--induct-research .aiwg/research/queue/`
+
+**Flow**: Research discovers 9 references. Phase 2b writes `.md` task files to `.aiwg/research/queue/` — one per reference — formatted with the induction body template. These can later be processed with `/induct-research .aiwg/research/queue/`.
+
+---
+
+### Example 7: Research Induction — Environment Variable
+
+**Shell**: `export AIWG_RESEARCH_REPO=https://git.integrolabs.net/roctinam/research`
+
+**User**: "Plan OAuth2 refresh token rotation using the research team."
+
+**Flow**: `AIWG_RESEARCH_REPO` is set; induction is implied. URI is a Gitea instance — issues filed via `mcp__gitea__issue_write` to that repo. No explicit flag needed.
+
+---
+
 ## Composition
 
 ```
@@ -418,6 +534,10 @@ issue-planner <objective>
     │   ├── Agent B: Current research / prior art
     │   └── Agent C: Vendor documentation
     ├── Phase 2: Research synthesis
+    ├── Phase 2b: Research induction queue (if --induct-research)
+    │   ├── Collect + deduplicate references from all 3 streams
+    │   ├── Resolve target (file path | URI | named MCP service)
+    │   └── File one induction task per reference → /induct-research
     ├── Phase 3: SDLC doc corpus generation
     │   └── /flow-gate-check <phase> (completeness gate)
     ├── Phase 4: Issue generation (taxonomy + priority + dependency waves)
@@ -428,6 +548,7 @@ issue-planner <objective>
 ## References
 
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/address-issues/SKILL.md — Consume the filed issues
+- @$AIWG_ROOT/agentic/code/frameworks/research-complete/skills/induct-research/SKILL.md — Research induction target skill
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/issue-create/SKILL.md — Single issue creation
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/issue-driven-al/SKILL.md — Agent loop per issue
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/flows/flow-gate-check.md — Phase gate criteria
