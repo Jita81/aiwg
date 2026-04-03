@@ -138,21 +138,36 @@ git push origin v2026.1.5
 # CI publishes to npm --tag latest (default install)
 ```
 
+### Release Pipeline
+
+This is a standard multi-stage release pipeline used by many npm packages:
+
+```
+dev (local) → nightly → alpha → beta → RC → stable
+```
+
 ### Naming Convention
 
-| Stage | Format | Example | npm tag | Meaning |
+| Stage | Format | Example | npm dist-tag | Meaning |
 |-------|--------|---------|---------|---------|
+| Dev | (local source install, no tag) | — | — | Active development on this machine |
 | Nightly | `vYYYY.M.PATCH-nightly.YYYYMMDD` | `v2026.1.5-nightly.20260324` | `nightly` | Automated or ad-hoc snapshot |
 | Alpha | `vYYYY.M.PATCH-alpha.N` | `v2026.1.5-alpha.1` | `next` | Early testing, pipeline validation |
 | Beta | `vYYYY.M.PATCH-beta.N` | `v2026.1.5-beta.1` | `next` | Feature-complete, broader testing |
+| RC | `vYYYY.M.PATCH-RCN` | `v2026.1.5-RC1` | `next` | Release candidate, final pre-stable |
 | Stable | `vYYYY.M.PATCH` | `v2026.1.5` | `latest` | Public release |
+
+Alpha, beta, and RC all publish to the `next` dist-tag. The latest of these is always what `npm install -g aiwg@next` installs.
 
 **Install by channel:**
 
 ```bash
-npm install -g aiwg              # stable (default)
-npm install -g aiwg@next         # alpha/beta
-npm install -g aiwg@nightly      # nightly snapshots
+npm install -g aiwg                  # stable (latest dist-tag, default)
+npm install -g aiwg@next             # latest alpha/beta/RC
+npm install -g aiwg@nightly          # latest nightly snapshot
+npm install -g aiwg@2026.1.5-RC3     # specific RC by exact version
+aiwg sync --channel next             # switch installed version to next channel
+aiwg sync --channel latest           # switch back to stable
 ```
 
 ### What pre-release means

@@ -53,6 +53,43 @@ aiwg steward capabilities --all
 aiwg steward find --capability scheduling
 ```
 
+## Release Channels
+
+AIWG uses a standard multi-stage release pipeline. You must understand this to correctly answer version and update questions.
+
+```
+dev (local) → nightly → alpha → beta → RC → stable
+```
+
+| Stage | Tag format | Example | npm dist-tag | Install command |
+|-------|-----------|---------|-------------|-----------------|
+| Dev | no tag — local source | — | — | `npm install -g .` from repo root |
+| Nightly | `vYYYY.M.PATCH-nightly.YYYYMMDD` | `v2026.4.0-nightly.20260403` | `nightly` | `npm install -g aiwg@nightly` |
+| Alpha | `vYYYY.M.PATCH-alpha.N` | `v2026.4.0-alpha.1` | `next` | `npm install -g aiwg@next` |
+| Beta | `vYYYY.M.PATCH-beta.N` | `v2026.4.0-beta.1` | `next` | `npm install -g aiwg@next` |
+| RC | `vYYYY.M.PATCH-RCN` | `v2026.4.0-RC3` | `next` | `npm install -g aiwg@next` |
+| Stable | `vYYYY.M.PATCH` | `v2026.4.0` | `latest` | `npm install -g aiwg` |
+
+**Key rules:**
+- Alpha, beta, and RC all publish to the `next` dist-tag. `aiwg@next` always gives the latest of these.
+- To install a specific RC: `npm install -g aiwg@2026.4.0-RC3`
+- To discover what RC versions are published: `npm view aiwg versions --json | grep -i rc`
+- To discover the current `next` tag: `npm view aiwg dist-tags`
+- `aiwg sync --channel next` switches the running install to the next channel
+- `aiwg sync --channel latest` switches back to stable
+- Dev mode (local source install) is detected when `aiwg version` shows a path inside the repo rather than a global npm location
+
+**When a user asks to install the latest RC:**
+1. Run `npm view aiwg dist-tags` to see what `next` currently points to
+2. Run `npm install -g aiwg@next` — this installs the latest alpha/beta/RC
+3. If they want a specific RC: `npm install -g aiwg@<exact-version>` (e.g., `aiwg@2026.4.0-RC3`)
+4. Then run `aiwg use all` to redeploy frameworks
+5. Then `aiwg doctor` to verify
+
+**What NOT to do:**
+- Never use `aiwg@2026.4.0` to install an RC — that is the stable version string, not the RC
+- Never assume the latest RC version number — always query `npm view aiwg dist-tags` first
+
 ## CLI Toolset
 
 You MUST use these CLI commands for all operations. Never write files directly when a CLI command exists.
@@ -164,7 +201,11 @@ aiwg steward find --capability mcp    # Routing advice for MCP on current provid
 | "deploy everything to cursor" | `aiwg sync --provider cursor` |
 | "repair the installation" | Full diagnostic: doctor → identify issues → sync → verify |
 | "what version am I running?" | `aiwg version` + compare to latest |
-| "switch to the next channel" | `aiwg sync --channel next` |
+| "install the latest RC" | `npm view aiwg dist-tags` → `npm install -g aiwg@next` → `aiwg use all` → `aiwg doctor` |
+| "install a specific RC" | `npm install -g aiwg@2026.4.0-RC3` → `aiwg use all` → `aiwg doctor` |
+| "switch to dev mode" | `npm install -g .` from repo root → `aiwg use all` → `aiwg doctor` |
+| "switch to the next/RC channel" | `aiwg sync --channel next` |
+| "switch back to stable" | `aiwg sync --channel latest` |
 | "what's available?" | `aiwg catalog list` |
 | "does my provider support scheduling natively?" | Detect provider → read matrix → report native vs emulated |
 | "what command should I use to schedule a task?" | `aiwg steward find --capability scheduler` + explain result |

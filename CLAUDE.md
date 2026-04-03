@@ -496,17 +496,32 @@ This is intentional - issues found while dogfooding become improvements to the f
 | GitHub Release | Public release notes | Condensed highlights + install instructions |
 | Gitea Release | Internal release notes | Same as GitHub |
 
-### Pre-release Tags (alpha/beta) — Internal Testing Only
+### Release Channels — Internal Testing Stages
 
-Pre-release tags (`v2026.3.3-nightly.20260324`, `-alpha.1`, `-beta.1`, etc.) are **internal pipeline checkpoints**, not public releases. They exist to validate the publish workflow and let a small group test before the stable tag is cut.
+This is a standard multi-stage release pipeline. Pre-release tags are **internal pipeline checkpoints**, not public releases. They exist to validate the publish workflow and let a small group test before the stable tag is cut.
 
 **Do NOT create release announcements, CHANGELOG entries, or Gitea/GitHub releases for pre-release tags.** The CHANGELOG and `docs/releases/` announcement are written once for the stable release and cover everything that accumulated across all pre-release iterations.
 
-| Tag type | npm dist-tag | Install via |
-|----------|-------------|-------------|
-| `nightly` | `nightly` | `npm install aiwg@nightly` |
-| `alpha`, `beta` | `next` | `npm install aiwg@next` |
-| stable | `latest` | `npm install aiwg` (default) |
+| Stage | Tag format | Example | npm dist-tag | Install via |
+|-------|-----------|---------|-------------|-------------|
+| Dev/local | (no tag — local source install) | — | — | `npm install -g .` from repo |
+| Nightly | `vYYYY.M.PATCH-nightly.YYYYMMDD` | `v2026.4.0-nightly.20260403` | `nightly` | `npm install -g aiwg@nightly` |
+| Alpha | `vYYYY.M.PATCH-alpha.N` | `v2026.4.0-alpha.1` | `next` | `npm install -g aiwg@next` |
+| Beta | `vYYYY.M.PATCH-beta.N` | `v2026.4.0-beta.1` | `next` | `npm install -g aiwg@next` |
+| RC | `vYYYY.M.PATCH-RCN` | `v2026.4.0-RC3` | `next` | `npm install -g aiwg@next` |
+| Stable | `vYYYY.M.PATCH` | `v2026.4.0` | `latest` | `npm install -g aiwg` (default) |
+
+**Channel commands:**
+```bash
+npm install -g aiwg              # stable (latest dist-tag)
+npm install -g aiwg@next         # latest alpha/beta/RC
+npm install -g aiwg@nightly      # latest nightly snapshot
+npm install -g aiwg@2026.4.0-RC3 # specific RC by exact version
+aiwg sync --channel next         # switch installed version to next channel
+aiwg sync --channel latest       # switch back to stable
+```
+
+**Pipeline flow:** `dev → nightly → alpha → beta → RC → stable`
 
 ### Release Checklist
 
