@@ -2107,6 +2107,95 @@ aiwg sdlc-accelerate --auto "Quick prototype"
 
 ---
 
+## Planning Skills
+
+### issue-planner
+
+Transform a high-level objective into a fully researched, SDLC-gated issue backlog — ready for `address-issues` — without manually researching, writing docs, or deciding priority order.
+
+```bash
+/issue-planner "<objective>" [options]
+```
+
+**Arguments:**
+- `<objective>` — Feature, capability, integration, or initiative to plan. One-liner or multi-paragraph brief.
+
+**Options:**
+- `--interactive` — Ask discovery questions before researching (scope constraints, excluded technologies, target phase, priority bias)
+- `--dry-run` — Generate full plan and issue list but do not file anything. Outputs a preview table.
+- `--guidance "text"` — Upfront direction shaping research focus, prioritization, and scope without interactive prompts
+- `--provider gitea|github|local` — Override default issue tracker
+- `--skip-research` — Skip parallel research pass, go straight to SDLC doc generation
+- `--phase inception|elaboration|construction|transition` — Target SDLC phase for artifact templates
+- `--induct-research <target>` — After research synthesis, extract discovered references and file tracking tasks to induct into a research repository
+
+**Capabilities:** planning, research, sdlc, issues, orchestration
+**Platforms:** All
+**Tools:** Read, Write, Glob, Grep, Bash, Agent, mcp__gitea__issue_write, WebSearch, WebFetch
+
+**Phases:**
+
+| Phase | What Happens |
+|-------|-------------|
+| 1. Parallel Research | Three agents in parallel: best practices, prior art, vendor docs |
+| 2. Synthesis | Consolidated brief written to `.aiwg/working/issue-planner/` |
+| 3. SDLC Doc Corpus | Phase-appropriate artifacts generated using sdlc-complete templates |
+| 4. Issue Generation | Issues with type, priority (P0–P3), phase, and dependency mapping |
+| 5. Human Approval | Full plan table presented — no filing until user approves |
+| 6. Filing + Handoff | Issues filed in wave order; `address-issues` invocation output |
+
+**Issue labels generated:**
+
+| Label | Meaning |
+|-------|---------|
+| `feat`, `docs`, `test`, `infra`, `spike`, `security` | Type |
+| `P0`–`P3` | Priority (P0 = gate blockers and security) |
+| `elaboration`, `construction`, etc. | Target SDLC phase |
+
+**Examples:**
+
+```bash
+# Basic planning run
+/issue-planner "Add OAuth2 SSO support"
+
+# Preview without filing
+/issue-planner "Refactor auth module" --dry-run
+
+# With guidance — skip Inception artifacts
+/issue-planner "Add pagination to list endpoints" \
+  --guidance "We're in Construction phase, skip Inception artifacts"
+
+# Interactive with research induction
+/issue-planner "Integrate OpenTelemetry" --interactive \
+  --induct-research roctinam/research-inbox
+
+# Skip research if already done externally
+/issue-planner "Implement rate limiting" --skip-research \
+  --phase elaboration
+```
+
+**Output:**
+
+```
+.aiwg/working/issue-planner/
+├── research-brief.md          # Synthesized research findings
+├── sdlc-artifacts/            # Generated use cases, risk register, etc.
+├── issue-plan.md              # Full issue plan table (approval gate)
+└── wave-manifest.json         # Dependency wave ordering
+```
+
+**Trigger patterns** (natural language):
+
+- "plan out `<feature>`" → full research + issue filing workflow
+- "file issues for `<objective>`" → issue-planner with dry-run preview first
+- "create a backlog for `<objective>`" → issue-planner with priority ordering
+- "research and plan `<topic>`" → parallel research pass then issue filing
+- "using the AIWG research team in parallel... `<objective>`" → canonical trigger
+
+**Skill location:** `agentic/code/frameworks/sdlc-complete/skills/issue-planner/SKILL.md`
+
+---
+
 ## Index Commands
 
 Commands for building and querying the artifact index. The index provides structured, pre-computed metadata about project artifacts, enabling agents and developers to discover, search, and navigate artifacts without manual file searching.
