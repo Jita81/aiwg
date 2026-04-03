@@ -74,6 +74,9 @@ class DaemonCLI {
       case 'memory':
         await this.memory();
         break;
+      case 'pty':
+        await this.pty();
+        break;
       default:
         this.usage();
         process.exit(1);
@@ -785,6 +788,143 @@ Options:
     }
   }
 
+  async pty() {
+    const subcommand = process.argv[3];
+    const args = process.argv.slice(4);
+
+    switch (subcommand) {
+      case 'start': {
+        const platform = args[0];
+        if (!platform) {
+          console.error('Usage: aiwg daemon pty start <platform> [-- <args...>]');
+          console.error('Platforms: claude-code, opencode, codex, warp, openclaw');
+          process.exit(1);
+        }
+
+        const dashDash = args.indexOf('--');
+        const extraArgs = dashDash >= 0 ? args.slice(dashDash + 1) : [];
+        const cols = this.flags.cols ? parseInt(this.flags.cols, 10) : 80;
+        const rows = this.flags.rows ? parseInt(this.flags.rows, 10) : 24;
+
+        try {
+          const { PTYAdapter } = await import('./pty-adapter.mjs');
+          const adapter = new PTYAdapter({ platform, args: extraArgs, cols, rows });
+
+          adapter.on('data', (chunk) => process.stdout.write(chunk));
+          adapter.on('exit', ({ exitCode }) => {
+            console.error(`\nPTY session exited (code: ${exitCode})`);
+            process.exit(exitCode ?? 0);
+          });
+
+          const sessionId = await adapter.start();
+          console.error(`PTY session started: ${sessionId} (platform: ${platform}, PID: ${adapter.getPid()})`);
+          console.error('Input is forwarded to the PTY. Press Ctrl+C to stop.');
+
+          // Forward stdin to the PTY
+          if (process.stdin.isTTY) process.stdin.setRawMode(true);
+          process.stdin.resume();
+          process.stdin.on('data', (chunk) => {
+            // Ctrl+C sends SIGINT to the adapter, not to our process
+            if (chunk[0] === 0x03) {
+              adapter.stop().then(() => process.exit(0));
+              return;
+            }
+            try { adapter.write(chunk.toString()); } catch { /* session gone */ }
+          });
+
+          // Forward terminal resize events
+          process.stdout.on('resize', () => {
+            adapter.resize(process.stdout.columns, process.stdout.rows);
+          });
+        } catch (error) {
+          console.error(`Failed to start PTY session: ${error.message}`);
+          process.exit(1);
+        }
+        break;
+      }
+
+      case 'list': {
+        try {
+          const { PTYAdapter } = await import('./pty-adapter.mjs');
+          const sessions = PTYAdapter.list();
+
+          if (sessions.length === 0) {
+            console.log('No active PTY sessions');
+            return;
+          }
+
+          console.log(`Active PTY sessions (${sessions.length}):`);
+          console.log('');
+          for (const s of sessions) {
+            console.log(`  ${s.sessionId}  platform=${s.platform}  pid=${s.pid}  ${s.cols}x${s.rows}  started=${s.started_at}`);
+          }
+        } catch (error) {
+          console.error(`Failed to list PTY sessions: ${error.message}`);
+          process.exit(1);
+        }
+        break;
+      }
+
+      case 'stop': {
+        const sessionId = args[0];
+        if (!sessionId) {
+          console.error('Usage: aiwg daemon pty stop <session-id>');
+          process.exit(1);
+        }
+
+        try {
+          const { PTYAdapter } = await import('./pty-adapter.mjs');
+          const session = PTYAdapter.getSession(sessionId);
+          if (!session) {
+            console.error(`Session not found or already stopped: ${sessionId}`);
+            process.exit(1);
+          }
+
+          try { process.kill(session.pid, 'SIGTERM'); } catch { /* already gone */ }
+          PTYAdapter._removeSession(sessionId);
+          console.log(`PTY session ${sessionId} stopped`);
+        } catch (error) {
+          console.error(`Failed to stop PTY session: ${error.message}`);
+          process.exit(1);
+        }
+        break;
+      }
+
+      default:
+        console.log(`
+Usage: aiwg daemon pty <subcommand> [options]
+
+Subcommands:
+  start <platform>   Spawn a platform TUI under a PTY and bridge I/O
+  list               List active PTY sessions
+  stop <session-id>  Stop a PTY session
+
+Platforms (Tier 1 — native daemon; Tier 2 — PTY adapter):
+  claude-code        Claude Code CLI  (Tier 1 + PTY adapter)
+  opencode           OpenCode CLI     (Tier 1)
+  codex              OpenAI Codex CLI (Tier 1 + PTY adapter)
+  warp               Warp Terminal    (Tier 1)
+  openclaw           OpenClaw CLI     (Tier 1)
+
+Options:
+  --cols <n>         Terminal width (default: 80)
+  --rows <n>         Terminal height (default: 24)
+
+Examples:
+  aiwg daemon pty start opencode
+  aiwg daemon pty start codex --cols 120 --rows 40
+  aiwg daemon pty start claude-code -- --dangerously-skip-permissions
+  aiwg daemon pty list
+  aiwg daemon pty stop abc123
+
+Requirements:
+  PTY adapter requires node-pty: npm install node-pty
+  node-pty needs native compilation (node-gyp + C++ build tools).
+        `.trim());
+        if (subcommand) process.exit(1);
+    }
+  }
+
   isDaemonRunning() {
     if (!fs.existsSync(PID_FILE)) {
       return false;
@@ -848,6 +988,7 @@ Commands:
   logs              Show daemon logs
   restart           Restart the daemon
   attach            Open tmux session with chat REPL and status pane
+  pty <sub>         PTY adapter — spawn a platform TUI over a chat bridge
   chat <message>    Send a message to the daemon agent
   task <sub>        Manage agent tasks (submit, list, get, cancel, stats)
   rooms             List connected messaging rooms
@@ -876,6 +1017,10 @@ Examples:
   aiwg daemon autonomous enable        # Enable self-directed thinking
   aiwg daemon schedule                 # Show scheduled tasks
   aiwg daemon attach
+  aiwg daemon pty start opencode           # Start OpenCode under PTY bridge
+  aiwg daemon pty start codex --cols 120   # Start Codex with wide terminal
+  aiwg daemon pty list                     # List active PTY sessions
+  aiwg daemon pty stop abc123              # Stop a specific PTY session
   aiwg daemon chat "Review the latest PR"
   aiwg daemon task submit "Run security audit"
   aiwg daemon task list

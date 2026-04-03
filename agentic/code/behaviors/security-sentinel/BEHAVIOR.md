@@ -2,9 +2,11 @@
 name: security-sentinel
 version: 1.0.0
 description: Continuous security monitoring with reactive scanning on file changes, deploys, and scheduled audits.
-# platforms restricted to daemon-capable systems — behaviors require a persistent
-# process for trigger management and lifecycle hooks
-platforms: [openclaw, claude-code]
+# platforms restricted to daemon-capable systems (Tier 1) — behaviors require a
+# persistent background process for trigger management and lifecycle hooks.
+# Tier 3 platforms (cursor, windsurf, copilot, factory) require a display server
+# or IDE host and cannot support daemon; see capability-matrix.yaml daemon_tier.
+platforms: [claude-code, opencode, warp, openclaw, codex]
 
 triggers:
   - "run security scan"

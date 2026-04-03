@@ -15,6 +15,48 @@ The daemon provides:
 - **Messaging integration** — Slack, Discord, and Telegram notifications and commands
 - **2-way AI chat** — Ask questions from messaging platforms
 
+## Platform Support
+
+The daemon runs on any CLI-based platform. Platforms are grouped into three tiers:
+
+| Tier | Meaning | Platforms |
+|------|---------|-----------|
+| **Tier 1 — Native** | Full headless daemon support. `aiwg daemon start/stop/status` work out of the box. | Claude Code, OpenCode, Warp Terminal, OpenClaw, Codex |
+| **Tier 2 — PTY Adapter** | Platform has a TUI that can be bridged over a PTY. Not headless, but operable remotely via `aiwg daemon pty`. | Claude Code (secondary), Codex (secondary) |
+| **Tier 3 — Unsupported** | Requires a display server or IDE host. Daemon is not applicable. | Cursor, Windsurf, GitHub Copilot, Factory AI |
+
+Tier 1 platforms receive the full daemon feature set: file watching, cron scheduling, agent supervision, IPC, automation rules, and behaviors. Tier 3 platforms still benefit from AIWG's agent loop, Mission Control, and scheduling via AIWG emulation.
+
+See `agentic/code/providers/capability-matrix.yaml` for the authoritative `daemon_tier` field per provider.
+
+### PTY Adapter (Tier 2)
+
+The PTY adapter spawns a Tier 1 platform's TUI process under a pseudo-terminal and relays I/O bidirectionally through the AIWG chat channel. This enables remote operation of interactive TUI tools (e.g. `opencode`, `codex`) from messaging platforms, shell scripts, or agentic LLMs — without requiring a local terminal session.
+
+```bash
+# Start an OpenCode TUI session bridged over PTY
+aiwg daemon pty start opencode
+
+# Start Codex with a wider terminal
+aiwg daemon pty start codex --cols 120 --rows 40
+
+# List active PTY sessions
+aiwg daemon pty list
+
+# Stop a session
+aiwg daemon pty stop <session-id>
+```
+
+The PTY adapter requires `node-pty` (native module):
+
+```bash
+npm install node-pty   # requires node-gyp + C++ build tools
+```
+
+Input from the chat channel is forwarded as keystrokes/stdin to the TUI. Output (screen state, ANSI sequences) flows back out. Both human-in-the-loop (typing in chat) and agentic driving (LLM or script sends input programmatically) are supported. Sessions persist across detaches — reconnect with `aiwg daemon pty list` to find the session ID.
+
+---
+
 ## Quick Start
 
 ### Start the daemon
@@ -970,6 +1012,8 @@ aiwg daemon status
 - [Messaging Guide](messaging-guide.md) — Platform integration
 - [Al Guide](ralph-guide.md) — Iterative task loops via daemon
 - [Behaviors Guide](behaviors-guide.md) — Attaching capabilities to daemon and long-running agents
+- [Provider Capability Matrix](providers/capability-matrix.md) — Per-provider daemon tier and feature support
+- `agentic/code/providers/capability-matrix.yaml` — Authoritative `daemon_tier` and feature data
 - `agentic/code/behaviors/concierge/BEHAVIOR.md` — Concierge behavior definition (reference implementation for agent-based behaviors)
 - `.aiwg/architecture/adrs/ADR-daemon-mode.md` — Original daemon architecture decision
 - `.aiwg/architecture/adrs/ADR-ipc-protocol.md` — IPC protocol specification
@@ -979,6 +1023,7 @@ aiwg daemon status
 - `.aiwg/architecture/adr-in-memory-queue-defer-redis.md` — Queue implementation decision
 - `tools/daemon/README.md` — Developer documentation
 - `tools/daemon/daemon-main.mjs` — Daemon entry point source
+- `tools/daemon/pty-adapter.mjs` — PTY adapter for TUI bridging (#656)
 - `tools/daemon/agent-supervisor.mjs` — Agent task execution
 - `tools/daemon/automation-engine.mjs` — Rule processing
 - `tools/daemon/ipc-server.mjs` — IPC server implementation

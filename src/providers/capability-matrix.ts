@@ -26,7 +26,19 @@ export type FeatureKey =
   | 'tasks'
   | 'mcp'
   | 'behaviors'
-  | 'mission_control';
+  | 'mission_control'
+  | 'daemon';
+
+/**
+ * Daemon support tier for a provider.
+ *
+ * - `native`      — full headless daemon (aiwg daemon start/stop/status)
+ * - `pty-adapter` — PTY bridge for TUI-based platforms (secondary/opt-in mode)
+ * - `unsupported` — requires a display server or IDE host; daemon not applicable
+ *
+ * @issue #656
+ */
+export type DaemonTier = 'native' | 'pty-adapter' | 'unsupported';
 
 export type EmulationStrategy =
   | 'native'
@@ -57,6 +69,10 @@ export interface ProviderCapabilities {
   display_name: string;
   aliases?: string[];
   status: ProviderStatus;
+  /** Primary daemon support tier. @issue #656 */
+  daemon_tier: DaemonTier;
+  /** True if the provider also supports the PTY adapter as a secondary mode. @issue #656 */
+  daemon_pty_adapter: boolean;
   artifact_paths: ArtifactPaths;
   native_features: Record<FeatureKey, boolean>;
   emulation: Record<FeatureKey, EmulationStrategy>;
@@ -193,6 +209,29 @@ export function getFeatureDefinition(
   return loadCapabilityMatrix().features[feature];
 }
 
+/**
+ * Get the daemon tier for a provider.
+ * Returns 'unsupported' if the provider is not found or has no daemon_tier.
+ *
+ * @issue #656
+ */
+export function getDaemonTier(providerKey: string): DaemonTier {
+  const caps = getProviderCapabilities(providerKey);
+  return caps?.daemon_tier ?? 'unsupported';
+}
+
+/**
+ * List all providers that support daemon mode (Tier 1: native).
+ *
+ * @issue #656
+ */
+export function daemonCapableProviders(): string[] {
+  const matrix = loadCapabilityMatrix();
+  return Object.entries(matrix.providers)
+    .filter(([, caps]) => caps.daemon_tier === 'native')
+    .map(([key]) => key);
+}
+
 // ---------------------------------------------------------------------------
 // Display helpers (for CLI output)
 // ---------------------------------------------------------------------------
@@ -209,6 +248,7 @@ export function formatCapabilityTable(): string {
     'mcp',
     'behaviors',
     'mission_control',
+    'daemon',
   ];
 
   const lines: string[] = [];

@@ -27,8 +27,10 @@ The baseline provider is Claude Code; all gap reporting in `aiwg doctor` is rela
 | **Mission Control** | Native | Emulated | Emulated | Emulated | Native | Emulated | Emulated | Emulated | Emulated |
 | **Behaviors** | Emulated | Emulated | Emulated | Emulated | Emulated | Emulated | Emulated | Emulated | **Native** |
 | **MCP** | Native | — | — | Native | Partial | Native | — | — | — |
+| **Daemon** | **T1** + T2 | **T1** + T2 | — | — | — | **T1** | **T1** | — | **T1** |
 
 **Legend:** Native = first-class platform support. Emulated = AIWG emulation via daemon/mc. — = not supported.
+**Daemon tiers:** T1 = native headless daemon (`aiwg daemon start`). T2 = PTY adapter (requires `node-pty`). — = requires display server/IDE host, not supported.
 
 ---
 
@@ -158,6 +160,40 @@ Extend the provider with external tool servers via the Model Context Protocol.
 
 ---
 
+### Daemon
+
+Persistent background process for headless/unattended operation — file watching, scheduled tasks, agent supervision, automation rules, and behaviors.
+
+Platforms are grouped into three daemon tiers:
+
+| Provider | Tier | Mode | AIWG Command |
+|----------|------|------|--------------|
+| Claude Code | Tier 1 (native) + Tier 2 (PTY) | Headless + PTY bridge | `aiwg daemon start` |
+| Codex | Tier 1 (native) + Tier 2 (PTY) | Headless + PTY bridge | `aiwg daemon start` |
+| OpenCode | Tier 1 (native) | Headless | `aiwg daemon start` |
+| Warp Terminal | Tier 1 (native) | Headless | `aiwg daemon start` |
+| OpenClaw | Tier 1 (native) | Headless | `aiwg daemon start` |
+| Cursor | Tier 3 — unsupported | IDE extension (VS Code host required) | — |
+| Windsurf | Tier 3 — unsupported | IDE extension (VS Code host required) | — |
+| GitHub Copilot | Tier 3 — unsupported | IDE extension | — |
+| Factory AI | Tier 3 — unsupported | Web-based | — |
+
+**Tier 1 (native):** Full daemon support. `aiwg daemon start/stop/status/attach` all work. The daemon manages its own process lifecycle, IPC socket, and state files. Behaviors, automation rules, and all daemon subsystems are available.
+
+**Tier 2 (PTY adapter):** Optional secondary mode for Claude Code and Codex. Spawns the platform's TUI under a pseudo-terminal and bridges I/O through the chat channel — enabling remote operation from messaging platforms, shell scripts, or agentic LLMs. Requires `node-pty`:
+
+```bash
+npm install node-pty    # requires node-gyp + C++ build tools
+aiwg daemon pty start opencode
+aiwg daemon pty start codex --cols 120
+```
+
+**Tier 3 (unsupported):** These providers run inside an IDE extension or web host that does not support background processes or headless CLI operation. The AIWG daemon cannot run within them. All other AIWG features (agents, commands, skills, rules, Mission Control emulation) remain fully available.
+
+See `docs/daemon-guide.md` for full configuration and usage.
+
+---
+
 ## Checking Your Provider's Capabilities
 
 ### Full capability summary
@@ -195,6 +231,7 @@ The doctor command includes a capabilities section that flags any emulated featu
 ## See Also
 
 - [Daemon Guide](../daemon-guide.md) — The daemon that powers emulation for most features
+- [Daemon Guide](../daemon-guide.md) — Platform tiers, PTY adapter, and daemon configuration
 - [Behaviors Guide](../behaviors-guide.md) — Full behavior format and provider details
 - [Concierge Guide](../concierge-guide.md) — Concierge behavior for daemon sessions
 - `agentic/code/providers/capability-matrix.yaml` — Canonical data source for this document

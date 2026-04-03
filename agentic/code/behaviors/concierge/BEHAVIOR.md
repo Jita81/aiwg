@@ -6,9 +6,11 @@ description: >
   skill, agent, or flow while maintaining a composed, professional interaction register throughout.
   First fully-featured agent-based behavior; serves as the reference implementation for the
   AIWG behaviors format.
-# platforms restricted to daemon-capable systems — behaviors require a persistent
-# process for trigger management and lifecycle hooks
-platforms: [claude-code, openclaw, cursor, warp]
+# platforms restricted to daemon-capable systems (Tier 1) — behaviors require a
+# persistent background process for trigger management and lifecycle hooks.
+# Tier 3 platforms (cursor, windsurf, copilot, factory) require a display server
+# or IDE host and cannot support daemon; see capability-matrix.yaml daemon_tier.
+platforms: [claude-code, opencode, warp, openclaw, codex]
 
 # Agent-based behavior: instructs the AI directly rather than running shell scripts.
 # Script-based behaviors (build-monitor, test-watcher) use mode: script (default).

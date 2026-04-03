@@ -16,6 +16,8 @@ providers:
   claude-code:
     display_name: Claude Code
     status: stable
+    daemon_tier: native
+    daemon_pty_adapter: true
     artifact_paths:
       agents: .claude/agents/
       commands: .claude/commands/
@@ -29,6 +31,7 @@ providers:
       mcp: true
       behaviors: false
       mission_control: false
+      daemon: true
     emulation:
       cron: native
       agent_teams: native
@@ -36,6 +39,7 @@ providers:
       mcp: native
       behaviors: hooks
       mission_control: aiwg-mc
+      daemon: native
     hook_wiring:
       at_link_support: true
       hook_file: AIWG.md
@@ -49,6 +53,8 @@ providers:
     aliases:
       - openai
     status: stable
+    daemon_tier: native
+    daemon_pty_adapter: true
     artifact_paths:
       agents: .codex/agents/
       commands: "~/.codex/prompts/"
@@ -62,6 +68,7 @@ providers:
       mcp: false
       behaviors: false
       mission_control: false
+      daemon: true
     emulation:
       cron: aiwg-schedule
       agent_teams: aiwg-mc
@@ -69,6 +76,7 @@ providers:
       mcp: null
       behaviors: aiwg-mc
       mission_control: aiwg-mc
+      daemon: native
     hook_wiring:
       at_link_support: false
       hook_file: AIWG-codex.md
@@ -80,6 +88,8 @@ providers:
   copilot:
     display_name: GitHub Copilot
     status: stable
+    daemon_tier: unsupported
+    daemon_pty_adapter: false
     artifact_paths:
       agents: .github/agents/
       commands: .github/agents/
@@ -93,6 +103,7 @@ providers:
       mcp: false
       behaviors: false
       mission_control: false
+      daemon: false
     emulation:
       cron: aiwg-schedule
       agent_teams: aiwg-mc
@@ -100,6 +111,7 @@ providers:
       mcp: null
       behaviors: aiwg-mc
       mission_control: aiwg-mc
+      daemon: null
     hook_wiring:
       at_link_support: false
       hook_file: AIWG-copilot.md
@@ -111,6 +123,8 @@ providers:
   factory:
     display_name: Factory AI
     status: stable
+    daemon_tier: unsupported
+    daemon_pty_adapter: false
     artifact_paths:
       agents: .factory/droids/
       commands: .factory/commands/
@@ -124,6 +138,7 @@ providers:
       mcp: false
       behaviors: false
       mission_control: false
+      daemon: false
     emulation:
       cron: aiwg-schedule
       agent_teams: aiwg-mc
@@ -131,6 +146,7 @@ providers:
       mcp: null
       behaviors: aiwg-mc
       mission_control: aiwg-mc
+      daemon: null
     hook_wiring:
       at_link_support: false
       hook_file: AIWG-factory.md
@@ -142,6 +158,9 @@ providers:
   cursor:
     display_name: Cursor IDE
     status: stable
+    # Cursor requires a display server (VS Code extension host) — daemon not supported
+    daemon_tier: unsupported
+    daemon_pty_adapter: false
     artifact_paths:
       agents: .cursor/agents/
       commands: .cursor/commands/
@@ -155,6 +174,7 @@ providers:
       mcp: false
       behaviors: false
       mission_control: false
+      daemon: false
     emulation:
       cron: aiwg-schedule
       agent_teams: aiwg-mc
@@ -162,6 +182,7 @@ providers:
       mcp: null
       behaviors: aiwg-mc
       mission_control: aiwg-mc
+      daemon: null
     hook_wiring:
       at_link_support: true
       hook_file: AIWG-cursor.md
@@ -173,6 +194,8 @@ providers:
   opencode:
     display_name: OpenCode
     status: stable
+    daemon_tier: native
+    daemon_pty_adapter: false
     artifact_paths:
       agents: .opencode/agent/
       commands: .opencode/command/
@@ -186,6 +209,7 @@ providers:
       mcp: false
       behaviors: false
       mission_control: false
+      daemon: true
     emulation:
       cron: aiwg-schedule
       agent_teams: aiwg-mc
@@ -193,6 +217,7 @@ providers:
       mcp: null
       behaviors: aiwg-mc
       mission_control: aiwg-mc
+      daemon: native
     hook_wiring:
       at_link_support: true
       hook_file: AIWG-opencode.md
@@ -204,6 +229,8 @@ providers:
   warp:
     display_name: Warp Terminal
     status: stable
+    daemon_tier: native
+    daemon_pty_adapter: false
     artifact_paths:
       agents: .warp/agents/
       commands: .warp/commands/
@@ -217,6 +244,7 @@ providers:
       mcp: false
       behaviors: false
       mission_control: false
+      daemon: true
     emulation:
       cron: aiwg-schedule
       agent_teams: aiwg-mc
@@ -224,6 +252,7 @@ providers:
       mcp: null
       behaviors: aiwg-mc
       mission_control: aiwg-mc
+      daemon: native
     hook_wiring:
       at_link_support: true
       hook_file: AIWG-warp.md
@@ -235,6 +264,9 @@ providers:
   windsurf:
     display_name: Windsurf
     status: experimental
+    # Windsurf is an IDE extension requiring VS Code host — daemon not supported
+    daemon_tier: unsupported
+    daemon_pty_adapter: false
     artifact_paths:
       agents: .windsurf/agents/
       commands: .windsurf/workflows/
@@ -248,6 +280,7 @@ providers:
       mcp: false
       behaviors: false
       mission_control: false
+      daemon: false
     emulation:
       cron: aiwg-schedule
       agent_teams: aiwg-mc
@@ -255,6 +288,7 @@ providers:
       mcp: null
       behaviors: aiwg-mc
       mission_control: aiwg-mc
+      daemon: null
     hook_wiring:
       at_link_support: false
       hook_file: AIWG-windsurf.md
@@ -266,6 +300,8 @@ providers:
   openclaw:
     display_name: OpenClaw
     status: stable
+    daemon_tier: native
+    daemon_pty_adapter: false
     artifact_paths:
       agents: "~/.openclaw/agents/"
       commands: "~/.openclaw/commands/"
@@ -279,6 +315,7 @@ providers:
       mcp: true
       behaviors: true
       mission_control: false
+      daemon: true
     emulation:
       cron: aiwg-schedule
       agent_teams: aiwg-mc
@@ -286,6 +323,7 @@ providers:
       mcp: native
       behaviors: native
       mission_control: aiwg-mc
+      daemon: native
     hook_wiring:
       at_link_support: false
       context_file: "~/.openclaw/config.yaml"
@@ -325,3 +363,12 @@ features:
     native_example: null
     emulation_strategies:
       aiwg-mc: AIWG mc start/dispatch/status/watch CLI
+  daemon:
+    description: >
+      Persistent background process for headless/unattended operation.
+      Tier 1 (native): full daemon support via aiwg daemon start/stop/status.
+      Tier 2 (pty-adapter): PTY bridge for platforms with a TUI but no headless mode.
+      Tier 3 (unsupported): requires a display server or IDE host; daemon not applicable.
+    native_example: aiwg daemon start (Claude Code, OpenCode, Warp, OpenClaw, Codex)
+    emulation_strategies:
+      pty-adapter: node-pty bridge for TUI platforms (Claude Code, Codex secondary mode)
