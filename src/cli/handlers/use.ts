@@ -315,11 +315,39 @@ async function countDeployedArtifacts(
       return 0;
     }
   };
+  // Count rules by parsing declared counts from RULES-INDEX.md files rather
+  // than counting .md files on disk. When deployIndexOnly is true, only one
+  // RULES-INDEX.md is deployed but it declares the total count of rules across
+  // all installed components via section headers like "## Name (N rules — ...)".
+  const countRules = async (dir: string): Promise<number> => {
+    if (!dir) return 0;
+    try {
+      const resolvedDir = path.isAbsolute(dir) ? dir : path.join(target, dir);
+      const entries = await fs.readdir(resolvedDir);
+      const indexFiles = entries.filter(f => f.endsWith('RULES-INDEX.md'));
+      if (indexFiles.length === 0) {
+        // No index files — fall back to counting individual rule .md files
+        return entries.filter(f => f.endsWith('.md')).length;
+      }
+      let total = 0;
+      for (const indexFile of indexFiles) {
+        const content = await fs.readFile(path.join(resolvedDir, indexFile), 'utf-8');
+        // Match section headers: "## Name (N rules — ..." or "— N rules*"
+        const matches = content.matchAll(/\((\d+) rules[^)]*\)/g);
+        for (const m of matches) {
+          total += parseInt(m[1], 10);
+        }
+      }
+      return total > 0 ? total : entries.filter(f => f.endsWith('.md')).length;
+    } catch {
+      return 0;
+    }
+  };
   return {
     agents: await countMd(paths.agents),
     commands: await countMd(paths.commands),
     skills: await countDirs(paths.skills),
-    rules: await countMd(paths.rules),
+    rules: await countRules(paths.rules),
     behaviors: await countDirs(paths.behaviors),
   };
 }
