@@ -206,7 +206,7 @@ export const syncHandler: CommandHandler = {
         provider: detectedProvider,
         frameworks: frameworks || ['all'],
         skipUpdate,
-        channel: channel || 'stable',
+        channel: channel || undefined,
       });
       console.log(output);
     }

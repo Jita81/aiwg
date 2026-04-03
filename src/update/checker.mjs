@@ -19,10 +19,11 @@ import { loadConfig, saveConfig, getChannel, getPackageRoot } from '../channel/m
 const NPM_REGISTRY = 'https://registry.npmjs.org/aiwg';
 
 /**
- * Fetch latest version from npm registry
- * @returns {Promise<string|null>} Latest version or null on error
+ * Fetch latest version for a given npm dist-tag
+ * @param {string} distTag - npm dist-tag to resolve (latest, next, nightly)
+ * @returns {Promise<string|null>} Resolved version or null on error
  */
-async function fetchLatestNpmVersion() {
+async function fetchNpmDistTag(distTag = 'latest') {
   return new Promise((resolve) => {
     const request = https.get(NPM_REGISTRY, { timeout: 5000 }, (res) => {
       if (res.statusCode !== 200) {
@@ -35,7 +36,7 @@ async function fetchLatestNpmVersion() {
       res.on('end', () => {
         try {
           const pkg = JSON.parse(data);
-          resolve(pkg['dist-tags']?.latest || null);
+          resolve(pkg['dist-tags']?.[distTag] || null);
         } catch {
           resolve(null);
         }
@@ -48,6 +49,14 @@ async function fetchLatestNpmVersion() {
       resolve(null);
     });
   });
+}
+
+/**
+ * Fetch latest version from npm registry (stable)
+ * @returns {Promise<string|null>} Latest version or null on error
+ */
+async function fetchLatestNpmVersion() {
+  return fetchNpmDistTag('latest');
 }
 
 /**
@@ -148,10 +157,15 @@ export async function checkForUpdates() {
   config.lastUpdateCheck = now;
   await saveConfig(config);
 
-  if (config.channel === 'stable') {
-    await checkStableUpdates(config);
-  } else {
+  if (config.channel === 'next') {
+    await checkNextUpdates(config);
+  } else if (config.channel === 'nightly') {
+    await checkNightlyUpdates(config);
+  } else if (config.channel === 'edge') {
     await checkEdgeUpdates(config);
+  } else {
+    // stable (or unrecognised — treat as stable)
+    await checkStableUpdates(config);
   }
 }
 
@@ -184,6 +198,84 @@ async function checkStableUpdates(config) {
         }
       } else {
         console.log('Update skipped. Run `npm update -g aiwg` when ready.');
+      }
+      console.log('');
+    }
+  } catch {
+    // Silently ignore errors during update check
+  }
+}
+
+/**
+ * Check for next (alpha/beta/RC) channel updates
+ */
+async function checkNextUpdates(config) {
+  const packageRoot = getPackageRoot();
+  const packageJsonPath = path.join(packageRoot, 'package.json');
+
+  try {
+    const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf8'));
+    const currentVersion = packageJson.version;
+    const latestVersion = await fetchNpmDistTag('next');
+
+    if (!latestVersion) return;
+
+    if (currentVersion !== latestVersion) {
+      console.log('');
+      console.log(`A new next release is available: ${currentVersion} → ${latestVersion}`);
+
+      const shouldUpdate = await promptUpdate('Would you like to update now?');
+
+      if (shouldUpdate) {
+        console.log('');
+        console.log('Updating aiwg@next...');
+        try {
+          execSync('npm install -g aiwg@next', { stdio: 'inherit' });
+          console.log('Update complete! Please restart your terminal.');
+        } catch {
+          console.error('Update failed. Run manually: npm install -g aiwg@next');
+        }
+      } else {
+        console.log('Update skipped. Run `npm install -g aiwg@next` when ready.');
+      }
+      console.log('');
+    }
+  } catch {
+    // Silently ignore errors during update check
+  }
+}
+
+/**
+ * Check for nightly channel updates
+ */
+async function checkNightlyUpdates(config) {
+  const packageRoot = getPackageRoot();
+  const packageJsonPath = path.join(packageRoot, 'package.json');
+
+  try {
+    const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf8'));
+    const currentVersion = packageJson.version;
+    const latestVersion = await fetchNpmDistTag('nightly');
+
+    if (!latestVersion) return;
+
+    if (currentVersion !== latestVersion) {
+      console.log('');
+      console.log(`A new nightly snapshot is available: ${currentVersion} → ${latestVersion}`);
+
+      const shouldUpdate = await promptUpdate('Would you like to update now?');
+
+      if (shouldUpdate) {
+        console.log('');
+        console.log('Updating aiwg@nightly...');
+        try {
+          execSync('npm install -g aiwg@nightly', { stdio: 'inherit' });
+          console.log('Update complete! Please restart your terminal.');
+        } catch {
+          console.error('Update failed. Run manually: npm install -g aiwg@nightly');
+        }
+      } else {
+        console.log('Update skipped. Run `npm install -g aiwg@nightly` when ready.');
       }
       console.log('');
     }
@@ -226,13 +318,45 @@ async function checkEdgeUpdates(config) {
  */
 export async function forceUpdateCheck() {
   const config = await loadConfig();
+  const packageRoot = getPackageRoot();
+  const packageJsonPath = path.join(packageRoot, 'package.json');
+  const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf8'));
+  const currentVersion = packageJson.version;
 
-  if (config.channel === 'stable') {
+  if (config.channel === 'next') {
+    console.log('Checking for updates on next channel...');
+    const latestVersion = await fetchNpmDistTag('next');
+    if (!latestVersion) {
+      console.log('Could not check npm registry. Try: npm install -g aiwg@next');
+      return;
+    }
+    if (currentVersion !== latestVersion) {
+      console.log(`Update available: ${currentVersion} → ${latestVersion}`);
+      console.log('');
+      console.log('Run: npm install -g aiwg@next');
+    } else {
+      console.log(`You are on the latest next release: ${currentVersion}`);
+    }
+  } else if (config.channel === 'nightly') {
+    console.log('Checking for updates on nightly channel...');
+    const latestVersion = await fetchNpmDistTag('nightly');
+    if (!latestVersion) {
+      console.log('Could not check npm registry. Try: npm install -g aiwg@nightly');
+      return;
+    }
+    if (currentVersion !== latestVersion) {
+      console.log(`Update available: ${currentVersion} → ${latestVersion}`);
+      console.log('');
+      console.log('Run: npm install -g aiwg@nightly');
+    } else {
+      console.log(`You are on the latest nightly snapshot: ${currentVersion}`);
+    }
+  } else if (config.channel === 'edge') {
+    const { updateEdge } = await import('../channel/manager.mjs');
+    await updateEdge();
+  } else {
+    // stable
     console.log('Checking for updates...');
-    const packageRoot = getPackageRoot();
-    const packageJsonPath = path.join(packageRoot, 'package.json');
-    const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf8'));
-    const currentVersion = packageJson.version;
     const latestVersion = await fetchLatestNpmVersion();
 
     if (!latestVersion) {
@@ -247,9 +371,5 @@ export async function forceUpdateCheck() {
     } else {
       console.log(`You are on the latest version: ${currentVersion}`);
     }
-  } else {
-    // Edge channel - update from git
-    const { updateEdge } = await import('../channel/manager.mjs');
-    await updateEdge();
   }
 }

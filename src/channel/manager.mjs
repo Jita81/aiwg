@@ -222,6 +222,66 @@ export async function switchToDev(devPath) {
 }
 
 /**
+ * Switch to next (alpha/beta/RC) channel
+ * Installs the latest pre-release from the `next` dist-tag
+ */
+export async function switchToNext() {
+  const config = await loadConfig();
+
+  console.log('Switching to next channel (alpha/beta/RC — latest pre-release)...');
+  console.log('');
+
+  try {
+    execSync('npm install -g aiwg@next', { stdio: 'inherit' });
+  } catch (error) {
+    console.error('Failed to install aiwg@next:', error.message);
+    console.error('Check that npm is available and you have write access to the global prefix.');
+    process.exit(1);
+  }
+
+  config.channel = 'next';
+  config.devMode = false;
+  await saveConfig(config);
+
+  console.log('');
+  console.log('Switched to next channel.');
+  console.log('You are now running the latest alpha/beta/RC release.');
+  console.log('');
+  console.log('To see what version you installed: aiwg version');
+  console.log('To switch back to stable:          aiwg sync --channel latest');
+}
+
+/**
+ * Switch to nightly channel
+ * Installs the latest nightly snapshot from the `nightly` dist-tag
+ */
+export async function switchToNightly() {
+  const config = await loadConfig();
+
+  console.log('Switching to nightly channel (latest automated snapshot)...');
+  console.log('');
+
+  try {
+    execSync('npm install -g aiwg@nightly', { stdio: 'inherit' });
+  } catch (error) {
+    console.error('Failed to install aiwg@nightly:', error.message);
+    console.error('Check that npm is available and you have write access to the global prefix.');
+    process.exit(1);
+  }
+
+  config.channel = 'nightly';
+  config.devMode = false;
+  await saveConfig(config);
+
+  console.log('');
+  console.log('Switched to nightly channel.');
+  console.log('You are now running the latest automated nightly snapshot.');
+  console.log('');
+  console.log('To see what version you installed: aiwg version');
+  console.log('To switch back to stable:          aiwg sync --channel latest');
+}
+
+/**
  * Switch to stable (npm) channel
  */
 export async function switchToStable() {
