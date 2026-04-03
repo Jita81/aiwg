@@ -1,6 +1,20 @@
 ---
 platforms: [all]
 description: Address open issues using issue-thread-driven agent loops with 2-way human-AI collaboration
+requires:
+  - issues: one or more issue numbers, a --filter expression, or --all-open flag
+  - tracker: issue tracker accessible (gitea | github) — auto-detected from project config
+ensures:
+  - cycle-comments: structured AL CYCLE status posted to each issue thread every cycle
+  - aggregate-report: summary table of all issues addressed with status, cycle count, and result
+  - "if --branch-per-issue: git branch fix/issue-N created per issue"
+errors:
+  - tracker-unavailable: cannot access issue tracker; check API credentials or --provider flag
+  - issue-not-found: one or more specified issue numbers do not exist in the tracker
+invariants:
+  - human comments on issue threads are never ignored; all feedback incorporated next cycle
+  - status comment posted to issue thread after every cycle without exception
+  - never exceeds --max-cycles without posting an escalation comment first
 commandHint:
   argumentHint: <issue_numbers...> [--filter "status:open label:bug"] [--all-open] [--max-cycles N] [--provider gitea|github] [--interactive] [--guidance "text"] [--branch-per-issue]
   allowedTools: Task, Read, Write, Edit, Bash, Glob, Grep, mcp__gitea__*

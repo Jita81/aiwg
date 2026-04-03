@@ -2,6 +2,20 @@
 name: issue-driven-al
 description: Orchestrates issue-driven agent loops that post cycle status to issue threads and incorporate human feedback in each cycle.
 platforms: [all]
+requires:
+  - issue: issue number or URL to work on in the loop
+  - work: description of the work to perform each cycle (the actual task — bug fix, feature, doc update)
+ensures:
+  - cycle-status: structured status comment posted to issue thread after every cycle
+  - thread-scan: all human comments classified and incorporated into subsequent cycles
+  - "if resolved: completion summary comment posted with checklist confirmation"
+errors:
+  - tracker-unavailable: cannot read or post comments to issue tracker
+  - max-cycles-reached: issue not resolved within cycle limit; escalation comment posted
+invariants:
+  - every cycle posts a status comment before returning, even partial cycles
+  - human feedback from any cycle is always acknowledged in the next status comment
+  - completion is only declared when all issue acceptance criteria are met
 
 ---
 
