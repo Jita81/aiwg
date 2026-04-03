@@ -46,6 +46,8 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 | **5 OpenProse antipattern rules** | `god-session`, `vague-discretion`, `context-bloat`, `parallel-then-synthesize`, `implicit-dependencies`. aiwg-utils: 7 → 13 rules. (#648) |
 | **prose-integration addon complete** | `prose-detect` + `prose-install` + `prose-resolution`. 7-skill count. Centralized detection. (#649) |
 | **`[all]` platforms token** | `platforms: [all]` replaced at deploy time. No more hardcoded provider lists. (#651–#653) |
+| **agentic-installer addon** | `setup.aiwg.io/v1` SetupManifest YAML language. Script-first installation: 11 cross-platform templates, 3 skills, 1 agent, 2 rules. (#663–#667) |
+| **`aiwg-ci-safety` rule (aiwg-dev)** | Agents may not touch `.gitea/workflows/` without human authorization. CI templates for users live in `agentic/code/frameworks/*/ci/`, never in forge dirs. HIGH. |
 
 ### Added
 
@@ -123,9 +125,12 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 - **prose-integration addon completion** — `prose-detect` + `prose-install` + `prose-resolution` + `docs/integration-guide.md`; Step 0 detection centralized across all prose skills (`prose-run`, `prose-validate`, `forme-manifest`, `prose-reader`); contract fields on all skills; 7-skill count (#649)
 - **`[all]` platforms token** — `platforms: [all]` in agent `.md` files replaced with the target platform at deploy time; `injectPlatform` option in base deployer; 5 grounding/diversifier agents converted from hardcoded lists to `[all]` (#651, #652, #653)
 - **OpenProse research review report** (`docs/reports/openprose-review.md`) — basis for 5 new antipattern rules (#617)
+- **agentic-installer addon** — `setup.aiwg.io/v1` SetupManifest YAML language for cross-platform, script-first installation workflows; JSON Schema covering all 7 step types (`script`, `detect`, `ask`, `verify`, `agentic`, `platform-route`, `chain`), platform matrix, params, prerequisites, recovery procedures, and briefing; `installer-agent` specialized persona; 3 skills: `setup-generate` (discover project, assemble manifest + scripts), `setup-run` (execute manifest with platform detection, param collection, 6-phase flow, dry-run, recovery confirmation), `setup-validate` (schema + reference + consistency + agentic-step audit); 11 cross-platform script templates (clone, install-deps for ubuntu/fedora/macos/windows, configure, verify, reset, hub-chain); lib helpers (`detect.sh`, `params.sh`, `verify.sh`, `detect.ps1`); rules: `installer-safety` (7 mandatory behaviors) + `installer-authoring` (5 rules); script-first design — `type: agentic` is exception handling only (#663–#667)
+- **`aiwg-ci-safety` rule** (HIGH, aiwg-dev) — agents may never modify `.gitea/workflows/` without explicit human authorization; CI templates for user projects live in `agentic/code/frameworks/*/ci/` (inert source data, not AIWG's own CI); Gitea is the authoritative CI forge; GitHub is publish-only mirror; no agentic self-modification of CI pipelines; includes per-action allowed/forbidden table; `skill-placement.md` and `addon-boundaries.md` updated with CI template disambiguation sections
 
 ### Fixed
 
+- **`aiwg use all` rule count off-by-many** — `countDeployedArtifacts` was counting `.md` files in the rules directory; with `deployIndexOnly: true`, only `RULES-INDEX.md` exists on disk, so it always returned 1; replaced with `countRules()` that parses `(N rules — ...)` section headers in RULES-INDEX files and sums across all indexes
 - **`aiwg index build` hard-error on docs-only repos** — `codebase` graph (defaultBuild, scans `src/test/tools`) now skips with a warning when those directories don't exist; only errors when `--graph codebase` is explicitly requested (#658)
 - **User-defined graphs not recognized via `--graph`** — `loadUserGraphConfigs` used `require()` which is undefined in ESM; replaced with static `import`; user graphs in `.aiwg/config.yaml` now load and validate correctly (#659)
 - **`sdlc-accelerate` handler** — "No handler found" error; `SdlcAccelerateHandler` implemented
