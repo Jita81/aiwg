@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://aiwg.io/schemas/aiwg.config.v1.json",
+  "title": "AIWG Project Configuration",
+  "description": "Configuration file for the AIWG AI coding assistant framework",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema reference"
+    },
+    "version": {
+      "type": "string",
+      "description": "AIWG config format version",
+      "examples": ["1"]
+    },
+    "project": {
+      "type": "string",
+      "description": "Project name"
+    },
+    "installed": {
+      "type": "object",
+      "description": "Installed AIWG frameworks",
+      "additionalProperties": {
+        "$ref": "#/definitions/InstalledFramework"
+      }
+    },
+    "providers": {
+      "type": "array",
+      "description": "Active AI provider targets",
+      "items": {
+        "type": "string",
+        "enum": [
+          "claude",
+          "copilot",
+          "cursor",
+          "warp",
+          "windsurf",
+          "openclaw",
+          "codex",
+          "opencode",
+          "factory",
+          "hermes"
+        ]
+      }
+    },
+    "scripts": {
+      "type": "object",
+      "description": "Named scripts runnable via AIWG sidebar or CLI",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "settings": {
+      "type": "object",
+      "description": "Framework-specific settings",
+      "additionalProperties": true
+    }
+  },
+  "definitions": {
+    "InstalledFramework": {
+      "type": "object",
+      "description": "Metadata for an installed AIWG framework",
+      "properties": {
+        "version": {
+          "type": "string",
+          "description": "Installed framework version (CalVer: YYYY.M.PATCH)"
+        },
+        "providers": {
+          "type": "array",
+          "description": "Providers this framework was deployed to",
+          "items": {
+            "type": "string"
+          }
+        },
+        "installedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of installation"
+        },
+        "source": {
+          "type": "string",
+          "description": "Source registry or path"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

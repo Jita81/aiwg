@@ -1,0 +1,215 @@
+{
+  "name": "aiwg",
+  "displayName": "AIWG — AI Writing Guide",
+  "description": "AI coding assistant framework: SDLC workflows, inference pipelines, and @aiwg Copilot chat participant",
+  "version": "2026.4.0",
+  "publisher": "jmagly",
+  "engines": {
+    "vscode": "^1.99.0"
+  },
+  "categories": [
+    "AI",
+    "Other"
+  ],
+  "keywords": [
+    "ai",
+    "llm",
+    "sdlc",
+    "inference",
+    "pipeline",
+    "copilot",
+    "aiwg",
+    "mcp"
+  ],
+  "activationEvents": [
+    "onStartupFinished",
+    "onChatParticipant:aiwg.assistant",
+    "workspaceContains:.aiwg/aiwg.config.json"
+  ],
+  "main": "./dist/extension.js",
+  "icon": "assets/aiwg-icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jmagly/aiwg"
+  },
+  "contributes": {
+    "chatParticipants": [
+      {
+        "id": "aiwg.assistant",
+        "fullName": "AIWG",
+        "name": "aiwg",
+        "description": "AI Writing Guide — skills, pipelines, SDLC workflows",
+        "isSticky": true,
+        "commands": [
+          {
+            "name": "deploy",
+            "description": "Deploy a framework to this project"
+          },
+          {
+            "name": "status",
+            "description": "Show AIWG project status"
+          },
+          {
+            "name": "pipeline",
+            "description": "Design or manage an inference pipeline"
+          },
+          {
+            "name": "eval",
+            "description": "Run an eval loop"
+          },
+          {
+            "name": "productionize",
+            "description": "Production readiness review"
+          },
+          {
+            "name": "skill",
+            "description": "Run any AIWG skill"
+          }
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "command": "aiwg.init",
+        "title": "Initialize Project",
+        "category": "AIWG"
+      },
+      {
+        "command": "aiwg.status",
+        "title": "Open Project Status",
+        "category": "AIWG"
+      },
+      {
+        "command": "aiwg.deploy",
+        "title": "Deploy Framework...",
+        "category": "AIWG"
+      },
+      {
+        "command": "aiwg.sync",
+        "title": "Sync",
+        "category": "AIWG"
+      },
+      {
+        "command": "aiwg.runScript",
+        "title": "Run Script...",
+        "category": "AIWG"
+      },
+      {
+        "command": "aiwg.configureMcp",
+        "title": "Configure MCP",
+        "category": "AIWG"
+      },
+      {
+        "command": "aiwg.installCli",
+        "title": "Install CLI",
+        "category": "AIWG"
+      },
+      {
+        "command": "aiwg.refreshSidebar",
+        "title": "Refresh",
+        "category": "AIWG",
+        "icon": "$(refresh)"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "aiwg-sidebar",
+          "title": "AIWG",
+          "icon": "assets/aiwg-activity.svg"
+        }
+      ]
+    },
+    "views": {
+      "aiwg-sidebar": [
+        {
+          "id": "aiwg.status",
+          "name": "Project Status"
+        },
+        {
+          "id": "aiwg.frameworks",
+          "name": "Installed Frameworks"
+        },
+        {
+          "id": "aiwg.scripts",
+          "name": "Scripts"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "aiwg.refreshSidebar",
+          "when": "view == aiwg.status",
+          "group": "navigation"
+        }
+      ]
+    },
+    "jsonValidation": [
+      {
+        "fileMatch": ".aiwg/aiwg.config.json",
+        "url": "./schemas/aiwg.config.v1.json"
+      }
+    ],
+    "languages": [
+      {
+        "id": "prompt-markdown",
+        "extensions": [
+          ".prompt.md"
+        ],
+        "aliases": [
+          "Prompt Markdown"
+        ]
+      }
+    ],
+    "configuration": {
+      "title": "AIWG",
+      "properties": {
+        "aiwg.cli.path": {
+          "type": "string",
+          "default": "",
+          "description": "Path to aiwg CLI. Leave empty to auto-detect from PATH."
+        },
+        "aiwg.chat.defaultModel": {
+          "type": "string",
+          "default": "claude-sonnet",
+          "enum": [
+            "claude-sonnet",
+            "claude-haiku",
+            "gpt-4o",
+            "gpt-4o-mini"
+          ],
+          "description": "Default model family for @aiwg chat participant"
+        },
+        "aiwg.mcp.autoStart": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically start and configure the AIWG MCP server on workspace open"
+        },
+        "aiwg.init.autoPrompt": {
+          "type": "boolean",
+          "default": true,
+          "description": "Offer to initialize AIWG when opening a project without aiwg.config.json"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --platform=node --target=node18 --sourcemap",
+    "compile:prod": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --platform=node --target=node18 --minify",
+    "watch": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --platform=node --target=node18 --sourcemap --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "node ./test/runTests.js",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "@types/vscode": "^1.99.0",
+    "@vscode/test-electron": "^2.4.0",
+    "@vscode/vsce": "^3.0.0",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.4.0"
+  }
+}
