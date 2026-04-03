@@ -176,9 +176,13 @@ export async function table(headers: string[], rows: string[][]): Promise<void> 
 export function channelLabel(channel: string): string {
   if (!isTTY) return `[${channel}]`;
   switch (channel) {
-    case 'stable': return chalk.green(`[${channel}]`);
-    case 'edge': return chalk.yellow(`[${channel}]`);
-    case 'dev': return chalk.cyan(`[${channel}]`);
+    case 'stable':  return chalk.green(`[${channel}]`);
+    case 'edge':    return chalk.yellow(`[${channel}]`);
+    case 'dev':     return chalk.cyan(`[${channel}]`);
+    case 'rc':      return chalk.yellow(`[${channel}]`);
+    case 'beta':    return chalk.yellow(`[${channel}]`);
+    case 'alpha':   return chalk.yellow(`[${channel}]`);
+    case 'nightly': return chalk.magenta(`[${channel}]`);
     default: return chalk.dim(`[${channel}]`);
   }
 }

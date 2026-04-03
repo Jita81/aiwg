@@ -253,9 +253,26 @@ export async function getVersionInfo() {
   const packageJsonPath = path.join(packageRoot, 'package.json');
   const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf8'));
 
+  // Detect pre-release channel from version string when channel.json says 'stable'
+  // This handles the case where a user ran `npm install -g aiwg@next` directly —
+  // npm updates the binary but channel.json stays as 'stable'.
+  let channel = config.channel;
+  const version = packageJson.version;
+  if (!config.devMode && channel === 'stable') {
+    if (version.includes('-rc.')) {
+      channel = 'rc';
+    } else if (version.includes('-beta.')) {
+      channel = 'beta';
+    } else if (version.includes('-alpha.')) {
+      channel = 'alpha';
+    } else if (version.includes('-nightly.')) {
+      channel = 'nightly';
+    }
+  }
+
   const info = {
-    version: packageJson.version,
-    channel: config.channel,
+    version,
+    channel,
     packageRoot,
     devMode: config.devMode || false,
   };
