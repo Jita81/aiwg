@@ -57,7 +57,8 @@ TODO.local.md
 .codex/
 .cursor/
 .factory/
-.github/
+.github/*
+!.github/workflows/
 .opencode/
 .warp/
 .windsurf/
