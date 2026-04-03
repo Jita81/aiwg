@@ -2,6 +2,23 @@
 platforms: [all]
 name: issue-planner
 description: Research-grounded SDLC issue planner. Given an objective, dispatches parallel research agents, generates the supporting SDLC doc corpus, then files prioritized, cross-referenced issues and awaits human review before work begins.
+requires:
+  - objective: non-empty string describing the feature, capability, or initiative to plan
+  - tracker: issue tracker accessible (gitea | github | local) — auto-detected from project config
+ensures:
+  - issues-filed: prioritized issue backlog with type/priority/phase labels and wave-ordered dependencies
+  - research-brief: synthesized research findings at .aiwg/working/issue-planner/research-brief.md
+  - sdlc-corpus: phase-appropriate SDLC artifacts (use cases, risk register, etc.)
+  - "if --dry-run: plan preview table shown without filing"
+  - "if --induct-research: reference induction tasks filed for discovered sources"
+errors:
+  - no-tracker-access: cannot reach issue tracker; check --provider or API credentials
+  - research-failed: all three parallel research agents returned empty results; try --skip-research with existing docs
+  - objective-too-vague: objective is too broad to plan without clarification; use --interactive
+invariants:
+  - human approval gate is mandatory before any issues are filed
+  - no issues are filed unless user explicitly confirms the plan
+  - every filed issue links to the SDLC artifact that generated it
 commandHint:
   argumentHint: "<objective> [--interactive] [--dry-run] [--guidance \"text\"] [--provider gitea|github|local] [--induct-research <target>]"
   allowedTools: Read, Write, Glob, Grep, Bash, Agent, mcp__gitea__issue_write, mcp__gitea__issue_read, mcp__gitea__list_issues, WebSearch, WebFetch
