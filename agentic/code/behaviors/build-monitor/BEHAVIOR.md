@@ -2,6 +2,8 @@
 name: build-monitor
 version: 1.0.0
 description: Track build health by monitoring build tool completions and running scheduled build checks.
+# platforms restricted to daemon-capable systems — behaviors require a persistent
+# process for trigger management and lifecycle hooks
 platforms: [openclaw, claude-code]
 
 triggers:

@@ -2,6 +2,8 @@
 name: quality-gate-watcher
 version: 1.0.0
 description: Enforce SDLC quality gate criteria on commits and pull requests.
+# platforms restricted to daemon-capable systems — behaviors require a persistent
+# process for trigger management and lifecycle hooks
 platforms: [openclaw, claude-code]
 
 triggers:

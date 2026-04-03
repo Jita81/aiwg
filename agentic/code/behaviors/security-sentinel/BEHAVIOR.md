@@ -2,6 +2,8 @@
 name: security-sentinel
 version: 1.0.0
 description: Continuous security monitoring with reactive scanning on file changes, deploys, and scheduled audits.
+# platforms restricted to daemon-capable systems — behaviors require a persistent
+# process for trigger management and lifecycle hooks
 platforms: [openclaw, claude-code]
 
 triggers:

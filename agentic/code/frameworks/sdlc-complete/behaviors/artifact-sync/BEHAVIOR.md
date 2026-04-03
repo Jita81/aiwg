@@ -2,6 +2,8 @@
 name: artifact-sync
 version: 1.0.0
 description: Keep the SDLC artifact index current by reacting to changes in .aiwg/ directories.
+# platforms restricted to daemon-capable systems — behaviors require a persistent
+# process for trigger management and lifecycle hooks
 platforms: [openclaw, claude-code]
 
 triggers:

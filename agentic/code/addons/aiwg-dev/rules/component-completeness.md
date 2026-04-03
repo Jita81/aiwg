@@ -87,6 +87,38 @@ At least one example showing input and expected output.
 | `README.md` | Required at addon root |
 | At least one artifact | Addon must contain skills, agents, rules, commands, or templates |
 
+### Behavior
+
+| Requirement | Detail |
+|-------------|--------|
+| `BEHAVIOR.md` | Must exist in `behaviors/<name>/BEHAVIOR.md` |
+| `name:` frontmatter | Required field |
+| `description:` frontmatter | Required field |
+| `platforms:` frontmatter | Required field — **must list only daemon-capable platforms** (e.g. `[openclaw, claude-code]`). Behaviors require a persistent process for trigger management and lifecycle hooks; `platforms: [all]` is never correct for behaviors. Include a comment above the field explaining the restriction. |
+| `triggers:` frontmatter | Required — at least one trigger phrase or event |
+| `hooks:` or `mode: agent` | At least one hook definition OR `mode: agent` with agent routing config |
+
+**Minimal valid BEHAVIOR.md**:
+```yaml
+---
+name: my-behavior
+version: 1.0.0
+description: One-sentence description.
+# platforms restricted to daemon-capable systems — behaviors require a persistent
+# process for trigger management and lifecycle hooks
+platforms: [openclaw, claude-code]
+
+triggers:
+  - "phrase that activates this behavior"
+
+hooks:
+  on_file_write:
+    - filter: "src/**/*.ts"
+      action: run_script
+      script: scripts/main.sh
+---
+```
+
 ### Rule
 
 | Requirement | Detail |
@@ -130,6 +162,14 @@ Use this checklist before marking any artifact as done:
 - [ ] All listed agents have properly formed `.md` files
 - [ ] All listed rules exist and have `RULES-INDEX.md` entries
 - [ ] No deployment-target files without `agentic/code/` source (see `skill-placement.md`)
+
+### Behavior Checklist
+
+- [ ] `BEHAVIOR.md` exists at `behaviors/<name>/BEHAVIOR.md`
+- [ ] `name:`, `description:`, `platforms:`, `triggers:` all present in frontmatter
+- [ ] `platforms:` lists only daemon-capable systems (never `[all]`)
+- [ ] Comment above `platforms:` explains the daemon restriction
+- [ ] At least one `hooks:` entry OR `mode: agent` with routing config
 
 ### Rule Checklist
 

@@ -2,6 +2,8 @@
 name: test-watcher
 version: 1.0.0
 description: Reactive test execution that runs tests on file changes and on a schedule.
+# platforms restricted to daemon-capable systems — behaviors require a persistent
+# process for trigger management and lifecycle hooks
 platforms: [openclaw, claude-code]
 
 triggers:
