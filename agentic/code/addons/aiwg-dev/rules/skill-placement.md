@@ -83,7 +83,7 @@ This rule applies to all AIWG deployment targets:
 | Provider Directory | Is a Deployment Target |
 |-------------------|----------------------|
 | `.claude/skills/`, `.claude/agents/`, `.claude/commands/`, `.claude/rules/` | YES |
-| `.github/agents/`, `.github/prompts/`, `.github/instructions/` | YES |
+| `.github/agents/`, `.github/prompts/`, `.github/instructions/` | YES — Copilot provider artifacts |
 | `.cursor/agents/`, `.cursor/commands/`, `.cursor/skills/`, `.cursor/rules/` | YES |
 | `.warp/agents/`, `.warp/commands/`, `.warp/skills/` | YES |
 | `.codex/agents/`, `~/.codex/prompts/`, `~/.codex/skills/` | YES |
@@ -92,6 +92,33 @@ This rule applies to all AIWG deployment targets:
 | `~/.openclaw/agents/`, `~/.openclaw/commands/`, `~/.openclaw/skills/` | YES |
 | `agentic/code/addons/<name>/` | SOURCE — author here |
 | `agentic/code/frameworks/<name>/` | SOURCE — author here |
+
+## CI Workflow Files — Special Cases
+
+`.github/workflows/` and `.gitea/workflows/` have a dual nature that requires precise handling:
+
+### AIWG's own CI workflows
+
+AIWG uses **Gitea as its authoritative CI**. GitHub is a publish-only mirror. AIWG's own CI workflows (test runners, release pipelines, extension publishing) belong in `.gitea/workflows/`, not `.github/workflows/`.
+
+**CRITICAL**: AIWG has thousands of downstream users. A broken CI workflow that merges to main can cascade — breaking the release pipeline, publishing a bad version, or corrupting the npm package that users install. **Never add or modify `.gitea/workflows/` files without explicit human authorization.** See `aiwg-ci-safety.md`.
+
+### CI hook templates for target projects
+
+When AIWG deploys CI hooks to a user's project via `aiwg use <framework> --ci-hooks-enabled`, the source templates must live in:
+
+```
+agentic/code/frameworks/<name>/ci/github/workflows/   ← deployed to user's .github/workflows/
+agentic/code/frameworks/<name>/ci/gitea/workflows/    ← deployed to user's .gitea/workflows/
+```
+
+**FORBIDDEN** — CI templates must NOT be stored in this repo's own forge directories:
+```
+.github/workflows/my-framework-hook.yml   ← would execute as AIWG's own CI
+.gitea/workflows/my-framework-hook.yml    ← would execute as AIWG's own CI
+```
+
+The templates are inert data in `agentic/code/`. They only execute in the user's project after `--ci-hooks-enabled` deploys them there.
 
 ## References
 

@@ -8,6 +8,11 @@ Contributor-focused rules for building AIWG addons, frameworks, skills, agents, 
 
 ### HIGH
 
+#### aiwg-ci-safety
+**Summary**: AIWG has thousands of downstream users — a broken CI workflow that merges to main can cascade into a bad npm publish that corrupts installs across the entire user base. `.gitea/workflows/` changes require explicit human authorization before committing. CI hook templates for user projects must NOT go in `.gitea/` or `.github/` in this repo — they are inert source data in `agentic/code/frameworks/<name>/ci/` and are deployed to target projects via `--ci-hooks-enabled`. Agents may draft and propose CI changes but must not commit to forge directories autonomously.
+**When to apply**: Any time `.gitea/workflows/` or `.github/workflows/` is being modified, creating CI hook templates for a framework, reviewing agentic tasks that touch the CI pipeline
+**Full rule**: @$AIWG_ROOT/agentic/code/addons/aiwg-dev/rules/aiwg-ci-safety.md
+
 #### skill-placement
 **Summary**: New skills, agents, commands, rules, and templates MUST go into `agentic/code/addons/<name>/` or `agentic/code/frameworks/<name>/`. Files placed directly in `.claude/`, `.github/`, `.cursor/`, `.warp/`, `.codex/`, `.windsurf/`, `.opencode/`, or `~/.openclaw/` are deployment targets — they are overwritten by `aiwg sync` and are invisible to the installer. A file only ships to users if it lives in `agentic/code/`.
 **When to apply**: Creating any new AIWG artifact (skill, agent, command, rule, template), editing a deployed file, onboarding as a new AIWG contributor
@@ -51,8 +56,11 @@ Contributor-focused rules for building AIWG addons, frameworks, skills, agents, 
 | **Writing agent definitions** | addon-boundaries, skill-placement |
 | **Onboarding as a contributor** | skill-placement, addon-boundaries |
 | **Pre-PR checklist** | component-completeness, skill-placement |
+| **Adding CI hook templates for a framework** | aiwg-ci-safety, skill-placement, addon-boundaries |
+| **Modifying `.gitea/workflows/` or `.github/workflows/`** | aiwg-ci-safety |
+| **Any agentic task touching CI** | aiwg-ci-safety |
 
 ---
 
-*Generated from aiwg-dev manifest.json — 5 rules*
+*Generated from aiwg-dev manifest.json — 6 rules*
 *Full rule files: @$AIWG_ROOT/agentic/code/addons/aiwg-dev/rules/*

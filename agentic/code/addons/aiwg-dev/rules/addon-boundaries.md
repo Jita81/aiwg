@@ -18,6 +18,12 @@ This creates two distinct failure modes:
 
 A developer adds a schema or template to `.aiwg/flows/schemas/` thinking this extends the framework. It doesn't — `aiwg use` never reads `.aiwg/`. The artifact ships nowhere. Users never see it.
 
+**Failure Mode 3: CI hook template placed in `.gitea/workflows/` or `.github/workflows/`**
+
+A developer adds a CI hook template for a framework (e.g., `aiwg-sdlc.yml`) to `.gitea/workflows/` in this repo, thinking it will be deployed to user projects. Instead, it executes as AIWG's own CI on the next push — potentially running agentic automation against the AIWG repo itself with no review. With thousands of downstream users depending on each AIWG release, a broken CI run can cascade into a bad publish.
+
+CI hook templates belong in `agentic/code/frameworks/<name>/ci/`. They are inert data here. The deployment pipeline (`--ci-hooks-enabled`) copies them into the target project's forge directories only when the user explicitly opts in.
+
 **Failure Mode 2: `.aiwg/` reference in agent/skill definition**
 
 A developer writes an agent that references `@.aiwg/requirements/UC-001.md`. The agent works fine in this repository but fails silently in every other project that installs AIWG — the reference points to a file that does not exist outside this repo.
@@ -28,9 +34,12 @@ A developer writes an agent that references `@.aiwg/requirements/UC-001.md`. The
 |-----------|------|-----------------|-----------------|
 | `agentic/code/addons/<name>/` | Framework source | YES via `aiwg use` | `@$AIWG_ROOT/agentic/code/addons/<name>/...` |
 | `agentic/code/frameworks/<name>/` | Framework source | YES via `aiwg use` | `@$AIWG_ROOT/agentic/code/frameworks/<name>/...` |
+| `agentic/code/frameworks/<name>/ci/` | CI hook templates for target projects | YES via `aiwg use --ci-hooks-enabled` | Source only — never executes here |
 | `src/` | CLI and MCP source | YES via npm package | N/A (compiled) |
 | `.aiwg/` | Project output (AIWG's own development) | NO | Only within this repo |
-| `.claude/` | Deployment target | NO (overwritten) | Do not author here |
+| `.claude/` | Deployment target (Copilot, etc.) | NO (overwritten) | Do not author here |
+| `.gitea/workflows/` | AIWG's own CI (Gitea is authoritative) | NO | Only with human authorization |
+| `.github/workflows/` | AIWG's own CI for GitHub mirror | NO | Only genuine repo CI |
 
 ## Mandatory Rules
 
@@ -96,13 +105,19 @@ When creating a new file, ask:
 
 ```
 Is this intended for AIWG users to have after running `aiwg use`?
-  YES → agentic/code/addons/<name>/ or agentic/code/frameworks/<name>/
+  YES → Is it a CI hook template (deployed via --ci-hooks-enabled)?
+          YES → agentic/code/frameworks/<name>/ci/github/ or /gitea/
+          NO  → agentic/code/addons/<name>/ or agentic/code/frameworks/<name>/
   NO  → Is this a project artifact for the AIWG project itself?
           YES → .aiwg/
           NO  → Is this CLI or MCP implementation code?
                   YES → src/
-                  NO  → Reconsider what this file is and who it is for
+                  NO  → Is this AIWG's own CI workflow?
+                          YES → .gitea/workflows/ (Gitea is authoritative) — requires human authorization
+                          NO  → Reconsider what this file is and who it is for
 ```
+
+**The CI template trap**: CI hook templates look like workflow files but must NOT go in `.gitea/workflows/` or `.github/workflows/` in this repo. They go in `agentic/code/frameworks/<name>/ci/` where they are inert data, not executable CI.
 
 ## References
 
