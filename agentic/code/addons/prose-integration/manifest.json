@@ -23,6 +23,7 @@
     "rules": "rules/"
   },
   "skills": [
+    "prose-detect",
     "prose-reader",
     "prose-run",
     "prose-validate",
@@ -41,9 +42,23 @@
   },
   "configuration": {
     "defaults": {
-      "proseRoot": "/tmp/prose/skills/open-prose",
+      "proseRoot": null,
       "proseStateDir": ".aiwg/working/prose-runs",
-      "defaultModel": "opus"
+      "defaultModel": "opus",
+      "autoDetect": true
+    },
+    "detection": {
+      "signals": [
+        "env:PROSE_ROOT",
+        "env:AIWG_PROSE_ROOT",
+        "config:.aiwg/config.json#prose.path",
+        "path:~/.aiwg/prose/skills/open-prose",
+        "plugin:.claude-plugin/plugin.json#name=open-prose",
+        "path:~/.prose/skills/open-prose",
+        "cli:prose"
+      ],
+      "required": ["prose.md", "forme.md"],
+      "cacheConfig": ".aiwg/config.json"
     }
   }
 }

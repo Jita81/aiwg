@@ -26,21 +26,15 @@ A path to a `.md` file that is an OpenProse program (has `requires:` and/or `ens
 
 Given a path to an OpenProse program file:
 
-### Step 0: Ensure OpenProse is Installed
+### Step 0: Detect OpenProse Installation
 
-Before any operation, check if OpenProse is available:
+Before any operation, run `/prose-detect` to locate the OpenProse installation and resolve `PROSE_ROOT`. `/prose-detect` handles the full detection chain (env var, AIWG config, AIWG-local install, project plugin manifest, user home, global CLI).
 
-```bash
-ls /tmp/prose/skills/open-prose/prose.md 2>/dev/null
+If `/prose-detect` reports no installation found, do NOT auto-clone. Inform the user:
+
 ```
-
-If not found, **automatically clone** the repo:
-
-```bash
-git clone https://github.com/openprose/prose.git /tmp/prose
+OpenProse not found. Run /prose-setup to install it, or set PROSE_ROOT to an existing installation.
 ```
-
-If found, optionally pull latest (if the user requested an update or if the clone is older than 7 days).
 
 ### Step 1: Read the File
 
