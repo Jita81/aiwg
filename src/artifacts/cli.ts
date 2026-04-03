@@ -67,7 +67,7 @@ export async function main(args: string[]): Promise<void> {
       console.log('  stats   Show index statistics');
       console.log('');
       console.log('Options:');
-      console.log('  --graph <type>  Target a specific graph (framework, project, codebase, or user-defined)');
+      console.log('  --graph <name>  Target a specific graph (framework, project, codebase, or user-defined)');
       console.log('  --all           Build all known graphs (including user-defined)');
       console.log('');
       console.log('Examples:');
@@ -91,10 +91,34 @@ export async function main(args: string[]): Promise<void> {
 
 /**
  * Handle 'index build' command
- *
- * Stub — full implementation in #415
  */
 async function handleBuild(args: string[]): Promise<void> {
+  if (args.includes('--help') || args.includes('-h')) {
+    console.log('Usage: aiwg index build [options]');
+    console.log('');
+    console.log('Options:');
+    console.log('  --force          Full rebuild (ignore checksums, re-index everything)');
+    console.log('  --verbose        Show detailed progress during indexing');
+    console.log('  --all            Build all known graphs (including user-defined)');
+    console.log('  --scope <dir>    Limit scan to a specific subdirectory');
+    console.log('  --graph <name>   Build a specific graph only (built-in or user-defined)');
+    console.log('');
+    console.log('Built-in graph names: project, codebase, framework');
+    console.log('User-defined graphs: configure under index.graphs in .aiwg/config.yaml');
+    console.log('');
+    console.log('Default behavior (no --graph): builds all graphs with defaultBuild: true');
+    console.log('  Built-in defaults: project (always), codebase (skipped if src/test/tools absent)');
+    console.log('');
+    console.log('Examples:');
+    console.log('  aiwg index build');
+    console.log('  aiwg index build --force');
+    console.log('  aiwg index build --graph codebase --force');
+    console.log('  aiwg index build --graph references            # user-defined graph');
+    console.log('  aiwg index build --scope documentation/references');
+    console.log('  aiwg index build --all');
+    return;
+  }
+
   // Dynamic import to keep the CLI router lightweight
   const { buildIndex } = await import('./index-builder.js');
   const cwd = process.cwd();
@@ -114,18 +138,18 @@ async function handleBuild(args: string[]): Promise<void> {
   loadUserGraphConfigs(cwd);
 
   if (graph) {
-    // Build a specific graph
-    await buildIndex(cwd, { force, verbose, scope, graph });
+    // Build a specific graph — explicitly requested via --graph
+    await buildIndex(cwd, { force, verbose, scope, graph, explicit: true });
   } else if (all) {
-    // Build all known graphs
+    // Build all known graphs — user asked for everything, but don't hard-error on missing dirs
     for (const name of Object.keys(GRAPH_CONFIGS)) {
-      await buildIndex(cwd, { force, verbose, graph: name });
+      await buildIndex(cwd, { force, verbose, graph: name, explicit: false });
     }
   } else {
-    // Default: build graphs with defaultBuild=true
+    // Default: build graphs with defaultBuild=true; skip gracefully if their dirs don't exist
     for (const [name, config] of Object.entries(GRAPH_CONFIGS)) {
       if (config.defaultBuild) {
-        await buildIndex(cwd, { force, verbose, scope: name === Object.keys(GRAPH_CONFIGS)[0] ? scope : undefined, graph: name });
+        await buildIndex(cwd, { force, verbose, scope: name === Object.keys(GRAPH_CONFIGS)[0] ? scope : undefined, graph: name, explicit: false });
       }
     }
   }

@@ -2200,15 +2200,18 @@ Transform a high-level objective into a fully researched, SDLC-gated issue backl
 
 Commands for building and querying the artifact index. The index provides structured, pre-computed metadata about project artifacts, enabling agents and developers to discover, search, and navigate artifacts without manual file searching.
 
-The index uses a **multi-graph architecture** with three built-in graph types:
+The index uses a **multi-graph architecture** with three built-in graph types plus user-defined graphs:
 
 | Graph | Scans | Storage | Built by default |
 |-------|-------|---------|-----------------|
 | `project` | `.aiwg/` artifacts | `.aiwg/.index/project/` | Yes |
-| `codebase` | `src/`, `test/`, `tools/` | `.aiwg/.index/codebase/` | Yes |
+| `codebase` | `src/`, `test/`, `tools/` | `.aiwg/.index/codebase/` | Yes (skipped if dirs absent) |
 | `framework` | `agentic/code/`, `docs/` | `.aiwg/.index/framework/` | No (use `--graph framework`) |
+| *(user-defined)* | configured in `.aiwg/config.yaml` | `.aiwg/.index/<name>/` | Configurable |
 
-All commands without `--graph` operate across all available project-local graphs (`project` + `codebase`). Use `--graph <name>` to target a specific graph.
+**`defaultBuild` behavior**: When you run `aiwg index build` with no `--graph` flag, every graph with `defaultBuild: true` is built. If a defaultBuild graph's scan directories do not exist (e.g. `codebase` in a docs-only repo), it is skipped with a warning rather than erroring. To require a graph's directories to exist, request it explicitly: `aiwg index build --graph codebase`.
+
+All commands without `--graph` operate across all available project-local graphs (`project` + `codebase`). Use `--graph <name>` to target a specific graph, including user-defined ones.
 
 ### index
 
@@ -2225,7 +2228,7 @@ aiwg index <subcommand> [options]
 - `stats` - Show index statistics
 
 **Global option (all subcommands):**
-- `--graph <type>` - Target a specific graph: `project`, `codebase`, or `framework`
+- `--graph <name>` - Target a specific graph: built-in (`project`, `codebase`, `framework`) or user-defined
 
 **Capabilities:** cli, index, artifacts, search, dependencies
 **Platforms:** All
@@ -2244,17 +2247,57 @@ aiwg index build [options]
 **Options:**
 - `--force` - Full rebuild (ignore checksums, re-index everything)
 - `--verbose` - Show detailed progress during indexing
-- `--scope <dir>` - Limit scan to a specific subdirectory
-- `--graph <type>` - Build a single graph only (`project`, `codebase`, `framework`)
+- `--all` - Build all known graphs (built-in + user-defined)
+- `--scope <dir>` - Limit scan to a specific subdirectory (relative to project root)
+- `--graph <name>` - Build a single graph only — built-in (`project`, `codebase`, `framework`) or user-defined
 
-**Default behavior** (no `--graph`): Builds `project` + `codebase` graphs only. The `framework` graph covers the AIWG framework source (`agentic/code/`, `docs/`) and must be built explicitly with `--graph framework`.
+**Default behavior** (no `--graph`): Builds all graphs with `defaultBuild: true`. Built-in defaults: `project` (always) and `codebase` (skipped with a warning if `src/`, `test/`, `tools/` are absent). The `framework` graph covers AIWG framework source (`agentic/code/`, `docs/`) and must be built explicitly with `--graph framework`.
 
 **Incremental mode** (default): Only re-indexes files whose checksum has changed. Use `--force` for a full rebuild.
+
+**User-defined graphs**: Define custom index graphs in `.aiwg/config.yaml` under `index.graphs`. Each graph gets its own named index under `.aiwg/.index/<name>/`.
+
+```yaml
+# .aiwg/config.yaml
+index:
+  graphs:
+    references:
+      scanDirs:
+        - documentation/references
+      extensions:
+        - .md
+      defaultBuild: false   # only built when explicitly requested via --graph references
+```
+
+Fields:
+- `scanDirs` (required) — directories to scan, relative to project root
+- `extensions` — file extensions to index (default: `.md`, `.yaml`, `.json`)
+- `defaultBuild` — whether to include in `aiwg index build` with no `--graph` (default: `true`)
+- `shared` — whether the graph is shared across projects (default: `false`)
+
+User-defined graph names cannot override built-in names (`project`, `codebase`, `framework`).
+
+**Documentation-only repos**: If your repo has no `src/`, `test/`, or `tools/` directories, `aiwg index build` will skip the `codebase` graph with a warning and still build the `project` graph. To index documentation under a custom path, define a user-defined graph:
+
+```yaml
+# .aiwg/config.yaml
+index:
+  graphs:
+    docs:
+      scanDirs:
+        - documentation
+        - guides
+      extensions:
+        - .md
+      defaultBuild: true
+```
+
+Then `aiwg index build` will automatically include your `docs` graph.
 
 **Examples:**
 
 ```bash
-# Build project + codebase (default)
+# Build project + codebase (default; codebase skipped if src/test/tools absent)
 aiwg index build
 
 # Full rebuild
@@ -2266,8 +2309,17 @@ aiwg index build --verbose
 # Build framework graph (agentic/code/ + docs/)
 aiwg index build --graph framework
 
-# Build a single graph
+# Build a single built-in graph
 aiwg index build --graph project
+
+# Build a user-defined graph
+aiwg index build --graph references
+
+# Build all graphs including user-defined
+aiwg index build --all
+
+# Scope to a specific subdirectory
+aiwg index build --scope documentation/references
 ```
 
 **Output structure:**

@@ -9,6 +9,9 @@
  * @tests @test/unit/artifacts/index-builder.test.ts
  */
 
+import fs from 'fs';
+import { load as loadYaml } from 'js-yaml';
+
 /**
  * A single indexed artifact entry
  */
@@ -263,12 +266,10 @@ export function loadUserGraphConfigs(cwd: string): string[] {
   const loaded: string[] = [];
 
   try {
-    const fs = await_fs();
     if (!fs.existsSync(configPath)) return loaded;
 
-    const { load } = await_yaml();
     const content = fs.readFileSync(configPath, 'utf-8');
-    const config = load(content) as Record<string, unknown> | null;
+    const config = loadYaml(content) as Record<string, unknown> | null;
     if (!config || typeof config !== 'object') return loaded;
 
     const indexConfig = config.index as Record<string, unknown> | undefined;
@@ -299,16 +300,6 @@ export function loadUserGraphConfigs(cwd: string): string[] {
   }
 
   return loaded;
-}
-
-// Lazy imports to avoid circular dependency issues at module load time
-function await_fs(): typeof import('fs') {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  return require('fs');
-}
-function await_yaml(): { load: (s: string) => unknown } {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  return require('js-yaml');
 }
 
 /**

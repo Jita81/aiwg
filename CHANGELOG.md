@@ -37,6 +37,15 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 | **Model evaluation suite** | Evaluate local/cloud models across 6 dimensions. Backed by `@matric/eval-client`. |
 | **`aiwg ralph --attach` / `ralph-attach`** | Stay attached to or re-attach to any running agent loop's output from any terminal. |
 | **MCP sidecar docs (all 8 providers)** | Full integration guides, minimal + full config templates, quickstart sections for every provider. |
+| **VS Code extension** | `@aiwg` Copilot chat participant, MCP auto-config, status bar, sidebar tree. Phase 1 + 2. (#623) |
+| **Daemon platform tiers** | Tier 1 (native headless), Tier 2 (PTY adapter), Tier 3 (unsupported). In capability matrix. |
+| **PTY adapter** | `aiwg daemon pty start/list/stop` — bridge Tier 1 TUIs over pseudo-terminal. `node-pty` optional. (#656) |
+| **Contract syntax for skills** | `requires:`/`ensures:`/`errors:`/`invariants:` + `contract-manifest` + `contract-validate`. (#644) |
+| **`issue-planner` + `induct-research` skills** | Research-grounded backlog generation. Human approval gate. Research routing to Gitea/GitHub/Jira. |
+| **`human-authorization` rule** | Recommendation ≠ authorization. Agents confirm before high-stakes implied actions. HIGH. (#655) |
+| **5 OpenProse antipattern rules** | `god-session`, `vague-discretion`, `context-bloat`, `parallel-then-synthesize`, `implicit-dependencies`. aiwg-utils: 7 → 13 rules. (#648) |
+| **prose-integration addon complete** | `prose-detect` + `prose-install` + `prose-resolution`. 7-skill count. Centralized detection. (#649) |
+| **`[all]` platforms token** | `platforms: [all]` replaced at deploy time. No more hardcoded provider lists. (#651–#653) |
 
 ### Added
 
@@ -100,9 +109,25 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 - **MCP config injection** (#554) — `aiwg config` can inject MCP server configurations into supported providers
 - **Claude Code reference expansion** (#570–#573) — Agent Teams, scheduled agents, remote triggers, and worktree isolation documented in depth; `subagent_type` catalog audited against Claude Code built-in types
 - **Test fixtures refactor** (#614) — hardcoded model names extracted into shared fixtures across test suites
+- **VS Code extension** — `vscode-extension/` directory; `@aiwg` Copilot chat participant with `/deploy`, `/status`, `/skill`, `/pipeline`, `/eval`, `/productionize` routing; MCP auto-config (idempotent `.vscode/mcp.json` writer); status bar showing installed frameworks + providers; sidebar tree views (Status, Frameworks, Scripts); bundled JSON Schema for `aiwg.config.json` (autocomplete + inline validation); brand assets (favicon, logo, 128×128 marketplace icon, activity bar icon) (#623)
+- **Daemon platform tier classification** — Tier 1 (native headless: claude-code, opencode, warp, openclaw, codex), Tier 2 (PTY adapter secondary: claude-code + codex), Tier 3 (unsupported — IDE/display server required: copilot, factory, cursor, windsurf); `daemon_tier` and `daemon_pty_adapter` fields in capability matrix; `getDaemonTier()` and `daemonCapableProviders()` TypeScript helpers (#656)
+- **PTY adapter** (`tools/daemon/pty-adapter.mjs`) — bridge any Tier 1 platform TUI over a pseudo-terminal using `node-pty`; `aiwg daemon pty start <platform>`, `pty list`, `pty stop <session-id>`; session state persisted to `.aiwg/daemon/pty/<sessionId>.json`; `node-pty` added as `optionalDependency` with graceful fallback error (#656)
+- **Contract syntax for skills** — `requires:`, `ensures:`, `errors:`, `invariants:` contract fields on SKILL.md files; `contract-manifest` skill generates human-readable chain manifests with data-flow wiring analysis and optional Mermaid diagram; `contract-validate` skill gives pass/fail verdict on skill chains at wiring time, catching missing dependencies before runtime; `--strict` and `--external` flags (#644)
+- **`issue-planner` skill** (sdlc-complete) — research-grounded SDLC issue planning; dispatches parallel research agents (best practices, current research, vendor docs), generates full SDLC doc corpus with gate checks, produces prioritized dependency-ordered issue backlog, requires human approval before filing, outputs `address-issues` invocation instructions
+- **`induct-research` skill** (research-complete) — research analogue of `address-issues`; accepts any target (file, directory, URI, issue reference), classifies and analyzes sources in parallel, routes filing to Gitea MCP / GitHub CLI / Jira REST / Codehound; `--induct-research` flag on `issue-planner` collects references found during parallel research and files structured induction tasks; supports `AIWG_RESEARCH_REPO` env var
+- **`human-authorization` rule** (HIGH, aiwg-utils) — agents must seek explicit human authorization before irreversible or high-stakes actions implied by findings; Rule 1: recommendation ≠ authorization; five enforceable rules with agent authoring guidance (#655)
+- **OpenProse antipattern rules** (aiwg-utils) — 5 rules derived from OpenProse research (#617): `god-session` (HIGH: >7 responsibilities → decompose), `vague-discretion` (HIGH: gate conditions must be concrete and measurable), `context-bloat` (MEDIUM: pass file paths not contents), `parallel-then-synthesize` (MEDIUM: parallelism is wrong when tasks aren't independent), `implicit-dependencies` (MEDIUM: sub-agents start clean; pass all context explicitly); aiwg-utils grows from 7 to 13 rules (#648)
+- **`prose-detect` skill** (prose-integration) — centralized OpenProse installation detector; 7-signal priority chain: env var → AIWG config → AIWG-local install → project plugin manifest → user home → global CLI → not found; `autoDetect: true` in manifest (#649, #650)
+- **`prose-install` skill** (prose-integration) — install OpenProse with user confirmation; `npx` → `git clone` fallback
+- **`prose-resolution` rule** (prose-integration) — canonical path resolution protocol; all prose skills delegate detection to `prose-detect` rather than hardcoding paths
+- **prose-integration addon completion** — `prose-detect` + `prose-install` + `prose-resolution` + `docs/integration-guide.md`; Step 0 detection centralized across all prose skills (`prose-run`, `prose-validate`, `forme-manifest`, `prose-reader`); contract fields on all skills; 7-skill count (#649)
+- **`[all]` platforms token** — `platforms: [all]` in agent `.md` files replaced with the target platform at deploy time; `injectPlatform` option in base deployer; 5 grounding/diversifier agents converted from hardcoded lists to `[all]` (#651, #652, #653)
+- **OpenProse research review report** (`docs/reports/openprose-review.md`) — basis for 5 new antipattern rules (#617)
 
 ### Fixed
 
+- **`aiwg index build` hard-error on docs-only repos** — `codebase` graph (defaultBuild, scans `src/test/tools`) now skips with a warning when those directories don't exist; only errors when `--graph codebase` is explicitly requested (#658)
+- **User-defined graphs not recognized via `--graph`** — `loadUserGraphConfigs` used `require()` which is undefined in ESM; replaced with static `import`; user graphs in `.aiwg/config.yaml` now load and validate correctly (#659)
 - **`sdlc-accelerate` handler** — "No handler found" error; `SdlcAccelerateHandler` implemented
 - **External agent loop startup crash** — `SemanticMemory` constructors received objects instead of path strings; loops always dead on arrival
 - **`--dangerous` flag position** — was appended after prompt; moved before so it is treated as CLI flag
@@ -117,9 +142,12 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 - **`sync.ts` unused variable warnings** — removed unused `providerResult` and `versionResult` assignments
 - **Incorrect provider configs** — Hermes was listed as a spawnable binary (it is not; it is model-series-only accessible via Ollama or MCP); OpenCode's `promptPrefix` was missing `['run']`, causing invocations without the required subcommand
 - **`CommandCategory` type** — added `'daemon'` variant; fixed missing categories in help order
+- **`new-project` in skills catalog** — was not registered in `skills.manifest.json`; now correctly discoverable via `aiwg skills list`
 
 ### Changed
 
+- **`aiwg index build --help`** — now shows full usage including `--scope`, `--all`, user-defined graph usage, and `defaultBuild` semantics; `--graph` description updated to mention user-defined names (#660)
+- **`docs/cli-reference.md` index section** — documents user-defined graphs (`index.graphs` config schema), `defaultBuild` behavior, doc-only repo example, and `--all` flag (#660)
 - **`aiwg add-command`** — deprecated; `aiwg add-skill` is the replacement
 - **All CLI commands** — consistent output via shared `ui.ts` module
 - **`aiwg use` post-deploy guidance** — `<provider>/<framework>` keys; platform-appropriate next steps
@@ -129,6 +157,8 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 - **`aiwg index stats`** — `--graph` flag now optional; flexible graph type support (#425, #426)
 - **`aiwg index`** — deploy next-steps guidance added to post-build output; verbose mode flag
 - **`CommandCategory` type** — extended with `'orchestration'` (Mission Control), `'config'`, `'ops'`, and `'daemon'` variants; CLI handler index updated with `skillsHandler`, `configHandler`, `opsHandler`
+- **BEHAVIOR.md platform lists** — all 6 behaviors updated to the full Tier 1 daemon set `[claude-code, opencode, warp, openclaw, codex]`; `cursor` removed from concierge (Tier 3 — VS Code extension host required) (#654, #656)
+- **aiwg-utils rule count** — 7 → 13 rules (added `human-authorization` + 5 OpenProse antipatterns)
 
 [2026.3.2]: https://github.com/jmagly/aiwg/compare/v2026.3.2...v2026.4.0
 

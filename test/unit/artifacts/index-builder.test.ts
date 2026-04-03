@@ -10,7 +10,70 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import { parseFrontmatter, extractMentions, buildIndex } from '../../../src/artifacts/index-builder.js';
-import { INDEX_DIR } from '../../../src/artifacts/types.js';
+import { INDEX_DIR, GRAPH_CONFIGS, loadUserGraphConfigs } from '../../../src/artifacts/types.js';
+
+describe('loadUserGraphConfigs', () => {
+  let tmpDir: string;
+
+  beforeEach(() => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'aiwg-graphs-test-'));
+  });
+
+  afterEach(() => {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+    // Clean up any user-defined graphs added to GRAPH_CONFIGS
+    for (const key of Object.keys(GRAPH_CONFIGS)) {
+      if (!['framework', 'project', 'codebase'].includes(key)) {
+        delete GRAPH_CONFIGS[key];
+      }
+    }
+  });
+
+  it('should load user-defined graphs from .aiwg/config.yaml', () => {
+    const aiwgDir = path.join(tmpDir, '.aiwg');
+    fs.mkdirSync(aiwgDir, { recursive: true });
+    fs.writeFileSync(path.join(aiwgDir, 'config.yaml'), `
+index:
+  graphs:
+    references:
+      scanDirs:
+        - documentation/references
+      extensions:
+        - .md
+      defaultBuild: false
+`);
+
+    const loaded = loadUserGraphConfigs(tmpDir);
+
+    expect(loaded).toContain('references');
+    expect(GRAPH_CONFIGS['references']).toBeDefined();
+    expect(GRAPH_CONFIGS['references'].scanDirs).toEqual(['documentation/references']);
+    expect(GRAPH_CONFIGS['references'].extensions).toEqual(['.md']);
+    expect(GRAPH_CONFIGS['references'].defaultBuild).toBe(false);
+  });
+
+  it('should not override built-in graph names', () => {
+    const aiwgDir = path.join(tmpDir, '.aiwg');
+    fs.mkdirSync(aiwgDir, { recursive: true });
+    fs.writeFileSync(path.join(aiwgDir, 'config.yaml'), `
+index:
+  graphs:
+    project:
+      scanDirs:
+        - custom-dir
+`);
+
+    loadUserGraphConfigs(tmpDir);
+
+    // project should still point to .aiwg, not custom-dir
+    expect(GRAPH_CONFIGS['project'].scanDirs).toEqual(['.aiwg']);
+  });
+
+  it('should return empty array when config.yaml does not exist', () => {
+    const loaded = loadUserGraphConfigs(tmpDir);
+    expect(loaded).toEqual([]);
+  });
+});
 
 describe('Artifact Index Builder', () => {
   describe('parseFrontmatter', () => {
@@ -238,6 +301,37 @@ type: use-case
       });
 
       await expect(buildIndex(path.join(tmpDir, 'nonexistent'))).rejects.toThrow('process.exit');
+
+      exitSpy.mockRestore();
+      consoleSpy.mockRestore();
+      logSpy.mockRestore();
+    });
+
+    it('should skip gracefully when defaultBuild graph dirs do not exist (non-explicit)', async () => {
+      // tmpDir has no src/test/tools — codebase graph should warn and return, not error
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => {
+        throw new Error('process.exit');
+      });
+
+      await expect(buildIndex(tmpDir, { graph: 'codebase', explicit: false })).resolves.toBeUndefined();
+
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('codebase graph: scan directories not found'));
+      expect(exitSpy).not.toHaveBeenCalled();
+
+      exitSpy.mockRestore();
+      warnSpy.mockRestore();
+    });
+
+    it('should error when explicitly requested graph dirs do not exist', async () => {
+      // explicit: true (--graph codebase) should still hard-error
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => {
+        throw new Error('process.exit');
+      });
+
+      await expect(buildIndex(tmpDir, { graph: 'codebase', explicit: true })).rejects.toThrow('process.exit');
 
       exitSpy.mockRestore();
       consoleSpy.mockRestore();

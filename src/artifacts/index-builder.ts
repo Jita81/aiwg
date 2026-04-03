@@ -24,6 +24,7 @@ export interface BuildOptions {
   scope?: string;
   outputDir?: string; // Override index output directory (default: <cwd>/.aiwg/.index/)
   graph?: GraphType;  // Target a specific graph (default: project for backward compat)
+  explicit?: boolean; // true when graph was requested via --graph flag; false for auto-selected defaultBuild graphs
 }
 
 /**
@@ -136,7 +137,7 @@ export async function buildIndex(
   cwd: string,
   options: BuildOptions = {}
 ): Promise<void> {
-  const { force = false, verbose = false, scope, outputDir, graph } = options;
+  const { force = false, verbose = false, scope, outputDir, graph, explicit = true } = options;
   const startTime = Date.now();
 
   // Ensure user-defined graphs are loaded
@@ -163,6 +164,13 @@ export async function buildIndex(
   // Verify at least one scan directory exists
   const existingDirs = scanDirs.filter(d => fs.existsSync(d));
   if (existingDirs.length === 0) {
+    // If this graph was auto-selected (defaultBuild) rather than explicitly requested via --graph,
+    // skip gracefully — a docs-only repo should not be forced to have src/test/tools.
+    if (graphConfig?.defaultBuild && !explicit) {
+      const relDirs = scanDirs.map(d => path.relative(cwd, d)).join(', ');
+      console.warn(`Warning: ${graph} graph: scan directories not found (${relDirs}), skipping`);
+      return;
+    }
     console.error(`Error: No scan directories found: ${scanDirs.join(', ')}`);
     console.log('Run this command from a project with the required directories.');
     process.exit(1);
