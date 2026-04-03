@@ -4,9 +4,19 @@ Core meta-utility rules for agent coordination, context management, and platform
 
 ---
 
-## AIWG Utilities Rules (8 rules — active with aiwg-utils addon)
+## AIWG Utilities Rules (13 rules — active with aiwg-utils addon)
 
 ### HIGH
+
+#### god-session
+**Summary**: A single agent that tries to do everything — research, implement, test, document, deploy — is a god session. God sessions are hard to debug, impossible to parallelize, and produce inconsistent results. Agent definitions must have a focused scope of ≤5–7 distinct responsibilities. When an agent discovers adjacent work mid-session, file issues rather than absorbing them.
+**When to apply**: Agent definition creation, reviewing agent scope, mid-session scope creep detection, multi-domain task planning
+**Full rule**: @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/god-session.md
+
+#### vague-discretion
+**Summary**: Loop termination conditions and quality gates must be concrete and measurable. Vague conditions — "good enough", "zero bugs", "comprehensive", "thorough" — cannot be evaluated consistently and cause infinite loops, premature exits, or wildly varying quality. Replace with specific thresholds, counts, or verifiable outcomes. Every loop must also have a `max-cycles` or `max-iterations` escape hatch.
+**When to apply**: Writing skill loop conditions, Ralph completion criteria, phase gate criteria, quality rubrics, any "done when" specification
+**Full rule**: @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md
 
 #### subagent-scoping
 **Summary**: Each subagent gets ONE focused task with minimal context. Decompose complex work into parallel subagents rather than overloading one. Prompt budget <20% of context window per subagent. No delegation chains deeper than 2 levels. Spawn many focused subagents over few overloaded ones. When `AIWG_CONTEXT_WINDOW` is set, concurrent parallel count must respect the budget limit.
@@ -35,6 +45,21 @@ Core meta-utility rules for agent coordination, context management, and platform
 
 ### MEDIUM
 
+#### context-bloat
+**Summary**: Sub-agents should receive only the context directly relevant to their task. Pass file paths (not file contents) when the agent will read files itself. Do not forward conversation history — sub-agents are clean-slate processes. Before dispatching, audit the prompt: if >50% is background rather than task-critical information, trim aggressively. Complements `subagent-scoping` with a cost-focused lens on information quantity.
+**When to apply**: Sub-agent prompt construction, orchestrator fan-out, multi-agent chaining, cost optimization reviews
+**Full rule**: @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/context-bloat.md
+
+#### parallel-then-synthesize
+**Summary**: Spawning parallel agents for *related* analytical work that feeds one conclusion often produces lower quality than a single focused agent — coordination overhead and context fragmentation outweigh parallelism benefits. Parallelism is correct when tasks are genuinely independent (each agent's output stands alone). It is counterproductive when the synthesis step requires choosing between conflicting assessments rather than combining complementary outputs.
+**When to apply**: Designing parallel dispatch patterns, analytical workflows, deciding when to parallelize vs. single-agent, RLM divide-conquer design
+**Full rule**: @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/parallel-then-synthesize.md
+
+#### implicit-dependencies
+**Summary**: Sub-agents must receive all required context explicitly — they have no access to the parent session's conversation, prior agent outputs, or any context not in their prompt. Never assume a sub-agent will "remember" what was discussed earlier. Pass prior outputs explicitly when chaining agents. The inverse of context-bloat: this rule prevents giving too little context.
+**When to apply**: Sub-agent prompt construction, agent chaining, orchestrator fan-out, any time prior session knowledge needs to carry forward
+**Full rule**: @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/implicit-dependencies.md
+
 #### context-budget
 **Summary**: When `AIWG_CONTEXT_WINDOW` is set in project context, agents must respect the declared context budget for parallel subagent spawning. Opt-in directive with lookup tables: max parallel count scales from 1 (32k) to 20 (512k+). Formula: `max(1, floor(context_window / 50000))`. Includes compaction guidance per tier (aggressive, moderate, standard, relaxed) and per-subagent output size targets.
 **When to apply**: Parallel subagent spawning, task scheduling, agent loop batching, orchestrator fan-out on constrained systems
@@ -57,16 +82,20 @@ Core meta-utility rules for agent coordination, context management, and platform
 | Task Type | Relevant Rules |
 |-----------|---------------|
 | **Delegating to subagents** | subagent-scoping, context-budget, instruction-comprehension |
+| **Sub-agent prompt construction** | context-bloat, implicit-dependencies, subagent-scoping |
 | **Interactive commands** | native-ux-tools, instruction-comprehension |
 | **Agent deployment** | agent-deployment |
+| **Agent definition scope** | god-session, subagent-scoping |
 | **Documentation** | diagram-generation |
 | **Research/decisions** | research-before-decision |
 | **Error diagnosis** | research-before-decision, instruction-comprehension |
 | **Constrained systems** | context-budget, subagent-scoping |
 | **Authorization gates** | human-authorization, native-ux-tools |
-| **Scope management** | human-authorization, instruction-comprehension |
+| **Scope management** | human-authorization, instruction-comprehension, god-session |
+| **Loop/gate conditions** | vague-discretion |
+| **Parallel dispatch design** | parallel-then-synthesize, subagent-scoping, context-budget |
 
 ---
 
-*Generated from aiwg-utils manifest.json — 8 rules*
+*Generated from aiwg-utils manifest.json — 13 rules*
 *Full rule files: @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/*

@@ -95,13 +95,18 @@
   ],
   "rules": [
     "agent-deployment",
+    "context-bloat",
     "context-budget",
+    "god-session",
     "human-authorization",
+    "implicit-dependencies",
     "instruction-comprehension",
+    "parallel-then-synthesize",
     "research-before-decision",
     "subagent-scoping",
     "diagram-generation",
-    "native-ux-tools"
+    "native-ux-tools",
+    "vague-discretion"
   ],
   "templates": [
     "devkit/addon-manifest",
