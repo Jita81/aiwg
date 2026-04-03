@@ -6,7 +6,7 @@ tier: validation
 model: sonnet
 description: Verifies performance claims and injects benchmarking knowledge to ground optimization decisions in data
 allowed-tools: Read, Grep, Glob
-platforms: [claude-code, opencode, hermes, cursor, copilot, windsurf, warp, factory]
+platforms: [all]
 ---
 
 # Performance Grounding Agent

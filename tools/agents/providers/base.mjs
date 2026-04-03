@@ -419,7 +419,7 @@ export function filterCommandsAgainstSkills(commandFiles, skillDirs) {
  * Handles transformation via provider's transform function
  */
 export function deployFiles(files, destDir, opts, transformFn) {
-  const { force = false, dryRun = false, provider = 'claude', fileExtension = '.md' } = opts;
+  const { force = false, dryRun = false, provider = 'claude', fileExtension = '.md', injectPlatform = false } = opts;
   const seen = new Set();
   const actions = [];
 
@@ -441,7 +441,13 @@ export function deployFiles(files, destDir, opts, transformFn) {
 
     // Read and transform source content
     const srcContent = fs.readFileSync(f, 'utf8');
-    const transformedContent = transformFn ? transformFn(f, srcContent, opts) : srcContent;
+    let transformedContent = transformFn ? transformFn(f, srcContent, opts) : srcContent;
+
+    // Inject target platform into agent .md files that use platforms: [all]
+    if (injectPlatform && provider && /platforms:\s*\[all\]/.test(transformedContent)) {
+      const platformName = PROVIDER_TO_PLATFORM[provider] || provider;
+      transformedContent = injectPlatformInContent(transformedContent, platformName);
+    }
 
     // Check if destination exists and compare contents
     if (fs.existsSync(dest)) {

@@ -6,7 +6,7 @@ tier: validation
 model: sonnet
 description: Verifies API usage, framework patterns, and technology claims against current documentation to prevent hallucinated APIs
 allowed-tools: Read, Grep, Glob, WebFetch
-platforms: [claude-code, opencode, hermes, cursor, copilot, windsurf, warp, factory]
+platforms: [all]
 ---
 
 # Technology Grounding Agent

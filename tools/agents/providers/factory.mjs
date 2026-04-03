@@ -367,7 +367,7 @@ argument-hint: ${argumentHint || '<task-description>'}`;
 export function deployAgents(agentFiles, targetDir, opts) {
   const destDir = path.join(targetDir, paths.agents);
   ensureDir(destDir, opts.dryRun);
-  return deployFiles(agentFiles, destDir, opts, transformAgent);
+  return deployFiles(agentFiles, destDir, { ...opts, injectPlatform: true }, transformAgent);
 }
 
 /**

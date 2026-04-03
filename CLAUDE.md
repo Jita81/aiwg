@@ -71,7 +71,7 @@ Use `@path/to/file.md` in your message to load specific documentation:
 
 ## Multi-Platform Support
 
-All 9 providers receive all 4 artifact types (agents, commands, skills, rules). OpenClaw additionally receives behaviors. Support level indicates how the platform discovers artifacts: **native** (auto-discovered), **conventional** (AIWG directory), **aggregated** (single-file + discrete).
+All 10 providers receive all 4 artifact types (agents, commands, skills, rules). OpenClaw additionally receives behaviors. Support level indicates how the platform discovers artifacts: **native** (auto-discovered), **conventional** (AIWG directory), **aggregated** (single-file + discrete).
 
 | Platform | Agents | Commands | Skills | Rules | Command |
 |----------|--------|----------|--------|-------|---------|
@@ -84,6 +84,7 @@ All 9 providers receive all 4 artifact types (agents, commands, skills, rules). 
 | Warp Terminal | `.warp/agents/` + WARP.md | `.warp/commands/` | `.warp/skills/` | `.warp/rules/` | `aiwg use sdlc --provider warp` |
 | Windsurf | AGENTS.md | `.windsurf/workflows/` | `.windsurf/skills/` | `.windsurf/rules/` | `aiwg use sdlc --provider windsurf` |
 | OpenClaw | `~/.openclaw/agents/` | `~/.openclaw/commands/` | `~/.openclaw/skills/` | `~/.openclaw/rules/` | `aiwg use sdlc --provider openclaw` |
+| Hermes | AGENTS.md | — | `~/.hermes/skills/` | — | `aiwg use sdlc --provider hermes` |
 
 **Special cases:**
 - **Codex**: Commands and skills deploy to home directory (`~/.codex/prompts/`, `~/.codex/skills/`) for user-level availability across all projects

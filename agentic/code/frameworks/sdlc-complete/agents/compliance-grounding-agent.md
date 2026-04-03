@@ -6,7 +6,7 @@ tier: validation
 model: sonnet
 description: Verifies compliance claims against GDPR, HIPAA, SOC2, and PCI-DSS requirements to prevent regulatory gaps
 allowed-tools: Read, Grep, Glob
-platforms: [claude-code, opencode, hermes, cursor, copilot, windsurf, warp, factory]
+platforms: [all]
 ---
 
 # Compliance Grounding Agent

@@ -6,7 +6,7 @@ tier: generation
 model: sonnet
 description: Generates diverse alternatives using Verbalized Sampling techniques to combat RLHF mode collapse
 allowed-tools: Read, Write, Bash
-platforms: [claude-code, opencode, hermes, cursor, copilot, windsurf, warp, factory]
+platforms: [all]
 ---
 
 # Content Diversifier

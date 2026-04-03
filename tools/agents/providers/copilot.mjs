@@ -365,7 +365,7 @@ function deriveApplyTo(srcPath, body) {
 export function deployAgents(agentFiles, targetDir, opts) {
   const destDir = path.join(targetDir, paths.agents);
   ensureDir(destDir, opts.dryRun);
-  return deployFiles(agentFiles, destDir, { ...opts, fileExtension: '.agent.md' }, transformAgent);
+  return deployFiles(agentFiles, destDir, { ...opts, fileExtension: '.agent.md', injectPlatform: true }, transformAgent);
 }
 
 /**

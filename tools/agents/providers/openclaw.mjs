@@ -103,7 +103,7 @@ export function transformCommand(srcPath, content, opts) {
  */
 function deployAgents(agentFiles, opts) {
   ensureDir(paths.agents, opts.dryRun);
-  return deployFiles(agentFiles, paths.agents, opts, transformAgent);
+  return deployFiles(agentFiles, paths.agents, { ...opts, injectPlatform: true }, transformAgent);
 }
 
 /**

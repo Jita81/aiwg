@@ -6,7 +6,7 @@ tier: validation
 model: sonnet
 description: Verifies security claims and injects OWASP/CWE knowledge into conversations to improve accuracy and reduce hallucination
 allowed-tools: Read, Grep, Glob
-platforms: [claude-code, opencode, hermes, cursor, copilot, windsurf, warp, factory]
+platforms: [all]
 ---
 
 # Security Grounding Agent
