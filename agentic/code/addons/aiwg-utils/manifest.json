@@ -96,6 +96,7 @@
   "rules": [
     "agent-deployment",
     "context-budget",
+    "human-authorization",
     "instruction-comprehension",
     "research-before-decision",
     "subagent-scoping",

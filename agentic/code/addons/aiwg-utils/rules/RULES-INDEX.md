@@ -4,7 +4,7 @@ Core meta-utility rules for agent coordination, context management, and platform
 
 ---
 
-## AIWG Utilities Rules (7 rules — active with aiwg-utils addon)
+## AIWG Utilities Rules (8 rules — active with aiwg-utils addon)
 
 ### HIGH
 
@@ -27,6 +27,11 @@ Core meta-utility rules for agent coordination, context management, and platform
 **Summary**: Agents MUST prefer platform-native interaction tools (e.g., AskUserQuestion in Claude Code) over plain text output for interactive questions. Check tool availability before asking, fall back to formatted markdown if unavailable. One question per interaction turn. Includes platform capability matrix for all 8 supported platforms.
 **When to apply**: Interactive commands (--interactive flag), decision gates, user confirmations, intake wizards, any agent question
 **Full rule**: @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/native-ux-tools.md
+
+#### human-authorization
+**Summary**: Agents must seek explicit human authorization before irreversible or high-stakes actions — especially when those actions are implied by findings rather than explicitly requested. A recommendation is not authorization to act. Covers: removal of artifacts, scope expansion beyond task, closing work items with implied resolution, acting on research findings. Pattern: discover → report → await authorization → act. Agents must proactively recognize scope boundaries; don't rely on system-level friction as the only gate.
+**When to apply**: Any action not explicitly stated in the task, removal of files/artifacts/components, scope expansion, closing issues, acting on review findings or recommendations, changes to shared resources
+**Full rule**: @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md
 
 ### MEDIUM
 
@@ -58,8 +63,10 @@ Core meta-utility rules for agent coordination, context management, and platform
 | **Research/decisions** | research-before-decision |
 | **Error diagnosis** | research-before-decision, instruction-comprehension |
 | **Constrained systems** | context-budget, subagent-scoping |
+| **Authorization gates** | human-authorization, native-ux-tools |
+| **Scope management** | human-authorization, instruction-comprehension |
 
 ---
 
-*Generated from aiwg-utils manifest.json — 7 rules*
+*Generated from aiwg-utils manifest.json — 8 rules*
 *Full rule files: @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/*
