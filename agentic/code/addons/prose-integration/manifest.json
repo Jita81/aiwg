@@ -1,0 +1,49 @@
+{
+  "id": "prose-integration",
+  "type": "addon",
+  "name": "OpenProse Integration",
+  "version": "0.1.0",
+  "description": "Tools for reading, parsing, validating, and executing OpenProse programs from AIWG workflows",
+  "core": false,
+  "autoInstall": false,
+  "author": "AIWG Contributors",
+  "license": "MIT",
+  "repository": "https://github.com/jmagly/aiwg",
+  "keywords": [
+    "prose",
+    "openprose",
+    "contracts",
+    "forme",
+    "requires",
+    "ensures",
+    "markdown-programming"
+  ],
+  "entry": {
+    "skills": "skills/",
+    "rules": "rules/"
+  },
+  "skills": [
+    "prose-reader",
+    "prose-run",
+    "prose-validate",
+    "forme-manifest",
+    "prose-setup"
+  ],
+  "rules": [
+    "prose-bridge"
+  ],
+  "dependencies": {
+    "required": [],
+    "optional": [
+      "rlm",
+      "aiwg-utils"
+    ]
+  },
+  "configuration": {
+    "defaults": {
+      "proseRoot": "/tmp/prose/skills/open-prose",
+      "proseStateDir": ".aiwg/working/prose-runs",
+      "defaultModel": "opus"
+    }
+  }
+}
