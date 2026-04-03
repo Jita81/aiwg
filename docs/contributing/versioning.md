@@ -132,6 +132,11 @@ git tag -m "v2026.1.5-beta.1" v2026.1.5-beta.1
 git push origin v2026.1.5-beta.1
 # CI publishes to npm --tag next → npm install aiwg@next
 
+# RC — release candidate (note: lowercase, dot-separated — matches npm semver)
+git tag -m "v2026.1.5-rc.1" v2026.1.5-rc.1
+git push origin v2026.1.5-rc.1
+# CI publishes to npm --tag next → npm install aiwg@next
+
 # Stable
 git tag -m "v2026.1.5" v2026.1.5
 git push origin v2026.1.5
@@ -154,7 +159,7 @@ dev (local) → nightly → alpha → beta → RC → stable
 | Nightly | `vYYYY.M.PATCH-nightly.YYYYMMDD` | `v2026.1.5-nightly.20260324` | `nightly` | Automated or ad-hoc snapshot |
 | Alpha | `vYYYY.M.PATCH-alpha.N` | `v2026.1.5-alpha.1` | `next` | Early testing, pipeline validation |
 | Beta | `vYYYY.M.PATCH-beta.N` | `v2026.1.5-beta.1` | `next` | Feature-complete, broader testing |
-| RC | `vYYYY.M.PATCH-RCN` | `v2026.1.5-RC1` | `next` | Release candidate, final pre-stable |
+| RC | `vYYYY.M.PATCH-rc.N` | `v2026.1.5-rc.1` | `next` | Release candidate, final pre-stable |
 | Stable | `vYYYY.M.PATCH` | `v2026.1.5` | `latest` | Public release |
 
 Alpha, beta, and RC all publish to the `next` dist-tag. The latest of these is always what `npm install -g aiwg@next` installs.
@@ -165,7 +170,7 @@ Alpha, beta, and RC all publish to the `next` dist-tag. The latest of these is a
 npm install -g aiwg                  # stable (latest dist-tag, default)
 npm install -g aiwg@next             # latest alpha/beta/RC
 npm install -g aiwg@nightly          # latest nightly snapshot
-npm install -g aiwg@2026.1.5-RC3     # specific RC by exact version
+npm install -g aiwg@2026.1.5-rc.3    # specific RC by exact version
 aiwg sync --channel next             # switch installed version to next channel
 aiwg sync --channel latest           # switch back to stable
 ```

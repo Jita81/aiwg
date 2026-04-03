@@ -508,7 +508,7 @@ This is a standard multi-stage release pipeline. Pre-release tags are **internal
 | Nightly | `vYYYY.M.PATCH-nightly.YYYYMMDD` | `v2026.4.0-nightly.20260403` | `nightly` | `npm install -g aiwg@nightly` |
 | Alpha | `vYYYY.M.PATCH-alpha.N` | `v2026.4.0-alpha.1` | `next` | `npm install -g aiwg@next` |
 | Beta | `vYYYY.M.PATCH-beta.N` | `v2026.4.0-beta.1` | `next` | `npm install -g aiwg@next` |
-| RC | `vYYYY.M.PATCH-RCN` | `v2026.4.0-RC3` | `next` | `npm install -g aiwg@next` |
+| RC | `vYYYY.M.PATCH-rc.N` | `v2026.4.0-rc.3` | `next` | `npm install -g aiwg@next` |
 | Stable | `vYYYY.M.PATCH` | `v2026.4.0` | `latest` | `npm install -g aiwg` (default) |
 
 **Channel commands:**
@@ -516,7 +516,7 @@ This is a standard multi-stage release pipeline. Pre-release tags are **internal
 npm install -g aiwg              # stable (latest dist-tag)
 npm install -g aiwg@next         # latest alpha/beta/RC
 npm install -g aiwg@nightly      # latest nightly snapshot
-npm install -g aiwg@2026.4.0-RC3 # specific RC by exact version
+npm install -g aiwg@2026.4.0-rc.3 # specific RC by exact version
 aiwg sync --channel next         # switch installed version to next channel
 aiwg sync --channel latest       # switch back to stable
 ```
