@@ -3,7 +3,20 @@ name: prose-run
 description: Execute an OpenProse program within the current AIWG session, following the two-phase model (Forme wiring + Prose VM execution)
 version: 0.1.0
 platforms: [all]
-
+requires:
+  - program: path to an OpenProse program file (.md with contract frontmatter)
+  - "if program has requires: fields: values for each required input"
+ensures:
+  - output: the program's ensures: outputs, delivered per contract obligation
+  - run-state: execution artifacts saved to .aiwg/working/prose-runs/{run-id}/
+  - "if multi-service (kind: program + services:): wiring manifest generated before execution"
+errors:
+  - prose-not-found: OpenProse installation not detected; run /prose-detect for guidance
+  - invalid-program: program file fails prose-validate checks; fix contract before running
+  - context-exceeded: multi-service program exceeds available context budget; split into smaller programs
+invariants:
+  - Opus-class model required; Sonnet is insufficient for reliable Prose VM simulation
+  - execution state written to .aiwg/working/prose-runs/ only; no writes outside that path
 ---
 
 # Prose Run Skill
@@ -24,21 +37,21 @@ You execute OpenProse programs by loading the Prose VM specification into contex
 
 ## Behavior
 
-### Step 0: Ensure OpenProse is Installed
+### Step 0: Detect OpenProse Installation
 
-Before execution, verify OpenProse is available. If not found at the configured path (default `/tmp/prose`), **automatically clone** the latest version:
+Run `/prose-detect` to locate the OpenProse installation and resolve `PROSE_ROOT`. If not found, stop and report:
 
-```bash
-git clone https://github.com/openprose/prose.git /tmp/prose
+```
+OpenProse not found. Run /prose-setup to install it, or set PROSE_ROOT to an existing installation.
 ```
 
 ### Step 1: Locate Prose Specs
 
-Check for the Prose VM and Forme specs:
+Using the `PROSE_ROOT` resolved by `/prose-detect`:
 
-1. Default location: `/tmp/prose/skills/open-prose/prose.md`
-2. Configured location: check `proseRoot` in addon config
-3. If not found after auto-install attempt: report error
+1. Prose VM spec: `$PROSE_ROOT/prose.md`
+2. Forme Container spec: `$PROSE_ROOT/forme.md`
+3. If files are missing at resolved path: report error (path is stale — re-run `/prose-detect`)
 
 ### Step 2: Read the Program
 

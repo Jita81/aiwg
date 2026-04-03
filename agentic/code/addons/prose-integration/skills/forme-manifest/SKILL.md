@@ -3,7 +3,19 @@ name: forme-manifest
 description: Read a multi-service OpenProse program directory, analyze all service contracts, and generate the Forme wiring manifest for inspection and debugging
 version: 0.1.0
 platforms: [all]
-
+requires:
+  - program-dir: path to directory containing a multi-service OpenProse program (index.md with kind: program and services: list)
+ensures:
+  - wiring-manifest: human-readable manifest showing service contracts, dependency graph, and execution order
+  - mermaid-diagram: visual dependency graph in Mermaid LR format
+  - issues: list of unwired dependencies, unused outputs, or circular dependency errors
+errors:
+  - prose-not-found: OpenProse installation not detected; run /prose-detect for guidance
+  - not-multi-service: target is a single-component program; wiring manifest not applicable
+  - circular-dependency: services form a dependency cycle; execution order cannot be determined
+invariants:
+  - no program execution occurs — forme-manifest is a static analysis tool
+  - ambiguous wiring (multiple possible sources for one requires:) is reported, not silently resolved
 ---
 
 # Forme Manifest Skill
@@ -24,12 +36,12 @@ A path to a directory containing a multi-service OpenProse program (must have an
 
 ## Behavior
 
-### Step 0: Ensure OpenProse is Installed
+### Step 0: Detect OpenProse Installation
 
-Before analysis, verify OpenProse is available. If not found at the configured path (default `/tmp/prose`), **automatically clone** the latest version:
+Run `/prose-detect` to locate the OpenProse installation and resolve `PROSE_ROOT`. The Forme Container spec at `$PROSE_ROOT/forme.md` drives the wiring semantics used in this analysis. If not found, stop and report:
 
-```bash
-git clone https://github.com/openprose/prose.git /tmp/prose
+```
+OpenProse not found. Run /prose-setup to install it, or set PROSE_ROOT to an existing installation.
 ```
 
 ### Step 1: Read Entry Point

@@ -24,6 +24,7 @@
   },
   "skills": [
     "prose-detect",
+    "prose-install",
     "prose-reader",
     "prose-run",
     "prose-validate",
@@ -31,7 +32,8 @@
     "prose-setup"
   ],
   "rules": [
-    "prose-bridge"
+    "prose-bridge",
+    "prose-resolution"
   ],
   "dependencies": {
     "required": [],

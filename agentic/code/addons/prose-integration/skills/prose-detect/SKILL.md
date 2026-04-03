@@ -3,6 +3,19 @@ name: prose-detect
 description: Locate an existing OpenProse installation using a prioritized signal chain — env var, AIWG config, AIWG-local install, project plugin manifest, user home directory, or global CLI. Returns the resolved PROSE_ROOT path. Does not install OpenProse; triggers prose-setup if no installation is found.
 version: 0.1.0
 platforms: [all]
+requires:
+  - "nothing: prose-detect is self-contained — reads environment and filesystem only"
+ensures:
+  - PROSE_ROOT: resolved path to OpenProse skills/open-prose/ directory, validated to contain prose.md and forme.md
+  - detection-source: which signal resolved the path (env | aiwg-config | aiwg-local | plugin-manifest | user-home | cli)
+  - config-updated: .aiwg/config.json updated with resolved path for future calls
+  - "if not found: clear instructions to run /prose-install with suggested install path"
+errors:
+  - not-found: no valid OpenProse installation detected via any of the 7 signals
+invariants:
+  - never installs OpenProse silently — detection only; installation requires user confirmation via /prose-install
+  - always validates prose.md and forme.md exist at the resolved path before accepting it
+  - stale cached paths that fail validation are skipped and detection continues to next signal
 
 ---
 

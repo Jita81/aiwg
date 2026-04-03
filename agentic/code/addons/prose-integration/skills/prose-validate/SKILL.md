@@ -3,7 +3,18 @@ name: prose-validate
 description: Validate an OpenProse program file against Prose contract grammar without executing it — checks frontmatter, contract structure, service references, and strategy syntax
 version: 0.1.0
 platforms: [all]
-
+requires:
+  - target: path to a .md program file, or directory containing a multi-service program (index.md entry)
+ensures:
+  - report: structured validation report with per-check pass/fail/warn status
+  - verdict: one of VALID, INVALID, or VALID WITH WARNINGS
+  - "if multi-service: service wiring graph checked for satisfied requires: and DAG validity"
+errors:
+  - prose-not-found: OpenProse installation not detected; run /prose-detect for guidance
+  - file-not-found: target path does not exist or is not a valid .md file
+invariants:
+  - validation never executes the program — structural analysis only
+  - empty ensures: always fails; a program that ensures nothing is structurally invalid
 ---
 
 # Prose Validate Skill
@@ -23,15 +34,13 @@ A path to a `.md` file to validate, or a directory containing a multi-service pr
 
 ## Behavior
 
-### Step 0: Ensure OpenProse is Installed
+### Step 0: Detect OpenProse Installation
 
-Before validation, verify OpenProse is available. If not found at the configured path (default `/tmp/prose`), **automatically clone** the latest version:
+Run `/prose-detect` to locate the OpenProse installation and resolve `PROSE_ROOT`. The contract grammar spec at `$PROSE_ROOT/prose.md` is used as the validation reference. If not found, stop and report:
 
-```bash
-git clone https://github.com/openprose/prose.git /tmp/prose
 ```
-
-This ensures validation checks reference the latest contract grammar from the spec.
+OpenProse not found. Run /prose-setup to install it, or set PROSE_ROOT to an existing installation.
+```
 
 ### Validation Checks
 
