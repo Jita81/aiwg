@@ -237,6 +237,25 @@ Configure in `~/.factory/settings.json` or `.factory/settings.json`:
 }
 ```
 
+### Hook Runtime Contract
+
+Each hook invocation receives a **JSON payload via stdin**:
+
+```json
+{
+  "tool_name": "Write",
+  "tool_input": { "file_path": "/absolute/path/to/file" },
+  "cwd": "/absolute/path/to/project"
+}
+```
+
+**Exit code contract** (identical to Claude Code):
+- `0` — success, workflow continues
+- `2` — block, workflow halted (return JSON body with `reason` on stdout)
+- Other — hook error, logged, workflow continues
+
+For the full stdin schema (including Claude Code comparison), cross-platform field table, and bash parsing examples, see `.aiwg/references/platforms/factory-ai.md` sections 6.3.1–6.3.2.
+
 ---
 
 ## Headless / CI Execution

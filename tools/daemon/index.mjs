@@ -805,6 +805,64 @@ Options:
         const extraArgs = dashDash >= 0 ? args.slice(dashDash + 1) : [];
         const cols = this.flags.cols ? parseInt(this.flags.cols, 10) : 80;
         const rows = this.flags.rows ? parseInt(this.flags.rows, 10) : 24;
+        const useTmux = !!this.flags.tmux;
+
+        // --tmux path: spawn inside a named tmux session for reconnect support
+        if (useTmux) {
+          try {
+            const { execSync, execFileSync } = await import('child_process');
+            const { createHash, randomBytes } = await import('crypto');
+            const { PTYAdapter } = await import('./pty-adapter.mjs');
+
+            const sessionId = randomBytes(6).toString('hex');
+            const tmuxName = `aiwg-pty-${sessionId}`;
+
+            // Resolve platform binary
+            const PLATFORM_BINS = {
+              'claude-code': 'claude', opencode: 'opencode', codex: 'codex',
+              warp: 'warp-terminal', openclaw: 'openclaw',
+            };
+            const bin = PLATFORM_BINS[platform] || platform;
+            const fullCmd = [bin, ...extraArgs].join(' ');
+
+            // Start named tmux session detached
+            execSync(`tmux new-session -d -s "${tmuxName}" -x ${cols} -y ${rows} "${fullCmd}"`);
+
+            // Get the PID of the shell/process running inside the tmux pane
+            let pid = null;
+            try {
+              pid = parseInt(
+                execSync(`tmux list-panes -t "${tmuxName}" -F '#{pane_pid}'`).toString().trim(),
+                10,
+              );
+            } catch { /* leave null if tmux version doesn't support format strings */ }
+
+            // Write session file (compatible with PTYAdapter.getSession)
+            PTYAdapter._ensureSessionDir();
+            const sessionFile = path.join('.aiwg/daemon/pty', `${sessionId}.json`);
+            fs.writeFileSync(
+              sessionFile,
+              JSON.stringify({
+                sessionId, platform, bin,
+                pid, cols, rows,
+                tmuxSession: tmuxName,
+                cwd: process.cwd(),
+                started_at: new Date().toISOString(),
+              }, null, 2),
+            );
+
+            console.log(`PTY session started in tmux: ${sessionId}`);
+            console.log(`  Platform:     ${platform}`);
+            console.log(`  tmux session: ${tmuxName}`);
+            console.log(`  Reattach:     aiwg daemon pty attach ${sessionId}`);
+            console.log(`  Or directly:  tmux attach-session -t ${tmuxName}`);
+          } catch (error) {
+            console.error(`Failed to start tmux PTY session: ${error.message}`);
+            console.error('Ensure tmux is installed: apt install tmux / brew install tmux');
+            process.exit(1);
+          }
+          break;
+        }
 
         try {
           const { PTYAdapter } = await import('./pty-adapter.mjs');
@@ -881,10 +939,62 @@ Options:
           }
 
           try { process.kill(session.pid, 'SIGTERM'); } catch { /* already gone */ }
+          // Also stop tmux session if one was created
+          if (session.tmuxSession) {
+            try {
+              const { execSync } = await import('child_process');
+              execSync(`tmux kill-session -t ${session.tmuxSession} 2>/dev/null`, { stdio: 'ignore' });
+            } catch { /* tmux session may already be gone */ }
+          }
           PTYAdapter._removeSession(sessionId);
           console.log(`PTY session ${sessionId} stopped`);
         } catch (error) {
           console.error(`Failed to stop PTY session: ${error.message}`);
+          process.exit(1);
+        }
+        break;
+      }
+
+      case 'attach': {
+        const sessionId = args[0];
+        if (!sessionId) {
+          console.error('Usage: aiwg daemon pty attach <session-id>');
+          process.exit(1);
+        }
+
+        try {
+          const { PTYAdapter } = await import('./pty-adapter.mjs');
+          const session = PTYAdapter.getSession(sessionId);
+          if (!session) {
+            console.error(`Session not found or expired: ${sessionId}`);
+            console.error('List active sessions with: aiwg daemon pty list');
+            process.exit(1);
+          }
+
+          if (session.tmuxSession) {
+            // Attach via named tmux session
+            const proc = spawn('tmux', ['attach-session', '-t', session.tmuxSession], {
+              stdio: 'inherit',
+            });
+            proc.on('close', (code) => process.exit(code ?? 0));
+            proc.on('error', (err) => {
+              console.error(`Failed to attach to tmux session: ${err.message}`);
+              console.error(`Attach manually: tmux attach-session -t ${session.tmuxSession}`);
+              process.exit(1);
+            });
+          } else {
+            // No tmux session — show info and suggest --tmux for future sessions
+            console.log(`Session info:`);
+            console.log(`  ID:       ${session.sessionId}`);
+            console.log(`  Platform: ${session.platform}`);
+            console.log(`  PID:      ${session.pid}`);
+            console.log(`  Started:  ${session.started_at}`);
+            console.log('');
+            console.log('This session was started without --tmux and cannot be reattached.');
+            console.log(`To start a reconnectable session: aiwg daemon pty start ${session.platform} --tmux`);
+          }
+        } catch (error) {
+          console.error(`Failed to attach: ${error.message}`);
           process.exit(1);
         }
         break;
@@ -895,9 +1005,10 @@ Options:
 Usage: aiwg daemon pty <subcommand> [options]
 
 Subcommands:
-  start <platform>   Spawn a platform TUI under a PTY and bridge I/O
-  list               List active PTY sessions
-  stop <session-id>  Stop a PTY session
+  start <platform>         Spawn a platform TUI under a PTY and bridge I/O
+  attach <session-id>      Reattach to a running PTY session (requires --tmux)
+  list                     List active PTY sessions
+  stop <session-id>        Stop a PTY session
 
 Platforms (Tier 1 — native daemon; Tier 2 — PTY adapter):
   claude-code        Claude Code CLI  (Tier 1 + PTY adapter)
@@ -909,17 +1020,21 @@ Platforms (Tier 1 — native daemon; Tier 2 — PTY adapter):
 Options:
   --cols <n>         Terminal width (default: 80)
   --rows <n>         Terminal height (default: 24)
+  --tmux             Start inside a named tmux session (enables reattach via 'pty attach')
 
 Examples:
   aiwg daemon pty start opencode
+  aiwg daemon pty start opencode --tmux           # Start in tmux for reattach support
+  aiwg daemon pty attach abc123                   # Reattach to a --tmux session
   aiwg daemon pty start codex --cols 120 --rows 40
   aiwg daemon pty start claude-code -- --dangerously-skip-permissions
   aiwg daemon pty list
   aiwg daemon pty stop abc123
 
 Requirements:
-  PTY adapter requires node-pty: npm install node-pty
+  PTY adapter (non-tmux) requires node-pty: npm install node-pty
   node-pty needs native compilation (node-gyp + C++ build tools).
+  tmux mode requires tmux to be installed.
         `.trim());
         if (subcommand) process.exit(1);
     }

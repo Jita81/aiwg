@@ -201,6 +201,79 @@ export class DaemonBehaviorLoader {
   }
 
   /**
+   * Hot-apply a behavior by name — discovers it on disk and activates it.
+   * If a behavior with the same name is already active, it is replaced.
+   *
+   * @param {string} name  Behavior name to apply
+   * @returns {Promise<{applied: boolean, name: string}>}
+   * @throws {Error} If the behavior is not found in any discovery tier
+   */
+  async apply(name) {
+    // Discover all available behaviors
+    const discovered = await this.discover();
+
+    // Find matching entry by name
+    let matchedEntry = null;
+    for (const entry of discovered) {
+      try {
+        const meta = await this.parseFrontmatter(entry.path);
+        if (!meta || meta.scope !== 'daemon') continue;
+        if (!meta.name || meta.name !== name) continue;
+        if (!meta.module) continue;
+        matchedEntry = { ...entry, meta };
+        break;
+      } catch { /* skip */ }
+    }
+
+    if (!matchedEntry) {
+      throw new Error(`Behavior '${name}' not found or is not a daemon-scoped behavior with a module`);
+    }
+
+    // Deactivate existing instance if present
+    this._active.delete(name);
+
+    // Activate the new instance
+    const orchestrator = await this._activate(matchedEntry);
+    if (!orchestrator) {
+      throw new Error(`Behavior '${name}' activation returned null`);
+    }
+
+    this._active.set(name, {
+      name,
+      meta: matchedEntry.meta,
+      orchestrator,
+      path: matchedEntry.path,
+      tier: matchedEntry.tier,
+    });
+
+    return { applied: true, name };
+  }
+
+  /**
+   * Remove an active behavior by name.
+   * If the orchestrator exposes a `deactivate()` method, it is called first.
+   *
+   * @param {string} name  Behavior name to remove
+   * @returns {{ removed: boolean, name: string }}
+   */
+  remove(name) {
+    const loaded = this._active.get(name);
+    if (!loaded) {
+      return { removed: false, name };
+    }
+
+    // Call optional cleanup hook
+    try {
+      if (typeof loaded.orchestrator.deactivate === 'function') {
+        loaded.orchestrator.deactivate();
+      }
+    } catch { /* non-fatal */ }
+
+    this._active.delete(name);
+    return { removed: true, name };
+  }
+
+  /**
    * Get the active behavior orchestrator for a given trigger type.
    * Returns all behaviors that declare this trigger.
    * @param {string} trigger  e.g. 'chat-message', 'session-start', 'pre-response', 'on-error'

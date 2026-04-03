@@ -19,6 +19,7 @@ import { getFrameworkRoot } from '../../channel/manager.mjs';
 import { getRegistry } from '../../extensions/registry.js';
 import { registerDeployedExtensions } from '../../extensions/deployment-registration.js';
 import { registerCliCommands, registerHooks } from '../cli-extension-loader.js';
+import { translateSkillsToCommands, providerNeedsCommands } from '../../plugin/skill-command-translator.js';
 import * as ui from '../ui.js';
 
 /**
@@ -495,6 +496,31 @@ export class UseHandler implements CommandHandler {
         if (result.exitCode !== 0) {
           return result;
         }
+      }
+    }
+
+    // Translate deployed skills to commands for providers that require legacy command format
+    // (#550) Skills are now canonical; commands are generated from SKILL.md frontmatter.
+    if (providerNeedsCommands(provider)) {
+      const paths = PROVIDER_PATHS[provider] || PROVIDER_PATHS.claude;
+      const targetSkillsDir = path.isAbsolute(paths.skills)
+        ? paths.skills
+        : path.join(target, paths.skills);
+      const targetCommandsDir = path.isAbsolute(paths.commands)
+        ? paths.commands
+        : path.join(target, paths.commands);
+      try {
+        const translationResult = await translateSkillsToCommands(targetSkillsDir, {
+          provider,
+          targetDir: targetCommandsDir,
+          dryRun,
+          verbose,
+        });
+        if (verbose && translationResult.translated.length > 0) {
+          ui.success(`Translated ${translationResult.translated.length} skills → commands (${provider})`);
+        }
+      } catch (error) {
+        ui.warn(`Skill→command translation failed: ${error instanceof Error ? error.message : String(error)}`);
       }
     }
 

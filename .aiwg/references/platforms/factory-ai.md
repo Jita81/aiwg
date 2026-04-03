@@ -383,6 +383,77 @@ Hooks are user-defined shell commands that execute at defined points in the Droi
 }
 ```
 
+### 6.3.1 Runtime Input (stdin JSON Schema)
+
+All hooks receive a JSON payload via **stdin** on each invocation. The AIWG CLI (when used as a hook command) parses this automatically — raw bash hooks must parse it with `jq`.
+
+**Factory stdin schema:**
+
+```json
+{
+  "tool_name": "Write",
+  "tool_input": {
+    "file_path": "/absolute/path/to/modified/file"
+  },
+  "cwd": "/absolute/path/to/working/directory"
+}
+```
+
+**Claude Code stdin schema** (for comparison — note additional fields):
+
+```json
+{
+  "session_id": "abc123",
+  "transcript_path": "/path/to/transcript.jsonl",
+  "cwd": "/absolute/path/to/project",
+  "hook_event_name": "PostToolUse",
+  "tool_name": "Write",
+  "tool_input": {
+    "file_path": "/absolute/path/to/file"
+  },
+  "tool_response": { "type": "text", "text": "..." }
+}
+```
+
+**Cross-platform field availability:**
+
+| Field | Factory | Claude Code |
+|-------|---------|-------------|
+| `tool_name` | ✓ | ✓ |
+| `tool_input.file_path` | ✓ | ✓ |
+| `cwd` | ✓ | ✓ |
+| `session_id` | — | ✓ |
+| `transcript_path` | — | ✓ |
+| `hook_event_name` | — | ✓ |
+| `tool_response` | — | ✓ (PostToolUse only) |
+
+**Accessing fields in bash hooks (raw scripts):**
+
+```bash
+# Read stdin into variable first (stdin is not seekable)
+INPUT=$(cat)
+
+FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
+TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // empty')
+CWD=$(echo "$INPUT"       | jq -r '.cwd // empty')
+```
+
+**AIWG CLI hooks** handle parsing internally — your hook command receives structured data without manual `jq` parsing.
+
+### 6.3.2 Exit Code Contract
+
+| Exit Code | Meaning | Effect |
+|-----------|---------|--------|
+| `0` | Success | Workflow continues normally |
+| `2` | Block | Workflow blocked; error message surfaced to the droid |
+| Any other | Error | Treated as hook failure — logged, workflow continues |
+
+This contract is **identical** across Factory and Claude Code. Hooks can return a JSON body on stdout when blocking:
+
+```json
+{ "decision": "block", "reason": "Blocked: file path is in protected directory" }
+```
+
 ### 6.4 Matcher Syntax
 
 | Matcher | Behavior |

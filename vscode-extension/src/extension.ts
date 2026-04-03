@@ -120,19 +120,20 @@ function registerCommands(
       statusBar?.refresh();
     }),
 
-    vscode.commands.registerCommand('aiwg.runScript', async () => {
+    vscode.commands.registerCommand('aiwg.runScript', async (scriptName?: string) => {
       if (!runner.cliPath) {
         await promptInstallCli();
         return;
       }
-      const scripts = await sidebarProvider?.getScriptNames() ?? [];
-      if (!scripts.length) {
-        vscode.window.showInformationMessage('No scripts found in aiwg.config.json');
-        return;
-      }
-      const script = await vscode.window.showQuickPick(scripts, {
-        placeHolder: 'Select script to run'
-      });
+      // If called from sidebar tree item, scriptName is provided directly
+      const script = scriptName ?? await (async () => {
+        const scripts = await sidebarProvider?.getScriptNames() ?? [];
+        if (!scripts.length) {
+          vscode.window.showInformationMessage('No scripts found in aiwg.config.json');
+          return undefined;
+        }
+        return vscode.window.showQuickPick(scripts, { placeHolder: 'Select script to run' });
+      })();
       if (!script) return;
       await runner.runAsTask(['run', script], `AIWG: Run ${script}`);
     }),

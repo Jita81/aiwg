@@ -15,5 +15,16 @@
   ],
   "ignore": [
     "manifest.json"
-  ]
+  ],
+  "memory": {
+    "creates": [
+      { "path": ".aiwg/marketing/", "description": "All marketing artifacts root directory" },
+      { "path": ".aiwg/marketing/intake/", "description": "Campaign intake forms and briefs" },
+      { "path": ".aiwg/marketing/campaigns/", "description": "Active campaign artifacts" },
+      { "path": ".aiwg/marketing/strategy/", "description": "Campaign strategy documents" },
+      { "path": ".aiwg/marketing/creation/", "description": "Content creation artifacts" },
+      { "path": ".aiwg/marketing/working/", "description": "Temporary working files (safe to delete)" },
+      { "path": ".aiwg/marketing/reports/", "description": "Generated marketing reports" }
+    ]
+  }
 }

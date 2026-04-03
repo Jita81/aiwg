@@ -14,5 +14,19 @@
   ],
   "ignore": [
     "manifest.json"
-  ]
+  ],
+  "memory": {
+    "creates": [
+      { "path": ".aiwg/media/", "description": "All media curation artifacts root directory" },
+      { "path": ".aiwg/media/analysis/", "description": "Artist analysis and era breakdowns" },
+      { "path": ".aiwg/media/discography/", "description": "Canonical album lists with MusicBrainz IDs" },
+      { "path": ".aiwg/media/sources/", "description": "Ranked source lists per album" },
+      { "path": ".aiwg/media/downloads/", "description": "Download logs" },
+      { "path": ".aiwg/media/tagging/", "description": "Metadata tagging logs" },
+      { "path": ".aiwg/media/verification/", "description": "Verification and integrity logs" },
+      { "path": ".aiwg/media/reports/", "description": "Completeness and gap reports" },
+      { "path": ".aiwg/media/sessions/", "description": "Resumable curation session state" },
+      { "path": ".aiwg/media-curator/profiles/", "description": "Artist profiles saved as YAML" }
+    ]
+  }
 }

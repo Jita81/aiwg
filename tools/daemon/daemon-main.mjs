@@ -601,6 +601,32 @@ class DaemonMain {
         return { behaviors: Object.entries(status.active).map(([name, info]) => ({ name, ...info })) };
       },
 
+      'behaviors.apply': async (params) => {
+        if (!params?.name) {
+          const err = new Error('Missing required parameter: name');
+          err.code = 'INVALID_PARAMS';
+          throw err;
+        }
+        if (!this.behaviorLoader) {
+          const err = new Error('Behavior loader not initialized');
+          err.code = 'INVALID_STATE';
+          throw err;
+        }
+        return await this.behaviorLoader.apply(params.name);
+      },
+
+      'behaviors.remove': (params) => {
+        if (!params?.name) {
+          const err = new Error('Missing required parameter: name');
+          err.code = 'INVALID_PARAMS';
+          throw err;
+        }
+        if (!this.behaviorLoader) {
+          return { removed: false, name: params.name };
+        }
+        return this.behaviorLoader.remove(params.name);
+      },
+
       // Autonomous mode management
       'autonomous.status': () => {
         return this.autonomousEngine ? this.autonomousEngine.getStatus() : { enabled: false };

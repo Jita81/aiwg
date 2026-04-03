@@ -10,9 +10,12 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createClient } from './ipc-client.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.join(__dirname, '..', '..');
+
+const SOCKET_PATH = '.aiwg/daemon/daemon.sock';
 
 const args = process.argv.slice(2);
 const subcommand = args[0];
@@ -96,6 +99,56 @@ Examples:
 `);
 }
 
+async function applyBehavior(behaviorName) {
+  if (!behaviorName) {
+    console.error('Usage: aiwg behavior apply <name>');
+    process.exit(1);
+  }
+
+  let client;
+  try {
+    client = await createClient(SOCKET_PATH);
+    const result = await client.call('behaviors.apply', { name: behaviorName });
+    console.log(`Behavior applied: ${result.name}`);
+  } catch (err) {
+    if (err.message && err.message.includes('not running')) {
+      console.error('Daemon is not running. Start it with: aiwg daemon start');
+    } else {
+      console.error(`Failed to apply behavior '${behaviorName}': ${err.message}`);
+    }
+    process.exit(1);
+  } finally {
+    client?.disconnect();
+  }
+}
+
+async function removeBehavior(behaviorName) {
+  if (!behaviorName) {
+    console.error('Usage: aiwg behavior remove <name>');
+    process.exit(1);
+  }
+
+  let client;
+  try {
+    client = await createClient(SOCKET_PATH);
+    const result = await client.call('behaviors.remove', { name: behaviorName });
+    if (result.removed) {
+      console.log(`Behavior removed: ${result.name}`);
+    } else {
+      console.log(`Behavior '${behaviorName}' was not active`);
+    }
+  } catch (err) {
+    if (err.message && err.message.includes('not running')) {
+      console.error('Daemon is not running. Start it with: aiwg daemon start');
+    } else {
+      console.error(`Failed to remove behavior '${behaviorName}': ${err.message}`);
+    }
+    process.exit(1);
+  } finally {
+    client?.disconnect();
+  }
+}
+
 switch (subcommand) {
   case 'list':
     listBehaviors();
@@ -104,10 +157,10 @@ switch (subcommand) {
     infoBehavior(name);
     break;
   case 'apply':
-    console.log('behavior apply: not yet implemented (requires running daemon)');
+    applyBehavior(name);
     break;
   case 'remove':
-    console.log('behavior remove: not yet implemented (requires running daemon)');
+    removeBehavior(name);
     break;
   case '--help':
   case '-h':
