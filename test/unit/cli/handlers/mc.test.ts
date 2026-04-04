@@ -1,0 +1,352 @@
+/**
+ * Unit tests for mc.ts Mission Control handler
+ * Covers start, dispatch, status, watch, abort, pause, resume, stop, list subcommands.
+ *
+ * @issue #690
+ * @parent #684
+ */
+
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import type { HandlerContext } from '../../../../src/cli/handlers/types.js';
+
+// ── In-memory fs mock ─────────────────────────────────────────
+// mc.ts uses node:fs/promises with relative paths. We mock the whole module
+// with an in-memory store to avoid chdir (not supported in vitest workers).
+
+type Dirent = { name: string; isDirectory: () => boolean; isFile: () => boolean };
+
+const { inMemoryFs } = vi.hoisted(() => {
+  const store = new Map<string, string>();
+  return {
+    inMemoryFs: {
+      store,
+      clear: () => store.clear(),
+    },
+  };
+});
+
+// mc.ts uses `import { promises as fs } from 'node:fs'` — must mock 'node:fs', not 'node:fs/promises'
+vi.mock('node:fs', () => {
+  const store = inMemoryFs.store;
+  const fsMethods = {
+    mkdir: vi.fn(async (_path: string) => undefined),
+    readFile: vi.fn(async (path: string) => {
+      const content = store.get(path);
+      if (!content) throw Object.assign(new Error(`ENOENT: no such file ${path}`), { code: 'ENOENT' });
+      return content;
+    }),
+    writeFile: vi.fn(async (path: string, content: string) => {
+      store.set(path, content);
+    }),
+    appendFile: vi.fn(async () => undefined),
+    readdir: vi.fn(async (path: string, _opts?: unknown) => {
+      const prefix = path.endsWith('/') ? path : path + '/';
+      const dirs = new Set<string>();
+      for (const key of store.keys()) {
+        if (key.startsWith(prefix)) {
+          const rest = key.slice(prefix.length);
+          const part = rest.split('/')[0];
+          if (part) dirs.add(part);
+        }
+      }
+      return Array.from(dirs).map((name): Dirent => ({
+        name,
+        isDirectory: () => true,
+        isFile: () => false,
+      }));
+    }),
+  };
+  return {
+    promises: fsMethods,
+    default: { promises: fsMethods },
+  };
+});
+
+vi.mock('../../../../src/cli/ui.js', () => ({
+  blank: vi.fn(),
+  rule: vi.fn(),
+  info: vi.fn(),
+  success: vi.fn(),
+  warn: vi.fn(),
+  dim: vi.fn(),
+  bold: vi.fn((s: string) => s),
+  brandMark: vi.fn(() => '◆'),
+  dimText: vi.fn((s: string) => s),
+  header: vi.fn(),
+  accent: vi.fn((s: string) => s),
+  error: vi.fn(),
+}));
+
+import { mcHandler } from '../../../../src/cli/handlers/mc.js';
+
+// ── Helpers ───────────────────────────────────────────────────
+
+function makeCtx(args: string[]): HandlerContext {
+  return {
+    args,
+    rawArgs: ['mc', ...args],
+    cwd: '/mock/cwd',
+    frameworkRoot: '/mock/framework/root',
+  };
+}
+
+beforeEach(() => {
+  inMemoryFs.clear();
+  vi.clearAllMocks();
+});
+
+// ── mcHandler metadata ────────────────────────────────────────
+
+describe('mcHandler metadata', () => {
+  it('has correct id and category', () => {
+    expect(mcHandler.id).toBe('mc');
+    expect(mcHandler.category).toBe('orchestration');
+    expect(mcHandler.aliases).toContain('mission-control');
+    expect(typeof mcHandler.execute).toBe('function');
+  });
+});
+
+// ── No subcommand / help ──────────────────────────────────────
+
+describe('mc (no subcommand)', () => {
+  it('shows help and exits 0', async () => {
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const result = await mcHandler.execute(makeCtx([]));
+    expect(result.exitCode).toBe(0);
+    consoleSpy.mockRestore();
+  });
+
+  it('--help exits 0', async () => {
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const result = await mcHandler.execute(makeCtx(['--help']));
+    expect(result.exitCode).toBe(0);
+    consoleSpy.mockRestore();
+  });
+
+  it('unknown subcommand exits 1', async () => {
+    const result = await mcHandler.execute(makeCtx(['bogus-subcommand']));
+    expect(result.exitCode).toBe(1);
+  });
+});
+
+// ── mc start ─────────────────────────────────────────────────
+
+describe('mc start', () => {
+  it('creates session and returns session ID in message', async () => {
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const result = await mcHandler.execute(makeCtx(['start']));
+    expect(result.exitCode).toBe(0);
+    expect(result.message).toBeDefined();
+    expect(result.message).toMatch(/^mc-/);
+    consoleSpy.mockRestore();
+  });
+
+  it('--name sets display name (exits 0)', async () => {
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const result = await mcHandler.execute(makeCtx(['start', '--name', 'Sprint 4']));
+    expect(result.exitCode).toBe(0);
+    consoleSpy.mockRestore();
+  });
+});
+
+// ── mc dispatch ───────────────────────────────────────────────
+
+describe('mc dispatch', () => {
+  it('exits 1 when no objective given', async () => {
+    const result = await mcHandler.execute(makeCtx(['dispatch']));
+    expect(result.exitCode).toBe(1);
+  });
+
+  it('dispatches mission to session and returns mission ID', async () => {
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const startResult = await mcHandler.execute(makeCtx(['start']));
+    const sessionId = startResult.message!;
+    const dispatchResult = await mcHandler.execute(
+      makeCtx(['dispatch', sessionId, 'Fix auth module', '--completion', 'tests pass'])
+    );
+    expect(dispatchResult.exitCode).toBe(0);
+    expect(dispatchResult.message).toMatch(/^m-/);
+    consoleSpy.mockRestore();
+  });
+
+  it('exits 1 when session not found', async () => {
+    const result = await mcHandler.execute(
+      makeCtx(['dispatch', 'mc-nonexistent', 'Do something'])
+    );
+    expect(result.exitCode).toBe(1);
+  });
+});
+
+// ── mc status ────────────────────────────────────────────────
+
+describe('mc status', () => {
+  it('exits 1 when no active session', async () => {
+    const result = await mcHandler.execute(makeCtx(['status']));
+    expect(result.exitCode).toBe(1);
+  });
+
+  it('exits 0 when active session exists', async () => {
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const startResult = await mcHandler.execute(makeCtx(['start']));
+    const sessionId = startResult.message!;
+    const result = await mcHandler.execute(makeCtx(['status', sessionId]));
+    expect(result.exitCode).toBe(0);
+    consoleSpy.mockRestore();
+  });
+
+  it('--json outputs parseable JSON when session found', async () => {
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const startResult = await mcHandler.execute(makeCtx(['start']));
+    const sessionId = startResult.message!;
+    const jsonCalls: string[] = [];
+    consoleSpy.mockImplementation((arg) => { jsonCalls.push(String(arg)); });
+    await mcHandler.execute(makeCtx(['status', sessionId, '--json']));
+    const jsonOutput = jsonCalls.find(s => { try { JSON.parse(s); return true; } catch { return false; } });
+    expect(jsonOutput).toBeDefined();
+    const parsed = JSON.parse(jsonOutput!);
+    expect(parsed).toHaveProperty('id', sessionId);
+    consoleSpy.mockRestore();
+  });
+
+  it('--json outputs error when no session', async () => {
+    const jsonCalls: string[] = [];
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation((arg) => { jsonCalls.push(String(arg)); });
+    const result = await mcHandler.execute(makeCtx(['status', '--json']));
+    expect(result.exitCode).toBe(1);
+    const jsonOutput = jsonCalls.find(s => { try { JSON.parse(s); return true; } catch { return false; } });
+    expect(jsonOutput).toBeDefined();
+    expect(JSON.parse(jsonOutput!)).toHaveProperty('error');
+    consoleSpy.mockRestore();
+  });
+});
+
+// ── mc abort ─────────────────────────────────────────────────
+
+describe('mc abort', () => {
+  it('exits 1 when session or mission id missing', async () => {
+    const result = await mcHandler.execute(makeCtx(['abort']));
+    expect(result.exitCode).toBe(1);
+  });
+
+  it('aborts a mission and exits 0', async () => {
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const startResult = await mcHandler.execute(makeCtx(['start']));
+    const sessionId = startResult.message!;
+    const dispatchResult = await mcHandler.execute(makeCtx(['dispatch', sessionId, 'Some task']));
+    const missionId = dispatchResult.message!;
+    const abortResult = await mcHandler.execute(makeCtx(['abort', sessionId, missionId]));
+    expect(abortResult.exitCode).toBe(0);
+    consoleSpy.mockRestore();
+  });
+});
+
+// ── mc pause / resume ────────────────────────────────────────
+
+describe('mc pause and resume', () => {
+  it('pause exits 1 when no active session', async () => {
+    const result = await mcHandler.execute(makeCtx(['pause']));
+    expect(result.exitCode).toBe(1);
+  });
+
+  it('pause → resume cycle works', async () => {
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const startResult = await mcHandler.execute(makeCtx(['start']));
+    const sessionId = startResult.message!;
+    const pauseResult = await mcHandler.execute(makeCtx(['pause', sessionId]));
+    expect(pauseResult.exitCode).toBe(0);
+    const resumeResult = await mcHandler.execute(makeCtx(['resume', sessionId]));
+    expect(resumeResult.exitCode).toBe(0);
+    consoleSpy.mockRestore();
+  });
+
+  it('resume exits 1 when session is not paused', async () => {
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const startResult = await mcHandler.execute(makeCtx(['start']));
+    const sessionId = startResult.message!;
+    // Active session, not paused
+    const resumeResult = await mcHandler.execute(makeCtx(['resume', sessionId]));
+    expect(resumeResult.exitCode).toBe(1);
+    consoleSpy.mockRestore();
+  });
+});
+
+// ── mc stop ───────────────────────────────────────────────────
+
+describe('mc stop', () => {
+  it('exits 1 when no active session', async () => {
+    const result = await mcHandler.execute(makeCtx(['stop']));
+    expect(result.exitCode).toBe(1);
+  });
+
+  it('stops session and exits 0', async () => {
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const startResult = await mcHandler.execute(makeCtx(['start']));
+    const sessionId = startResult.message!;
+    const stopResult = await mcHandler.execute(makeCtx(['stop', sessionId]));
+    expect(stopResult.exitCode).toBe(0);
+    consoleSpy.mockRestore();
+  });
+
+  it('start → stop skipping pause is valid', async () => {
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const startResult = await mcHandler.execute(makeCtx(['start']));
+    const sessionId = startResult.message!;
+    const stopResult = await mcHandler.execute(makeCtx(['stop', sessionId]));
+    expect(stopResult.exitCode).toBe(0);
+    consoleSpy.mockRestore();
+  });
+
+  it('dispatch on stopped session exits 1 (auto-detect finds no active session)', async () => {
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const startResult = await mcHandler.execute(makeCtx(['start']));
+    const sessionId = startResult.message!;
+    await mcHandler.execute(makeCtx(['stop', sessionId]));
+    // Auto-detection (no explicit sessionId) filters for active/paused only — stopped session not found
+    const dispatchResult = await mcHandler.execute(
+      makeCtx(['dispatch', '--objective', 'New task'])
+    );
+    expect(dispatchResult.exitCode).toBe(1);
+    consoleSpy.mockRestore();
+  });
+});
+
+// ── mc list ───────────────────────────────────────────────────
+
+describe('mc list', () => {
+  it('exits 0 when no sessions (graceful empty)', async () => {
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const result = await mcHandler.execute(makeCtx(['list']));
+    expect(result.exitCode).toBe(0);
+    consoleSpy.mockRestore();
+  });
+
+  it('--json outputs array', async () => {
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    await mcHandler.execute(makeCtx(['start', '--name', 'Test']));
+    const jsonCalls: string[] = [];
+    consoleSpy.mockImplementation((arg) => { jsonCalls.push(String(arg)); });
+    await mcHandler.execute(makeCtx(['list', '--json']));
+    const jsonOutput = jsonCalls.find(s => { try { JSON.parse(s); return true; } catch { return false; } });
+    expect(jsonOutput).toBeDefined();
+    expect(Array.isArray(JSON.parse(jsonOutput!))).toBe(true);
+    consoleSpy.mockRestore();
+  });
+});
+
+// ── mc watch ─────────────────────────────────────────────────
+
+describe('mc watch', () => {
+  it('exits 1 when no active session', async () => {
+    const result = await mcHandler.execute(makeCtx(['watch']));
+    expect(result.exitCode).toBe(1);
+  });
+
+  it('exits 0 when active session exists', async () => {
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const startResult = await mcHandler.execute(makeCtx(['start']));
+    const sessionId = startResult.message!;
+    const watchResult = await mcHandler.execute(makeCtx(['watch', sessionId]));
+    expect(watchResult.exitCode).toBe(0);
+    consoleSpy.mockRestore();
+  });
+});

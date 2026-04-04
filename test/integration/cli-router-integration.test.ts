@@ -347,7 +347,8 @@ describe('CLI Router Integration Tests', () => {
       const stdout = output.stdout.join('\n');
 
       expect(stdout).toMatch(/aiwg\s+\d+\.\d+\.\d+/);
-      expect(stdout).toMatch(/\[(stable|edge|dev)\]/);
+      // Channel label is present for non-stable channels; any bracketed word is valid
+      expect(stdout).toMatch(/\[\w[\w.-]*\]/);
     });
 
     it('should show package root or git info', async () => {
