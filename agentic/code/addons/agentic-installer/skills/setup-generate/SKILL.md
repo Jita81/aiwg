@@ -57,6 +57,74 @@ Build the manifest YAML following this priority order:
    - End with a `verify` step
 5. **recovery_procedures block** — always include a `full-reset` fallback
 
+### Docker-based Project Detection
+
+When `docker-compose.yml` or `compose.yaml` is found during Phase 1 discovery, apply these additional behaviors:
+
+**Platform** (#676):
+- Include `macos` in the platform block alongside `linux` — Docker Desktop covers both.
+- Any GPU or nvidia steps must add `when: "$(uname -s) = Linux"` so they are skipped on macOS.
+- Update `install_hint` for docker prereqs to include macOS install links.
+
+**Prerequisites** (#672, #674):
+- Replace `command -v docker` with `docker version --format '{{.Server.Version}}' 2>/dev/null` to catch both "not installed" and "installed but no permission" cases.
+- Expand the docker `install_hint` to mention `sudo usermod -aG docker $USER`.
+- When Docker images or ML models are present, add disk space prereq (≥20GB free):
+  ```yaml
+  - name: disk-space
+    detect: "df --output=avail -BG / | tail -1 | tr -d ' G'"
+    version_min: "20"
+    install_hint: "At least 20GB free disk space required for Docker images."
+  ```
+- When ML models are detected (Ollama, HuggingFace, etc.), add RAM prereq (≥8GB):
+  ```yaml
+  - name: ram
+    detect: "awk '/MemTotal/ {printf \"%.0f\", $2/1024/1024}' /proc/meminfo"
+    version_min: "8"
+    install_hint: "At least 8GB RAM recommended. 16GB+ for GPU profiles."
+  ```
+
+**Params** (#671, #675):
+- When a `DOMAIN` or `ISSUER_URL` param is emitted, also emit a `PROTOCOL` param with a smart default:
+  ```yaml
+  - name: PROTOCOL
+    type: choice
+    choices: [http, https]
+    default: "$(echo ${DOMAIN} | grep -qE '^(localhost|127\\.0\\.0\\.1)' && echo http || echo https)"
+    description: "Protocol for OAuth/API URLs. Defaults to http for localhost."
+  ```
+  Then reference `${PROTOCOL}://${DOMAIN}` in configure.sh instead of hardcoding `https://`.
+- Default `DATA_DIR` to `${INSTALL_DIR}/data` (project-local, user-writable) rather than any system path like `/var/lib/<project>`. If the project explicitly requires a system path, emit a `check-data-dir` step (see steps below).
+
+**Steps** (#673, #675, #677):
+- Emit a `check-ports` step before `deploy` that validates all ports declared in the compose file are free:
+  ```yaml
+  - id: check-ports
+    type: script
+    script: installer/scripts/check-ports.sh
+    depends_on: [configure]
+  ```
+- When the default `DATA_DIR` is a system path, emit a `check-data-dir` step before `configure`:
+  ```yaml
+  - id: check-data-dir
+    type: script
+    script: installer/scripts/check-data-dir.sh
+    depends_on: [clone]
+  ```
+- When Ollama is detected in the compose file or `.env` template, emit a `pull-models` step after `deploy`:
+  ```yaml
+  - id: pull-models
+    type: script
+    description: Pull Ollama models (may take several minutes)
+    script: installer/scripts/pull-models.sh
+    depends_on: [deploy]
+    verify: "docker exec $(docker compose ps -q ollama) ollama list | grep -q ${OLLAMA_GEN_MODEL%%:*}"
+  ```
+
+**Script templates used for Docker projects**:
+- `installer/scripts/check-ports.sh` — port availability check before deploy
+- `installer/scripts/pull-models.sh` — Ollama model pull after deploy (when applicable)
+
 ### Phase 3: Script Assembly
 
 For each script step:
