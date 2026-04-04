@@ -21,7 +21,7 @@ Get started with iterative AI task execution in 5 minutes.
 
 ## What is Ralph?
 
-Ralph (from the "Ralph Wiggum methodology") executes AI tasks in a loop until completion criteria are met:
+Ralph (from the "iterative agent loop methodology") executes AI tasks in a loop until completion criteria are met:
 
 1. **Execute** your task
 2. **Verify** if completion criteria are met

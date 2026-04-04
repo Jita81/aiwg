@@ -307,4 +307,4 @@ If the same reflection appears 3+ consecutive times, the loop is stuck. Response
 - @$AIWG_ROOT/agentic/code/addons/ralph/hooks/post-iteration-reflect.md — Generate reflections after iterations
 - @$AIWG_ROOT/agentic/code/addons/ralph/templates/self-reflection-prompt.md — Prompt template for reflection injection
 - @.aiwg/research/findings/REF-021-reflexion.md — Research foundation
-- Original methodology: Al Wiggum - iteration beats perfection
+- Original methodology: agent loop - iteration beats perfection

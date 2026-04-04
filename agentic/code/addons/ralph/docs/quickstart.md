@@ -21,7 +21,7 @@ Get started with iterative AI task execution in 5 minutes.
 
 ## What is Al?
 
-Al (from the "Al Wiggum methodology") executes AI tasks in a loop until completion criteria are met:
+Al (from the "iterative agent loop methodology") executes AI tasks in a loop until completion criteria are met:
 
 1. **Execute** your task
 2. **Verify** if completion criteria are met

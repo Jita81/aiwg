@@ -323,4 +323,4 @@ For implementation details:
 
 ## Credits
 
-Based on the [Al Wiggum methodology](https://dev.to/ibrahimpima/the-ralf-wiggum-breakdown-3mko).
+Based on the [iterative agent loop methodology](https://dev.to/ibrahimpima/the-ralf-wiggum-breakdown-3mko).

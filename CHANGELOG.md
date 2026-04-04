@@ -1013,7 +1013,7 @@ All addons in `agentic/code/addons/` are now automatically deployed:
   - Loop state persistence in `.aiwg/ralph/`
   - Completion reports with iteration history
 - **Natural language triggers**: "ralph this", "loop until", "keep trying until"
-- Philosophy: "Iteration beats perfection" - inspired by Ralph Wiggum methodology
+- Philosophy: "Iteration beats perfection" - inspired by iterative agent loop methodology
 
 **Command Enhancements**:
 

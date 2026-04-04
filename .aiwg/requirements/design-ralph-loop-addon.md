@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-The Ralph Wiggum methodology transforms AI coding from "single-pass execution" to "iterative completion loops." This integration adds a complete Ralph subsystem to AIWG, enabling autonomous task execution with automatic recovery and iteration until success criteria are met.
+The iterative agent loop methodology transforms AI coding from "single-pass execution" to "iterative completion loops." This integration adds a complete Ralph subsystem to AIWG, enabling autonomous task execution with automatic recovery and iteration until success criteria are met.
 
 **Core Philosophy**: "Iteration beats perfection" - predictable failure with automatic recovery beats unpredictable single-pass success.
 
@@ -200,7 +200,7 @@ agentic/code/addons/ralph/
     "migration"
   ],
   "researchFoundation": {
-    "REF-001": "Ralph Wiggum methodology - iterative AI execution",
+    "REF-001": "iterative agent loop methodology - iterative AI execution",
     "REF-002": "BP-6 - Recovery requires execution history",
     "REF-003": "Archetype 4 - Predictable failure with automatic recovery"
   },
@@ -1321,7 +1321,7 @@ Get started with iterative AI task execution in 5 minutes.
 
 ## What is Ralph?
 
-Ralph (from "Ralph Wiggum methodology") executes AI tasks in a loop:
+Ralph (from "iterative agent loop methodology") executes AI tasks in a loop:
 
 1. **Execute** your task
 2. **Check** if completion criteria are met
@@ -1872,7 +1872,7 @@ aiwg trace-view --filter ralph
 
 ## References
 
-- Original Ralph Wiggum methodology: https://dev.to/ibrahimpima/the-ralf-wiggum-breakdown-3mko
+- Original iterative agent loop methodology: https://dev.to/ibrahimpima/the-ralf-wiggum-breakdown-3mko
 - AIWG hooks system: `@agentic/code/addons/aiwg-hooks/`
 - AIWG command patterns: `@agentic/code/frameworks/sdlc-complete/commands/`
 - AIWG skill patterns: `@agentic/code/addons/voice-framework/skills/`
