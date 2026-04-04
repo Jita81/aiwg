@@ -735,3 +735,11 @@ ralph:
 
 - **2.0.0**: Multi-loop awareness with loop_id tracking and cross-loop aggregation (Issue #269)
 - **1.0.0**: Initial cross-task learning with semantic matching (Issues #154, #155)
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/ralph/README.md — Ralph addon overview
+- @$AIWG_ROOT/agentic/code/addons/ralph/schemas/shared-patterns.yaml — Pattern schema for cross-loop learning
+- @$AIWG_ROOT/agentic/code/addons/ralph/schemas/cross-task-memory.yaml — Cross-task memory schema
+- @$AIWG_ROOT/agentic/code/addons/ralph/docs/cross-loop-learning.md — Full cross-loop learning documentation
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md — Subagent scoping rules relevant to loop orchestration

@@ -390,3 +390,10 @@ Run '/workspace-realign --dry-run' periodically to check alignment.
 - `/workspace-prune-working` - Clean up .aiwg/working/ directory
 - `/workspace-reset` - Wipe .aiwg/ and start fresh
 - `/project-status` - View current project state
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/README.md — aiwg-utils addon overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Confirm before archiving or deleting stale documents
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Analyze git history and doc state before generating update plan
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/README.md — SDLC artifact structure used to assess documentation alignment

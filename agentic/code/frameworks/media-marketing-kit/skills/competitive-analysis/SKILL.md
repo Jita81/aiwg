@@ -128,3 +128,10 @@ Saved to `.aiwg/marketing/competitive/`:
 - [ ] Digital presence audited
 - [ ] Gaps and opportunities identified
 - [ ] Actionable recommendations provided
+
+## References
+
+- @$AIWG_ROOT/agentic/code/frameworks/media-marketing-kit/README.md — Media marketing kit framework overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Research-first approach for competitor analysis
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md — Multi-agent competitive research orchestration
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

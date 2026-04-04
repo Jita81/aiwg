@@ -108,3 +108,11 @@ Files created in: pipelines/<name>/
 | rag-pipeline | rag.prompt + evaluator | pipeline.config.yaml | retrieval.py + pipeline.py | yes |
 | eval-loop | generator + evaluator | pipeline.config.yaml | eval/loop.py/.ts | inherent |
 | dynamic-prompt | template.prompt.md.j2 + evaluator | pipeline.config.yaml + builder.config.yaml | prompt_builder.py/.ts | yes |
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/nlp-prod/README.md — nlp-prod addon overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/native-ux-tools.md — Interactive questioning pattern for --interactive mode
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md — Delegation to Pipeline Architect agent for artifact scaffolding
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Elicit requirements before selecting and scaffolding a pattern
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for aiwg nlp commands

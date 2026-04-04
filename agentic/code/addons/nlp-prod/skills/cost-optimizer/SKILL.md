@@ -99,3 +99,10 @@ Always show:
 4. Percentage savings at stated volume
 
 Never recommend optimizations without a validation path — every recommendation includes either a command to verify or an explicit "risk: none" note.
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/nlp-prod/README.md — nlp-prod addon overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Concrete savings estimates and validation requirements
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Analyze pipeline config before making recommendations
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for cost-report and metrics commands

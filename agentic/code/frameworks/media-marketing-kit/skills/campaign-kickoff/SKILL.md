@@ -138,3 +138,10 @@ Campaign kickoff is complete when:
 - [ ] Timeline established
 - [ ] Budget allocated
 - [ ] Team assigned
+
+## References
+
+- @$AIWG_ROOT/agentic/code/frameworks/media-marketing-kit/README.md — Media marketing kit framework overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/native-ux-tools.md — Interactive discovery question patterns
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md — Multi-agent kickoff orchestration
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

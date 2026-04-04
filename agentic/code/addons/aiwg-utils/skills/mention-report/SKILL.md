@@ -112,3 +112,10 @@ aiwg mention-report [--format md|json|csv] [--output <file>]
 - `/check-traceability` - Full traceability verification
 
 Generate report for: $ARGUMENTS
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/README.md — aiwg-utils addon overview
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for mention-report command
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Scan codebase before reporting
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/README.md — SDLC artifact structure for traceability reporting

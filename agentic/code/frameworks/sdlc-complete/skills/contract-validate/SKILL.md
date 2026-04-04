@@ -138,3 +138,11 @@ Use `contract-manifest` to understand a workflow; use `contract-validate` to gat
 ## Model
 
 Runs on **Sonnet** — contract matching is structural analysis, not complex reasoning.
+
+## References
+
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/README.md — SDLC framework context and skill catalog
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Measurable validation verdicts and criteria
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Research-first for contract dependency resolution
+- @$AIWG_ROOT/docs/extensions/overview.md — Extension system and skill architecture
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

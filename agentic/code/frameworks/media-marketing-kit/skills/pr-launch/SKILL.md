@@ -130,3 +130,10 @@ Saved to `.aiwg/marketing/pr/{announcement-name}/`:
 - [ ] Q&A prepared
 - [ ] Legal review complete
 - [ ] Timeline established
+
+## References
+
+- @$AIWG_ROOT/agentic/code/frameworks/media-marketing-kit/README.md — Media marketing kit framework overview
+- @$AIWG_ROOT/agentic/code/addons/voice-framework/README.md — Voice framework for press release and executive messaging
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Authorization gates for press release approval
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

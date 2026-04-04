@@ -489,3 +489,12 @@ Which scope did you have in mind?
 ## Version History
 
 - **1.0.0**: Initial implementation for RLM mode detection and routing
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/rlm/README.md — RLM addon overview and architecture
+- @$AIWG_ROOT/agentic/code/addons/rlm/schemas/rlm-config.yaml — RLM configuration schema
+- @$AIWG_ROOT/agentic/code/addons/rlm/docs/rlm-architecture.md — RLM system design and decomposition strategy
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md — Subagent scoping and context budget rules
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/context-budget.md — Context window budgeting for parallel subagents
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for rlm commands

@@ -103,3 +103,11 @@ aiwg scaffold-extension <name> --for <framework> --description "..."
 - `/devkit-create-framework` - Create full framework
 - `/devkit-validate` - Validate extension structure
 - `aiwg add-template` - Add template to extension
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-dev/README.md — aiwg-dev addon overview
+- @$AIWG_ROOT/docs/extensions/overview.md — Extension system architecture
+- @$AIWG_ROOT/docs/extensions/creating-extensions.md — Guide to building custom extensions
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference including scaffold-extension command
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/README.md — SDLC framework as example parent framework

@@ -143,3 +143,10 @@ Saved to `.aiwg/marketing/sales-enablement/`:
 - [ ] Content library organized
 - [ ] Training documentation provided
 - [ ] Sales team briefed
+
+## References
+
+- @$AIWG_ROOT/agentic/code/frameworks/media-marketing-kit/README.md — Media marketing kit framework overview
+- @$AIWG_ROOT/agentic/code/addons/voice-framework/README.md — Voice framework for sales messaging and positioning
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md — Multi-agent sales content orchestration
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

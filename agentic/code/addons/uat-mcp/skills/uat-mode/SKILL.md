@@ -106,3 +106,10 @@ Check your MCP configuration and try again.
 - Commands: `/uat-generate`, `/uat-execute`, `/uat-report`
 - Agents: `uat-planner`, `uat-executor`
 - Issue: #380
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Measurable UAT completion criteria
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/README.md — SDLC framework context for acceptance testing
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for uat commands
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/native-ux-tools.md — Interactive question patterns for UAT flow

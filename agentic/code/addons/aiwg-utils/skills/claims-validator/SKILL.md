@@ -252,3 +252,10 @@ This skill complements:
 ## Output Location
 
 - Validation reports: `.aiwg/reports/claims-validation.md`
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/README.md — aiwg-utils addon overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Verify claims before accepting them
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Requirements for measurable, verifiable claims
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for validation commands

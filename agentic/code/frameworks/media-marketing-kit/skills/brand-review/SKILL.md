@@ -126,3 +126,10 @@ Saved to `.aiwg/marketing/reviews/brand/`:
 - [ ] Remediation guidance provided
 - [ ] Approval/rejection decision made
 - [ ] Sign-off documented
+
+## References
+
+- @$AIWG_ROOT/agentic/code/frameworks/media-marketing-kit/README.md — Media marketing kit framework overview
+- @$AIWG_ROOT/agentic/code/addons/voice-framework/README.md — Voice framework for verbal identity standards
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Measurable review completion criteria
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

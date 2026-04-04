@@ -115,3 +115,10 @@ aiwg mention-lint [--target <dir>] [--fix] [--strict]
 - `/mention-conventions` - Display conventions
 
 Lint @-mentions for: $ARGUMENTS
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/README.md — aiwg-utils addon overview
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for mention-lint command
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Verify paths exist before referencing
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/README.md — SDLC artifacts that use @-mention conventions

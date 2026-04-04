@@ -147,3 +147,10 @@ Prioritized action list: which agents to review, which archetypes to harden.
 - `aiwg lint agents` - Static validation
 
 Generate evaluation report: $ARGUMENTS
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-evals/README.md — aiwg-evals addon overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Concrete threshold and scoring requirements
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/README.md — SDLC framework context for agent evaluation scope
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for evaluation-related commands

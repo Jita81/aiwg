@@ -141,3 +141,10 @@ graph LR
 ## Model
 
 This skill runs on **Sonnet** — contract analysis requires moderate reasoning but not Opus-level complexity.
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/prose-integration/README.md — prose-integration addon overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Run prose-detect before operating
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Report ambiguous wiring explicitly rather than resolving silently
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for AIWG addon integration commands

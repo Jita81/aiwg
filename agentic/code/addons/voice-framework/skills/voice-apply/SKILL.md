@@ -192,3 +192,11 @@ Authenticity Check:
 ✓ Uses specific numbers
 ✓ References constraints
 ```
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/voice-framework/README.md — Voice framework addon overview and profile documentation
+- @$AIWG_ROOT/agentic/code/addons/voice-framework/voices/templates/ — Built-in voice profile templates
+- @$AIWG_ROOT/agentic/code/addons/writing-quality/README.md — Writing quality addon for authenticity enforcement
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for voice commands
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/instruction-comprehension.md — Parsing voice and style directives accurately

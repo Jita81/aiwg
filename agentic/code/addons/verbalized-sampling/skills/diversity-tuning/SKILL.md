@@ -61,3 +61,10 @@ When comparing presets:
    - Average pairwise edit distance
    - Semantic cluster count
 5. Recommend the better preset for the task
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Measurable diversity thresholds and tuning criteria
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/instruction-comprehension.md — Parsing tuning parameters accurately
+- @$AIWG_ROOT/docs/extensions/overview.md — Extension system architecture
+- @$AIWG_ROOT/agentic/code/addons/voice-framework/README.md — Voice framework for style diversity context

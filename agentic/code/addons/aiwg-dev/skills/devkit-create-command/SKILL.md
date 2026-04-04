@@ -128,3 +128,11 @@ aiwg add-command <name> --to <target> --template <type>
 - `/devkit-create-agent` - Create an agent
 - `/devkit-create-skill` - Create an auto-triggered skill
 - `/devkit-validate` - Validate command structure
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-dev/README.md — aiwg-dev addon overview
+- @$AIWG_ROOT/docs/extensions/extension-types.md — Extension types including command type
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference including add-command command
+- @$AIWG_ROOT/docs/extensions/creating-extensions.md — Guide to building custom extensions
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/README.md — SDLC framework with example commands

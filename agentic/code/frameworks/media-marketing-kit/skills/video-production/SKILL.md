@@ -142,3 +142,10 @@ Saved to `.aiwg/marketing/video/{project-name}/`:
 - [ ] Rights cleared
 - [ ] Deliverables specified
 - [ ] Distribution planned
+
+## References
+
+- @$AIWG_ROOT/agentic/code/frameworks/media-marketing-kit/README.md — Media marketing kit framework overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md — Multi-agent video production orchestration
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Authorization gates for production and rights approval
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

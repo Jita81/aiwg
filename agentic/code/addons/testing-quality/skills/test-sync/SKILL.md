@@ -312,3 +312,10 @@ Remove orphaned tests:
 ```bash
 python scripts/cleanup_orphans.py --project . --dry-run
 ```
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/testing-quality/README.md — Testing quality addon overview
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/README.md — SDLC framework context for test traceability
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Authorization before deleting test files
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for check-traceability command

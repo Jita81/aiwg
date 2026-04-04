@@ -155,3 +155,10 @@ This skill should:
 - `/workspace-reset` - Full workspace reset (destructive)
 - `/project-status` - Current project state
 - `/check-traceability` - Verify requirement links
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/README.md — aiwg-utils addon overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Report findings and await user authorization before cleanup
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Concrete thresholds for health checks (file count, age)
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/README.md — SDLC phase structure that workspace health is measured against

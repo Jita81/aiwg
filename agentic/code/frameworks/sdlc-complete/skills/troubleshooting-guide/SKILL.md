@@ -361,3 +361,10 @@ Remember to:
 - Collect feedback from users and improve guides
 - Include screenshots and visual aids where helpful
 - Make guides searchable and well-organized
+
+## References
+
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/README.md — SDLC framework context and documentation standards
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Research-first for root cause analysis
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/diagram-generation.md — System topology and architecture diagram standards
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

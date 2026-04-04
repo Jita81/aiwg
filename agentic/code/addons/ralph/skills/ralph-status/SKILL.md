@@ -121,3 +121,10 @@ Options:
 1. Delete and start fresh: rm -rf .aiwg/ralph/
 2. Check file manually: cat .aiwg/ralph/current-loop.json
 ```
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/ralph/README.md — Ralph addon overview and loop executor documentation
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for ralph-status and related commands
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Loop completion and iteration limit rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/README.md — SDLC framework context

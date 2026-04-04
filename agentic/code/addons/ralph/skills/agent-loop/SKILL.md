@@ -300,3 +300,11 @@ User: "actually, abort that and just fix the login bug"
 - **3.0.0**: Renamed from `ralph-loop` to `agent-loop`; added loop taxonomy (Issue #558)
 - **2.0.0**: Added multi-loop support with registry tracking (Issue #268)
 - **1.0.0**: Initial single-loop implementation
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/ralph/README.md — Ralph addon overview and loop executor documentation
+- @$AIWG_ROOT/agentic/code/addons/ralph/schemas/loop-registry.yaml — Registry schema for multi-loop tracking
+- @$AIWG_ROOT/agentic/code/addons/ralph/schemas/loop-state.yaml — Loop state schema
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Loop termination and completion criteria rules
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for ralph commands

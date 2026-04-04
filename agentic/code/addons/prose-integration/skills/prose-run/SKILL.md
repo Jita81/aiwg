@@ -123,3 +123,11 @@ Run artifacts saved to: `.aiwg/working/prose-runs/{run-id}/`
 - Requires Opus for reliable execution; Sonnet may produce partial or incorrect results
 - Large multi-service programs may exceed context budget
 - No persistent state across sessions (state lives in `.aiwg/working/`)
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/prose-integration/README.md — prose-integration addon overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md — Sub-agent spawning via Task tool for multi-component execution
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/context-budget.md — Monitor context budget for large multi-service programs
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Run prose-detect and prose-validate before execution
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for AIWG integration commands

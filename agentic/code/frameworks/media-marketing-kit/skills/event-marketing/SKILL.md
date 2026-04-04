@@ -144,3 +144,10 @@ Saved to `.aiwg/marketing/events/{event-name}/`:
 - [ ] On-site marketing planned
 - [ ] Follow-up sequence created
 - [ ] Success metrics defined
+
+## References
+
+- @$AIWG_ROOT/agentic/code/frameworks/media-marketing-kit/README.md — Media marketing kit framework overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md — Multi-agent event marketing orchestration
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Measurable event success metrics
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

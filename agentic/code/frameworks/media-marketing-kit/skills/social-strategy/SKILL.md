@@ -133,3 +133,10 @@ Saved to `.aiwg/marketing/social/{strategy-period}/`:
 - [ ] Post templates created
 - [ ] KPIs and benchmarks established
 - [ ] Community guidelines documented
+
+## References
+
+- @$AIWG_ROOT/agentic/code/frameworks/media-marketing-kit/README.md — Media marketing kit framework overview
+- @$AIWG_ROOT/agentic/code/addons/voice-framework/README.md — Voice framework for platform-specific tone calibration
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Measurable social KPIs and benchmarks
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

@@ -72,3 +72,10 @@ aiwg validate-mentions [--target <dir>] [--strict]
 - `/mention-report` - Generate traceability report
 
 Validate @-mentions for: $ARGUMENTS
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/README.md — aiwg-utils addon overview
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for validate-mentions command
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Verify before reporting validity
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/README.md — SDLC artifact paths validated by this skill

@@ -119,3 +119,10 @@ Run all checks and report results as pass/fail with details:
 ## Model
 
 This skill runs on **Sonnet** — validation is structural analysis, not complex reasoning.
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/prose-integration/README.md — prose-integration addon overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Run prose-detect before validating; read grammar spec from PROSE_ROOT
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Concrete pass/fail/warn criteria for each validation check
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for AIWG addon integration commands

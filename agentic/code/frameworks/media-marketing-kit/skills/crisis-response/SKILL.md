@@ -141,3 +141,10 @@ Saved to `.aiwg/marketing/crisis/{crisis-id}/`:
 - [ ] Legal review complete
 - [ ] Response team briefed
 - [ ] Monitoring established
+
+## References
+
+- @$AIWG_ROOT/agentic/code/frameworks/media-marketing-kit/README.md — Media marketing kit framework overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Authorization gates for crisis communications
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Measurable severity levels and response time criteria
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

@@ -335,3 +335,10 @@ aiwg -reset-workspace --reinitialize
 - `/workspace-realign` - Sync docs with project state (non-destructive)
 - `/workspace-prune-working` - Clean up working directory only
 - `/intake-wizard` - Start fresh intake after reset
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/README.md — aiwg-utils addon overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Explicit confirmation required before destructive reset
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Concrete confirmation prompt and safety checks
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/README.md — SDLC artifact directory structure recreated on --reinitialize

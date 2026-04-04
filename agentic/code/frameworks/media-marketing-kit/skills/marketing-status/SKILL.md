@@ -129,3 +129,10 @@ Saved to `.aiwg/marketing/reports/`:
 - [ ] Issues and risks identified
 - [ ] Actions prioritized
 - [ ] Report delivered to stakeholders
+
+## References
+
+- @$AIWG_ROOT/agentic/code/frameworks/media-marketing-kit/README.md — Media marketing kit framework overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md — Multi-agent status collection orchestration
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Measurable status and risk criteria
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

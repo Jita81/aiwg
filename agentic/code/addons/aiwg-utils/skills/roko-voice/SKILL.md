@@ -402,3 +402,10 @@ Before finalizing output, verify:
 **Command Version**: 1.0
 **Voice Reference**: ROKO Network - Technical Mythology for Protocol Age
 **Maintained By**: AIWG Team
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/README.md — aiwg-utils addon overview
+- @$AIWG_ROOT/agentic/code/addons/voice-framework/README.md — Voice framework for systematic voice profile application
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/instruction-comprehension.md — Honor --density and --preserve-structure parameters precisely
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for voice-related commands

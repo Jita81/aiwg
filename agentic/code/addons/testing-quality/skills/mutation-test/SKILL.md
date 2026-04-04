@@ -299,3 +299,10 @@ Analyze and prioritize survivors:
 ```bash
 python scripts/mutation_analyzer.py --report stryker-report.json
 ```
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/testing-quality/README.md — Testing quality addon overview
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/README.md — SDLC framework context for quality gates
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Measurable quality thresholds and gate criteria
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

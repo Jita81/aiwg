@@ -81,3 +81,10 @@ Next step:
 - State Machine is for compliance-critical or multi-retry flows — not general complexity
 - RAG is for external knowledge retrieval — not for "the context might be long"
 - Recommend the upgrade path: start simple, add complexity only when eval scores justify it
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/nlp-prod/README.md — nlp-prod addon overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Understand use case requirements before recommending a pattern
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/god-session.md — Guidance on appropriate complexity boundaries for agent and pipeline design
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for aiwg nlp commands

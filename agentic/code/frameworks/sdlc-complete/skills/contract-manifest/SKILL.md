@@ -159,3 +159,11 @@ graph LR
 ## Model
 
 Runs on **Sonnet** — contract extraction and matching is structural analysis.
+
+## References
+
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/README.md — SDLC framework context and skill catalog
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Research-first approach for contract resolution
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/diagram-generation.md — Mermaid diagram generation standards
+- @$AIWG_ROOT/docs/extensions/overview.md — Extension system and skill architecture
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

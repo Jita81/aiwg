@@ -130,3 +130,10 @@ Saved to `.aiwg/marketing/compliance/`:
 - [ ] Remediation guidance provided
 - [ ] Required disclaimers identified
 - [ ] Sign-off obtained
+
+## References
+
+- @$AIWG_ROOT/agentic/code/frameworks/media-marketing-kit/README.md — Media marketing kit framework overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Authorization gates for legal review sign-off
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Measurable compliance criteria and severity levels
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

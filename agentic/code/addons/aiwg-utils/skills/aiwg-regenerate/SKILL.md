@@ -402,3 +402,11 @@ See `@$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/native-ux-tools.md` for th
 | Backup write fails | Abort with error (never overwrite without backup) |
 | AIWG not detected | Generate project-only content, warn user |
 | Parse error | Warn, offer `--full` as recovery option |
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/README.md — aiwg-utils addon overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/native-ux-tools.md — Platform detection and native UX tool usage
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Confirmation before destructive --full regeneration
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for aiwg sync command
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/README.md — SDLC framework context included in regenerated files

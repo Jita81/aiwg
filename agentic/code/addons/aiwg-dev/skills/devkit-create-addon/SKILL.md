@@ -81,3 +81,11 @@ aiwg scaffold-addon <name> --description "..." --author "..."
 - `/devkit-create-command` - Add command to addon
 - `/devkit-create-skill` - Add skill to addon
 - `/devkit-validate` - Validate addon structure
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-dev/README.md — aiwg-dev addon overview
+- @$AIWG_ROOT/docs/extensions/overview.md — Extension system architecture
+- @$AIWG_ROOT/docs/extensions/creating-extensions.md — Guide to building custom extensions
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference including scaffold-addon command
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/god-session.md — Scope rules for addon design

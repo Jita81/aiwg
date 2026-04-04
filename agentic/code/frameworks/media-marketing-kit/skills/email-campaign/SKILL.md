@@ -141,3 +141,10 @@ Saved to `.aiwg/marketing/email/{campaign-name}/`:
 - [ ] Legal compliance verified
 - [ ] QC checklist completed
 - [ ] Accessibility reviewed
+
+## References
+
+- @$AIWG_ROOT/agentic/code/frameworks/media-marketing-kit/README.md — Media marketing kit framework overview
+- @$AIWG_ROOT/agentic/code/addons/voice-framework/README.md — Voice framework for email tone and messaging
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md — Multi-agent email campaign orchestration
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

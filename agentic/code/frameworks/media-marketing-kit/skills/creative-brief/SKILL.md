@@ -128,3 +128,10 @@ Saved to `.aiwg/marketing/creative/briefs/`:
 - [ ] Deliverables specified with dimensions
 - [ ] Timeline with milestones
 - [ ] Approval workflow defined
+
+## References
+
+- @$AIWG_ROOT/agentic/code/frameworks/media-marketing-kit/README.md — Media marketing kit framework overview
+- @$AIWG_ROOT/agentic/code/addons/voice-framework/README.md — Voice framework for tone and messaging direction
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/native-ux-tools.md — Interactive discovery question patterns
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

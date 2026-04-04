@@ -138,3 +138,10 @@ git push
 ```
 
 **NEVER** force push to shared branches unless explicitly required and safe.
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/README.md — aiwg-utils addon overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Confirmation before destructive git operations
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/instruction-comprehension.md — Correct interpretation of commit message intent
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for AIWG versioning and release workflow

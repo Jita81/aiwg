@@ -121,3 +121,10 @@ Saved to `.aiwg/marketing/budget/`:
 - [ ] Optimization opportunities identified
 - [ ] Reallocation recommendations provided
 - [ ] Forecast updated
+
+## References
+
+- @$AIWG_ROOT/agentic/code/frameworks/media-marketing-kit/README.md — Media marketing kit framework overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Measurable ROI thresholds and review criteria
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md — Multi-agent budget analysis orchestration
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

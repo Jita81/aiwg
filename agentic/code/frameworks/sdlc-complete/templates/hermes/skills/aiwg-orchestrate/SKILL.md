@@ -71,3 +71,11 @@ After delegation returns:
 1. Confirm the artifact path exists under `.aiwg/`
 2. Confirm the summary accurately describes the artifact
 3. If the user asks to see the artifact, use `artifact-read` (not memory recall)
+
+## References
+
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/README.md — SDLC framework context and workflow catalog
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/context-bloat.md — Minimizing context cost via delegation
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md — Focused subagent delegation patterns
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/implicit-dependencies.md — Passing required context to delegated agents
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for AIWG workflow commands

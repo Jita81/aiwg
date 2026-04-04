@@ -357,3 +357,10 @@ Next Steps:
 - `/workspace-realign` - Sync all .aiwg/ docs with project state
 - `/workspace-reset` - Wipe .aiwg/ and start fresh
 - `/project-status` - View current project state
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/README.md — aiwg-utils addon overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Confirm before promoting, archiving, or deleting artifacts
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Concrete classification criteria and age thresholds
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/README.md — SDLC artifact structure for promotion target mapping

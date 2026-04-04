@@ -131,3 +131,10 @@ Saved to `.aiwg/marketing/production/{project-name}/`:
 - [ ] QC passed
 - [ ] Assets delivered
 - [ ] Documentation complete
+
+## References
+
+- @$AIWG_ROOT/agentic/code/frameworks/media-marketing-kit/README.md — Media marketing kit framework overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md — Multi-agent orchestration patterns
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Authorization gates for production decisions
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

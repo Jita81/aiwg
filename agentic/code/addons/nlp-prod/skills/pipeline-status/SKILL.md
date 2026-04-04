@@ -75,3 +75,10 @@ Actions recommended:
   doc-classifier: Pass rate 78% < 85% threshold — run aiwg nlp eval pipelines/doc-classifier/
   qa-rag: No eval run found — run aiwg nlp eval pipelines/qa-rag/
 ```
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/nlp-prod/README.md — nlp-prod addon overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Concrete health score thresholds and pass/fail criteria
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Scan pipeline configs before reporting status
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for aiwg nlp and metrics commands

@@ -133,3 +133,11 @@ Next Steps:
 - Study existing frameworks before creating new ones
 - Use `--interactive` for guided design process
 - Start small and iterate (core agents first, then expand)
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-dev/README.md — aiwg-dev addon overview
+- @$AIWG_ROOT/docs/extensions/overview.md — Extension system architecture
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference including scaffold-framework command
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/README.md — SDLC framework as reference implementation
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/god-session.md — Scope guidelines for agent design within frameworks

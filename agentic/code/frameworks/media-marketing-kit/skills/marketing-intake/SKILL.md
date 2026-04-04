@@ -164,3 +164,10 @@ When run interactively, guides through:
 - [ ] Timeline created
 - [ ] Team assigned
 - [ ] Kickoff ready
+
+## References
+
+- @$AIWG_ROOT/agentic/code/frameworks/media-marketing-kit/README.md — Media marketing kit framework overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/native-ux-tools.md — Interactive intake question patterns
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/instruction-comprehension.md — Fully parsing intake requirements before acting
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

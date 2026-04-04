@@ -315,3 +315,10 @@ TL;DR
 **Template Version**: 1.0
 **Based On**: Roko Dev Community Update (Oct 7 & 9, 2025)
 **Maintained By**: AIWG Team
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/README.md — aiwg-utils addon overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/instruction-comprehension.md — Honor --style, --emphasize, and --avoid parameters correctly
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Concrete output length and coverage targets
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for AIWG output formatting conventions

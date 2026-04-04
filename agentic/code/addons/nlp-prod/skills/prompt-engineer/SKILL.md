@@ -100,3 +100,11 @@ Before finalizing any prompt:
 - [ ] If evaluator: isolation verified (no generator context)
 - [ ] Version header is correct
 - [ ] Notes section explains non-obvious decisions
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/nlp-prod/README.md — nlp-prod addon overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Concrete prompt quality criteria and token budget thresholds
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md — Evaluator isolation as a separate agent call
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/instruction-comprehension.md — Make ONE targeted change per iteration; do not rewrite wholesale
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for aiwg nlp eval commands

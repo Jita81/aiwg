@@ -217,3 +217,10 @@ Output: .cursorrules (187 lines)
 | `/aiwg-regenerate-windsurfrules` | .windsurfrules |
 | `/aiwg-regenerate-copilot` | copilot-instructions.md |
 | `/aiwg-regenerate` | Auto-detect |
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/README.md — aiwg-utils addon overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/native-ux-tools.md — Platform capability matrix including Cursor support
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for aiwg sync and regenerate commands
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/README.md — SDLC framework integration referenced in generated .cursorrules

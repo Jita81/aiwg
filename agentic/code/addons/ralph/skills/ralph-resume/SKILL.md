@@ -170,3 +170,10 @@ Continues from last checkpoint with original settings.
 - `/ralph-status` - Check what state the loop is in
 - `/ralph-abort` - Stop instead of resume
 - `/ralph` - Start new loop
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/ralph/README.md — Ralph addon overview and loop executor documentation
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Loop termination and iteration limit rules
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for ralph-resume and related commands
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/instruction-comprehension.md — Re-reading original task instructions on resume

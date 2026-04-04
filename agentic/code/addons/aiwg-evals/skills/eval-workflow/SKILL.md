@@ -130,3 +130,11 @@ Run automated evaluation tests against a multi-agent workflow.
 - `aiwg lint agents` - Static validation
 
 Evaluate workflow: $ARGUMENTS
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-evals/README.md — aiwg-evals addon overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md — Parallel agent coordination rules evaluated in workflows
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Concrete success thresholds and test criteria
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/README.md — SDLC flow commands available for workflow evaluation
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for aiwg lint and eval commands

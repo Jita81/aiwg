@@ -213,3 +213,10 @@ Output: .windsurfrules (187 lines)
 | `/aiwg-regenerate-windsurfrules` | .windsurfrules |
 | `/aiwg-regenerate-copilot` | copilot-instructions.md |
 | `/aiwg-regenerate` | Auto-detect |
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/README.md — aiwg-utils addon overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/native-ux-tools.md — Platform capability matrix including Windsurf
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for aiwg sync and regenerate commands
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/README.md — SDLC framework context referenced in generated .windsurfrules

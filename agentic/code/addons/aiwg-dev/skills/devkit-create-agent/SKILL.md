@@ -165,3 +165,11 @@ aiwg lint agents <target>/agents/<name>.md --verbose
 - `/devkit-create-skill` - Create an auto-triggered skill
 - `/devkit-validate` - Validate agent structure
 - `aiwg lint agents` - Validate against 10 Golden Rules
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-dev/README.md — aiwg-dev addon overview
+- @$AIWG_ROOT/docs/extensions/extension-types.md — Extension types including agent type
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference including add-agent command
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/god-session.md — Single-responsibility rules for agents
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/agent-deployment.md — Agent metadata structure and multi-provider deployment

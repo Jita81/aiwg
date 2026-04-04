@@ -134,3 +134,11 @@ Tests for Roig (2025) failure archetypes:
 - `aiwg lint agents` - Static validation
 
 Evaluate agent: $ARGUMENTS
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-evals/README.md — aiwg-evals addon overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/god-session.md — Single-responsibility rules that agents are evaluated against
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Concrete success criteria and threshold definitions
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/README.md — SDLC agent catalog available for evaluation
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for aiwg lint agents

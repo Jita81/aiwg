@@ -123,3 +123,10 @@ Saved to `.aiwg/marketing/content/`:
 - [ ] Content briefs created for priority content
 - [ ] Distribution strategy documented
 - [ ] Quality standards established
+
+## References
+
+- @$AIWG_ROOT/agentic/code/frameworks/media-marketing-kit/README.md — Media marketing kit framework overview
+- @$AIWG_ROOT/agentic/code/addons/voice-framework/README.md — Voice framework for content tone and style planning
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md — Multi-agent content strategy orchestration
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

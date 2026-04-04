@@ -130,3 +130,10 @@ Saved to `.aiwg/marketing/analytics/{campaign-name}/`:
 - [ ] Insights documented
 - [ ] Actionable recommendations provided
 - [ ] Report delivered to stakeholders
+
+## References
+
+- @$AIWG_ROOT/agentic/code/frameworks/media-marketing-kit/README.md — Media marketing kit framework overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Measurable KPI thresholds and analytics criteria
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md — Multi-agent analytics orchestration
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

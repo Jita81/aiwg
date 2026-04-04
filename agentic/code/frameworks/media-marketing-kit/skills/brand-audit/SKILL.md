@@ -136,3 +136,10 @@ Saved to `.aiwg/marketing/brand/audit/`:
 - [ ] Gaps identified
 - [ ] Recommendations prioritized
 - [ ] Action plan created
+
+## References
+
+- @$AIWG_ROOT/agentic/code/frameworks/media-marketing-kit/README.md — Media marketing kit framework overview
+- @$AIWG_ROOT/agentic/code/addons/voice-framework/README.md — Voice framework for verbal identity evaluation
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md — Multi-agent audit orchestration
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference

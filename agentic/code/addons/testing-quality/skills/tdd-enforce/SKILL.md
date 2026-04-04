@@ -273,3 +273,10 @@ Options:
 - `--threshold`: Line coverage threshold (default: 80)
 - `--branch-threshold`: Branch coverage threshold (default: 75)
 - `--dry-run`: Show what would be done without making changes
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/testing-quality/README.md — Testing quality addon overview
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/README.md — SDLC framework context for quality gates and phase transitions
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Measurable enforcement thresholds
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for setup-tdd command

@@ -150,3 +150,11 @@ When `--fix` is specified:
 - `/devkit-create-addon` - Create new addon
 - `/devkit-create-extension` - Create new extension
 - `aiwg validate` - CLI validation tool
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-dev/README.md — aiwg-dev addon overview
+- @$AIWG_ROOT/docs/extensions/overview.md — Extension system architecture and manifest spec
+- @$AIWG_ROOT/docs/extensions/extension-types.md — Full extension type reference
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference including validate-metadata command
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Verify before acting pattern

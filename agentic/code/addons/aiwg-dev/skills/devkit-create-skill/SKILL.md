@@ -195,3 +195,11 @@ Next Steps:
 3. **Specific execution**: Document exactly what happens when triggered
 4. **Good examples**: Show realistic usage scenarios
 5. **Reference materials**: Include supporting docs when needed
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-dev/README.md — aiwg-dev addon overview
+- @$AIWG_ROOT/docs/extensions/extension-types.md — Extension types including skill type
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference including add-skill command
+- @$AIWG_ROOT/docs/extensions/creating-extensions.md — Guide to building custom extensions
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Concrete trigger phrase and loop termination requirements

@@ -128,3 +128,10 @@ Removed: langchain dependency (replaced with direct anthropic SDK call)
 Deploy: docker build -t <name>:latest . && docker run <name>:latest
 Cost model: prod/cost-model.yaml (~$9/mo at 100k calls)
 ```
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/nlp-prod/README.md — nlp-prod addon overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Concrete readiness thresholds (pass rate ≥85%, eval within 7 days)
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Confirm with user when ✗ items found before generating prod artifacts
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for aiwg nlp commands

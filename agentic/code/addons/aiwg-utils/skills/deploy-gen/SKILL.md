@@ -162,3 +162,10 @@ From Unified Plan:
 | Security baseline | Non-root, minimal image |
 
 Generate deployment for: $ARGUMENTS
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/README.md — aiwg-utils addon overview
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/README.md — SDLC framework context for deployment workflows
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference including deploy-related commands
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Analyze project before generating configs
