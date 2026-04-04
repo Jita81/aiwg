@@ -94,6 +94,7 @@
     "new-project"
   ],
   "rules": [
+    "no-time-estimates",
     "agent-deployment",
     "context-bloat",
     "context-budget",

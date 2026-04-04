@@ -8,6 +8,11 @@ Core meta-utility rules for agent coordination, context management, and platform
 
 ### HIGH
 
+#### no-time-estimates
+**Summary**: Never produce wall-clock time estimates in AI-assisted work contexts. Human+AI development velocity is unknowable and varies non-linearly with operator skill, model quality, task decomposability, and centaur configuration. Instead, express effort in agent-oriented units: scope count (atomic deliverables), agent count and roles, parallelism map (parallel vs sequential batches), and pass estimate (iterations to quality gate). Prohibited phrases include "N days/hours/weeks," "expected duration," and "this should be quick."
+**When to apply**: Planning, task decomposition, sprint estimation, phase planning, completion reports, responding to "how long will this take?" questions
+**Full rule**: @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/no-time-estimates.md
+
 #### god-session
 **Summary**: A single agent that tries to do everything — research, implement, test, document, deploy — is a god session. God sessions are hard to debug, impossible to parallelize, and produce inconsistent results. Agent definitions must have a focused scope of ≤5–7 distinct responsibilities. When an agent discovers adjacent work mid-session, file issues rather than absorbing them.
 **When to apply**: Agent definition creation, reviewing agent scope, mid-session scope creep detection, multi-domain task planning
@@ -97,5 +102,9 @@ Core meta-utility rules for agent coordination, context management, and platform
 
 ---
 
-*Generated from aiwg-utils manifest.json — 13 rules*
+| **Estimation and planning** | no-time-estimates, vague-discretion, subagent-scoping |
+
+---
+
+*Generated from aiwg-utils manifest.json — 14 rules*
 *Full rule files: @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/*
