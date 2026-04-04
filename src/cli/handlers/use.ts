@@ -64,9 +64,22 @@ export async function getAllAddons(frameworkRoot: string): Promise<string[]> {
  * The USE_ALL_DISALLOW list does NOT block explicit single-addon installs —
  * contributors can still run `aiwg use aiwg-dev` directly.
  */
+/** Resolve canonical addon folder name from user-supplied alias. */
+function resolveAddonFolderName(name: string): string {
+  const ADDON_ALIASES: Record<string, string> = {
+    // ring-methodology has always been invokable as 'ring'
+    'ring': 'ring-methodology',
+    // agent-loop addon (formerly ralph) — support all three invocation names
+    'al': 'ralph',
+    'agent-loop': 'ralph',
+    // ralph stays as-is (backwards compat) — folder rename tracked in #694
+  };
+  return ADDON_ALIASES[name] ?? name;
+}
+
 export async function isValidAddon(frameworkRoot: string, name: string): Promise<boolean> {
   try {
-    const folderName = name === 'ring' ? 'ring-methodology' : name;
+    const folderName = resolveAddonFolderName(name);
     const stat = await fs.stat(path.join(frameworkRoot, 'agentic/code/addons', folderName));
     return stat.isDirectory();
   } catch {
@@ -76,11 +89,10 @@ export async function isValidAddon(frameworkRoot: string, name: string): Promise
 
 /**
  * Resolve addon source path from its name.
- * Handles the ring-methodology special case where the folder name differs from the alias.
+ * Handles known aliases (ring, al, agent-loop).
  */
 export function addonPath(frameworkRoot: string, name: string): string {
-  // Legacy alias: `ring` → ring-methodology folder
-  const folderName = name === 'ring' ? 'ring-methodology' : name;
+  const folderName = resolveAddonFolderName(name);
   return path.join(frameworkRoot, 'agentic/code/addons', folderName);
 }
 
