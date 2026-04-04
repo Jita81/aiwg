@@ -153,3 +153,11 @@ memory_forensics:
       - linux.check_syscall
       - linux.check_modules
 ```
+
+## References
+
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/rules/volatility-order.md — Memory is the most volatile artifact; acquire before any disk or log collection
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/rules/evidence-integrity.md — Hash memory image immediately after acquisition; record hash in custody log
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Verify disk space, kernel version, and tool availability before starting acquisition
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/rules/red-flag-escalation.md — Escalate when malfind, DKOM-hidden processes, or SSDT hooks are found in memory
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/skills/ioc-extraction/SKILL.md — Extract network IOCs from Volatility netstat/sockstat output for cross-referencing

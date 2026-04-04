@@ -180,3 +180,11 @@ container_forensics:
     - kube-public
     - default
 ```
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Detect environment type (Docker, containerd, Kubernetes) before applying collection procedures
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/rules/non-destructive.md — Do not stop or remove containers until all artifacts are collected and hashed
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/rules/red-flag-escalation.md — Escalate immediately when container escape, Docker socket exposure, or privileged escape is confirmed
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/rules/evidence-integrity.md — Hash container logs and filesystem exports immediately after collection
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/skills/linux-forensics/SKILL.md — Investigate the underlying host after container forensics; container escapes leave traces on the host

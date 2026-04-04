@@ -162,3 +162,11 @@ log_analysis:
     - SUSPICIOUS
     - MALICIOUS
 ```
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Discover available log sources before analysis; absence of logs is itself evidence to document
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/rules/evidence-integrity.md — Analyze log copies only; do not modify original log files
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/rules/red-flag-escalation.md — Escalate immediately when log analysis reveals active attacker presence or data exfiltration
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/skills/evidence-preservation/SKILL.md — Logs must be preserved and hashed before analysis begins
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/skills/sigma-hunting/SKILL.md — Sigma hunting applies detection rules on top of the log sources analyzed here

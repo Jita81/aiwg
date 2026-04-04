@@ -117,3 +117,11 @@ linux_forensics:
       auth_log: /var/log/messages
       pkg_verify: "rpm -Va"
 ```
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Detect distribution family before selecting tooling; read /etc/os-release first
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/rules/non-destructive.md — Never modify target system state; use read-only commands and copy-on-collect procedures
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/rules/volatility-order.md — Collect volatile process and network state before disk artifacts
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/rules/red-flag-escalation.md — Escalate immediately when active malicious processes, rootkit indicators, or live attacker sessions are found
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/skills/evidence-preservation/SKILL.md — Preserve and hash collected log files before analysis

@@ -144,3 +144,11 @@ supply_chain_forensics:
     - "eval.*\\$\\("
     - "pull_request_target"
 ```
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Identify package ecosystems and build pipeline from lock files before starting analysis
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/rules/evidence-integrity.md — Do not run build scripts during investigation; analyze artifacts read-only to avoid triggering payloads
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Report integrity failures and tampering indicators; await human decision before blocking or removing dependencies
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/rules/red-flag-escalation.md — Escalate immediately when dependency hash mismatches or CI/CD script injection is confirmed
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/token-security.md — Supply chain audit checks for secrets in build pipelines; this rule defines what constitutes a violation

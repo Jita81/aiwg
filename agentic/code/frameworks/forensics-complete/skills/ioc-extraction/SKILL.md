@@ -126,3 +126,11 @@ ioc_extraction:
   domain_allowlist: []
   ip_allowlist: []
 ```
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Scan investigation artifacts completely before extracting; check baseline and allowlists before flagging
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Produce IOC lists for analyst review; do not autonomously push indicators to blocking systems
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/rules/evidence-integrity.md — IOC extraction must not modify source artifacts; read-only access to evidence
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/skills/evidence-preservation/SKILL.md — Evidence must be preserved and hashed before IOC extraction begins
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/skills/sigma-hunting/SKILL.md — Sigma hunting cross-references extracted IOCs against log sources for confirmation

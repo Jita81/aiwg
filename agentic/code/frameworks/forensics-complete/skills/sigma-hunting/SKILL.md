@@ -127,3 +127,11 @@ sigma_hunting:
     - splunk
   sigma_cli_path: sigma
 ```
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Identify available log sources and rule libraries before executing hunts; check tool availability
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/rules/evidence-integrity.md — Hunting must not modify log sources; run rules against read-only copies
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/rules/red-flag-escalation.md — Escalate to human when Sigma hits indicate active compromise or critical severity findings
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/skills/ioc-extraction/SKILL.md — Cross-reference Sigma rule hits against extracted IOCs for confirmation
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/skills/log-analysis/SKILL.md — Log analysis skill provides the correlated timeline that Sigma hunting adds detection coverage to

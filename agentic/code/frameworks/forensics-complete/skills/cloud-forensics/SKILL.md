@@ -131,3 +131,11 @@ cloud_forensics:
   key_age_threshold_days: 90
   flag_public_instances: true
 ```
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Verify provider identity and access before collection; detect available log sources
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/rules/evidence-integrity.md — Export and hash cloud artifacts before analysis; record snapshot IDs in custody log
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/rules/red-flag-escalation.md — Escalate when CloudTrail tampering (StopLogging, DeleteTrail) or active IAM privilege escalation is found
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/skills/evidence-preservation/SKILL.md — Cloud evidence (snapshots, log exports) must be preserved per custody procedures
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/skills/ioc-extraction/SKILL.md — Extract IOCs (suspicious IPs, ARNs, service principal IDs) from cloud audit log findings

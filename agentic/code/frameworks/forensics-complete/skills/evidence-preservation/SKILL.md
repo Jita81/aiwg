@@ -161,3 +161,11 @@ evidence_preservation:
   volatile_collection_window_seconds: 60
   require_write_blocker_confirmation: true
 ```
+
+## References
+
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/rules/evidence-integrity.md — Evidence integrity requirements this skill implements (hashing, custody chain, packaging)
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/rules/non-destructive.md — Never modify source evidence; copy-only collection and read-only access rules
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Confirm case ID and examiner authorization before beginning collection; custody transfers require explicit approval
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/rules/volatility-order.md — RFC 3227 volatile-first collection ordering this skill enforces
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/skills/ioc-extraction/SKILL.md — IOC extraction follows evidence preservation; cannot extract from unpreserved artifacts

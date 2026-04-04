@@ -105,3 +105,11 @@ target_profiling:
     - filebeat
   output_format: markdown
 ```
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Validate SSH connectivity before starting collection; document what is and is not accessible
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/rules/non-destructive.md — Profile using read-only commands only; do not alter target system state
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/rules/evidence-integrity.md — Record collection timestamp and SSH user with the profile for forensic traceability
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/skills/linux-forensics/SKILL.md — Target profile feeds as baseline context for subsequent Linux forensic investigation
+- @$AIWG_ROOT/agentic/code/frameworks/forensics-complete/skills/evidence-preservation/SKILL.md — Profile documents collected after target profiling feed the evidence preservation workflow
