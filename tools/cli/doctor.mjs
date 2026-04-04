@@ -9,9 +9,11 @@ import os from 'os';
 import path from 'path';
 import { execSync } from 'child_process';
 import chalk from 'chalk';
+import { getFrameworkRoot, getVersionInfo } from '../../src/channel/manager.mjs';
 
-const AIWG_ROOT = process.env.AIWG_ROOT ||
-  path.join(process.env.HOME || '', '.local/share/ai-writing-guide');
+// AIWG_ROOT: env override > channel-manager resolved path > legacy edge path
+// getFrameworkRoot() resolves correctly for npm global installs, edge, and dev channels.
+const AIWG_ROOT = process.env.AIWG_ROOT || await getFrameworkRoot();
 
 const checks = [];
 
@@ -40,20 +42,26 @@ async function runDoctor() {
   console.log(rule);
   console.log('');
 
-  // 1. Check AIWG installation
+  // 1. Check AIWG installation — use channel-manager resolved root, not legacy edge path
   const aiwgInstalled = await fileExists(AIWG_ROOT);
   if (aiwgInstalled) {
     check('AIWG Installation', 'ok', `Found at ${AIWG_ROOT}`);
   } else {
-    check('AIWG Installation', 'error', 'AIWG not installed. Run: npm install -g aiwg');
+    check('AIWG Installation', 'error', `AIWG not found at ${AIWG_ROOT}. Run: npm install -g aiwg`);
   }
 
-  // 2. Check version
+  // 2. Check version — include channel label (stable / next / nightly / edge)
   try {
-    const version = execSync('aiwg -version 2>/dev/null', { encoding: 'utf-8' }).trim();
-    check('AIWG Version', 'ok', version.split('\n')[0]);
+    const versionInfo = await getVersionInfo();
+    const channelLabel = versionInfo.channel !== 'stable' ? ` [${versionInfo.channel}]` : '';
+    check('AIWG Version', 'ok', `${versionInfo.version}${channelLabel}`);
   } catch {
-    check('AIWG Version', 'warn', 'Could not determine version');
+    try {
+      const version = execSync('aiwg -version 2>/dev/null', { encoding: 'utf-8' }).trim();
+      check('AIWG Version', 'ok', version.split('\n')[0]);
+    } catch {
+      check('AIWG Version', 'warn', 'Could not determine version');
+    }
   }
 
   // 3. Check .aiwg directory in current project
