@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Build correlated event timeline from multiple sources
 commandHint:

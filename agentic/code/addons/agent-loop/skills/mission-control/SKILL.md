@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 name: mission-control
 platforms: [all]
 

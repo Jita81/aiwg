@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 name: agent-loop
 description: Detect requests for iterative autonomous agent loops and route to the appropriate loop executor
 version: 3.0.0

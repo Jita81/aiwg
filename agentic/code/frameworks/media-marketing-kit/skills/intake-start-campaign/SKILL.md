@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Validate manually-created campaign intake forms and kick off Strategy phase with agent assignments
 commandHint:

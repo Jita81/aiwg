@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Orchestrate production deployment with strategy selection, validation, automated rollback, and regression gates
 commandHint:

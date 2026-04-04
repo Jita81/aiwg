@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 name: daemon-status
 description: Show daemon health, active sessions, task queue, and subsystem status
 version: 2026.3.0

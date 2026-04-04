@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 name: al
 aliases: [ralph, agent-loop]
 deprecated_names: [ralph]

@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Enable the AIWG context hook in platform context files without re-deploying
 commandHint:

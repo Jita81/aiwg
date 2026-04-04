@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Search AIWG knowledge base for help, documentation, and troubleshooting
 commandHint:

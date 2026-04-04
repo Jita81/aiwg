@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Discover and rank media sources across platforms for an artist or specific content
 commandHint:

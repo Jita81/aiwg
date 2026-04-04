@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Enable interactive question mode
 commandHint:

@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 name: prose-reader
 description: Read and parse an OpenProse program file, extracting its contract (requires, ensures, strategies, errors, invariants) and services into a structured representation
 version: 0.1.0

@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Assess source quality using GRADE methodology
 commandHint:

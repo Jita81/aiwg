@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 name: linux-forensics
 description: "Generalized Linux incident response and forensic analysis covering Debian/Ubuntu, RHEL/CentOS/Rocky, and SUSE families"
 tools: Bash, Read, Write, Glob, Grep

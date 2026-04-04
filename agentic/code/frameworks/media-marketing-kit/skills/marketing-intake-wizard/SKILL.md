@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Generate or complete marketing intake forms (campaign-intake, brand-profile, option-matrix) with interactive questioning and optional guidance
 commandHint:

@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Simulate project outcomes with variable modeling, risk assessment, and resource optimization scenarios.
 commandHint:

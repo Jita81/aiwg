@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Scan existing codebase and generate intake documents by analyzing code, dependencies, and infrastructure. Accepts optional guidance text to tailor analysis.
 commandHint:

@@ -726,6 +726,14 @@ export interface SkillMetadata {
   type: 'skill';
 
   /**
+   * Namespace prefix for collision avoidance (e.g., 'aiwg').
+   * Canonical invocation slug: '{namespace}-{name}'
+   *
+   * @see adr-skill-namespace-strategy.md
+   */
+  namespace?: string;
+
+  /**
    * Natural language trigger phrases
    *
    * @example ["what's next?", "project status", "where are we?"]

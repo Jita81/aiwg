@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Generate or update the agentic environment definition for AgentSmith, SkillSmith, and CommandSmith
 commandHint:

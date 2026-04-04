@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Compare current behavior against baseline to detect regressions
 commandHint:

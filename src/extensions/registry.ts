@@ -59,6 +59,14 @@ export class ExtensionRegistry {
   private aliasMap: Map<string, string> = new Map();
 
   /**
+   * Qualified name map: `{namespace}-{id}` to extension ID
+   *
+   * Enables lookup by canonical namespaced slug (e.g. `aiwg-sync` → `sync`).
+   * Only populated for skills/commands that carry a `namespace` field.
+   */
+  private qualifiedNameMap: Map<string, string> = new Map();
+
+  /**
    * Register an extension in the registry
    *
    * If an extension with the same ID already exists, it will be replaced.
@@ -104,6 +112,16 @@ export class ExtensionRegistry {
     // Register primary command/skill name
     if (extension.type === 'command' || extension.type === 'skill') {
       this.aliasMap.set(id, id);
+    }
+
+    // Register qualified name for namespaced skills/commands
+    if ((extension.type === 'skill' || extension.type === 'command') && 'namespace' in extension.metadata) {
+      const namespace = (extension.metadata as any).namespace as string | undefined;
+      if (namespace) {
+        const prefix = `${namespace}-`;
+        const qualifiedName = id.startsWith(prefix) ? id : `${prefix}${id}`;
+        this.qualifiedNameMap.set(qualifiedName, id);
+      }
     }
   }
 
@@ -196,6 +214,25 @@ export class ExtensionRegistry {
   }
 
   /**
+   * Resolve a qualified namespaced name to an extension ID.
+   *
+   * Accepts either the canonical qualified slug (`aiwg-sync`) or the bare ID (`sync`).
+   * Falls back to bare ID lookup when no qualified name match is found.
+   *
+   * @param qualifiedName - Qualified skill name (e.g. `aiwg-sync`) or bare ID
+   * @returns Extension ID if found, undefined otherwise
+   *
+   * @example
+   * ```typescript
+   * const id = registry.resolveQualifiedName('aiwg-sync'); // 'sync'
+   * const ext = registry.get(id);
+   * ```
+   */
+  resolveQualifiedName(qualifiedName: string): string | undefined {
+    return this.qualifiedNameMap.get(qualifiedName) ?? this.extensions.get(qualifiedName)?.id;
+  }
+
+  /**
    * Get all registered extensions
    *
    * Returns a new array containing all extensions. Modifications to the
@@ -261,6 +298,7 @@ export class ExtensionRegistry {
     this.extensions.clear();
     this.byType.clear();
     this.aliasMap.clear();
+    this.qualifiedNameMap.clear();
   }
 
   /**

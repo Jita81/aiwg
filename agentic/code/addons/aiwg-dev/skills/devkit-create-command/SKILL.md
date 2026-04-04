@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Create a new slash command with AI-guided behavior definition
 ---

@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Analyze gaps in research coverage
 commandHint:

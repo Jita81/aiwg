@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 name: forme-manifest
 description: Read a multi-service OpenProse program directory, analyze all service contracts, and generate the Forme wiring manifest for inspection and debugging
 version: 0.1.0

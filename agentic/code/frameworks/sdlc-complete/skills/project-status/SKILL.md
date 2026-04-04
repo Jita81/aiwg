@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Analyze project state from .aiwg/ artifacts and provide contextual status with recommended next steps
 commandHint:

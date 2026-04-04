@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Synchronize documentation and code to eliminate drift with parallel audit, auto-fix, and Al refinement
 commandHint:

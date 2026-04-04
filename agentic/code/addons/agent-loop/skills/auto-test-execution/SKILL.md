@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 name: auto-test-execution
 platforms: [all]
 

@@ -1,3 +1,10 @@
+---
+namespace: aiwg
+name: setup-generate
+platforms: [all]
+description: "Generate a `setup.manifest.yaml` file for a project using the `setup.aiwg.io/v1`"
+---
+
 # setup-generate
 
 Generate a `setup.manifest.yaml` file for a project using the `setup.aiwg.io/v1` SetupManifest language.

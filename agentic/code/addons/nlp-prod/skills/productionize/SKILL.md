@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Production readiness review — strip prototype scaffolding, harden code, validate cost model, generate prod/ artifacts
 commandHint:

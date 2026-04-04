@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Analyze LLM pipeline costs and generate concrete optimization recommendations with savings estimates
 commandHint:

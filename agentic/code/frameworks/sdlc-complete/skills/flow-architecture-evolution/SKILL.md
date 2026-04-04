@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Orchestrate architecture evolution workflow with ADR management, architecture review, breaking change analysis, and migration planning
 commandHint:

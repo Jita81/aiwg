@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 name: Integrity Verification
 description: SHA-256 checksum manifest generation, self-verification, and PREMIS fixity patterns

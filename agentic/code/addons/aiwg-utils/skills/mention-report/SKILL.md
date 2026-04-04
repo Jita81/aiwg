@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Generate traceability report from @-mentions
 ---

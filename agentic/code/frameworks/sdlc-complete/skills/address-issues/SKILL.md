@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Address open issues using issue-thread-driven agent loops with 2-way human-AI collaboration
 requires:

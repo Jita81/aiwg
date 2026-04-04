@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Perform comprehensive security assessment
 commandHint:

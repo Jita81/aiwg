@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 name: cross-task-learner
 description: Enable agent loops to learn from similar past tasks and share patterns across loops
 version: 2.0.0

@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Extract and enrich indicators of compromise
 commandHint:

@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Configure and run the isolated eval loop pattern — generate, evaluate, refine until pass threshold met
 commandHint:

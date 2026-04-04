@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 name: prose-install
 description: Install OpenProse for AIWG use when no existing installation is found. Tries npx skills add first, falls back to git clone, then saves the resolved path to .aiwg/config.json.
 version: 0.1.0

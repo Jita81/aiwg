@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 name: ralph-memory
 platforms: [all]
 description: Manage Al semantic memory entries — list, query, and clear lessons learned across loop iterations

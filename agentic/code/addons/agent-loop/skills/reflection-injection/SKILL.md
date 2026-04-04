@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 name: reflection-injection
 platforms: [all]
 

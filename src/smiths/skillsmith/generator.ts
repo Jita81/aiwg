@@ -161,6 +161,7 @@ function generateFrontmatter(options: SkillOptions): string {
 
   const lines = ['---'];
   lines.push(`name: ${fm.name}`);
+  lines.push(`namespace: aiwg`);
   lines.push(`description: ${fm.description}`);
   lines.push(`version: ${fm.version}`);
   if (fm.tools) {

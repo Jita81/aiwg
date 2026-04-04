@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Verify archive integrity with self-verifying SHA-256 checksums, generate VERIFY.md, and optionally create W3C PROV provenance
 commandHint:

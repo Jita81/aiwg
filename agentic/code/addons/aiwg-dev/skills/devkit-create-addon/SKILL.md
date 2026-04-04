@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Create a new AIWG addon with AI-guided setup
 ---

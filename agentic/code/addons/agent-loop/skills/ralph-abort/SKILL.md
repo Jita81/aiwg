@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 name: ralph-abort
 platforms: [all]
 description: Abort a running agent loop and optionally revert changes

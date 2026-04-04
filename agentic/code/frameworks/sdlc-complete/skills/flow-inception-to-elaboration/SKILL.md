@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Orchestrate Inception→Elaboration phase transition with architecture baselining and risk retirement
 commandHint:

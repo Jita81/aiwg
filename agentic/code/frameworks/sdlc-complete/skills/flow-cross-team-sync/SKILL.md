@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Orchestrate cross-team synchronization with dependency mapping, sync cadence, blocker escalation, integration planning, and cross-team demos
 commandHint:

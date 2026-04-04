@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: CI-friendly complexity enforcement gate returning pass/fail results for pipeline integration
 commandHint:

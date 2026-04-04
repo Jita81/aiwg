@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Enforce minimum security criteria before iteration close or release
 commandHint:

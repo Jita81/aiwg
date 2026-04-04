@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Orchestrate Knowledge Transfer flow with assessment, documentation, shadowing, validation, and handover
 commandHint:

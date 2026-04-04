@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Audit codebase for dead code, unused exports, orphaned files, and stale manifests
 commandHint:

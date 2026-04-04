@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 name: Provenance Tracking
 description: W3C PROV-O patterns for tracking media derivation chains and production history

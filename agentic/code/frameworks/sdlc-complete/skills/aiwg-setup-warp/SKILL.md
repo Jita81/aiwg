@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Setup Warp Terminal with AIWG framework context (preserves existing content)
 commandHint:

@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Evidence acquisition with chain of custody and hash verification
 commandHint:

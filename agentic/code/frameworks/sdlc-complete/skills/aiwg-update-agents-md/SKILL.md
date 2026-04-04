@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Update AGENTS.md with project-specific context for Factory AI based on codebase analysis
 commandHint:

@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Orchestrate comprehensive test strategy with test suite execution, coverage validation, defect triage, and regression analysis
 commandHint:

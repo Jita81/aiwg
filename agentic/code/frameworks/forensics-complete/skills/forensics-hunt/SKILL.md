@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Threat hunt using Sigma rules against log sources
 commandHint:

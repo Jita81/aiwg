@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Analyze overall project health and metrics
 commandHint:

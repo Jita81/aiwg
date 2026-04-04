@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 name: ralph-resume
 platforms: [all]
 description: Resume an interrupted agent loop from last checkpoint

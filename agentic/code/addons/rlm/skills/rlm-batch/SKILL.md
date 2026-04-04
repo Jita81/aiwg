@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Parallel fan-out processing - spawn multiple sub-agents for chunked context processing
 commandHint:

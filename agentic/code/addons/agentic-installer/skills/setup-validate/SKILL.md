@@ -1,3 +1,10 @@
+---
+namespace: aiwg
+name: setup-validate
+platforms: [all]
+description: "Validate a `setup.aiwg.io/v1` SetupManifest file against the schema and run cons"
+---
+
 # setup-validate
 
 Validate a `setup.aiwg.io/v1` SetupManifest file against the schema and run consistency checks.

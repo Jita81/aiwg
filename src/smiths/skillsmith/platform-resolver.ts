@@ -16,61 +16,72 @@ const PLATFORM_CONFIGS: Record<Platform, PlatformSkillConfig> = {
     baseDir: '.claude/skills',
     extension: '.md',
     supportsSkills: true,
+    supportsSubdirectory: true,
   },
   factory: {
     baseDir: '.factory/skills',
     extension: '.md',
     supportsSkills: false,
     alternativeStrategy: 'command',
+    supportsSubdirectory: true,
   },
   cursor: {
     baseDir: '.cursor/skills',
     extension: '.md',
     supportsSkills: true,
+    supportsSubdirectory: true,
   },
   codex: {
     baseDir: '.codex/skills',
     extension: '.md',
     supportsSkills: false,
     alternativeStrategy: 'command',
+    supportsSubdirectory: true,
   },
   opencode: {
     baseDir: '.opencode/skill',
     extension: '.md',
     supportsSkills: false,
     alternativeStrategy: 'command',
+    supportsSubdirectory: true,
   },
   warp: {
     baseDir: '.warp/skills',
     extension: '.md',
     supportsSkills: true,
+    supportsSubdirectory: true,
   },
   windsurf: {
     baseDir: '.windsurf/skills',
     extension: '.md',
     supportsSkills: false,
     alternativeStrategy: 'command',
+    supportsSubdirectory: false, // 1-level discovery only — no subdir recursion
   },
   copilot: {
     baseDir: '.github/copilot/skills',
     extension: '.md',
     supportsSkills: false,
     alternativeStrategy: 'none',
+    supportsSubdirectory: true,
   },
   generic: {
     baseDir: 'skills',
     extension: '.md',
     supportsSkills: true,
+    supportsSubdirectory: true,
   },
   hermes: {
     baseDir: '.hermes/skills',
     extension: '.md',
     supportsSkills: true,
+    supportsSubdirectory: true,
   },
   openclaw: {
     baseDir: '.openclaw/skills',
     extension: '.md',
     supportsSkills: true,
+    supportsSubdirectory: true,
   },
 };
 
@@ -144,6 +155,71 @@ export class PlatformSkillResolver {
     platform: Platform
   ): 'command' | 'agent' | 'none' | undefined {
     return this.getConfig(platform).alternativeStrategy;
+  }
+
+  /**
+   * Compute the canonical namespaced slug for a skill.
+   *
+   * Idempotent: if `name` already starts with `{namespace}-`, returns `name` unchanged.
+   * This prevents double-prefixing existing `aiwg-*` skills (e.g. `aiwg-sync` → `aiwg-sync`,
+   * not `aiwg-aiwg-sync`).
+   *
+   * @param name - Skill folder name (e.g. 'sync', 'aiwg-sync')
+   * @param namespace - Namespace prefix (e.g. 'aiwg')
+   * @returns Canonical slug (e.g. 'aiwg-sync')
+   */
+  static computeCanonicalSlug(name: string, namespace: string): string {
+    const prefix = `${namespace}-`;
+    return name.startsWith(prefix) ? name : `${prefix}${name}`;
+  }
+
+  /**
+   * Get path for a namespaced skill deployment.
+   *
+   * Platforms with subdirectory support deploy under `{baseDir}/{namespace}/{slug}/`.
+   * Windsurf (1-level discovery) deploys flat at `{baseDir}/{slug}/`.
+   *
+   * @param platform - Target platform
+   * @param projectPath - Project root directory
+   * @param skillName - Skill folder name (e.g. 'sync')
+   * @param namespace - Namespace prefix (e.g. 'aiwg')
+   * @returns Full deployment directory path
+   */
+  static getNamespacedSkillPath(
+    platform: Platform,
+    projectPath: string,
+    skillName: string,
+    namespace: string
+  ): string {
+    const config = this.getConfig(platform);
+    const slug = this.computeCanonicalSlug(skillName, namespace);
+    const baseDir = path.join(projectPath, config.baseDir);
+
+    if (config.supportsSubdirectory) {
+      return path.join(baseDir, namespace, slug);
+    }
+    // Windsurf and other flat-discovery platforms: slug only, no namespace subdir
+    return path.join(baseDir, slug);
+  }
+
+  /**
+   * Get path for the SKILL.md file under namespaced deployment layout.
+   *
+   * @param platform - Target platform
+   * @param projectPath - Project root directory
+   * @param skillName - Skill folder name
+   * @param namespace - Namespace prefix (e.g. 'aiwg')
+   * @returns Full path to SKILL.md
+   */
+  static getNamespacedSkillFilePath(
+    platform: Platform,
+    projectPath: string,
+    skillName: string,
+    namespace: string
+  ): string {
+    const skillDir = this.getNamespacedSkillPath(platform, projectPath, skillName, namespace);
+    const config = this.getConfig(platform);
+    return path.join(skillDir, `SKILL${config.extension}`);
   }
 
   /**

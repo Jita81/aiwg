@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Spawn sub-agent to process focused context and return structured result
 commandHint:

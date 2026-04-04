@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 name: quality-checker
 description: Validate skill quality, completeness, and adherence to standards. Use before packaging to ensure skill meets quality requirements.
 tools: Read, Write, Bash, Glob, Grep

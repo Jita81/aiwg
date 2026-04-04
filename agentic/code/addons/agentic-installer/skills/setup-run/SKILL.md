@@ -1,3 +1,10 @@
+---
+namespace: aiwg
+name: setup-run
+platforms: [all]
+description: "Execute a `setup.aiwg.io/v1` SetupManifest, performing cross-platform installati"
+---
+
 # setup-run
 
 Execute a `setup.aiwg.io/v1` SetupManifest, performing cross-platform installation step by step.

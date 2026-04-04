@@ -249,6 +249,10 @@ Natural language workflows triggered by phrases or conditions.
 interface SkillMetadata {
   type: 'skill';
 
+  namespace?: string;               // Package/vendor identifier (e.g., 'aiwg')
+                                    // Canonical slug: '{namespace}-{name}'
+                                    // See adr-skill-namespace-strategy.md
+
   triggerPhrases: string[];         // Natural language triggers
   autoTrigger?: boolean;            // Auto-activate on conditions
   autoTriggerConditions?: string[]; // When to auto-activate
@@ -314,6 +318,31 @@ interface SkillReference {
   }
 }
 ```
+
+### Skill Namespace Strategy
+
+All AIWG-owned skills declare `namespace: aiwg` in their SKILL.md frontmatter. This drives collision avoidance and ownership attribution.
+
+**Canonical invocation slug:** `{namespace}-{name}` → e.g., `aiwg-sync`, `aiwg-run`
+
+**Deployment layout:**
+
+```
+.claude/skills/aiwg/aiwg-sync/SKILL.md    ← canonical (unlimited-recursion platforms)
+.windsurf/skills/aiwg-sync/SKILL.md       ← Windsurf (1-level limit; no subdir)
+.agents/skills/aiwg/aiwg-sync/SKILL.md    ← universal cross-platform path
+```
+
+**Frontmatter example:**
+
+```yaml
+name: sync
+namespace: aiwg
+description: Sync to latest version and re-deploy all frameworks
+type: skill
+```
+
+Short aliases (`/sync`) are opt-in via `aiwg use sdlc --aliases` and suppressed when a conflict is detected. See `.aiwg/architecture/adr-skill-namespace-strategy.md` for the full decision record.
 
 ---
 

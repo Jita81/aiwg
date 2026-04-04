@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 name: contract-validate
 description: Validate that a chain of AIWG skills has all requires: inputs satisfied by upstream ensures: outputs before execution. Catches missing dependencies at wiring time rather than at runtime.

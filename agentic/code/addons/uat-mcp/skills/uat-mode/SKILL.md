@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 name: uat-mode
 description: Detect requests for UAT generation, execution, or reporting and invoke the appropriate UAT command
 version: 1.0.0

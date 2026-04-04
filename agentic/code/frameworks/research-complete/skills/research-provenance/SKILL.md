@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Query provenance chains and artifact relationships
 commandHint:

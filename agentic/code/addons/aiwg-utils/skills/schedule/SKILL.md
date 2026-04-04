@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Create, update, list, or run scheduled remote agents (triggers) that execute on a cron schedule
 commandHint:

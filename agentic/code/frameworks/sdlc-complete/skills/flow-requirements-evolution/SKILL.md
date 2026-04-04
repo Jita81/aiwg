@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Orchestrate living requirements refinement, change control, impact analysis, and traceability maintenance throughout SDLC
 commandHint:

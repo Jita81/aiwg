@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Download media from discovered sources with format selection and progress tracking
 commandHint:

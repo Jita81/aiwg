@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 name: rlm-mode
 description: Detect requests for recursive decomposition and large-scale operations that benefit from RLM processing
 version: 1.0.0

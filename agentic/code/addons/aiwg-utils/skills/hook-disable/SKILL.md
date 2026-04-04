@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Disable the AIWG context hook without uninstalling AIWG or deleting hook files
 commandHint:

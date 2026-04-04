@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Mark an issue as complete with comprehensive summary and verification
 commandHint:

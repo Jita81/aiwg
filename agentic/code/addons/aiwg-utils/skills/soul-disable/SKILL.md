@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Disable soul enforcement without deleting SOUL.md or soul files
 commandHint:

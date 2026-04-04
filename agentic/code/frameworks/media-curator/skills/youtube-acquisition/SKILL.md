@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 name: YouTube Acquisition
 description: yt-dlp patterns for acquiring content from YouTube and video platforms

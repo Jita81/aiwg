@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Orchestrate systematic retrospective cycle with structured feedback collection, improvement tracking, and action item management
 commandHint:

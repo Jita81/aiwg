@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 description: Verify @file references in AIWG skills and agents against the linking contract — per-file or corpus-wide, with optional auto-fix
 platforms: [all]
 

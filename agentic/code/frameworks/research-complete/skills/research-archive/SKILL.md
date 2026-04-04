@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Package research artifacts for long-term archival
 commandHint:

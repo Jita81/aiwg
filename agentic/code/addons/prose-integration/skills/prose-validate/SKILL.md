@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 name: prose-validate
 description: Validate an OpenProse program file against Prose contract grammar without executing it — checks frontmatter, contract structure, service references, and strategy syntax
 version: 0.1.0

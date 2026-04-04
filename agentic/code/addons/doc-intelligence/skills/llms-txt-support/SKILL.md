@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 name: llms-txt-support
 description: Detect and use llms.txt files for LLM-optimized documentation. Use when checking if a site has LLM-ready docs before scraping.
 tools: Read, Write, WebFetch

@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Run evaluation tests against a multi-agent workflow to assess orchestration quality and failure archetype resistance
 ---

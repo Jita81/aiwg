@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Orchestrate Concept→Inception phase transition with intake validation and vision alignment
 commandHint:

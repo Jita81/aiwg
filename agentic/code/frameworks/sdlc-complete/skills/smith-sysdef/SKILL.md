@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Generate system definition file for ToolSmith with tested OS commands
 commandHint:

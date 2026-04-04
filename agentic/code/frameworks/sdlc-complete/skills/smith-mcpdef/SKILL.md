@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Generate MCP environment definition for MCPSmith with Docker and Node.js verification
 commandHint:

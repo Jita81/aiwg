@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Update existing project WARP.md with latest AIWG orchestration guidance
 commandHint:

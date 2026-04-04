@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Full multi-agent investigation workflow
 commandHint:

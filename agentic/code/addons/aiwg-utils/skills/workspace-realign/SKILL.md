@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Reorganize and update .aiwg/ documentation to reflect current project reality
 ---

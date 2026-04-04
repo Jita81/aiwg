@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: End-to-end SDLC ramp-up from idea to construction-ready with automated phase transitions and focused gate questions
 commandHint:

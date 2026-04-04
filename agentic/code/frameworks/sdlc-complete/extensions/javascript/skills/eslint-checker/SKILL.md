@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 name: eslint-checker
 description: Run ESLint for JavaScript/TypeScript code quality and style enforcement. Use for static analysis and auto-fixing.
 tools: Read, Write, Bash

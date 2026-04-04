@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 name: aiwg-orchestrate
 description: Route structured artifact work to AIWG workflows via MCP with zero parent context cost

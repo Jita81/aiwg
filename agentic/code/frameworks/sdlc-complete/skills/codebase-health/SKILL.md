@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Scan source code and report agent-readiness metrics with actionable recommendations
 commandHint:

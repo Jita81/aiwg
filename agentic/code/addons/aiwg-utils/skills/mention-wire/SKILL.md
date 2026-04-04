@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Analyze codebase and inject @-mentions for traceability
 ---

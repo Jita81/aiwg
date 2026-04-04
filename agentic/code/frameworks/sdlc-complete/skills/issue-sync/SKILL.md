@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Automatically detect and update linked issues based on commits, artifacts, and task events
 commandHint:

@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 name: repo-analyzer
 description: Analyze GitHub repositories for structure, documentation, dependencies, and contribution patterns. Use for codebase understanding and health assessment.
 tools: Read, Write, Bash, Glob, Grep

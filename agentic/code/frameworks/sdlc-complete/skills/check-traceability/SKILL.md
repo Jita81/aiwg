@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Verify links from use cases and requirements to design, code, tests, and releases
 commandHint:

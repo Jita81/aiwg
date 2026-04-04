@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 name: ralph-analytics
 platforms: [all]
 description: Show analytics and metrics from agent loop execution history

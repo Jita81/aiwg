@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 name: prose-detect
 description: Locate an existing OpenProse installation using a prioritized signal chain — env var, AIWG config, AIWG-local install, project plugin manifest, user home directory, or global CLI. Returns the resolved PROSE_ROOT path. Does not install OpenProse; triggers prose-setup if no installation is found.
 version: 0.1.0

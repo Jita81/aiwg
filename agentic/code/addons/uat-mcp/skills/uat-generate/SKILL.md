@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Discover MCP tools and generate a phased UAT plan with agent-executable test specifications
 commandHint:

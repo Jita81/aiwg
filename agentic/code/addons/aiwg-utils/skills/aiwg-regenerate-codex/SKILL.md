@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Regenerate Codex context file (CODEX.md or ~/.codex/instructions.md) with AIWG framework content
 commandHint:

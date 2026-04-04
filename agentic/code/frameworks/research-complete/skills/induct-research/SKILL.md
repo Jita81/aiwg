@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 name: induct-research
 description: Induct research sources into a research repository. Point at an issue, a single file, a directory of papers, or a URI and the skill reads, annotates, and files structured induction tasks — one per source. Similar to address-issues but for research corpora instead of code backlogs.

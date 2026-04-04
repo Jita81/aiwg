@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Wipe .aiwg/ directory and optionally restart with fresh intake
 ---

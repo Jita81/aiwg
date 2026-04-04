@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 description: Run a development-focused health check on the AIWG repository structure
 platforms: [all]
 

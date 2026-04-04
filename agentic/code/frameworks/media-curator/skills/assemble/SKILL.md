@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Assemble media into thematic compilations, concert films, era playlists, and narrative experiences
 commandHint:

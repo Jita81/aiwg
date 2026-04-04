@@ -115,6 +115,13 @@ export interface PlatformSkillConfig {
 
   /** Alternative deployment strategy if skills not supported */
   alternativeStrategy?: 'command' | 'agent' | 'none';
+
+  /**
+   * Whether this platform supports subdirectory recursion for skill discovery.
+   * When true, namespaced skills deploy under `{baseDir}/{namespace}/{slug}/`.
+   * When false (e.g. Windsurf), skills deploy flat at `{baseDir}/{slug}/`.
+   */
+  supportsSubdirectory: boolean;
 }
 
 /**

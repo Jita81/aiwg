@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Orchestrate continuous risk identification, assessment, tracking, and retirement across SDLC phases
 commandHint:

@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Orchestrate end-to-end media curation from analysis through acquisition, tagging, and verification
 commandHint:

@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 name: generate-factory
 description: Auto-generate test data factories from schemas, types, or models. Use when creating test data infrastructure, setting up fixtures, or reducing test setup boilerplate.
 version: 1.0.0

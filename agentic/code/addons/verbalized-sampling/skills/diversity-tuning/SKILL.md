@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 name: diversity-tuning
 description: Interactive tuning of Verbalized Sampling diversity parameters with preset management and A/B comparison
 version: 1.0.0

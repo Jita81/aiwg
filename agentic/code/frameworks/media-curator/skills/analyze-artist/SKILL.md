@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Analyze an artist's discography to identify eras, catalog structure, and collection plan
 commandHint:

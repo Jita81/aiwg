@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 name: debug-memory
 platforms: [all]
 description: Query and manage the executable feedback debug memory

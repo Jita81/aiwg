@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 name: prose-setup
 description: Clone or update the OpenProse repository to ensure AIWG prose tools hook into the latest version of the specification and examples
 version: 0.1.0

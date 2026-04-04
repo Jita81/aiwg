@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Create a new AIWG extension (framework expansion pack) with AI-guided setup
 ---

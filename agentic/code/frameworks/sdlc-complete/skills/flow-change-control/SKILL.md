@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Orchestrate change control workflow with baseline management, impact assessment, CCB review, and communication
 commandHint:

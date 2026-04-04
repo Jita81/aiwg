@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Create a Product Requirements Document (PRD) for a product feature
 commandHint:

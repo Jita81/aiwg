@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: One-command TDD infrastructure setup with pre-commit hooks and CI coverage gates
 commandHint:

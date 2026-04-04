@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Evaluate architectural decisions using Tree of Thoughts exploration
 commandHint:

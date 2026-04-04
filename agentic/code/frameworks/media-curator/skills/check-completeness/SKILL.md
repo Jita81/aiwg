@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 description: Analyze collection completeness against canonical discography and generate prioritized gap report
 commandHint:

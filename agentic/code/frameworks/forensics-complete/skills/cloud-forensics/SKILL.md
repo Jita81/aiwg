@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 name: cloud-forensics
 description: "AWS, Azure, and GCP forensic investigation covering audit logs, IAM review, storage access, network flows, and compute instance forensics"
 tools: Bash, Read, Write, Glob, Grep

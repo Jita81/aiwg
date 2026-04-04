@@ -1,4 +1,5 @@
 ---
+namespace: aiwg
 platforms: [all]
 name: Quality Filtering
 description: Accept/reject logic and quality scoring heuristics for media content
