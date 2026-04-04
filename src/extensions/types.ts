@@ -1018,6 +1018,21 @@ export interface MCPServerMetadata {
 /**
  * Framework-specific metadata
  */
+/**
+ * CI workflow artifacts declared by a framework.
+ * Source files live under `{framework}/ci/{forge}/workflows/`.
+ * Deployed to `.github/workflows/` or `.gitea/workflows/` when
+ * `aiwg use <framework> --ci-hooks-enabled` is run.
+ *
+ * @implements #661
+ */
+export interface ManifestCiSpec {
+  /** Paths relative to `ci/github/` to deploy to `.github/workflows/` */
+  github?: string[];
+  /** Paths relative to `ci/gitea/` to deploy to `.gitea/workflows/` */
+  gitea?: string[];
+}
+
 export interface FrameworkMetadata {
   type: 'framework';
 
@@ -1039,6 +1054,12 @@ export interface FrameworkMetadata {
     templates?: string[];
     prompts?: string[];
   };
+
+  /**
+   * CI workflow artifacts for opt-in deployment via --ci-hooks-enabled.
+   * @implements #661
+   */
+  ci?: ManifestCiSpec;
 
   /**
    * Framework configuration schema

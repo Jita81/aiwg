@@ -15,12 +15,13 @@ import path from 'path';
 import os from 'os';
 import { CommandHandler, HandlerContext, HandlerResult } from './types.js';
 import { createScriptRunner } from './script-runner.js';
-import { getFrameworkRoot } from '../../channel/manager.mjs';
+import { getFrameworkRoot, getVersionInfo } from '../../channel/manager.mjs';
 import { getRegistry } from '../../extensions/registry.js';
 import { registerDeployedExtensions } from '../../extensions/deployment-registration.js';
 import { registerCliCommands, registerHooks } from '../cli-extension-loader.js';
 import { translateSkillsToCommands, providerNeedsCommands } from '../../plugin/skill-command-translator.js';
 import * as ui from '../ui.js';
+import { readAiwgConfig, writeAiwgConfig, updateInstalled, hashManifest } from '../../config/aiwg-config.js';
 
 /**
  * Valid framework identifiers
@@ -353,6 +354,104 @@ async function countDeployedArtifacts(
 }
 
 /**
+ * Detect forge targets from .git/config remote URLs.
+ * Returns a list of forge types found: 'github' | 'gitea'
+ *
+ * @implements #661
+ */
+async function detectForges(projectDir: string): Promise<Array<'github' | 'gitea'>> {
+  const forges = new Set<'github' | 'gitea'>();
+  try {
+    const gitConfig = await fs.readFile(path.join(projectDir, '.git', 'config'), 'utf-8');
+    if (/github\.com/i.test(gitConfig)) forges.add('github');
+    // Gitea: any non-github remote host (self-hosted instances)
+    const remoteUrls = [...gitConfig.matchAll(/url\s*=\s*(.+)/g)].map(m => m[1].trim());
+    for (const url of remoteUrls) {
+      if (!url.includes('github.com') && (url.includes('git.') || url.includes('.net') || url.includes('.io'))) {
+        forges.add('gitea');
+      }
+    }
+  } catch {
+    // No .git/config — default to github only
+    forges.add('github');
+  }
+  return [...forges];
+}
+
+/**
+ * Deploy CI workflow files to .github/workflows/ and/or .gitea/workflows/
+ * when --ci-hooks-enabled is set.
+ *
+ * @implements #661
+ */
+async function deployCiHooks(opts: {
+  frameworkRoot: string;
+  framework: string;
+  target: string;
+  dryRun: boolean;
+}): Promise<void> {
+  const { frameworkRoot, framework, target, dryRun } = opts;
+
+  // Resolve framework source dir
+  const frameworkDir = path.join(
+    frameworkRoot,
+    'agentic/code/frameworks',
+    `${framework === 'all' ? 'sdlc' : framework}-complete`
+  );
+
+  // Read CI manifest from framework manifest.json
+  let ciSpec: { github?: string[]; gitea?: string[] } = {};
+  try {
+    const manifestPath = path.join(frameworkDir, 'manifest.json');
+    const manifestContent = await fs.readFile(manifestPath, 'utf-8');
+    const manifest = JSON.parse(manifestContent) as { ci?: { github?: string[]; gitea?: string[] } };
+    ciSpec = manifest.ci ?? {};
+  } catch {
+    // No CI spec in manifest — nothing to deploy
+    return;
+  }
+
+  if (Object.keys(ciSpec).length === 0) return;
+
+  const forges = await detectForges(target);
+  const ciSourceDir = path.join(frameworkDir, 'ci');
+
+  const forgeMap: Array<{ forge: 'github' | 'gitea'; targetDir: string; files: string[] }> = [
+    { forge: 'github', targetDir: path.join(target, '.github', 'workflows'), files: ciSpec.github ?? [] },
+    { forge: 'gitea', targetDir: path.join(target, '.gitea', 'workflows'), files: ciSpec.gitea ?? [] },
+  ];
+
+  let deployed = 0;
+  for (const { forge, targetDir, files } of forgeMap) {
+    if (!forges.includes(forge) || files.length === 0) continue;
+
+    if (!dryRun) {
+      await fs.mkdir(targetDir, { recursive: true });
+    }
+
+    for (const file of files) {
+      const src = path.join(ciSourceDir, forge, file);
+      const dest = path.join(targetDir, path.basename(file));
+      if (dryRun) {
+        console.log(`  [dry-run] Would copy CI file: ${src} → ${dest}`);
+      } else {
+        try {
+          await fs.copyFile(src, dest);
+          deployed++;
+        } catch {
+          ui.warn(`Could not copy CI file: ${file} (source missing in framework — skipping)`);
+        }
+      }
+    }
+  }
+
+  if (!dryRun && deployed > 0) {
+    ui.blank();
+    ui.warn(`CI hooks installed (${deployed} file(s)). Review before committing — they affect your CI pipeline.`);
+  }
+}
+
+/**
  * Use command handler
  *
  * Deploys framework agents, commands, and skills to the current project,
@@ -369,12 +468,32 @@ export class UseHandler implements CommandHandler {
     const framework = ctx.args[0];
     const remainingArgs = ctx.args.slice(1);
 
-    // Validate target argument (framework or addon)
+    // Read project config for config-first resolution (#621)
+    const projectDir = ctx.cwd || process.cwd();
+    const config = await readAiwgConfig(projectDir);
+
+    // Zero-arg form: `aiwg use` with no framework → redeploy all installed to all providers
     if (!framework) {
-      return {
-        exitCode: 1,
-        message: 'Error: Framework or addon name required\nFrameworks: sdlc, marketing, media-curator, research, writing, all\nAddons: rlm, ring, daemon, aiwg-dev',
-      };
+      if (!config || Object.keys(config.installed).length === 0) {
+        const advisory = !config
+          ? "\n\nRun 'aiwg init' to configure providers and track deployments."
+          : '';
+        return {
+          exitCode: 1,
+          message: `Error: Framework or addon name required\nFrameworks: sdlc, marketing, media-curator, research, writing, all\nAddons: rlm, ring, daemon, aiwg-dev${advisory}`,
+        };
+      }
+      const installedNames = Object.keys(config.installed);
+      const redeployProviders = config.providers.length > 0 ? config.providers : ['claude'];
+      ui.blank();
+      ui.header(`  Redeploying ${installedNames.length} framework(s) to ${redeployProviders.join(', ')}...`);
+      for (const name of installedNames) {
+        for (const p of redeployProviders) {
+          const result = await this.execute({ ...ctx, args: [name, '--provider', p] });
+          if (result.exitCode !== 0) return result;
+        }
+      }
+      return { exitCode: 0 };
     }
 
     const frameworkRoot = await getFrameworkRoot();
@@ -391,7 +510,11 @@ export class UseHandler implements CommandHandler {
     // Handle addon-only deployment
     if (isAddon) {
       const providerIdx = remainingArgs.findIndex(a => a === '--provider' || a === '--platform');
-      const provider = providerIdx >= 0 && remainingArgs[providerIdx + 1] ? remainingArgs[providerIdx + 1] : 'claude';
+      const explicitAddonProvider = providerIdx >= 0 && remainingArgs[providerIdx + 1] ? remainingArgs[providerIdx + 1] : null;
+      const provider = explicitAddonProvider ?? (config?.providers?.[0] ?? 'claude');
+      if (!explicitAddonProvider && !config) {
+        ui.warn("No .aiwg/aiwg.config found. Run 'aiwg init' to configure providers.");
+      }
       const targetIdx = remainingArgs.findIndex(a => a === '--target');
       const target = targetIdx >= 0 && remainingArgs[targetIdx + 1] ? remainingArgs[targetIdx + 1] : process.cwd();
 
@@ -475,15 +598,41 @@ export class UseHandler implements CommandHandler {
     const skipUtils = remainingArgs.includes('--no-utils');
     const verbose = remainingArgs.includes('--verbose') || remainingArgs.includes('-v');
     const dryRun = remainingArgs.includes('--dry-run');
-    const filteredArgs = deployArgs.filter(a => a !== '--no-utils');
+    const ciHooksEnabled = remainingArgs.includes('--ci-hooks-enabled');
+    const filteredArgs = deployArgs.filter(a => a !== '--no-utils' && a !== '--ci-hooks-enabled');
 
     // Pass --quiet to suppress deploy-agents.mjs header/footer in default mode (#460)
     // Dry-run must not capture output — its purpose is to show what would happen
     if (!verbose && !dryRun) filteredArgs.push('--quiet');
 
     // Extract provider and target from remainingArgs to pass to addon deployments
+    // Config-first resolution (#621): explicit --provider overrides config, config overrides default 'claude'
     const providerIdx = remainingArgs.findIndex(a => a === '--provider' || a === '--platform');
-    const provider = providerIdx >= 0 && remainingArgs[providerIdx + 1] ? remainingArgs[providerIdx + 1] : 'claude';
+    const explicitProvider = providerIdx >= 0 && remainingArgs[providerIdx + 1] ? remainingArgs[providerIdx + 1] : null;
+
+    // Determine providers list for multi-provider deployment
+    let providers: string[];
+    if (explicitProvider) {
+      providers = [explicitProvider];
+    } else if (config && config.providers.length > 0) {
+      providers = config.providers;
+    } else {
+      providers = ['claude'];
+      if (!config) {
+        ui.warn("No .aiwg/aiwg.config found. Run 'aiwg init' to configure providers for this project.");
+      }
+    }
+
+    // Multi-provider: loop over providers, deploying to each in sequence
+    if (providers.length > 1) {
+      for (const p of providers) {
+        const result = await this.execute({ ...ctx, args: [framework, '--provider', p, ...remainingArgs] });
+        if (result.exitCode !== 0) return result;
+      }
+      return { exitCode: 0 };
+    }
+
+    const provider = providers[0];
     const targetIdx = remainingArgs.findIndex(a => a === '--target');
     const target = targetIdx >= 0 && remainingArgs[targetIdx + 1] ? remainingArgs[targetIdx + 1] : process.cwd();
 
@@ -578,10 +727,11 @@ export class UseHandler implements CommandHandler {
     }
 
     // Show completion summary and next steps (default mode only)
+    let counts = { agents: 0, commands: 0, skills: 0, rules: 0, behaviors: 0 };
     if (quiet) {
       // Count deployed artifacts
       const paths = PROVIDER_PATHS[provider] || PROVIDER_PATHS.claude;
-      const counts = await countDeployedArtifacts(target, paths);
+      counts = await countDeployedArtifacts(target, paths);
       if (counts.agents > 0) ui.deployCount('Agents', counts.agents);
       if (counts.commands > 0) ui.deployCount('Commands', counts.commands);
       if (counts.skills > 0) ui.deployCount('Skills', counts.skills);
@@ -589,6 +739,34 @@ export class UseHandler implements CommandHandler {
       if (counts.behaviors > 0) ui.deployCount('Behaviors', counts.behaviors);
       ui.blank();
       printNextSteps(framework as Framework, provider);
+    }
+
+    // Deploy CI workflow files when --ci-hooks-enabled is set (#661)
+    if (ciHooksEnabled) {
+      await deployCiHooks({ frameworkRoot, framework, target, dryRun });
+    }
+
+    // Update installed section in config (#621)
+    if (config !== null && !dryRun) {
+      try {
+        const versionInfo = await getVersionInfo();
+        const frameworkManifestPath = path.join(
+          frameworkRoot,
+          'agentic/code/frameworks',
+          `${framework === 'all' ? 'sdlc' : framework}-complete`,
+          'manifest.json'
+        );
+        const mHash = await hashManifest(frameworkManifestPath);
+        const updatedConfig = updateInstalled(config, framework, provider, {
+          agents: counts.agents,
+          commands: counts.commands,
+          skills: counts.skills,
+          rules: counts.rules,
+        }, { version: versionInfo.version, source: 'bundled', manifestHash: mHash });
+        await writeAiwgConfig(projectDir, updatedConfig);
+      } catch {
+        // Non-fatal: config tracking failure must not block deployment
+      }
     }
 
     return {
