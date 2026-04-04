@@ -25,11 +25,11 @@ export async function run(args, options = {}) {
   const routerPath = path.join(__dirname, 'router-entry.ts');
 
   return new Promise((resolve, reject) => {
-    // Use npx tsx - the shell:true is fine for user-controlled args in dev tooling
-    const child = spawn('npx', ['tsx', routerPath, ...args], {
+    // Use local tsx binary (installed as devDependency) to avoid stale npx caches
+    const tsxBin = path.resolve(__dirname, '../../node_modules/.bin/tsx');
+    const child = spawn(tsxBin, [routerPath, ...args], {
       cwd: options.cwd || process.cwd(),
       stdio: 'inherit',
-      shell: process.platform === 'win32', // Only use shell on Windows
     });
 
     child.on('close', (code) => {
