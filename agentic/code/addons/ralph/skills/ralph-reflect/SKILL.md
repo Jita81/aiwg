@@ -1,4 +1,5 @@
 ---
+name: ralph-reflect
 platforms: [all]
 description: View and manage agent loop reflections and episodic memory
 commandHint:

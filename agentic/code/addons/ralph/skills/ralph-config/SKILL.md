@@ -1,4 +1,5 @@
 ---
+name: ralph-config
 platforms: [all]
 description: View and configure agent loop settings — show, set, reset, and apply named presets
 commandHint:

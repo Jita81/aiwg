@@ -10,17 +10,18 @@
   "license": "MIT",
   "repository": "https://github.com/jmagly/aiwg",
   "keywords": [
+    "al",
+    "agent-loop",
     "ralph",
     "iteration",
     "loop",
     "autonomous",
     "batch",
     "refactor",
-    "migration",
-    "wiggum"
+    "migration"
   ],
   "researchFoundation": {
-    "REF-001": "Ralph Wiggum methodology - iterative AI execution with stop hooks",
+    "REF-001": "Agent loop methodology - iterative AI execution with stop hooks",
     "REF-002": "BP-6 - Recovery requires execution history",
     "REF-003": "Predictable failure with automatic recovery beats unpredictable success"
   },
@@ -31,18 +32,16 @@
     "templates": "templates/",
     "docs": "docs/"
   },
-  "commands": [
+  "skills": [
     "ralph",
+    "agent-loop",
     "ralph-status",
     "ralph-abort",
     "ralph-resume",
     "ralph-reflect",
     "ralph-analytics",
     "debug-memory",
-    "execute-feedback"
-  ],
-  "skills": [
-    "agent-loop",
+    "execute-feedback",
     "reflection-injection",
     "auto-test-execution",
     "mission-control"

@@ -1,4 +1,7 @@
 ---
+name: al
+aliases: [ralph, agent-loop]
+deprecated_names: [ralph]
 platforms: [all]
 description: Execute iterative task loop until completion criteria are met - iteration beats perfection
 commandHint:
@@ -348,6 +351,6 @@ This orchestration succeeds when:
 
 ## References
 
-- Al Wiggum methodology: iteration beats perfection
+- Agent loop methodology: iteration beats perfection
 - @.aiwg/ralph/current-loop.json - Loop state (for resume)
 - @.aiwg/ralph/iterations/ - Iteration history

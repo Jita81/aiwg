@@ -1,4 +1,5 @@
 ---
+name: ralph-external
 platforms: [all]
 description: Crash-resilient external loop with state persistence and CI/CD integration
 commandHint:

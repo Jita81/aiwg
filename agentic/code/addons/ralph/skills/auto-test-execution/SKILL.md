@@ -1,4 +1,5 @@
 ---
+name: auto-test-execution
 platforms: [all]
 
 ---

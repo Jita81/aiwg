@@ -1,4 +1,5 @@
 ---
+name: ralph-attach
 platforms: [all]
 description: Attach to a running agent loop's live output stream
 commandHint:

@@ -1,4 +1,5 @@
 ---
+name: mission-control
 platforms: [all]
 
 ---

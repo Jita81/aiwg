@@ -1,4 +1,5 @@
 ---
+name: execute-feedback
 platforms: [all]
 description: Execute tests on generated code and iterate until passing
 commandHint:
