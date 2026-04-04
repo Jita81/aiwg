@@ -941,3 +941,11 @@ Archive Acquisition skill provides:
 - **Performance**: Parallel tuning, caching, rate limiting
 
 Use this skill whenever working with Internet Archive content in the Media Curator framework.
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Seek explicit authorization before bulk downloads and irreversible archive operations
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Evaluate archive item quality and metadata before committing to download
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/acquire/SKILL.md — General acquisition skill that delegates to archive-acquisition for archive.org sources
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/integrity-verification/SKILL.md — Verify checksums after archive downloads
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/quality-filtering/SKILL.md — Quality scoring used to select best format from archive items

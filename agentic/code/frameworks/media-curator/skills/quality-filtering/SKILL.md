@@ -543,3 +543,10 @@ verify_download() {
 - **@$AIWG_ROOT/agentic/code/frameworks/media-curator/agents/quality-assessor.md** - Agent that uses this skill
 - **@$AIWG_ROOT/agentic/code/frameworks/media-curator/tools/ffprobe-wrapper.md** - Metadata extraction tool
 - **@$AIWG_ROOT/agentic/code/frameworks/media-curator/agents/download-orchestrator.md** - Integration point for quality decisions
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Evaluate quality metadata before making accept/reject decisions
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/find-sources/SKILL.md — Source discovery that uses quality scoring to rank discovered sources
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/acquire/SKILL.md — Acquisition skill that applies quality filtering before downloading
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/integrity-verification/SKILL.md — Integrity verification used as a post-download quality check

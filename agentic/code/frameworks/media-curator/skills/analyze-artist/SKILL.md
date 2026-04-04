@@ -564,6 +564,13 @@ Proceed? (y/n):
 - **MusicBrainz API Documentation**: https://musicbrainz.org/doc/MusicBrainz_API
 - **Discogs API Documentation**: https://www.discogs.com/developers
 
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Research canonical sources (MusicBrainz, Discogs) before making era boundary decisions
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/find-sources/SKILL.md — Source discovery skill that consumes the artist profile produced here
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/gap-documentation/SKILL.md — Gap documentation skill used to record missing catalog items
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/check-completeness/SKILL.md — Completeness checking skill that builds on artist analysis output
+
 ---
 
 *Part of the AIWG Media Curator Framework*

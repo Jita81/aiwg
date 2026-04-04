@@ -457,3 +457,10 @@ convert cover.jpg -resize 1200x1200 cover-resized.jpg
 - Skill: @metadata-tagging
 - Skill: @cover-art-embedding
 - Agent: @Metadata Curator
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Seek explicit authorization before bulk-overwriting metadata tags on existing files
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/metadata-tagging/SKILL.md — Metadata tagging patterns used by tag-collection
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/cover-art-embedding/SKILL.md — Cover art embedding patterns used by tag-collection
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/curate/SKILL.md — Orchestration skill that invokes tag-collection as a curation phase

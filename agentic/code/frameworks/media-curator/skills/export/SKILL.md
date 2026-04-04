@@ -497,3 +497,10 @@ Copied: 142
 - Progress reporting: Update every N files or every M seconds
 - Disk I/O: Batch operations to minimize seeks
 - Memory: Stream large files instead of loading into memory
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Seek explicit authorization before overwriting existing export targets
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/curate/SKILL.md — Orchestration skill that invokes export as the final curation phase
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/assemble/SKILL.md — Assembly skill used before export to prepare media collections
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/integrity-verification/SKILL.md — Verify exported files match source checksums

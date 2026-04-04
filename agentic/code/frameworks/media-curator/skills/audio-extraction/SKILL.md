@@ -148,3 +148,10 @@ ffmpeg -y -ss 5 -i video.mp4 -vframes 1 -q:v 2 cover.jpg
 # Extract frame as WebP (smaller)
 ffmpeg -y -ss 5 -i video.mp4 -vframes 1 cover.webp
 ```
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Seek explicit authorization before overwriting existing audio files
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/acquire/SKILL.md — Acquisition skill that invokes audio extraction via --extract-audio flag
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/integrity-verification/SKILL.md — Verify extracted audio file integrity after processing
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/metadata-tagging/SKILL.md — Tag extracted audio files with correct metadata after extraction

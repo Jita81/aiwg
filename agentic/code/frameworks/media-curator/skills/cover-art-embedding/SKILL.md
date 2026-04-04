@@ -642,3 +642,10 @@ echo "Saved to: artwork/albums/${artist_safe}-${album_safe}.jpg"
 - MusicBrainz CAA: https://coverartarchive.org/
 - fanart.tv API: https://fanart.tv/api-docs/
 - ImageMagick documentation: https://imagemagick.org/
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Seek explicit authorization before overwriting existing embedded artwork
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/metadata-tagging/SKILL.md — Metadata tagging skill used alongside cover art embedding for complete file tagging
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/tag-collection/SKILL.md — Tag collection skill that orchestrates metadata and artwork embedding together
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/integrity-verification/SKILL.md — Verify file integrity after embedding artwork

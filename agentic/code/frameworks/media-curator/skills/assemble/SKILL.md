@@ -390,3 +390,10 @@ All commands generate:
 - Generation log (commands executed, errors encountered)
 
 Files are written to `--output` path or default location based on type.
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Seek explicit authorization before overwriting existing assemblies or compilations
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/curate/SKILL.md — Orchestration skill that drives assembly as part of the full curation pipeline
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/analyze-artist/SKILL.md — Artist analysis that informs era and narrative structure for assemblies
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/export/SKILL.md — Export skill used after assembly to deliver to target platforms

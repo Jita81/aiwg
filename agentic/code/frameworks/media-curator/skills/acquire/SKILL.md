@@ -688,3 +688,11 @@ export_metadata() {
 - **Disk quota**: Respect user/system quotas
 - **Network access**: Only connect to explicitly allowed domains
 - **Credential handling**: Never log or expose API keys/tokens
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Seek explicit authorization before irreversible actions (overwrites, deletions)
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Research sources before deciding on acquisition strategy
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/find-sources/SKILL.md — Source discovery skill used before acquisition
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/integrity-verification/SKILL.md — Verify downloaded files after acquisition
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/provenance-tracking/SKILL.md — Track origin and derivation of acquired media

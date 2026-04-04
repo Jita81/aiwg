@@ -544,3 +544,11 @@ aiwg download-queue --input yt.yaml --format best
 - Source Discoverer Agent: `@$AIWG_ROOT/agentic/code/frameworks/media-curator/agents/source-discoverer.md`
 - YouTube Acquisition Skill: `@$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/youtube-acquisition.md`
 - Queue Manager Agent: `@$AIWG_ROOT/agentic/code/frameworks/media-curator/agents/queue-manager.md`
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Research sources thoroughly before deciding on acquisition strategy
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Seek explicit authorization before irreversible acquisition actions
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/acquire/SKILL.md — Acquisition skill that consumes source plans generated here
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/quality-filtering/SKILL.md — Quality scoring logic used to rank discovered sources
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/analyze-artist/SKILL.md — Artist analysis skill that informs scope of source discovery

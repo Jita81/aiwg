@@ -672,3 +672,10 @@ else
   exit 1
 fi
 ```
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Seek explicit authorization before regenerating checksums (overwrites existing CHECKSUMS.sha256)
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/acquire/SKILL.md — Acquisition skill that invokes integrity verification via --verify-after flag
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/provenance-tracking/SKILL.md — Provenance tracking that records fixity events alongside checksums
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/verify-archive/SKILL.md — High-level verify-archive skill that uses these integrity patterns

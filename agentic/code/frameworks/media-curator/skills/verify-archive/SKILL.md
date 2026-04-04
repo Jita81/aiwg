@@ -427,3 +427,10 @@ aiwg verify-archive ~/media/podcast-archive --generate --provenance
 ```bash
 0 2 * * * aiwg verify-archive /media/archives/podcast --verify --quiet || echo "Archive verification failed" | mail -s "Alert" admin@example.com
 ```
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Seek explicit authorization before regenerating or fixing checksums (--generate, --fix)
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/integrity-verification/SKILL.md — Core integrity verification patterns used by this skill
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/provenance-tracking/SKILL.md — Provenance records generated via --provenance flag
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/curate/SKILL.md — Orchestration skill that invokes verify-archive as a curation phase

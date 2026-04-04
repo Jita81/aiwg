@@ -633,3 +633,11 @@ Each phase validates outputs before proceeding:
 - Verification: Checksums and provenance records exist
 - Completeness: Gap report generated
 - Export: Output directory structure is valid
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Seek explicit authorization before irreversible curation actions (overwrites, deletions)
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/subagent-scoping.md — Orchestration skill that delegates to focused subagents per phase
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/analyze-artist/SKILL.md — Artist analysis phase entry point
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/acquire/SKILL.md — Acquisition phase orchestrated by curate
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/verify-archive/SKILL.md — Verification phase orchestrated by curate

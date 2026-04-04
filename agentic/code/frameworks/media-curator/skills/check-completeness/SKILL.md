@@ -586,3 +586,10 @@ All output written to `.media-curator/completeness/{artist-slug}/`:
 - Priority assignments align with collector consensus >90%
 - Availability checks current within 7 days
 - Report generation <60 seconds for any collection size
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Research canonical discography (MusicBrainz, Discogs) before determining completeness
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/analyze-artist/SKILL.md — Artist analysis that establishes the canonical discography used as completeness baseline
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/gap-documentation/SKILL.md — Gap documentation skill used to record identified missing items
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/find-sources/SKILL.md — Source discovery skill used to locate missing releases identified by completeness check

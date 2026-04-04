@@ -489,3 +489,10 @@ aiwg media-curator gap-report --format markdown > GAPS.md
 - `@$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/catalog-generation.md` - Replacing GAP-NOTEs with catalogs
 - `@$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/archive-organization.md` - Directory structure conventions
 - Issue #81 (gitea) - Original field testing that discovered this pattern
+
+## References
+
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/check-completeness/SKILL.md — Completeness analysis that identifies gaps which this skill documents
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/analyze-artist/SKILL.md — Artist analysis that establishes the canonical discography used to detect gaps
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/find-sources/SKILL.md — Source discovery used to locate items identified as gaps
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/provenance-tracking/SKILL.md — Provenance tracking applied when gaps are resolved and acquisitions recorded

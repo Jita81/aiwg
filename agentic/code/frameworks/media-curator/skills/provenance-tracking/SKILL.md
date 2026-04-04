@@ -173,3 +173,10 @@ du -sh . | cut -f1
 | Schema.org | Latest | Structured data |
 | JSON-LD | 1.1 | Serialization format |
 | ISO 8601 | 2019 | Timestamps |
+
+## References
+
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/integrity-verification/SKILL.md — Integrity verification that generates fixity records tracked by provenance
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/acquire/SKILL.md — Acquisition skill whose download events are recorded as provenance activities
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/audio-extraction/SKILL.md — Audio extraction that produces derivation relationships tracked in provenance
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/verify-archive/SKILL.md — Archive verification skill that can generate provenance records via --provenance flag

@@ -828,3 +828,11 @@ yt-dlp -f "best[ext=mp4]/best" \
 - Source Discoverer Agent: `@$AIWG_ROOT/agentic/code/frameworks/media-curator/agents/source-discoverer.md`
 - find-sources Command: `@$AIWG_ROOT/agentic/code/frameworks/media-curator/commands/find-sources.md`
 - Queue Manager Agent: `@$AIWG_ROOT/agentic/code/frameworks/media-curator/agents/queue-manager.md`
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Seek explicit authorization before bulk channel downloads or overwriting existing files
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/find-sources/SKILL.md — Source discovery skill that identifies YouTube URLs for this skill to download
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/acquire/SKILL.md — General acquisition skill that delegates YouTube downloads to this skill
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/audio-extraction/SKILL.md — Audio extraction patterns used after YouTube video downloads
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/quality-filtering/SKILL.md — Quality filtering applied to select best available YouTube format

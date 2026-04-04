@@ -520,3 +520,10 @@ fi
 - Agent: `@Metadata Curator`
 - MusicBrainz API: https://musicbrainz.org/doc/MusicBrainz_API
 - opustags documentation: https://github.com/fmang/opustags
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Seek explicit authorization before overwriting existing metadata tags in bulk
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/cover-art-embedding/SKILL.md — Cover art embedding skill used alongside metadata tagging for complete file tagging
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/tag-collection/SKILL.md — High-level tag-collection command that orchestrates metadata tagging
+- @$AIWG_ROOT/agentic/code/frameworks/media-curator/skills/provenance-tracking/SKILL.md — Record provenance of metadata sources (MusicBrainz, Discogs)
