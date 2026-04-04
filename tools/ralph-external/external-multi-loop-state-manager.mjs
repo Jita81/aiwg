@@ -9,7 +9,7 @@
  * - MAX_CONCURRENT_LOOPS enforcement (REF-086, REF-088)
  *
  * @implements @.aiwg/working/multi-loop-ralph-plan.md Section 7
- * @schema @agentic/code/addons/ralph/schemas/multi-loop-registry.yaml
+ * @schema @agentic/code/addons/agent-loop/schemas/multi-loop-registry.yaml
  * @issue #271
  */
 

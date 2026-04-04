@@ -1,5 +1,6 @@
 {
-  "id": "ralph",
+  "id": "agent-loop",
+  "aliases": ["ralph", "al"],
   "type": "addon",
   "name": "Agent Loop",
   "version": "1.0.0",

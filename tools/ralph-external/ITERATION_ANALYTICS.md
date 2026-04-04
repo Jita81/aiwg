@@ -370,7 +370,7 @@ node tools/ralph-external/iteration-analytics.example.mjs
 
 ## References
 
-- **Schema**: `/mnt/dev-inbox/jmagly/ai-writing-guide/agentic/code/addons/ralph/schemas/iteration-analytics.yaml`
+- **Schema**: `/mnt/dev-inbox/jmagly/ai-writing-guide/agentic/code/addons/agent-loop/schemas/iteration-analytics.yaml`
 - **Research**: `/mnt/dev-inbox/jmagly/ai-writing-guide/.aiwg/research/findings/REF-015-self-refine.md`
 - **Issue**: #167 - Iteration analytics implementation
 - **Related**:

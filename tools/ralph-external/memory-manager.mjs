@@ -4,7 +4,7 @@
  * Implements configurable memory capacity (Ω parameter) for Ralph reflection management.
  * Maintains a sliding window of past reflections following REF-021 Reflexion research.
  *
- * @implements @agentic/code/addons/ralph/schemas/cross-task-memory.yaml
+ * @implements @agentic/code/addons/agent-loop/schemas/cross-task-memory.yaml
  * @research @.aiwg/research/findings/REF-021-reflexion.md
  * @issue #170
  */

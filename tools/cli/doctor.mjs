@@ -126,8 +126,8 @@ async function runDoctor() {
   const addonChecks = [
     { id: 'daemon', label: 'Daemon Addon', manifest: 'agentic/code/addons/daemon/manifest.json',
       artifacts: ['behaviors/concierge.behavior.md', 'agents/concierge.md', 'skills/daemon-status/SKILL.md', 'rules/daemon-interaction.md'] },
-    { id: 'ralph', label: 'Ralph Addon', manifest: 'agentic/code/addons/ralph/manifest.json',
-      artifacts: ['commands/ralph.md', 'agents/ralph-loop.md'] },
+    { id: 'agent-loop', label: 'Agent Loop Addon', manifest: 'agentic/code/addons/agent-loop/manifest.json',
+      artifacts: ['agents/ralph-loop.md'] },
     { id: 'rlm', label: 'RLM Addon', manifest: 'agentic/code/addons/rlm/manifest.json',
       artifacts: [] },
     { id: 'ring', label: 'Ring Methodology', manifest: 'agentic/code/addons/ring-methodology/manifest.json',

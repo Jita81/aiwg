@@ -4,7 +4,7 @@
  * Tracks quality metrics, detects diminishing returns, and selects best output
  * per REF-015 Self-Refine research.
  *
- * @implements @agentic/code/addons/ralph/schemas/iteration-analytics.yaml
+ * @implements @agentic/code/addons/agent-loop/schemas/iteration-analytics.yaml
  * @research @.aiwg/research/findings/REF-015-self-refine.md
  * @issue #167
  */

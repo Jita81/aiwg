@@ -11,7 +11,7 @@
  * - L3: Semantic Memory (this) - Cross-loop persistent knowledge
  *
  * @implements @.aiwg/working/issue-ralph-external-completion.md Section L3
- * @schema @agentic/code/addons/ralph/schemas/semantic-memory.yaml
+ * @schema @agentic/code/addons/agent-loop/schemas/semantic-memory.yaml
  * @issue #24
  */
 

@@ -529,7 +529,7 @@ Iteration 3: ██████████████████████�
 
 ## References
 
-- **Schema**: `@agentic/code/addons/ralph/schemas/iteration-analytics.yaml`
+- **Schema**: `@agentic/code/addons/agent-loop/schemas/iteration-analytics.yaml`
 - **Research**: `@.aiwg/research/findings/REF-015-self-refine.md`
 - **Rules**: `@.claude/rules/best-output-selection.md`
 - **Issue**: #168

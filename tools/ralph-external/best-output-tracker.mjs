@@ -8,7 +8,7 @@
  * with peak quality often occurring at iteration 2-3 before degrading.
  *
  * @implements @.aiwg/requirements/use-cases/UC-168-best-output-selection.md
- * @schema @agentic/code/addons/ralph/schemas/iteration-analytics.yaml
+ * @schema @agentic/code/addons/agent-loop/schemas/iteration-analytics.yaml
  * @research @.aiwg/research/findings/REF-015-self-refine.md
  */
 

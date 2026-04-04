@@ -69,10 +69,9 @@ function resolveAddonFolderName(name: string): string {
   const ADDON_ALIASES: Record<string, string> = {
     // ring-methodology has always been invokable as 'ring'
     'ring': 'ring-methodology',
-    // agent-loop addon (formerly ralph) — support all three invocation names
-    'al': 'ralph',
-    'agent-loop': 'ralph',
-    // ralph stays as-is (backwards compat) — folder rename tracked in #694
+    // agent-loop addon — 'al' and 'ralph' are legacy aliases
+    'al': 'agent-loop',
+    'ralph': 'agent-loop',
   };
   return ADDON_ALIASES[name] ?? name;
 }

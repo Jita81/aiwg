@@ -2,7 +2,7 @@
 
 ## Overview
 
-Implemented BestOutputTracker for Ralph external loop per issue #168, conforming to schema at `agentic/code/addons/ralph/schemas/iteration-analytics.yaml`.
+Implemented BestOutputTracker for Ralph external loop per issue #168, conforming to schema at `agentic/code/addons/agent-loop/schemas/iteration-analytics.yaml`.
 
 ## Implementation Details
 
@@ -241,7 +241,7 @@ const report = tracker.generateSelectionReport(selection);
 
 ## References
 
-- **Schema**: `@agentic/code/addons/ralph/schemas/iteration-analytics.yaml`
+- **Schema**: `@agentic/code/addons/agent-loop/schemas/iteration-analytics.yaml`
 - **Research**: `@.aiwg/research/findings/REF-015-self-refine.md`
 - **Rules**: `@.claude/rules/best-output-selection.md`
 - **Issue**: #168

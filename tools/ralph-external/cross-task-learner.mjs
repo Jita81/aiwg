@@ -11,7 +11,7 @@
  * - Pruning stale memory entries
  *
  * @implements @.aiwg/requirements/use-cases/UC-154-cross-task-learning.md
- * @schema @agentic/code/addons/ralph/schemas/cross-task-memory.yaml
+ * @schema @agentic/code/addons/agent-loop/schemas/cross-task-memory.yaml
  * @research @.aiwg/research/findings/REF-021-reflexion.md
  */
 

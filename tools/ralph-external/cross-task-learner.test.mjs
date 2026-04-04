@@ -2,7 +2,7 @@
  * Tests for CrossTaskLearner
  *
  * @tests @tools/ralph-external/cross-task-learner.mjs
- * @requirement @agentic/code/addons/ralph/schemas/cross-task-memory.yaml
+ * @requirement @agentic/code/addons/agent-loop/schemas/cross-task-memory.yaml
  * @issue #154
  */
 

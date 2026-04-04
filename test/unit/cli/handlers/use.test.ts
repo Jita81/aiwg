@@ -50,8 +50,13 @@ describe('USE_ALL_DISALLOW', () => {
 
 describe('addonPath()', () => {
   it('constructs path from framework root and addon name', () => {
+    const result = addonPath('/some/root', 'agent-loop');
+    expect(result).toBe('/some/root/agentic/code/addons/agent-loop');
+  });
+
+  it('maps ralph legacy alias to agent-loop folder', () => {
     const result = addonPath('/some/root', 'ralph');
-    expect(result).toBe('/some/root/agentic/code/addons/ralph');
+    expect(result).toBe('/some/root/agentic/code/addons/agent-loop');
   });
 
   it('maps ring alias to ring-methodology folder', () => {
@@ -129,7 +134,7 @@ describe('getAllAddons()', () => {
 
     // Known addons that must be present
     expect(addons).toContain('aiwg-utils');
-    expect(addons).toContain('ralph');
+    expect(addons).toContain('agent-loop');
     expect(addons).toContain('rlm');
     expect(addons).toContain('daemon');
     expect(addons).toContain('voice-framework');
@@ -159,7 +164,12 @@ describe('isValidAddon()', () => {
   });
 
   it('returns true for an existing addon directory', async () => {
-    await createFakeAddonTree(tmpDir, ['ralph']);
+    await createFakeAddonTree(tmpDir, ['agent-loop']);
+    expect(await isValidAddon(tmpDir, 'agent-loop')).toBe(true);
+  });
+
+  it('resolves ralph alias to agent-loop', async () => {
+    await createFakeAddonTree(tmpDir, ['agent-loop']);
     expect(await isValidAddon(tmpDir, 'ralph')).toBe(true);
   });
 
@@ -175,7 +185,8 @@ describe('isValidAddon()', () => {
 
   it('returns true for real addons in the actual repo including aiwg-dev', async () => {
     const repoRoot = path.resolve(__dirname, '../../../..');
-    expect(await isValidAddon(repoRoot, 'ralph')).toBe(true);
+    expect(await isValidAddon(repoRoot, 'agent-loop')).toBe(true);
+    expect(await isValidAddon(repoRoot, 'ralph')).toBe(true); // legacy alias
     expect(await isValidAddon(repoRoot, 'aiwg-utils')).toBe(true);
     expect(await isValidAddon(repoRoot, 'rlm')).toBe(true);
     expect(await isValidAddon(repoRoot, 'daemon')).toBe(true);

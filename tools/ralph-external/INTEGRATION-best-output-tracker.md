@@ -300,5 +300,5 @@ Customize for different scenarios:
 - `best-output-tracker.mjs` - Implementation
 - `README-best-output-tracker.md` - Full documentation
 - `examples/best-output-example.mjs` - Runnable example
-- `@agentic/code/addons/ralph/schemas/iteration-analytics.yaml` - Schema
+- `@agentic/code/addons/agent-loop/schemas/iteration-analytics.yaml` - Schema
 - `@.aiwg/research/findings/REF-015-self-refine.md` - Research
