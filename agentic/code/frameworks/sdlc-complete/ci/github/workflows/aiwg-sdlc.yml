@@ -1,0 +1,52 @@
+# AIWG SDLC Framework — CI Workflow (GitHub Actions)
+#
+# Deployed by: aiwg use sdlc --ci-hooks-enabled
+# Source:      agentic/code/frameworks/sdlc-complete/ci/github/workflows/aiwg-sdlc.yml
+#
+# Review this file before committing. It runs on your repository's CI infrastructure.
+#
+# What this does:
+#   - Validates AIWG framework deployments are up to date
+#   - Runs aiwg doctor on pull requests and pushes to main
+#
+# Customize the triggers and steps below for your project's needs.
+
+name: AIWG SDLC
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - '.claude/**'
+      - '.aiwg/**'
+      - 'package.json'
+  pull_request:
+    branches: [main, master]
+    paths:
+      - '.claude/**'
+      - '.aiwg/**'
+      - 'package.json'
+  workflow_dispatch:
+
+jobs:
+  aiwg-health:
+    name: AIWG Framework Health
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install AIWG
+        run: npm install -g aiwg
+
+      - name: Check AIWG health
+        run: aiwg doctor
+
+      - name: Verify framework deployment
+        run: aiwg sync --dry-run

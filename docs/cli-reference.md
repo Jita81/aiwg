@@ -245,6 +245,7 @@ aiwg use <framework|addon>
 - `--no-utils` - Skip aiwg-utils addon installation (frameworks only)
 - `--force` - Overwrite existing deployments
 - `--dry-run` - Preview without making changes
+- `--ci-hooks-enabled` - Also deploy CI workflow files to `.github/workflows/` and/or `.gitea/workflows/` (opt-in; detects forge from `.git/config`). Review deployed files before committing.
 - `--skip-commands-migration` - Skip deleting the legacy commands directory (warns about duplicate entries in the command palette)
 
 **Capabilities:** cli, framework, deployment, addon
@@ -289,6 +290,12 @@ aiwg use sdlc --model sonnet --reasoning opus
 
 # Save model overrides for future deployments
 aiwg use sdlc --model sonnet --save
+
+# Deploy SDLC with CI workflow files (opt-in; review before committing)
+aiwg use sdlc --ci-hooks-enabled
+
+# Preview CI files that would be deployed without writing them
+aiwg use sdlc --ci-hooks-enabled --dry-run
 ```
 
 **Model override precedence:** CLI flags > project `models.json` > user `~/.config/aiwg/models.json` > AIWG defaults

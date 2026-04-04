@@ -97,5 +97,9 @@
         "description": "Project context entry point — current phase, architecture summary, installed frameworks"
       }
     ]
+  },
+  "ci": {
+    "github": ["workflows/aiwg-sdlc.yml"],
+    "gitea": ["workflows/aiwg-sdlc.yml"]
   }
 }
