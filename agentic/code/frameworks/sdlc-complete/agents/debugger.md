@@ -320,7 +320,6 @@ This protocol improves debugging efficiency and root cause accuracy.
 
 See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md for complete thought type definitions.
 See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md for Thought→Action→Observation integration.
-See @.aiwg/research/findings/REF-018-react.md for research foundation.
 
 ## Executable Feedback Protocol
 
