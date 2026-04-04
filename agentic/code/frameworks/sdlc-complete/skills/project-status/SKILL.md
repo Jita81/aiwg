@@ -691,3 +691,12 @@ This command succeeds when:
 - [ ] Blockers identified (if any)
 - [ ] Next steps recommended (3-5 relevant commands)
 - [ ] Status report formatted and output to console
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Scan .aiwg/ artifacts before determining phase; base detection on actual file presence
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/artifact-discovery.md — Artifact discovery patterns used to detect phase and milestone completeness
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/sdlc-orchestration.md — Phase progression model and gate criteria that status detection is based on
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/project-health-check/SKILL.md — Complementary skill that reports code and team health metrics
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/orchestrate-project/SKILL.md — Orchestration skill that this status skill informs with phase context
+

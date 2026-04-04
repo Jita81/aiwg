@@ -333,3 +333,10 @@ Trend: Improving from last sprint (was 55% positive)"
 5. **Follow-up**: Track action item completion
 6. **Celebrate Wins**: Acknowledge improvements
 7. **Safe Space**: Encourage honest feedback
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Collect sprint data and previous retrospective action items before pattern analysis
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Action items must be SMART (specific, measurable); avoid "improve process" without concrete steps
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Identify patterns and options; await team discussion before assigning retrospective action owners
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/project-health-check/SKILL.md — Health metrics feed into retrospective data collection as quantitative evidence

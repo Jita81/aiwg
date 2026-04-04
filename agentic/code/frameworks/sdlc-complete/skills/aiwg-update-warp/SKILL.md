@@ -688,6 +688,15 @@ This command succeeds when:
 | Aggregation | Full agent/command aggregation | Full agent/command aggregation |
 | Template format | Single-file WARP.md.aiwg-base | Single-file WARP.md.aiwg-base |
 
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Always create a backup before modifying WARP.md; warn before losing user content after AIWG marker
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/agent-deployment.md — Rules for working with agent definitions and multi-provider deployment
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Identify WARP.md section boundaries before acting
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/aiwg-setup-warp/SKILL.md — Initial Warp setup skill; use this skill for subsequent updates
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/aiwg-update-claude/SKILL.md — Analogous Claude Code update skill; shares same merge strategy pattern
+
+
 ## Key Differences from aiwg-update-claude
 
 | Feature | aiwg-update-claude | aiwg-update-warp |

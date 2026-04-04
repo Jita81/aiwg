@@ -413,3 +413,10 @@ Resource-Based Success:
 - Static planning: Not adapting simulation based on actual project progress
 
 Transform project planning from hopeful guessing into systematic, evidence-based timeline optimization through comprehensive simulation and scenario analysis.
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Timeline estimates must be bounded and measurable; avoid "flexible" or "as needed" schedule buffers
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Validate project scope and constraints before generating scenarios
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/project-status/SKILL.md — Use to confirm current SDLC phase and existing planning artifacts before simulating
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/project-health-check/SKILL.md — Health metrics (velocity, defect rate) feed into simulation variable modeling

@@ -312,3 +312,11 @@ This command succeeds when:
 - [x] Supports TypeScript, JavaScript, Python at minimum
 - [x] Executes in <5s for `--changed-only` mode
 - [x] Clear violation details with file, metric, value, threshold
+
+## References
+
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/agent-friendly-code.md — Threshold definitions (max LOC, complexity) that gate violations are measured against
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Gate criteria must be measurable (numeric thresholds), never vague conditions like "acceptable complexity"
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/codebase-health/SKILL.md — Diagnostic dashboard that complements this pass/fail enforcement gate
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md — Execute checks before reporting; retry with root cause analysis on tool failures
+

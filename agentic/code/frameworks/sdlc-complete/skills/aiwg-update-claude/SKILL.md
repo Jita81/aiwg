@@ -564,3 +564,11 @@ This command succeeds when:
 | Backup | Optional | ALWAYS created |
 | Validation | Basic checks | Comprehensive validation |
 | Use Case | Initial setup | Update to latest guidance |
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Always create a backup before modifying CLAUDE.md; never silently overwrite user content
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/agent-deployment.md — Rules for working with agent definitions and multi-provider deployment
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Read existing CLAUDE.md and identify section boundaries before acting
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/aiwg-setup-project/SKILL.md — Initial setup skill; use this skill for subsequent updates
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/aiwg-update-agents-md/SKILL.md — Companion skill to invoke when Factory AI is also detected

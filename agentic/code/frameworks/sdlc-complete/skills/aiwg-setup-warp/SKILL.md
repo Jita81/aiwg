@@ -471,3 +471,12 @@ node "$AIWG_PATH/tools/warp/setup-warp.mjs" --target "$PROJECT_DIR" --force
 **Category**: SDLC Setup
 **Mode**: Interactive Setup and Configuration
 **Platform**: Warp Terminal
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/agent-deployment.md — Rules for working with agent definitions and multi-provider deployment
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Seek explicit authorization before overwriting user content in WARP.md
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Detect AIWG installation and WARP.md state before making changes
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/aiwg-update-warp/SKILL.md — Companion skill for updating an already-configured Warp project
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/aiwg-setup-project/SKILL.md — Analogous Claude Code setup skill; shares same merge strategy pattern
+

@@ -484,3 +484,12 @@ When merging AIWG section, ensure these are included:
 **Command Version**: 2.0
 **Category**: SDLC Setup
 **Mode**: Interactive Setup and Configuration
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/agent-deployment.md — Rules for working with agent definitions and multi-provider deployment
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Seek explicit authorization before modifying existing CLAUDE.md content
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Detect AIWG installation and project structure before making changes
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/aiwg-update-claude/SKILL.md — Companion skill for updating an already-configured project
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/aiwg-update-agents-md/SKILL.md — Companion skill invoked when Factory AI is also detected
+

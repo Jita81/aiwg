@@ -507,3 +507,12 @@ This command succeeds when:
 **Phase**: Any (Elaboration most common)
 **Duration**: 4 hours - 3 days (time-boxed)
 **Output**: PoC code + README + decision
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — PoC completion criteria must be concrete and time-boxed; avoid "done when working" conditions
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Seek authorization before deciding the PoC outcome changes the architectural approach
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Research technology and existing patterns before implementation
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/security-audit/SKILL.md — Consider security during PoC if the risk involves authentication or data handling
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/anti-laziness.md — Never skip testing or weaken PoC validation criteria to declare success faster
+

@@ -207,3 +207,10 @@ Or ask naturally: "How do I fix my AIWG install?"
 - [ ] Quick fix included for troubleshooting queries
 - [ ] Related topics referenced
 - [ ] Source documentation cited
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Research documentation before answering; read error messages completely
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/instruction-comprehension.md — Fully parse and confirm understanding of user queries before acting
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/project-status/SKILL.md — Related status skill users may need when seeking orientation
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/aiwg-setup-project/SKILL.md — Related setup skill that this skill provides help for

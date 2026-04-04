@@ -759,3 +759,12 @@ This command intelligently updates AGENTS.md for Factory AI users by:
 5. Providing next steps and validation
 
 The result is a comprehensive, project-specific AGENTS.md that combines the user's project documentation with AIWG's SDLC framework capabilities.
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/agent-deployment.md — Rules for working with agent definitions and multi-provider deployment
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Seek explicit authorization before overwriting existing AGENTS.md content
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Analyze codebase before generating project-specific commands section
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/aiwg-setup-project/SKILL.md — Analogous Claude Code setup skill; calls this skill when Factory AI is detected
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/aiwg-update-claude/SKILL.md — Parallel update skill for Claude Code's CLAUDE.md configuration
+

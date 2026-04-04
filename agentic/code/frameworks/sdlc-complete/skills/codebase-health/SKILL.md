@@ -284,3 +284,10 @@ This command succeeds when:
 - [x] Output format matches requested format
 - [x] CI mode returns correct exit code
 - [x] Completes in <10s for codebases up to 50K LOC
+
+## References
+
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/agent-friendly-code.md — Threshold definitions (warning: 300 LOC, error: 500 LOC) that this skill enforces
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Scan codebase before calculating scores; check existing patterns before flagging anti-patterns
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/complexity-gate/SKILL.md — CI-friendly enforcement gate that pairs with this diagnostic skill
+

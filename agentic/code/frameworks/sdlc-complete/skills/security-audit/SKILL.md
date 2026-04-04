@@ -73,3 +73,11 @@ Perform a systematic security audit following these steps:
     - Create an executive summary with key recommendations
 
 Use automated security scanning tools when available and provide manual review for complex security patterns.
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Identify technology stack and existing security controls before scanning
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Report findings with severity levels; await owner authorization before attempting remediation
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/token-security.md — Token security rules that this audit checks for violations
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/security-gate/SKILL.md — Security gate that consumes this audit's findings to produce a pass/fail decision
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/anti-laziness.md — Never reduce audit scope or skip vulnerability categories to complete faster
