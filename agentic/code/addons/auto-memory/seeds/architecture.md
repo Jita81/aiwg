@@ -3,15 +3,32 @@
 ## Key Design Choices
 
 <!-- Captured from ADRs in .aiwg/architecture/ and code review discussions -->
+<!-- Add [confidence: established|emerging|speculative] to each entry. See auto-memory overview for convention. -->
 
 ### [Decision Category]
 
-**Decision**: <!-- What was decided -->
+**Decision**: <!-- What was decided --> [confidence: established — see ADR-XXX]
 **Context**: <!-- Why the decision was needed -->
 **Rationale**: <!-- Why this choice was made -->
 **Alternatives Considered**: <!-- What else was evaluated -->
 **Trade-offs**: <!-- Pros and cons of this choice -->
 **Status**: <!-- Active, Superseded, Deprecated -->
+
+<!-- Example of a well-annotated entry:
+### Authentication Strategy
+
+**Decision**: Use JWT RS256 for all service tokens. [confidence: established — see ADR-012]
+**Context**: Needed stateless auth that works across microservices.
+**Rationale**: RS256 lets services verify tokens without sharing a secret.
+**Alternatives Considered**: HS256 (shared secret — rejected: key distribution problem), opaque tokens (rejected: requires DB lookup on every request).
+**Trade-offs**: Token revocation requires a denylist or short expiry; accepted this for the stateless benefit.
+**Status**: Active
+
+### Session Caching
+
+**Decision**: Consider Redis for session storage in web-facing services. [confidence: emerging — evaluated sprint 4, not yet in prod]
+**Status**: Under evaluation
+-->
 
 ---
 

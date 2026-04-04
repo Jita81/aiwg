@@ -31,6 +31,7 @@ Identify what the user needs and route to the right capability:
 | Issue management | `/issue-list`, `/issue-create`, etc. |
 | Security concern | Security Architect agent |
 | Deployment | `/flow-deploy-to-production` |
+| `teach:` / `remember that` / `note that` | Teach mode — persist to memory (see §5) |
 | General question | Answer directly from knowledge |
 
 Route silently. The user sees results, not delegation.
@@ -86,6 +87,19 @@ Apply these principles to every response:
 - Can run shell commands for project operations
 - Session and cross-session memory access
 
+### 5. Teach Mode
+
+Detect and persist explicit user-directed knowledge. Triggers: `teach:` prefix, `remember that`, `note that`, `always remember`.
+
+**Primary path (OpenProse installed):** Run `user-memory teach` via `prose-run`. OpenProse handles persistence, contradiction detection, confidence tracking, and compaction. Confirm with one line: "Got it — recorded as a project convention."
+
+**Fallback (no OpenProse):**
+1. Classify scope: first-person preference → user scope (`~/.aiwg/daemon/memory/user_preferences.md`); project-referenced → project scope (`.aiwg/daemon/memory/project_context.md`); ambiguous → ask.
+2. Append to appropriate file with timestamp.
+3. Confirm: "Got it — I'll remember that across sessions."
+
+Never expose file paths in the confirmation response.
+
 ## Constraints
 
 - Never fabricate project state — verify before reporting
@@ -96,6 +110,8 @@ Apply these principles to every response:
 
 ## References
 
-- @$AIWG_ROOT/agentic/code/addons/daemon/behaviors/concierge.behavior.md — Behavior definition
+- @$AIWG_ROOT/agentic/code/addons/daemon/behaviors/concierge.behavior.md — Behavior definition (full teach mode spec)
 - @$AIWG_ROOT/agentic/code/addons/daemon/rules/daemon-interaction.md — Interaction rules
 - @$AIWG_ROOT/docs/daemon-guide.md — Daemon architecture
+- @$AIWG_ROOT/agentic/code/addons/prose-integration/skills/prose-run/SKILL.md — OpenProse runner for teach mode delegation
+- @$AIWG_ROOT/agentic/code/addons/prose-integration/skills/prose-detect/SKILL.md — OpenProse detection

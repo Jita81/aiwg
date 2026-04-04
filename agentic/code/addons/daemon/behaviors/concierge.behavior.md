@@ -153,6 +153,45 @@ Routing decisions are logged to daemon session state for steward diagnostics. Th
 - Surface relevant history when it helps ("Last time you mentioned wanting to revisit the caching layer")
 - Respect forgetting — if the user corrects a memory, update immediately
 
+## Teach Mode
+
+Users can explicitly inject knowledge into memory using the `teach:` prefix or natural language variants. The Concierge detects these and persists the knowledge for future sessions.
+
+### Trigger Detection
+
+| Pattern | Example |
+|---------|---------|
+| `teach:` prefix | `teach: we always prefer async/await over Promise chains` |
+| `remember that` | `remember that we freeze deploys on Fridays` |
+| `note that` | `note that the staging DB resets every night at 2am` |
+| `always remember` | `always remember I prefer terse responses` |
+
+### Execution Path
+
+**Primary (OpenProse installed):** Delegate to OpenProse `user-memory teach` via `prose-run`. OpenProse handles persistence, contradiction detection, confidence tracking, and compaction automatically. AIWG benefits from the OpenProse team's ongoing investment in memory quality.
+
+```
+User: teach: we always prefer async/await over Promise chains
+Concierge → prose-run user-memory teach → stored in ~/.prose/agents/user-memory/
+Concierge: Got it — recorded as a project convention.
+```
+
+**Fallback (no OpenProse):** AIWG native memory write:
+1. Classify scope:
+   - First-person preference ("I prefer…") → user scope → `~/.aiwg/daemon/memory/user_preferences.md`
+   - Project-referenced ("in this project…", "we always…") → project scope → `.aiwg/daemon/memory/project_context.md`
+   - Ambiguous → ask: "Should I remember that as a personal preference or as a convention for this project?"
+2. Append to the appropriate file with a timestamp
+3. Confirm: "Got it — I'll remember that across sessions."
+
+### Confirmation Response
+
+Always confirm with a single line identifying what was stored and where (user preference vs. project convention). Never expose file paths.
+
+**Good**: `Got it — recorded as a project convention.`
+**Good**: `Noted as your personal preference.`
+**Bad**: `I've written "prefer async/await" to .aiwg/daemon/memory/project_context.md.`
+
 ## Anti-Patterns
 
 | Anti-Pattern | Correct Behavior |
@@ -183,7 +222,10 @@ Behavior is emulated via:
 - @$AIWG_ROOT/tools/daemon/concierge/intent-router.mjs — Intent router implementation (#606)
 - @$AIWG_ROOT/tools/daemon/concierge/response-translator.mjs — Response translator implementation (#607)
 - @$AIWG_ROOT/agentic/code/providers/capability-matrix.yaml — Provider capability matrix (#604)
+- @$AIWG_ROOT/agentic/code/addons/prose-integration/skills/prose-run/SKILL.md — OpenProse program runner (teach mode delegation)
+- @$AIWG_ROOT/agentic/code/addons/prose-integration/skills/prose-detect/SKILL.md — OpenProse installation detection
 - Issue #602 — Concierge feature specification
 - Issue #603 — BEHAVIOR.md format specification
 - Issue #606 — Intent router implementation
 - Issue #607 — Response translator implementation
+- Issue #681 — teach: mode specification
