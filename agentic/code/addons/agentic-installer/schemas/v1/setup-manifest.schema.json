@@ -22,7 +22,13 @@
       "properties": {
         "name": { "type": "string", "description": "Identifier for this manifest." },
         "description": { "type": "string" },
-        "version": { "type": "string" }
+        "version": { "type": "string" },
+        "install_type": {
+          "type": "string",
+          "enum": ["user", "developer", "ci"],
+          "default": "user",
+          "description": "Audience and scope of this manifest. 'user' = production deploy. 'developer' = local dev environment. 'ci' = headless pipeline setup."
+        }
       }
     },
     "spec": {
@@ -45,6 +51,11 @@
           "type": "array",
           "description": "Prerequisite checks run before any step. Required ones abort if missing.",
           "items": { "$ref": "#/definitions/prerequisite" }
+        },
+        "os_config": {
+          "type": "array",
+          "description": "OS-level configuration entries. Developer manifests only. Each entry declares a check and an apply command for OS mutations (kernel params, group membership, file permissions, shell profile changes).",
+          "items": { "$ref": "#/definitions/os-config-entry" }
         },
         "steps": {
           "type": "array",
@@ -122,6 +133,11 @@
           "type": "array",
           "description": "Valid values when type is 'choice'.",
           "items": { "type": "string" }
+        },
+        "interactive_required": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, the installer must prompt for this param interactively. Cannot be pre-filled by default in developer manifests. Use for params where a wrong default would cause OS configuration changes (SSH key email, local domain, GPG key ID, preferred IDE)."
         }
       }
     },
@@ -146,6 +162,47 @@
         }
       }
     },
+    "os-config-entry": {
+      "type": "object",
+      "required": ["id", "description", "check", "apply"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier. Referenced by os-config steps via config_id."
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of what this config entry does."
+        },
+        "check": {
+          "type": "string",
+          "description": "Shell command. Exit 0 = already configured, skip apply. Non-zero = needs configuration."
+        },
+        "apply": {
+          "type": "string",
+          "description": "Shell command or multi-line script to apply the configuration."
+        },
+        "requires_relogin": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, installer must warn the user that a logout/login or new shell is required for this change to take effect."
+        },
+        "interactive": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, apply triggers a GUI dialog or interactive prompt. Installer must pause and inform the user before running."
+        },
+        "platforms": {
+          "type": "array",
+          "description": "Platform(s) this entry applies to. Omit to apply on all declared platforms.",
+          "items": {
+            "type": "string",
+            "enum": ["linux", "macos", "windows"]
+          }
+        }
+      }
+    },
     "step": {
       "type": "object",
       "required": ["id", "type"],
@@ -154,8 +211,8 @@
         "id": { "type": "string", "description": "Unique step identifier. Referenced by depends_on and on_fail." },
         "type": {
           "type": "string",
-          "enum": ["script", "detect", "ask", "verify", "agentic", "platform-route", "chain"],
-          "description": "Step execution type."
+          "enum": ["script", "detect", "ask", "verify", "agentic", "platform-route", "chain", "os-config"],
+          "description": "Step execution type. 'os-config' applies a single os_config entry by ID (developer manifests only)."
         },
         "platform": {
           "oneOf": [
@@ -163,6 +220,10 @@
             { "type": "array", "items": { "type": "string" } }
           ],
           "description": "Platform(s) this step runs on. Omit to run on all declared platforms."
+        },
+        "config_id": {
+          "type": "string",
+          "description": "ID of the os_config entry to apply. Required for type=os-config."
         },
         "script": {
           "type": "string",
