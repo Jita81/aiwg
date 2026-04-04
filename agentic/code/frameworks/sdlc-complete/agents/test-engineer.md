@@ -342,7 +342,7 @@ This protocol improves test quality and ensures comprehensive coverage.
 
 See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md for complete thought type definitions.
 See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md for Thought→Action→Observation integration.
-See @.aiwg/research/findings/REF-018-react.md for research foundation.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/research-foundation.md for research foundation.
 
 ## Executable Feedback Protocol
 
@@ -1138,7 +1138,7 @@ test.describe('Checkout Flow - Complete Purchase', () => {
 
 ## References
 
-- @.aiwg/requirements/use-cases/UC-009-generate-test-artifacts.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/testing/test-plan-template.md — Test artifact template and use case structure
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/generate-tests/SKILL.md
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/flow-test-strategy-execution/SKILL.md
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md
