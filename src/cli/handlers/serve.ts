@@ -9,6 +9,7 @@
  * @see #714 — React app scaffold
  */
 
+import path from 'path';
 import type { CommandHandler, HandlerContext, HandlerResult } from './types.js';
 import { createPtyWsHandler, registry as ptyRegistry } from '../../serve/pty-bridge.js';
 
@@ -109,8 +110,27 @@ async function startServer(opts: {
     app.post('/api/sessions', (c: any) => c.json({ id: null, error: 'Use /ws/pty/:sessionId to start a PTY session' }, 501));
   }
 
-  // Fallback: 404 for anything not matched above (static files served by #714)
-  app.notFound((c: any) => c.json({ error: 'Not found' }, 404));
+  // Static file serving — apps/web/dist/ (#714)
+  // Served with @hono/node-server/serve-static if the dist exists
+  const webDistDir = path.join(opts.frameworkRoot, 'apps', 'web', 'dist');
+  try {
+    const { serveStatic } = await (new Function('m', 'return import(m)'))('@hono/node-server/serve-static');
+    app.use('/*', serveStatic({ root: webDistDir }));
+  } catch {
+    // serve-static not available yet (before #714 dist is built) — fallback below
+    app.get('/', (c: any) =>
+      c.text('AIWG Dashboard — run `pnpm build` inside apps/web/ to build the UI.', 503),
+    );
+  }
+
+  // Fallback: 404 for API routes not matched above
+  app.notFound((c: any) => {
+    if (c.req.path.startsWith('/api/') || c.req.path.startsWith('/ws/')) {
+      return c.json({ error: 'Not found' }, 404);
+    }
+    // SPA fallback — serve index.html for client-side routing
+    return c.text('Not found', 404);
+  });
 
   const url = `http://${opts.host}:${opts.port}`;
 

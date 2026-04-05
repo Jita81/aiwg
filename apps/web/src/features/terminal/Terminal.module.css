@@ -1,0 +1,78 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #0d0d0d;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 12px;
+  background: #1a1a1a;
+  border-bottom: 1px solid #2a2a2a;
+  min-height: 36px;
+}
+
+.sessionLabel {
+  font-size: 12px;
+  color: #888;
+  flex: 1;
+}
+
+.sessionLabel code {
+  color: #b0d0ff;
+  font-size: 11px;
+}
+
+.badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.connecting  { background: #2a2a00; color: #ffdd00; }
+.connected   { background: #002a00; color: #00ff88; }
+.reconnecting{ background: #2a1a00; color: #ffaa00; }
+.exited      { background: #1a0000; color: #ff6060; }
+
+.actions {
+  display: flex;
+  gap: 6px;
+}
+
+.actions button {
+  background: #2a2a2a;
+  color: #c0c0c0;
+  border: 1px solid #3a3a3a;
+  border-radius: 4px;
+  padding: 3px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.actions button:hover,
+.actions button:focus-visible {
+  background: #3a3a3a;
+  outline: 2px solid #5a8fff;
+  outline-offset: 2px;
+}
+
+.terminal {
+  flex: 1;
+  overflow: hidden;
+  padding: 4px;
+}
+
+/* xterm.js viewport override */
+.terminal :global(.xterm) {
+  height: 100%;
+}
