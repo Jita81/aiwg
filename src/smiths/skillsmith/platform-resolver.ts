@@ -58,8 +58,7 @@ const PLATFORM_CONFIGS: Record<Platform, PlatformSkillConfig> = {
   copilot: {
     baseDir: '.github/skills',
     extension: '.md',
-    supportsSkills: false,
-    alternativeStrategy: 'none',
+    supportsSkills: true,
     supportsSubdirectory: true,
   },
   generic: {

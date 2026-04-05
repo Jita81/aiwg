@@ -51,13 +51,14 @@ describe('SkillSmith', () => {
     it('should identify platforms with native skill support', () => {
       expect(PlatformSkillResolver.supportsSkills('claude')).toBe(true);
       expect(PlatformSkillResolver.supportsSkills('generic')).toBe(true);
-      expect(PlatformSkillResolver.supportsSkills('factory')).toBe(false);
+      expect(PlatformSkillResolver.supportsSkills('factory')).toBe(true);
       expect(PlatformSkillResolver.supportsSkills('cursor')).toBe(true);
+      expect(PlatformSkillResolver.supportsSkills('copilot')).toBe(true);
     });
 
-    it('should provide alternative strategies for non-skill platforms', () => {
-      expect(PlatformSkillResolver.getAlternativeStrategy('factory')).toBe('command');
-      expect(PlatformSkillResolver.getAlternativeStrategy('copilot')).toBe('none');
+    it('should return undefined alternative strategy for skill-native platforms', () => {
+      expect(PlatformSkillResolver.getAlternativeStrategy('factory')).toBeUndefined();
+      expect(PlatformSkillResolver.getAlternativeStrategy('copilot')).toBeUndefined();
     });
   });
 
