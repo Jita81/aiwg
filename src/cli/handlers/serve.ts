@@ -10,6 +10,7 @@
  */
 
 import type { CommandHandler, HandlerContext, HandlerResult } from './types.js';
+import { createPtyWsHandler, registry as ptyRegistry } from '../../serve/pty-bridge.js';
 
 const DEFAULT_PORT = 7337;
 const DEFAULT_HOST = '127.0.0.1';
@@ -75,21 +76,37 @@ async function startServer(opts: {
   }
 
   const { Hono } = honoMod;
-  const { serve } = nodeMod;
+  const { serve, createNodeWebSocket } = nodeMod;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const app = new Hono() as any;
 
+  // WebSocket PTY bridge (#712) — must be set up before serve() is called
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let injectWebSocket: ((server: any) => void) | null = null;
+  if (!opts.readOnly) {
+    try {
+      const { upgradeWebSocket, injectWebSocket: inject } = createNodeWebSocket({ app });
+      injectWebSocket = inject;
+      app.get('/ws/pty/:sessionId', upgradeWebSocket(createPtyWsHandler));
+    } catch {
+      // @hono/node-server/ws not available — WebSocket routes skipped
+    }
+  }
+
   // Health check
   app.get('/api/health', (c: any) => c.json({ status: 'ok', readOnly: opts.readOnly }));
 
-  // REST stubs — filled in by #712 / #715 / #716
-  app.get('/api/sessions', (c: any) => c.json({ sessions: [] }));
+  // REST stubs — filled in by #715 / #716
+  app.get('/api/sessions', (c: any) => {
+    const sessions = [...ptyRegistry['sessions'].keys()];
+    return c.json({ sessions });
+  });
   app.get('/api/missions', (c: any) => c.json({ missions: [] }));
   app.get('/api/telemetry', (c: any) => c.json({ events: [] }));
 
   if (!opts.readOnly) {
-    app.post('/api/sessions', (c: any) => c.json({ id: null, error: 'Not implemented — see #712' }, 501));
+    app.post('/api/sessions', (c: any) => c.json({ id: null, error: 'Use /ws/pty/:sessionId to start a PTY session' }, 501));
   }
 
   // Fallback: 404 for anything not matched above (static files served by #714)
@@ -99,9 +116,15 @@ async function startServer(opts: {
 
   const server = serve({ fetch: app.fetch, port: opts.port, hostname: opts.host });
 
+  // Inject WebSocket upgrade support into the underlying HTTP server
+  if (injectWebSocket) {
+    injectWebSocket(server);
+  }
+
   return {
     url,
     close: () => {
+      ptyRegistry.shutdown();
       if (typeof (server as { close?: () => void }).close === 'function') {
         (server as { close: () => void }).close();
       }
