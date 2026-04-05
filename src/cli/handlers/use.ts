@@ -209,8 +209,9 @@ async function runPreDeployCollisionCheck(opts: {
   provider: string;
   force: boolean;
   skipConflicts: boolean;
+  verbose?: boolean;
 }): Promise<boolean> {
-  const { frameworkRoot, framework, target, provider, force } = opts;
+  const { frameworkRoot, framework, target, provider, force, verbose = false } = opts;
 
   // Resolve source skills dir for this framework
   const frameworkSlug = framework === 'all' ? 'sdlc' : framework;
@@ -235,9 +236,10 @@ async function runPreDeployCollisionCheck(opts: {
     skillNames,
     namespace: 'aiwg',
     skillsBaseDir,
+    sourceSkillsDir,
   });
 
-  const report = formatCollisionReport(results);
+  const report = formatCollisionReport(results, { verbose });
   if (report) {
     process.stderr.write(report + '\n');
   }
@@ -752,6 +754,7 @@ export class UseHandler implements CommandHandler {
         provider,
         force,
         skipConflicts,
+        verbose,
       });
       if (!canDeploy) {
         return { exitCode: 1, message: 'Deployment blocked due to name collisions. See above for details.' };

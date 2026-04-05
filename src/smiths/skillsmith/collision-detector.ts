@@ -15,6 +15,7 @@
  */
 
 import { promises as fs } from 'fs';
+import { createHash } from 'crypto';
 import * as path from 'path';
 import type { Platform } from '../../agents/types.js';
 
@@ -48,6 +49,8 @@ export interface CollisionCheckOptions {
   namespace?: string;
   /** Base skills directory (computed from platform if not provided) */
   skillsBaseDir?: string;
+  /** Source skills directory for content hash comparison (skips unchanged files) */
+  sourceSkillsDir?: string;
 }
 
 // ============================================
@@ -134,6 +137,34 @@ async function isAiwgOwned(skillPath: string): Promise<boolean> {
 }
 
 // ============================================
+// Content Hash Comparison
+// ============================================
+
+/**
+ * Compute MD5 hash of a file's content. Returns null if unreadable.
+ */
+async function fileHash(filePath: string): Promise<string | null> {
+  try {
+    const content = await fs.readFile(filePath);
+    return createHash('md5').update(content).digest('hex');
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Check if the source skill SKILL.md matches the deployed SKILL.md by content hash.
+ * Returns true when both exist and have identical content (no update needed).
+ */
+async function skillContentUnchanged(sourceDir: string, deployedDir: string): Promise<boolean> {
+  const srcFile = path.join(sourceDir, 'SKILL.md');
+  const dstFile = path.join(deployedDir, 'SKILL.md');
+  const [srcHash, dstHash] = await Promise.all([fileHash(srcFile), fileHash(dstFile)]);
+  if (!srcHash || !dstHash) return false;
+  return srcHash === dstHash;
+}
+
+// ============================================
 // Collision Check
 // ============================================
 
@@ -145,7 +176,7 @@ async function isAiwgOwned(skillPath: string): Promise<boolean> {
  *          are returned (clean deployments are omitted).
  */
 export async function checkCollisions(options: CollisionCheckOptions): Promise<CollisionResult[]> {
-  const { platform, projectPath, skillNames, namespace = 'aiwg', skillsBaseDir } = options;
+  const { platform, projectPath, skillNames, namespace = 'aiwg', skillsBaseDir, sourceSkillsDir } = options;
 
   const platformBuiltins = new Set(PLATFORM_BUILTINS[platform] ?? []);
   const results: CollisionResult[] = [];
@@ -200,11 +231,20 @@ export async function checkCollisions(options: CollisionCheckOptions): Promise<C
     // Check 4: Ownership of existing skill
     const owned = await isAiwgOwned(targetPath);
     if (owned) {
+      // Check if content is actually unchanged — skip silently if identical
+      if (sourceSkillsDir) {
+        const sourceDir = path.join(sourceSkillsDir, skillName);
+        const unchanged = await skillContentUnchanged(sourceDir, targetPath);
+        if (unchanged) {
+          // Identical content — no collision, no output needed
+          continue;
+        }
+      }
       results.push({
         skillName,
         targetPath,
         severity: 'info',
-        reason: `'${skillName}' already deployed by AIWG — will overwrite`,
+        reason: `'${skillName}' updating`,
         blocksDeployment: false,
       });
     } else {
@@ -225,11 +265,17 @@ export async function checkCollisions(options: CollisionCheckOptions): Promise<C
  * Format collision results as a human-readable warning block.
  *
  * @param results - Collision results from `checkCollisions()`
+ * @param options - Formatting options
+ * @param options.verbose - When false, suppress info-level messages (AIWG → AIWG updates)
  * @returns Formatted string for CLI output, or empty string if no results
  */
-export function formatCollisionReport(results: CollisionResult[]): string {
+export function formatCollisionReport(
+  results: CollisionResult[],
+  options: { verbose?: boolean } = {}
+): string {
   if (results.length === 0) return '';
 
+  const { verbose = false } = options;
   const errors = results.filter((r) => r.severity === 'error');
   const warnings = results.filter((r) => r.severity === 'warn');
   const infos = results.filter((r) => r.severity === 'info');
@@ -254,8 +300,8 @@ export function formatCollisionReport(results: CollisionResult[]): string {
     lines.push('  Use --force to overwrite, or --skip-conflicts to skip these skills.');
   }
 
-  if (infos.length > 0 && errors.length === 0 && warnings.length === 0) {
-    // Only show info-level if no more serious issues
+  // Info-level (AIWG updating its own files) only shown in verbose mode
+  if (verbose && infos.length > 0 && errors.length === 0 && warnings.length === 0) {
     for (const r of infos) {
       lines.push(`  ℹ ${r.skillName}: ${r.reason}`);
     }
