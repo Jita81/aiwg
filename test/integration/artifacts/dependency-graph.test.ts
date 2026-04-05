@@ -60,11 +60,15 @@ describe('Artifact Dependency Graph (integration)', () => {
     if (!deps) return;
     // For every A→B upstream edge, B should have A in its downstream
     for (const [artifact, node] of Object.entries(deps)) {
-      for (const upstream of node.upstream) {
-        if (deps[upstream]) {
+      for (const upEdge of node.upstream) {
+        const upPath = typeof upEdge === 'string' ? upEdge : upEdge.path;
+        if (deps[upPath]) {
+          const downPaths = deps[upPath].downstream.map(
+            (e: string | { path: string }) => typeof e === 'string' ? e : e.path
+          );
           expect(
-            deps[upstream].downstream,
-            `${upstream} downstream should include ${artifact}`
+            downPaths,
+            `${upPath} downstream should include ${artifact}`
           ).toContain(artifact);
         }
       }
@@ -87,10 +91,13 @@ describe('Artifact Dependency Graph (integration)', () => {
     // For entries with dependents, verify they match downstream in the graph
     for (const [entryPath, entry] of Object.entries(entries)) {
       if (entry.dependents.length > 0) {
-        const graphDownstream = deps[entryPath]?.downstream ?? [];
+        const rawDownstream = deps[entryPath]?.downstream ?? [];
+        const downPaths = rawDownstream.map(
+          (e: string | { path: string }) => typeof e === 'string' ? e : e.path
+        );
         // Each dependent should appear in the graph downstream
         for (const dep of entry.dependents) {
-          expect(graphDownstream, `${entryPath} graph should have dependent ${dep}`).toContain(dep);
+          expect(downPaths, `${entryPath} graph should have dependent ${dep}`).toContain(dep);
         }
       }
     }

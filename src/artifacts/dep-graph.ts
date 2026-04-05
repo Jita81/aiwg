@@ -9,7 +9,8 @@
  * @tests @test/unit/artifacts/dep-graph.test.ts
  */
 
-import type { DependencyGraph, GraphType } from './types.js';
+import type { DependencyGraph, GraphType, TypedEdge } from './types.js';
+import { normalizeEdges } from './types.js';
 import { loadDependencyGraph, loadGraphIndexFile } from './index-reader.js';
 
 export interface DepsOptions {
@@ -17,6 +18,7 @@ export interface DepsOptions {
   depth?: number;
   json?: boolean;
   graph?: GraphType;
+  edgeType?: string;
 }
 
 interface TraversalResult {
@@ -27,6 +29,8 @@ interface TraversalResult {
 
 /**
  * Traverse the dependency graph in one direction
+ *
+ * @param edgeType - Optional filter: only follow edges of this type
  */
 function traverse(
   graph: DependencyGraph,
@@ -34,22 +38,27 @@ function traverse(
   direction: 'upstream' | 'downstream',
   maxDepth: number,
   visited: Set<string> = new Set(),
-  currentDepth: number = 0
+  currentDepth: number = 0,
+  edgeType?: string
 ): TraversalResult[] {
   if (currentDepth >= maxDepth) return [];
 
   const node = graph[startPath];
   if (!node) return [];
 
-  const neighbors = direction === 'upstream' ? node.upstream : node.downstream;
+  const rawEdges = direction === 'upstream' ? node.upstream : node.downstream;
+  // Normalize for backward compat (old indexes may have string arrays)
+  const edges: TypedEdge[] = normalizeEdges(rawEdges as (string | TypedEdge)[]);
+  // Filter by edge type if specified
+  const filtered = edgeType ? edges.filter(e => e.type === edgeType) : edges;
   const results: TraversalResult[] = [];
 
-  for (const neighbor of neighbors) {
-    if (visited.has(neighbor)) continue; // Cycle detection
-    visited.add(neighbor);
+  for (const edge of filtered) {
+    if (visited.has(edge.path)) continue; // Cycle detection
+    visited.add(edge.path);
 
-    const children = traverse(graph, neighbor, direction, maxDepth, visited, currentDepth + 1);
-    results.push({ path: neighbor, depth: currentDepth + 1, children });
+    const children = traverse(graph, edge.path, direction, maxDepth, visited, currentDepth + 1, edgeType);
+    results.push({ path: edge.path, depth: currentDepth + 1, children });
   }
 
   return results;
@@ -93,7 +102,7 @@ export async function showDeps(
   artifactPath: string,
   options: DepsOptions = {}
 ): Promise<void> {
-  const { direction = 'both', depth = 3, json = false, graph: graphType } = options;
+  const { direction = 'both', depth = 3, json = false, graph: graphType, edgeType } = options;
 
   let depGraph: DependencyGraph | null = null;
 
@@ -136,10 +145,10 @@ export async function showDeps(
   const showDownstream = direction === 'downstream' || direction === 'both';
 
   const upstreamResults = showUpstream
-    ? traverse(depGraph, artifactPath, 'upstream', depth, new Set([artifactPath]))
+    ? traverse(depGraph, artifactPath, 'upstream', depth, new Set([artifactPath]), 0, edgeType)
     : [];
   const downstreamResults = showDownstream
-    ? traverse(depGraph, artifactPath, 'downstream', depth, new Set([artifactPath]))
+    ? traverse(depGraph, artifactPath, 'downstream', depth, new Set([artifactPath]), 0, edgeType)
     : [];
 
   if (json) {

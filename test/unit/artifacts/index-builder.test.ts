@@ -10,7 +10,8 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import { parseFrontmatter, extractMentions, buildIndex } from '../../../src/artifacts/index-builder.js';
-import { INDEX_DIR, GRAPH_CONFIGS, loadUserGraphConfigs } from '../../../src/artifacts/types.js';
+import { INDEX_DIR, GRAPH_CONFIGS, loadUserGraphConfigs, normalizeEdge, normalizeEdges } from '../../../src/artifacts/types.js';
+import type { TypedEdge, DependencyGraph } from '../../../src/artifacts/types.js';
 
 describe('loadUserGraphConfigs', () => {
   let tmpDir: string;
@@ -336,6 +337,78 @@ type: use-case
       exitSpy.mockRestore();
       consoleSpy.mockRestore();
       logSpy.mockRestore();
+    });
+
+    it('should produce typed edges in dependency graph', async () => {
+      const aiwgDir = path.join(tmpDir, '.aiwg', 'requirements');
+      fs.mkdirSync(aiwgDir, { recursive: true });
+
+      fs.writeFileSync(path.join(aiwgDir, 'UC-001.md'), `---
+title: User Login
+type: use-case
+---
+# UC-001: User Login
+
+Users can log in.
+`);
+
+      fs.writeFileSync(path.join(aiwgDir, 'UC-002.md'), `---
+title: User Registration
+type: use-case
+---
+# UC-002: User Registration
+
+Depends on @.aiwg/requirements/UC-001.md
+`);
+
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      await buildIndex(tmpDir, { force: true });
+
+      consoleSpy.mockRestore();
+      consoleErrorSpy.mockRestore();
+
+      const indexDir = path.join(tmpDir, INDEX_DIR);
+      const deps: DependencyGraph = JSON.parse(
+        fs.readFileSync(path.join(indexDir, 'dependencies.json'), 'utf-8')
+      );
+
+      // UC-002 should have UC-001 as upstream with type "depends-on"
+      const uc002 = deps['.aiwg/requirements/UC-002.md'];
+      expect(uc002).toBeDefined();
+      expect(uc002.upstream).toHaveLength(1);
+      expect(uc002.upstream[0]).toEqual({ path: '.aiwg/requirements/UC-001.md', type: 'depends-on' });
+
+      // UC-001 should have UC-002 as downstream
+      const uc001 = deps['.aiwg/requirements/UC-001.md'];
+      expect(uc001).toBeDefined();
+      expect(uc001.downstream).toHaveLength(1);
+      expect(uc001.downstream[0]).toEqual({ path: '.aiwg/requirements/UC-002.md', type: 'depends-on' });
+    });
+  });
+
+  describe('normalizeEdge / normalizeEdges', () => {
+    it('should convert string to TypedEdge with depends-on type', () => {
+      const edge = normalizeEdge('path/to/file.md');
+      expect(edge).toEqual({ path: 'path/to/file.md', type: 'depends-on' });
+    });
+
+    it('should pass through TypedEdge unchanged', () => {
+      const input: TypedEdge = { path: 'ref.md', type: 'cites' };
+      expect(normalizeEdge(input)).toEqual(input);
+    });
+
+    it('should normalize mixed arrays', () => {
+      const mixed: (string | TypedEdge)[] = [
+        'old-string-edge.md',
+        { path: 'new-typed.md', type: 'cites' },
+      ];
+      const result = normalizeEdges(mixed);
+      expect(result).toEqual([
+        { path: 'old-string-edge.md', type: 'depends-on' },
+        { path: 'new-typed.md', type: 'cites' },
+      ]);
     });
   });
 });

@@ -76,15 +76,45 @@ export interface TagIndex {
 }
 
 /**
+ * A typed edge in the dependency graph
+ *
+ * @implements #724
+ */
+export interface TypedEdge {
+  /** Target artifact path */
+  path: string;
+  /** Relationship type (e.g., "depends-on", "cites", "cited-by", "summarizes") */
+  type: string;
+}
+
+/**
+ * Normalize a raw edge value to TypedEdge.
+ * Handles backward compatibility: plain strings become { path, type: "depends-on" }.
+ */
+export function normalizeEdge(edge: string | TypedEdge): TypedEdge {
+  if (typeof edge === 'string') return { path: edge, type: 'depends-on' };
+  return edge;
+}
+
+/**
+ * Normalize an array of raw edges to TypedEdge[].
+ */
+export function normalizeEdges(edges: (string | TypedEdge)[]): TypedEdge[] {
+  return edges.map(normalizeEdge);
+}
+
+/**
  * Dependency graph stored at .aiwg/.index/dependencies.json
+ *
+ * @implements #724
  */
 export interface DependencyGraph {
   /** Path -> upstream and downstream relationships */
   [path: string]: {
-    /** Artifacts this one depends on */
-    upstream: string[];
-    /** Artifacts that depend on this one */
-    downstream: string[];
+    /** Artifacts this one depends on (typed edges) */
+    upstream: TypedEdge[];
+    /** Artifacts that depend on this one (typed edges) */
+    downstream: TypedEdge[];
   };
 }
 
@@ -198,6 +228,28 @@ export type BuiltinGraphType = 'framework' | 'project' | 'codebase';
 export type GraphType = string;
 
 /**
+ * Edge extraction configuration for a graph
+ *
+ * @implements #722
+ */
+export interface EdgeExtractionConfig {
+  /** Parser to use for edge extraction */
+  parser: 'citation-sidecar';
+
+  /** Edge definitions to extract */
+  edges: Array<{
+    /** Edge type label (e.g., "cites", "cited-by") */
+    type: string;
+    /** Source field path (e.g., "frontmatter.ref") */
+    source: string;
+    /** Target field path (e.g., "outgoing-table.inducted-ref") */
+    target: string;
+    /** Skip rows where the target column is empty or dash */
+    skipEmpty?: boolean;
+  }>;
+}
+
+/**
  * Graph configuration — defines what each graph indexes
  */
 export interface GraphConfig {
@@ -215,6 +267,9 @@ export interface GraphConfig {
 
   /** Whether to include in default `aiwg index build` (no --graph flag) */
   defaultBuild: boolean;
+
+  /** Optional edge extraction configuration */
+  edgeExtraction?: EdgeExtractionConfig;
 }
 
 /**
@@ -292,6 +347,7 @@ export function loadUserGraphConfigs(cwd: string): string[] {
         extensions: Array.isArray(graphDef.extensions) ? graphDef.extensions as string[] : ['.md', '.yaml', '.json'],
         shared: graphDef.shared === true,
         defaultBuild: graphDef.defaultBuild !== false, // Default true for user graphs
+        edgeExtraction: graphDef.edgeExtraction as EdgeExtractionConfig | undefined,
       };
       loaded.push(name);
     }

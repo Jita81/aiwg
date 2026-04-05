@@ -14,8 +14,9 @@ import fs from 'fs';
 import path from 'path';
 import { createHash } from 'crypto';
 import { load as loadYaml } from 'js-yaml';
-import type { MetadataEntry, ArtifactIndex, TagIndex, DependencyGraph, GraphType } from './types.js';
+import type { MetadataEntry, ArtifactIndex, TagIndex, DependencyGraph, GraphType, TypedEdge } from './types.js';
 import { INDEX_VERSION, INDEX_DIR, PHASE_DIRECTORIES, GRAPH_CONFIGS, loadUserGraphConfigs } from './types.js';
+import { parseCitationSidecar, citationResultToEdges, buildRefToPathMap } from './citation-parser.js';
 import { writeIndexFile, resolveIndexDir, loadGraphIndexFile } from './index-reader.js';
 
 export interface BuildOptions {
@@ -276,18 +277,78 @@ export async function buildIndex(
         p => p === dep || p.endsWith(dep)
       );
       if (normalizedDep && normalizedDep !== entry.path) {
-        depGraph[entry.path].upstream.push(normalizedDep);
+        const upEdge: TypedEdge = { path: normalizedDep, type: 'depends-on' };
+        depGraph[entry.path].upstream.push(upEdge);
 
         if (!depGraph[normalizedDep]) {
           depGraph[normalizedDep] = { upstream: [], downstream: [] };
         }
-        depGraph[normalizedDep].downstream.push(entry.path);
+        const downEdge: TypedEdge = { path: entry.path, type: 'depends-on' };
+        depGraph[normalizedDep].downstream.push(downEdge);
 
         // Also update the dependents field on the target entry
         if (entries[normalizedDep]) {
           entries[normalizedDep].dependents.push(entry.path);
         }
       }
+    }
+  }
+
+  // Run citation sidecar edge extraction if configured
+  if (graphConfig?.edgeExtraction?.parser === 'citation-sidecar') {
+    // Build REF-XXX → path map from all entries with ref frontmatter
+    const entryFrontmatter = new Map<string, Record<string, unknown>>();
+    for (const entryPath of Object.keys(entries)) {
+      const fullPath = path.join(cwd, entryPath);
+      if (fs.existsSync(fullPath)) {
+        const content = fs.readFileSync(fullPath, 'utf-8');
+        const { data } = parseFrontmatter(content);
+        entryFrontmatter.set(entryPath, data);
+      }
+    }
+    const refToPath = buildRefToPathMap(entryFrontmatter);
+
+    // Parse each entry as a citation sidecar and extract edges
+    let citationEdgeCount = 0;
+    for (const entryPath of Object.keys(entries)) {
+      const fullPath = path.join(cwd, entryPath);
+      if (!fs.existsSync(fullPath)) continue;
+
+      const content = fs.readFileSync(fullPath, 'utf-8');
+      const result = parseCitationSidecar(content);
+      if (!result) continue;
+
+      const edges = citationResultToEdges(result, refToPath);
+
+      if (!depGraph[entryPath]) {
+        depGraph[entryPath] = { upstream: [], downstream: [] };
+      }
+
+      // Add upstream "cites" edges
+      for (const edge of edges.upstream) {
+        depGraph[entryPath].upstream.push(edge);
+        // Add reciprocal downstream edge on the target
+        if (!depGraph[edge.path]) {
+          depGraph[edge.path] = { upstream: [], downstream: [] };
+        }
+        depGraph[edge.path].downstream.push({ path: entryPath, type: 'cites' });
+        citationEdgeCount++;
+      }
+
+      // Add downstream "cited-by" edges
+      for (const edge of edges.downstream) {
+        depGraph[entryPath].downstream.push(edge);
+        // Add reciprocal upstream edge on the source
+        if (!depGraph[edge.path]) {
+          depGraph[edge.path] = { upstream: [], downstream: [] };
+        }
+        depGraph[edge.path].upstream.push({ path: entryPath, type: 'cited-by' });
+        citationEdgeCount++;
+      }
+    }
+
+    if (verbose && citationEdgeCount > 0) {
+      console.log(`  citation edges: ${citationEdgeCount}`);
     }
   }
 

@@ -24,18 +24,24 @@ describe('Artifact Dependency Graph', () => {
     const indexDir = path.join(tmpDir, INDEX_DIR);
     fs.mkdirSync(indexDir, { recursive: true });
 
-    // Create mock dependency graph
+    // Create mock dependency graph with typed edges
     const graph: DependencyGraph = {
       '.aiwg/requirements/UC-001.md': {
         upstream: [],
-        downstream: ['.aiwg/architecture/adr-001.md', '.aiwg/testing/tp-001.md'],
+        downstream: [
+          { path: '.aiwg/architecture/adr-001.md', type: 'depends-on' },
+          { path: '.aiwg/testing/tp-001.md', type: 'depends-on' },
+        ],
       },
       '.aiwg/architecture/adr-001.md': {
-        upstream: ['.aiwg/requirements/UC-001.md'],
-        downstream: ['.aiwg/testing/tp-001.md'],
+        upstream: [{ path: '.aiwg/requirements/UC-001.md', type: 'depends-on' }],
+        downstream: [{ path: '.aiwg/testing/tp-001.md', type: 'depends-on' }],
       },
       '.aiwg/testing/tp-001.md': {
-        upstream: ['.aiwg/requirements/UC-001.md', '.aiwg/architecture/adr-001.md'],
+        upstream: [
+          { path: '.aiwg/requirements/UC-001.md', type: 'depends-on' },
+          { path: '.aiwg/architecture/adr-001.md', type: 'depends-on' },
+        ],
         downstream: [],
       },
       '.aiwg/risks/risk-register.md': {

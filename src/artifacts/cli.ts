@@ -57,14 +57,24 @@ export async function main(args: string[]): Promise<void> {
       await handleStats(subcommandArgs);
       break;
 
+    case 'neighbors':
+      await handleNeighbors(subcommandArgs);
+      break;
+
+    case 'set':
+      await handleSetQuery(subcommandArgs);
+      break;
+
     case undefined:
       console.error('Error: Index subcommand required');
       console.log('');
       console.log('Available subcommands:');
-      console.log('  build   Build/rebuild the artifact index');
-      console.log('  query   Search artifacts by keyword, type, phase, tags');
-      console.log('  deps    Show artifact dependency graph');
-      console.log('  stats   Show index statistics');
+      console.log('  build      Build/rebuild the artifact index');
+      console.log('  query      Search artifacts by keyword, type, phase, tags');
+      console.log('  deps       Show artifact dependency graph');
+      console.log('  stats      Show index statistics');
+      console.log('  neighbors  Get neighbors of a node in a graph');
+      console.log('  set        Set operations (intersection, union, difference) on neighbor sets');
       console.log('');
       console.log('Options:');
       console.log('  --graph <name>  Target a specific graph (framework, project, codebase, or user-defined)');
@@ -79,12 +89,14 @@ export async function main(args: string[]): Promise<void> {
       console.log('  aiwg index deps .aiwg/requirements/UC-001.md');
       console.log('  aiwg index stats --json');
       console.log('  aiwg index stats --graph project');
+      console.log('  aiwg index neighbors --graph citation-network --node REF-008 --direction in --edge-type cites');
+      console.log('  aiwg index set --graph citation-network --op intersection --node-a REF-008 --node-b REF-016 --direction in');
       process.exit(1);
       break;
 
     default:
       console.error(`Error: Unknown index subcommand '${subcommand}'`);
-      console.log('Available: build, query, deps, stats');
+      console.log('Available: build, query, deps, stats, neighbors, set');
       process.exit(1);
   }
 }
@@ -247,9 +259,15 @@ async function handleDeps(args: string[]): Promise<void> {
     depth = parseInt(args[depthIdx + 1], 10);
   }
 
+  let edgeType: string | undefined;
+  const etIdx = args.indexOf('--edge-type');
+  if (etIdx !== -1 && etIdx + 1 < args.length) {
+    edgeType = args[etIdx + 1];
+  }
+
   const graph = parseGraphFlag(args);
 
-  await showDeps(cwd, artifactPath, { direction, depth, json, graph });
+  await showDeps(cwd, artifactPath, { direction, depth, json, graph, edgeType });
 }
 
 /**
@@ -266,4 +284,159 @@ async function handleStats(args: string[]): Promise<void> {
   const graph = parseGraphFlag(args);
 
   await showStats(cwd, { json, graph });
+}
+
+/**
+ * Handle 'index neighbors' command
+ *
+ * @implements #725
+ */
+async function handleNeighbors(args: string[]): Promise<void> {
+  if (args.includes('--help') || args.includes('-h')) {
+    console.log('Usage: aiwg index neighbors --graph <name> --node <id> [options]');
+    console.log('');
+    console.log('Options:');
+    console.log('  --graph <name>      Graph to query (required)');
+    console.log('  --node <id>         Node path or REF-XXX identifier (required)');
+    console.log('  --direction <dir>   in (upstream), out (downstream), or both (default: both)');
+    console.log('  --edge-type <type>  Filter by edge type (e.g., "cites", "depends-on")');
+    console.log('  --json              Output as JSON');
+    console.log('');
+    console.log('Examples:');
+    console.log('  aiwg index neighbors --graph citation-network --node REF-008 --direction in --edge-type cites');
+    console.log('  aiwg index neighbors --graph project --node .aiwg/requirements/UC-001.md --json');
+    return;
+  }
+
+  const { showNeighbors } = await import('./graph-query.js');
+  const cwd = process.cwd();
+
+  const graph = parseGraphFlag(args);
+  if (!graph) {
+    console.error('Error: --graph is required for neighbors command');
+    process.exit(1);
+  }
+
+  let node: string | undefined;
+  const nodeIdx = args.indexOf('--node');
+  if (nodeIdx !== -1 && nodeIdx + 1 < args.length) {
+    node = args[nodeIdx + 1];
+  }
+  if (!node) {
+    // Try first positional arg
+    node = args.find(a => !a.startsWith('--') && args.indexOf(a) !== args.indexOf('--graph') + 1);
+  }
+  if (!node) {
+    console.error('Error: --node is required for neighbors command');
+    process.exit(1);
+  }
+
+  let direction: 'in' | 'out' | 'both' = 'both';
+  const dirIdx = args.indexOf('--direction');
+  if (dirIdx !== -1 && dirIdx + 1 < args.length) {
+    const val = args[dirIdx + 1];
+    if (val === 'in' || val === 'out' || val === 'both') {
+      direction = val;
+    }
+  }
+
+  let edgeType: string | undefined;
+  const etIdx = args.indexOf('--edge-type');
+  if (etIdx !== -1 && etIdx + 1 < args.length) {
+    edgeType = args[etIdx + 1];
+  }
+
+  const json = args.includes('--json');
+
+  await showNeighbors(cwd, { graph, node, direction, edgeType, json });
+}
+
+/**
+ * Handle 'index set' command
+ *
+ * @implements #725
+ */
+async function handleSetQuery(args: string[]): Promise<void> {
+  if (args.includes('--help') || args.includes('-h')) {
+    console.log('Usage: aiwg index set --graph <name> --op <operation> --node-a <id> --node-b <id> [options]');
+    console.log('');
+    console.log('Operations:');
+    console.log('  intersection   Nodes in both neighbor sets');
+    console.log('  union          Nodes in either neighbor set');
+    console.log('  difference     Nodes in A but not in B');
+    console.log('');
+    console.log('Options:');
+    console.log('  --graph <name>      Graph to query (required)');
+    console.log('  --op <operation>    Set operation (required)');
+    console.log('  --node-a <id>       First node (required)');
+    console.log('  --node-b <id>       Second node (required)');
+    console.log('  --direction <dir>   in (upstream) or out (downstream) (default: in)');
+    console.log('  --edge-type <type>  Filter by edge type');
+    console.log('  --json              Output as JSON');
+    console.log('');
+    console.log('Examples:');
+    console.log('  # Papers that cited both REF-008 and REF-016');
+    console.log('  aiwg index set --graph citation-network --op intersection --node-a REF-008 --node-b REF-016 --direction in');
+    console.log('');
+    console.log('  # Papers cited by REF-004 but not cited by REF-001');
+    console.log('  aiwg index set --graph citation-network --op difference --node-a REF-004 --node-b REF-001 --direction out');
+    return;
+  }
+
+  const { executeSetQuery } = await import('./graph-query.js');
+  const cwd = process.cwd();
+
+  const graph = parseGraphFlag(args);
+  if (!graph) {
+    console.error('Error: --graph is required for set command');
+    process.exit(1);
+  }
+
+  let op: string | undefined;
+  const opIdx = args.indexOf('--op');
+  if (opIdx !== -1 && opIdx + 1 < args.length) {
+    op = args[opIdx + 1];
+  }
+  if (!op || !['intersection', 'union', 'difference'].includes(op)) {
+    console.error('Error: --op is required (intersection, union, difference)');
+    process.exit(1);
+  }
+
+  let nodeA: string | undefined;
+  const naIdx = args.indexOf('--node-a');
+  if (naIdx !== -1 && naIdx + 1 < args.length) nodeA = args[naIdx + 1];
+
+  let nodeB: string | undefined;
+  const nbIdx = args.indexOf('--node-b');
+  if (nbIdx !== -1 && nbIdx + 1 < args.length) nodeB = args[nbIdx + 1];
+
+  if (!nodeA || !nodeB) {
+    console.error('Error: --node-a and --node-b are required');
+    process.exit(1);
+  }
+
+  let direction: 'in' | 'out' = 'in';
+  const dirIdx = args.indexOf('--direction');
+  if (dirIdx !== -1 && dirIdx + 1 < args.length) {
+    const val = args[dirIdx + 1];
+    if (val === 'in' || val === 'out') direction = val;
+  }
+
+  let edgeType: string | undefined;
+  const etIdx = args.indexOf('--edge-type');
+  if (etIdx !== -1 && etIdx + 1 < args.length) {
+    edgeType = args[etIdx + 1];
+  }
+
+  const json = args.includes('--json');
+
+  await executeSetQuery(cwd, {
+    graph,
+    op: op as 'intersection' | 'union' | 'difference',
+    nodeA,
+    nodeB,
+    direction,
+    edgeType,
+    json,
+  });
 }
