@@ -1,20 +1,18 @@
 /**
  * AIWG Dashboard root application.
  *
- * Layout:
- *   ┌──────────────────────────────────────────┐
- *   │  Header — nav tabs: Terminal | Missions   │
- *   ├──────────────────────────────────────────┤
- *   │  Main area (tab content)                  │
- *   └──────────────────────────────────────────┘
+ * Tabs: Terminal | Missions | Telemetry | Memory
  */
 
 import { useState } from 'react';
 import { Terminal } from '../features/terminal/Terminal.js';
 import { SessionSelector } from '../features/terminal/SessionSelector.js';
+import { MissionControl } from '../features/missions/MissionControl.js';
+import { TelemetryDashboard } from '../features/telemetry/TelemetryDashboard.js';
+import { MemoryPanel } from '../features/memory/MemoryPanel.js';
 import styles from './App.module.css';
 
-type Tab = 'terminal' | 'missions';
+type Tab = 'terminal' | 'missions' | 'telemetry' | 'memory';
 
 export function App() {
   const [tab, setTab] = useState<Tab>('terminal');
@@ -28,22 +26,17 @@ export function App() {
           <span aria-hidden="true">⚙</span> AIWG Dashboard
         </h1>
         <nav className={styles.nav} aria-label="Dashboard tabs">
-          <button
-            type="button"
-            className={tab === 'terminal' ? styles.active : ''}
-            onClick={() => setTab('terminal')}
-            aria-current={tab === 'terminal' ? 'page' : undefined}
-          >
-            Terminal
-          </button>
-          <button
-            type="button"
-            className={tab === 'missions' ? styles.active : ''}
-            onClick={() => setTab('missions')}
-            aria-current={tab === 'missions' ? 'page' : undefined}
-          >
-            Missions
-          </button>
+          {(['terminal', 'missions', 'telemetry', 'memory'] as const).map((t) => (
+            <button
+              key={t}
+              type="button"
+              className={tab === t ? styles.active : ''}
+              onClick={() => setTab(t)}
+              aria-current={tab === t ? 'page' : undefined}
+            >
+              {t.charAt(0).toUpperCase() + t.slice(1)}
+            </button>
+          ))}
         </nav>
         {tab === 'terminal' && (
           <div className={styles.sessionControl}>
@@ -56,12 +49,9 @@ export function App() {
         {tab === 'terminal' && (
           <Terminal key={sessionId} sessionId={sessionId} readOnly={readOnly} />
         )}
-        {tab === 'missions' && (
-          <section className={styles.placeholder} aria-label="Mission Control">
-            <h2>Mission Control</h2>
-            <p>Mission Control panel coming in #715.</p>
-          </section>
-        )}
+        {tab === 'missions' && <MissionControl />}
+        {tab === 'telemetry' && <TelemetryDashboard sessionId={sessionId} />}
+        {tab === 'memory' && <MemoryPanel />}
       </main>
     </div>
   );

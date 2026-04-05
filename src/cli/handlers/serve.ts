@@ -12,6 +12,7 @@
 import path from 'path';
 import type { CommandHandler, HandlerContext, HandlerResult } from './types.js';
 import { createPtyWsHandler, registry as ptyRegistry } from '../../serve/pty-bridge.js';
+import { telemetryStore, createEvent } from '../../serve/telemetry.js';
 
 const DEFAULT_PORT = 7337;
 const DEFAULT_HOST = '127.0.0.1';
@@ -103,8 +104,40 @@ async function startServer(opts: {
     const sessions = [...ptyRegistry['sessions'].keys()];
     return c.json({ sessions });
   });
-  app.get('/api/missions', (c: any) => c.json({ missions: [] }));
-  app.get('/api/telemetry', (c: any) => c.json({ events: [] }));
+  // Mission Control API stubs (#715)
+  app.get('/api/missions', (c: any) => c.json({ missions: [], sessions: [] }));
+  app.get('/api/sessions/:id/missions', (c: any) => c.json({ missions: [] }));
+  app.post('/api/sessions/:id/dispatch', async (c: any) => {
+    const { task = '', completion = '' } = await c.req.json().catch(() => ({}));
+    const sessionId: string = c.req.param('id');
+    const missionId = `mission-${Date.now()}`;
+    telemetryStore.ingest(createEvent('mission.dispatch', sessionId, { task, completion }, missionId));
+    return c.json({ id: missionId, task, completion, status: 'queued' }, 202);
+  });
+  app.put('/api/missions/:id/pause', (c: any) => c.json({ ok: true }));
+  app.put('/api/missions/:id/resume', (c: any) => c.json({ ok: true }));
+  app.delete('/api/missions/:id', (c: any) => c.json({ ok: true }));
+
+  // Telemetry API (#716)
+  app.get('/api/telemetry', (c: any) => {
+    const sid = c.req.query('sessionId');
+    const limit = parseInt(c.req.query('limit') ?? '100', 10);
+    const events = telemetryStore.query(sid || 'default', { limit });
+    return c.json({ events });
+  });
+  app.get('/api/telemetry/metrics', (c: any) => {
+    const sid = c.req.query('sessionId') || 'default';
+    return c.json(telemetryStore.metrics(sid));
+  });
+  app.post('/api/telemetry', async (c: any) => {
+    try {
+      const body = await c.req.json();
+      telemetryStore.ingest(body);
+      return c.json({ ok: true }, 201);
+    } catch {
+      return c.json({ error: 'Invalid event' }, 400);
+    }
+  });
 
   if (!opts.readOnly) {
     app.post('/api/sessions', (c: any) => c.json({ id: null, error: 'Use /ws/pty/:sessionId to start a PTY session' }, 501));

@@ -1,0 +1,309 @@
+.panel {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  height: 100%;
+  gap: 0;
+  overflow: hidden;
+}
+
+/* ── Sidebar ─────────────────────────────── */
+
+.sidebar {
+  background: #111;
+  border-right: 1px solid #2a2a2a;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.sidebarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px 6px;
+  border-bottom: 1px solid #222;
+}
+
+.sidebarHeader h2 {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.sidebarHeader button {
+  background: #1a2a4a;
+  border: 1px solid #2a4a7a;
+  border-radius: 4px;
+  color: #8ab8ff;
+  cursor: pointer;
+  font-size: 11px;
+  padding: 2px 8px;
+}
+
+.sidebarHeader button:hover,
+.sidebarHeader button:focus-visible {
+  background: #2a3a5a;
+  outline: 2px solid #5a8fff;
+  outline-offset: 2px;
+}
+
+.sessionItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  gap: 8px;
+  list-style: none;
+  padding: 8px 12px;
+  border-bottom: 1px solid #1a1a1a;
+  transition: background 0.1s;
+}
+
+.sessionItem:hover { background: #1a1a1a; }
+
+.sessionItem.selected { background: #162030; }
+
+.sessionItem:focus-visible {
+  outline: 2px solid #5a8fff;
+  outline-offset: -2px;
+}
+
+.sessionName { font-size: 12px; color: #ccc; flex: 1; word-break: break-all; }
+
+.activeIndicator { color: #00ff88; font-size: 10px; }
+.stoppedIndicator { color: #666; font-size: 10px; }
+
+/* ── Main ──────────────────────────────── */
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.errorBanner {
+  background: #2a0a0a;
+  border: 1px solid #8a2020;
+  border-radius: 4px;
+  color: #ff8080;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  font-size: 12px;
+  gap: 8px;
+  padding: 8px 12px;
+}
+
+.errorBanner button {
+  background: transparent;
+  border: none;
+  color: #ff8080;
+  cursor: pointer;
+  flex-shrink: 0;
+  font-size: 14px;
+  padding: 0 4px;
+}
+
+/* ── Dispatch form ──────────────────────── */
+
+.dispatchForm {
+  background: #111;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+}
+
+.dispatchForm h3 {
+  font-size: 13px;
+  font-weight: 600;
+  color: #aaa;
+  margin: 0 0 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.dispatchForm label {
+  color: #888;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.dispatchForm textarea,
+.dispatchForm input {
+  background: #0d0d0d;
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 6px 8px;
+  resize: vertical;
+  width: 100%;
+}
+
+.dispatchForm textarea:focus,
+.dispatchForm input:focus {
+  outline: 2px solid #5a8fff;
+  outline-offset: -1px;
+  border-color: #5a8fff;
+}
+
+.dispatchForm button {
+  align-self: flex-start;
+  background: #1a3a7a;
+  border: 1px solid #2a5aaa;
+  border-radius: 4px;
+  color: #8ab8ff;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 16px;
+  transition: background 0.15s;
+}
+
+.dispatchForm button:hover:not(:disabled),
+.dispatchForm button:focus-visible {
+  background: #2a4a8a;
+  outline: 2px solid #5a8fff;
+  outline-offset: 2px;
+}
+
+.dispatchForm button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Mission grid ───────────────────────── */
+
+.missionGrid h3 {
+  font-size: 13px;
+  font-weight: 600;
+  color: #aaa;
+  margin: 0 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.missionCount { color: #555; margin-left: 6px; font-weight: 400; }
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.card {
+  background: #111;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.badge {
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  text-transform: uppercase;
+}
+
+.badgeQueued   { background: #1a1a2a; color: #8888ff; }
+.badgeRunning  { background: #002a00; color: #00ff88; }
+.badgePaused   { background: #2a1a00; color: #ffaa00; }
+.badgeComplete { background: #001a00; color: #00cc66; }
+.badgeAborted  { background: #1a0000; color: #ff6060; }
+.badgeFailed   { background: #2a0000; color: #ff4444; }
+
+.gateIndicator { font-size: 18px; cursor: default; }
+
+.taskText {
+  color: #ccc;
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 0;
+  word-break: break-word;
+}
+
+.metrics {
+  display: flex;
+  gap: 12px;
+  color: #666;
+  font-size: 11px;
+}
+
+.progressBar {
+  background: #2a2a2a;
+  border-radius: 3px;
+  height: 4px;
+  overflow: hidden;
+}
+
+.progressFill {
+  background: #5a8fff;
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+
+.lastAction {
+  color: #555;
+  font-size: 11px;
+  font-style: italic;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cardActions {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.cardActions button {
+  background: #1a1a1a;
+  border: 1px solid #3a3a3a;
+  border-radius: 4px;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 11px;
+  padding: 3px 10px;
+}
+
+.cardActions button:hover,
+.cardActions button:focus-visible {
+  background: #2a2a2a;
+  color: #e0e0e0;
+  outline: 2px solid #5a8fff;
+  outline-offset: 2px;
+}
+
+.abortBtn { color: #ff8080 !important; border-color: #5a2020 !important; }
+.abortBtn:hover { background: #2a1010 !important; }
+
+/* ── Shared ─────────────────────────────── */
+
+.empty { color: #444; font-size: 12px; font-style: italic; padding: 8px 0; }

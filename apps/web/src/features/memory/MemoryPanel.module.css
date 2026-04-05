@@ -1,0 +1,248 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.header h2 {
+  color: #aaa;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.installPrompt {
+  background: #1a1a00;
+  border: 1px solid #4a4a00;
+  border-radius: 4px;
+  color: #cccc00;
+  font-size: 11px;
+  padding: 6px 10px;
+  line-height: 1.6;
+}
+
+.installPrompt code {
+  background: #111;
+  border-radius: 3px;
+  padding: 1px 4px;
+}
+
+.badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #001a00;
+}
+
+/* ── Search ─────────────────────────────── */
+
+.searchRow { display: flex; }
+
+.searchInput {
+  background: #0d0d0d;
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-size: 13px;
+  padding: 6px 10px;
+  width: 100%;
+}
+
+.searchInput:focus {
+  border-color: #5a8fff;
+  outline: 2px solid #5a8fff;
+  outline-offset: -1px;
+}
+
+/* ── New Note form ──────────────────────── */
+
+.newNote {
+  background: #111;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+}
+
+.newNote h3 {
+  color: #aaa;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  margin: 0 0 4px;
+  text-transform: uppercase;
+}
+
+.newNote label {
+  color: #666;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.newNote input,
+.newNote textarea {
+  background: #0d0d0d;
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 6px 8px;
+  resize: vertical;
+  width: 100%;
+}
+
+.newNote input:focus,
+.newNote textarea:focus {
+  border-color: #5a8fff;
+  outline: 2px solid #5a8fff;
+  outline-offset: -1px;
+}
+
+.newNote button {
+  align-self: flex-start;
+  background: #1a3a7a;
+  border: 1px solid #2a5aaa;
+  border-radius: 4px;
+  color: #8ab8ff;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 16px;
+}
+
+.newNote button:hover:not(:disabled),
+.newNote button:focus-visible {
+  background: #2a4a8a;
+  outline: 2px solid #5a8fff;
+  outline-offset: 2px;
+}
+
+.newNote button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Note list ──────────────────────────── */
+
+.noteList h3 {
+  color: #aaa;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.noteList ul {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.noteCard {
+  background: #111;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.noteHeader {
+  align-items: flex-start;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.noteTitle {
+  color: #e0e0e0;
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0;
+  word-break: break-word;
+}
+
+.deleteBtn {
+  background: transparent;
+  border: none;
+  color: #555;
+  cursor: pointer;
+  flex-shrink: 0;
+  font-size: 12px;
+  padding: 0 4px;
+}
+
+.deleteBtn:hover,
+.deleteBtn:focus-visible {
+  color: #ff6060;
+  outline: 2px solid #5a8fff;
+  outline-offset: 2px;
+}
+
+.noteBody {
+  color: #888;
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.noteMeta {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: #555;
+  font-size: 11px;
+}
+
+.tagList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tag {
+  background: #1a1a2a;
+  border: 1px solid #3a3a5a;
+  border-radius: 3px;
+  color: #8888cc;
+  font-size: 10px;
+  padding: 1px 6px;
+}
+
+.empty { color: #444; font-size: 12px; font-style: italic; }
+
+.srOnly {
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
