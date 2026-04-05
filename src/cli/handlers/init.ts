@@ -21,6 +21,7 @@ import {
   writeAiwgConfig,
   emptyConfig,
   migrateLegacyRegistry,
+  populateDeployedTo,
   VALID_PROVIDERS,
   getConfigPath,
 } from '../../config/aiwg-config.js';
@@ -176,6 +177,9 @@ export const initHandler: CommandHandler = {
 
     // Migrate legacy registry.json entries
     config = await migrateLegacyRegistry(projectDir, config);
+
+    // Populate deployedTo from disk for migrated entries with empty deployedTo (#721)
+    config = await populateDeployedTo(config, projectDir);
 
     // Write
     await writeAiwgConfig(projectDir, config);

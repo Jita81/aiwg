@@ -21,7 +21,8 @@ import { registerDeployedExtensions } from '../../extensions/deployment-registra
 import { registerCliCommands, registerHooks } from '../cli-extension-loader.js';
 import { translateSkillsToCommands, providerNeedsCommands } from '../../plugin/skill-command-translator.js';
 import * as ui from '../ui.js';
-import { readAiwgConfig, writeAiwgConfig, updateInstalled, hashManifest } from '../../config/aiwg-config.js';
+import { readAiwgConfig, writeAiwgConfig, updateInstalled, hashManifest, emptyConfig } from '../../config/aiwg-config.js';
+import { initHandler } from './init.js';
 import {
   checkCollisions,
   formatCollisionReport,
@@ -551,7 +552,31 @@ export class UseHandler implements CommandHandler {
 
     // Read project config for config-first resolution (#621)
     const projectDir = ctx.cwd || process.cwd();
-    const config = await readAiwgConfig(projectDir);
+    let config = await readAiwgConfig(projectDir);
+
+    // Auto-init when no config found (#720)
+    // Check early for --provider/--platform and --providers flags
+    const _providerFlagIdx = remainingArgs.findIndex(a => a === '--provider' || a === '--platform');
+    const _hasExplicitProvider = _providerFlagIdx >= 0 && !!remainingArgs[_providerFlagIdx + 1];
+    const _providersFlagIdx = remainingArgs.findIndex(a => a === '--providers');
+    const _providersValue = _providersFlagIdx >= 0 ? remainingArgs[_providersFlagIdx + 1] : null;
+
+    if (!config) {
+      if (_providersValue) {
+        // --providers shorthand: write config without wizard
+        const pList = _providersValue === 'default'
+          ? ['claude']
+          : _providersValue.split(',').map(s => s.trim()).filter(Boolean);
+        config = emptyConfig(pList.length > 0 ? pList : ['claude']);
+        await writeAiwgConfig(projectDir, config);
+      } else if (!_hasExplicitProvider && process.stdin.isTTY) {
+        // Interactive terminal with no config → run init wizard inline (#720)
+        const initResult = await initHandler.execute({ ...ctx, args: [] });
+        if (initResult.exitCode !== 0) return initResult;
+        config = await readAiwgConfig(projectDir);
+      }
+      // Non-interactive (CI/pipes) or explicit provider: fall through and warn below
+    }
 
     // Zero-arg form: `aiwg use` with no framework → redeploy all installed to all providers
     if (!framework) {
@@ -593,9 +618,6 @@ export class UseHandler implements CommandHandler {
       const providerIdx = remainingArgs.findIndex(a => a === '--provider' || a === '--platform');
       const explicitAddonProvider = providerIdx >= 0 && remainingArgs[providerIdx + 1] ? remainingArgs[providerIdx + 1] : null;
       const provider = explicitAddonProvider ?? (config?.providers?.[0] ?? 'claude');
-      if (!explicitAddonProvider && !config) {
-        ui.warn("No .aiwg/aiwg.config found. Run 'aiwg init' to configure providers.");
-      }
       const targetIdx = remainingArgs.findIndex(a => a === '--target');
       const target = targetIdx >= 0 && remainingArgs[targetIdx + 1] ? remainingArgs[targetIdx + 1] : process.cwd();
 
@@ -839,6 +861,15 @@ export class UseHandler implements CommandHandler {
       if (counts.behaviors > 0) ui.deployCount('Behaviors', counts.behaviors);
       ui.blank();
       printNextSteps(framework as Framework, provider);
+
+      // Append version confirmation line (#719)
+      try {
+        const versionInfo = await getVersionInfo();
+        ui.blank();
+        ui.dim(`  AIWG v${versionInfo.version} — git.integrolabs.net/roctinam/aiwg`);
+      } catch {
+        // Graceful fallback: omit version line if versionInfo unavailable
+      }
     }
 
     // Deploy CI workflow files when --ci-hooks-enabled is set (#661)

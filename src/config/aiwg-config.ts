@@ -9,9 +9,9 @@
  * @implements #621
  */
 
-import { readFile, writeFile, mkdir, access } from 'fs/promises';
+import { readFile, writeFile, mkdir, access, readdir } from 'fs/promises';
 import { createHash } from 'crypto';
-import { resolve, join } from 'path';
+import { resolve, join, isAbsolute } from 'path';
 
 const CONFIG_FILENAME = 'aiwg.config';
 const AIWG_DIR = '.aiwg';
@@ -179,6 +179,84 @@ export async function hashManifest(manifestPath: string): Promise<string | undef
   } catch {
     return undefined;
   }
+}
+
+/**
+ * Provider → relative deployment directories (project-relative unless absolute).
+ * Mirrors PROVIDER_PATHS in use.ts; kept here to avoid circular imports.
+ */
+const PROVIDER_DEPLOY_DIRS: Record<string, { agents: string; skills: string; commands: string; rules: string }> = {
+  claude:   { agents: '.claude/agents',       skills: '.claude/skills',      commands: '.claude/commands',    rules: '.claude/rules'          },
+  copilot:  { agents: '.github/agents',       skills: '.github/skills',      commands: '.github/commands',   rules: '.github/copilot-rules'   },
+  cursor:   { agents: '.cursor/agents',       skills: '.cursor/skills',      commands: '.cursor/commands',    rules: '.cursor/rules'           },
+  opencode: { agents: '',                     skills: '.opencode/skill',     commands: '',                   rules: '.opencode/rule'           },
+  warp:     { agents: '.warp/agents',         skills: '.warp/skills',        commands: '.warp/commands',      rules: '.warp/rules'             },
+  windsurf: { agents: '.windsurf/agents',     skills: '.windsurf/skills',    commands: '.windsurf/workflows', rules: '.windsurf/rules'         },
+  factory:  { agents: '.factory/droids',      skills: '.factory/skills',     commands: '.factory/commands',   rules: '.factory/rules'          },
+  codex:    { agents: '.codex/agents',        skills: '.codex/skills',       commands: '.codex/commands',     rules: '.codex/rules'            },
+};
+
+/**
+ * Count .md files or subdirectories in a deployment directory.
+ * Returns 0 if the directory does not exist.
+ */
+async function countDeployedInDir(
+  projectDir: string,
+  relOrAbsDir: string,
+  mode: 'md' | 'dirs'
+): Promise<number> {
+  if (!relOrAbsDir) return 0;
+  const dir = isAbsolute(relOrAbsDir) ? relOrAbsDir : resolve(projectDir, relOrAbsDir);
+  try {
+    const entries = await readdir(dir, { withFileTypes: true });
+    if (mode === 'md') return entries.filter(e => e.isFile() && e.name.endsWith('.md')).length;
+    return entries.filter(e => e.isDirectory()).length;
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * Scan actual deployment directories and populate `deployedTo` for any
+ * `installed` entries that have an empty `deployedTo` map.
+ *
+ * Called by `aiwg init` when migrating a project that already has frameworks
+ * deployed but whose config was created before deployment-tracking was added.
+ *
+ * @implements #721
+ */
+export async function populateDeployedTo(
+  config: AiwgConfig,
+  projectDir: string
+): Promise<AiwgConfig> {
+  const entriesNeedingPopulation = Object.entries(config.installed).filter(
+    ([, entry]) => Object.keys(entry.deployedTo).length === 0
+  );
+  if (entriesNeedingPopulation.length === 0) return config;
+
+  for (const provider of config.providers) {
+    const dirs = PROVIDER_DEPLOY_DIRS[provider];
+    if (!dirs) continue;
+
+    const counts: DeployedArtifactCounts = {
+      agents:   await countDeployedInDir(projectDir, dirs.agents,   'md'),
+      commands: await countDeployedInDir(projectDir, dirs.commands, 'md'),
+      skills:   await countDeployedInDir(projectDir, dirs.skills,   'dirs'),
+      rules:    await countDeployedInDir(projectDir, dirs.rules,    'md'),
+    };
+
+    // Only populate if at least one artifact type is present
+    if (counts.agents + counts.commands + counts.skills + counts.rules === 0) continue;
+
+    for (const [name, entry] of entriesNeedingPopulation) {
+      if (Object.keys(entry.deployedTo).length === 0) {
+        entry.deployedTo[provider] = counts;
+        config.installed[name] = entry;
+      }
+    }
+  }
+
+  return config;
 }
 
 /**

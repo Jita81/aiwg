@@ -1,0 +1,333 @@
+/* Onboarding overlay — full-viewport modal over the dashboard */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 16px;
+}
+
+.container {
+  width: 100%;
+  max-width: 600px;
+}
+
+/* ── Card (welcome, builder, complete) ───── */
+
+.card {
+  background: #111;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 32px;
+  text-align: center;
+}
+
+.logo {
+  font-size: 40px;
+  line-height: 1;
+}
+
+.celebration {
+  font-size: 48px;
+  line-height: 1;
+}
+
+.heading {
+  font-size: 22px;
+  font-weight: 700;
+  color: #e0e0e0;
+  margin: 0;
+}
+
+.tagline {
+  color: #888;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ── Buttons ──────────────────────────── */
+
+.primaryBtn {
+  background: #1a3a7a;
+  border: 1px solid #2a5aaa;
+  border-radius: 6px;
+  color: #8ab8ff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 24px;
+  transition: background 0.15s;
+  width: 100%;
+}
+
+.primaryBtn:hover:not(:disabled),
+.primaryBtn:focus-visible {
+  background: #2a4a8a;
+  outline: 2px solid #5a8fff;
+  outline-offset: 2px;
+}
+
+.primaryBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.secondaryBtn {
+  background: #1a1a1a;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 20px;
+  transition: background 0.15s;
+  width: 100%;
+}
+
+.secondaryBtn:hover,
+.secondaryBtn:focus-visible {
+  background: #2a2a2a;
+  color: #e0e0e0;
+  outline: 2px solid #5a8fff;
+  outline-offset: 2px;
+}
+
+.skipLink {
+  background: transparent;
+  border: none;
+  color: #555;
+  cursor: pointer;
+  font-size: 12px;
+  text-decoration: underline;
+  padding: 2px 0;
+}
+
+.skipLink:hover,
+.skipLink:focus-visible {
+  color: #888;
+  outline: none;
+  text-decoration: none;
+}
+
+/* ── Form elements ────────────────────── */
+
+.label {
+  color: #888;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.textarea,
+.input,
+.select {
+  background: #0d0d0d;
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 8px 10px;
+  text-align: left;
+  width: 100%;
+}
+
+.textarea { resize: vertical; }
+
+.inputSmall {
+  background: #0d0d0d;
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 6px 10px;
+  width: 80px;
+}
+
+.textarea:focus,
+.input:focus,
+.select:focus,
+.inputSmall:focus {
+  border-color: #5a8fff;
+  outline: 2px solid #5a8fff;
+  outline-offset: -1px;
+}
+
+.select option { background: #111; }
+
+/* ── Example chips ────────────────────── */
+
+.examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+}
+
+.exampleChip {
+  background: #1a1a2a;
+  border: 1px solid #2a2a4a;
+  border-radius: 12px;
+  color: #8888ff;
+  cursor: pointer;
+  font-size: 11px;
+  padding: 3px 10px;
+  transition: background 0.1s;
+}
+
+.exampleChip:hover,
+.exampleChip:focus-visible {
+  background: #2a2a4a;
+  outline: 2px solid #5a5aff;
+  outline-offset: 2px;
+}
+
+/* ── Advanced section ─────────────────── */
+
+.advanced {
+  border: 1px solid #1e1e1e;
+  border-radius: 4px;
+  text-align: left;
+}
+
+.advancedToggle {
+  color: #555;
+  cursor: pointer;
+  font-size: 12px;
+  list-style: none;
+  padding: 8px 10px;
+}
+
+.advancedToggle::-webkit-details-marker { display: none; }
+
+.advancedBody {
+  border-top: 1px solid #1e1e1e;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+}
+
+/* ── Error ───────────────────────────── */
+
+.error {
+  background: #2a0a0a;
+  border: 1px solid #8a2020;
+  border-radius: 4px;
+  color: #ff8080;
+  font-size: 12px;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+/* ── Launch + watch layout ────────────── */
+
+.launchLayout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  height: 70vh;
+  background: #111;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.launchSidebar {
+  background: #0d0d0d;
+  border-right: 1px solid #2a2a2a;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 16px;
+}
+
+.launchTitle {
+  color: #aaa;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.launchTask {
+  color: #ccc;
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0;
+  word-break: break-word;
+}
+
+.launchStats {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.statRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.statLabel { color: #555; font-size: 11px; }
+.statValue { color: #8ab8ff; font-size: 12px; font-weight: 600; }
+
+.launchHint {
+  color: #444;
+  font-size: 11px;
+  font-style: italic;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.launchTerminal {
+  overflow: hidden;
+}
+
+/* ── Completion summary ───────────────── */
+
+.summaryGrid {
+  display: flex;
+  gap: 32px;
+  justify-content: center;
+  margin: 8px 0;
+}
+
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.summaryValue {
+  color: #00ff88;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.summaryLabel {
+  color: #666;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.completionActions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

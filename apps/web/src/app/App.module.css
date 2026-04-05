@@ -56,6 +56,32 @@
   margin-left: auto;
 }
 
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.newTaskBtn {
+  background: #1a3a7a;
+  border: 1px solid #2a5aaa;
+  border-radius: 4px;
+  color: #8ab8ff;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  white-space: nowrap;
+}
+
+.newTaskBtn:hover,
+.newTaskBtn:focus-visible {
+  background: #2a4a8a;
+  outline: 2px solid #5a8fff;
+  outline-offset: 2px;
+}
+
 .main {
   flex: 1;
   overflow: hidden;
