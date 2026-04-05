@@ -21,7 +21,11 @@
  *   - EXPERIMENTAL: Untested, may require adjustments
  */
 
-import fs from 'fs';
+import realFs from 'fs';
+import { createRequire } from 'module';
+const _require = createRequire(import.meta.url);
+let fs;
+try { const gfs = _require('graceful-fs'); gfs.gracefulify(realFs); fs = realFs; } catch { fs = realFs; }
 import path from 'path';
 import {
   ensureDir,

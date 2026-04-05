@@ -8,8 +8,23 @@
  * - Other shared utilities
  */
 
-import fs from 'fs';
+import realFs from 'fs';
 import path from 'path';
+import { createRequire } from 'module';
+
+// Use graceful-fs to prevent EMFILE crashes on systems with low ulimit.
+// graceful-fs queues open() calls when FD pressure is detected and retries
+// after a backoff, transparently wrapping the native fs module.
+let fs;
+try {
+  const require = createRequire(import.meta.url);
+  const gracefulFs = require('graceful-fs');
+  gracefulFs.gracefulify(realFs);
+  fs = realFs;
+} catch {
+  // graceful-fs not available — fall back to native fs
+  fs = realFs;
+}
 
 // ============================================================================
 // File Operations
