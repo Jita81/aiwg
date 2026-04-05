@@ -54,6 +54,7 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 | **Artifact index: typed edges & filename-metadata** | Cross-graph set queries (`union`/`intersection`/`difference`), citation sidecar parser, typed edge extraction. Filename-metadata node strategy derives metadata from filename regex without reading file content. |
 | **`no-time-estimates` rule** | Agent-oriented estimation: scope count, agent count, parallelism map, pass estimate. No wall-clock figures. HIGH. |
 | **Graph backends guide** | Documentation for pluggable graph storage backends in `docs/development/`. |
+| **Specification-complete layer (Layer 3 + 4)** | Elaboration now produces behavioral specs (sequence diagrams, state machines, decision tables, interface contracts) and pseudo-code specs — making construction-phase code generation a translation task, not a design task. 6 new templates, deepened gate criteria, new `/flow-use-case-realization` orchestration, 6-layer traceability enforcement. |
 
 ### Added
 
@@ -139,6 +140,7 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 - **Artifact index: typed edges & filename-metadata** — cross-graph set queries (`union`, `intersection`, `difference`); citation sidecar parser; typed edge extraction; filename-metadata node strategy derives metadata from filename regex without reading file content; `MetadataSupplementConfig` enriches nodes from sidecar files (#723)
 - **`no-time-estimates` rule** (HIGH, aiwg-utils) — agents must express effort in agent-oriented units: scope count (atomic deliverables), agent count and roles, parallelism map (parallel vs sequential batches), pass estimate (iterations to quality gate); wall-clock estimates (`N days/hours/weeks`, "expected duration", "this should be quick") are prohibited (#708)
 - **Graph backends guide** (`docs/development/graph-backends.md`) — documentation for pluggable graph storage backends
+- **Specification-complete layer (Layer 3 + Layer 4)** — 6 new behavioral specification templates (`state-machine-spec` DES-SM, `decision-table` DES-DT, `activity-diagram-spec` DES-ACT, `method-interface-contract` DES-MIC, `data-flow-spec` DES-DFS, `pseudocode-spec` DES-PSC) in `analysis-design/`; `flow-use-case-realization` orchestration command for multi-agent behavioral spec generation with 4-reviewer parallel review; ABM gate deepened with sections 3a (behavioral specs ≥80% coverage) and 8a (pseudo-code specs for first iteration); `check-traceability` rewritten for 6-layer enforcement (UC ↔ BS ↔ IC ↔ PC ↔ code ↔ tests) with orphan detection, `--fix` mode, and coverage metrics; `sdlc-accelerate` Phase 3 updated; 8 new `.aiwg/` artifact directories in framework manifest (#740–#746)
 
 ### Fixed
 
