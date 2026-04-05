@@ -4,6 +4,7 @@
  * @module smiths/skillsmith/platform-resolver
  */
 
+import * as os from 'os';
 import * as path from 'path';
 import type { Platform } from '../../agents/types.js';
 import type { PlatformSkillConfig } from './types.js';
@@ -21,8 +22,7 @@ const PLATFORM_CONFIGS: Record<Platform, PlatformSkillConfig> = {
   factory: {
     baseDir: '.factory/skills',
     extension: '.md',
-    supportsSkills: false,
-    alternativeStrategy: 'command',
+    supportsSkills: true,
     supportsSubdirectory: true,
   },
   cursor: {
@@ -32,17 +32,15 @@ const PLATFORM_CONFIGS: Record<Platform, PlatformSkillConfig> = {
     supportsSubdirectory: true,
   },
   codex: {
-    baseDir: '.codex/skills',
+    baseDir: '~/.codex/skills', // Home-dir deployment; path.join(os.homedir(), ...) at call site
     extension: '.md',
-    supportsSkills: false,
-    alternativeStrategy: 'command',
+    supportsSkills: true,
     supportsSubdirectory: true,
   },
   opencode: {
     baseDir: '.opencode/skill',
     extension: '.md',
-    supportsSkills: false,
-    alternativeStrategy: 'command',
+    supportsSkills: true,
     supportsSubdirectory: true,
   },
   warp: {
@@ -54,12 +52,11 @@ const PLATFORM_CONFIGS: Record<Platform, PlatformSkillConfig> = {
   windsurf: {
     baseDir: '.windsurf/skills',
     extension: '.md',
-    supportsSkills: false,
-    alternativeStrategy: 'command',
-    supportsSubdirectory: false, // 1-level discovery only — no subdir recursion
+    supportsSkills: true,
+    supportsSubdirectory: false, // 1-level discovery only — native since v1.13.6
   },
   copilot: {
-    baseDir: '.github/copilot/skills',
+    baseDir: '.github/skills',
     extension: '.md',
     supportsSkills: false,
     alternativeStrategy: 'none',
@@ -97,10 +94,14 @@ export class PlatformSkillResolver {
   }
 
   /**
-   * Get base directory for skills on a platform
+   * Get base directory for skills on a platform.
+   * Supports home-dir paths (baseDir starting with `~/`) for platforms like Codex and OpenClaw.
    */
   static getBaseDir(platform: Platform, projectPath: string): string {
     const config = this.getConfig(platform);
+    if (config.baseDir.startsWith('~/')) {
+      return path.join(os.homedir(), config.baseDir.slice(2));
+    }
     return path.join(projectPath, config.baseDir);
   }
 
