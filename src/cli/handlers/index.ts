@@ -89,6 +89,7 @@ import { packagesHandler } from './packages.js';
 import { initHandler } from './init.js';
 import { runHandler } from './run.js';
 import { stewardHandler, stewardHandlers } from './steward.js';
+import { serveHandler } from './serve.js';
 
 import type { CommandHandler } from './types.js';
 
@@ -181,6 +182,9 @@ export {
 
   // Steward
   stewardHandler,
+
+  // Serve
+  serveHandler,
 };
 
 // Re-export handler arrays
@@ -276,6 +280,9 @@ export const allHandlers: CommandHandler[] = [
   rlmPrepHandler,
   rlmSearchHandler,
   rlmStatusCliHandler,
+
+  // Web dashboard
+  serveHandler,
 ];
 
 /**

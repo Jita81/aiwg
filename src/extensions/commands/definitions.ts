@@ -413,6 +413,36 @@ export const newCommand: Extension = {
   } satisfies SkillMetadata,
 };
 
+// Serve Command
+
+export const serveCommand: Extension = {
+  id: 'serve',
+  type: 'skill',
+  name: 'Serve',
+  description: 'Start local HTTP dashboard server with WebSocket PTY bridge',
+  version: '1.0.0',
+  capabilities: ['cli', 'web', 'dashboard'],
+  keywords: ['serve', 'dashboard', 'web', 'server', 'browser'],
+  category: 'project',
+  platforms: {
+    claude: 'full',
+    generic: 'full',
+  },
+  deployment: {
+    pathTemplate: '.{platform}/commands/{id}.md',
+    core: true,
+  },
+  metadata: {
+    type: 'skill',
+    triggerPhrases: ['serve dashboard', 'start server', 'open dashboard', 'aiwg serve'],
+    commandHint: {
+      template: 'utility',
+      argumentHint: '[--port <n>] [--bind <host>] [--no-open] [--read-only]',
+      allowedTools: ['Bash'],
+    },
+  } satisfies SkillMetadata,
+};
+
 // Workspace Management Commands
 
 export const statusCommand: Extension = {
@@ -2059,12 +2089,12 @@ export const rlmStatusCommand: Extension = {
 // ============================================
 
 /**
- * All command definitions (59 total)
+ * All command definitions (60 total)
  *
  * Organized by category:
  * - Maintenance (5): help, version, doctor, update, sync
  * - Framework (3): use, list, remove
- * - Project (1): new
+ * - Project (4): new, init, run, serve
  * - Workspace (3): status, migrate-workspace, rollback-workspace
  * - MCP (1): mcp
  * - Catalog (1): catalog
@@ -2100,10 +2130,11 @@ export const commandDefinitions: Extension[] = [
   installCommand,
   packagesCommand,
 
-  // Project (3)
+  // Project (4)
   newCommand,
   initCommand,
   runCommand,
+  serveCommand,
 
   // Workspace (3)
   statusCommand,
