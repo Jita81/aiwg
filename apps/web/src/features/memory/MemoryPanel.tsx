@@ -15,7 +15,7 @@
  * @see #712 — MCP bridge for agent memory access
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './MemoryPanel.module.css';
 
 // ─────────────────────────────────────────────
@@ -33,11 +33,23 @@ export interface Note {
 }
 
 // ─────────────────────────────────────────────
+// NoteStore interface — abstraction over local
+// and fortemi-react backends
+// ─────────────────────────────────────────────
+
+interface NoteStore {
+  add(note: Note): Promise<void> | void;
+  search(query: string): Promise<Note[]> | Note[];
+  delete(id: string): Promise<void> | void;
+  getAll(): Promise<Note[]> | Note[];
+}
+
+// ─────────────────────────────────────────────
 // In-memory note store (fallback when fortemi
 // packages are not installed)
 // ─────────────────────────────────────────────
 
-class LocalNoteStore {
+class LocalNoteStore implements NoteStore {
   private notes: Note[] = [];
 
   add(note: Note): void {
@@ -64,7 +76,74 @@ class LocalNoteStore {
   }
 }
 
-const localStore = new LocalNoteStore();
+// ─────────────────────────────────────────────
+// Fortemi-backed note store (when @fortemi/react
+// is installed — uses IndexedDB + semantic search)
+// ─────────────────────────────────────────────
+
+class FortemiNoteStore implements NoteStore {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private fortemi: any;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  constructor(fortemiModule: any) {
+    this.fortemi = fortemiModule;
+  }
+
+  async add(note: Note): Promise<void> {
+    await this.fortemi.createNote({
+      title: note.title,
+      content: note.body,
+      tags: note.tags,
+      metadata: {
+        sessionId: note.sessionId,
+        missionId: note.missionId,
+        createdAt: note.createdAt,
+      },
+    });
+  }
+
+  async search(query: string): Promise<Note[]> {
+    const results = await this.fortemi.searchNotes(query || '*', { limit: 100 });
+    return results.map(this.toNote);
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.fortemi.deleteNote(id);
+  }
+
+  async getAll(): Promise<Note[]> {
+    const results = await this.fortemi.listNotes({ limit: 100 });
+    return results.map(this.toNote);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private toNote(r: any): Note {
+    return {
+      id: r.id,
+      title: r.title ?? '',
+      body: r.content ?? r.body ?? '',
+      tags: r.tags ?? [],
+      createdAt: r.metadata?.createdAt ?? r.createdAt ?? new Date().toISOString(),
+      sessionId: r.metadata?.sessionId,
+      missionId: r.metadata?.missionId,
+    };
+  }
+}
+
+// ─────────────────────────────────────────────
+// Store initialization — prefer fortemi, fall
+// back to local
+// ─────────────────────────────────────────────
+
+async function initStore(): Promise<{ store: NoteStore; isFortemi: boolean }> {
+  try {
+    const mod = await (new Function('m', 'return import(m)'))('@fortemi/react');
+    return { store: new FortemiNoteStore(mod), isFortemi: true };
+  } catch {
+    return { store: new LocalNoteStore(), isFortemi: false };
+  }
+}
 
 // ─────────────────────────────────────────────
 // Auto-note creation from telemetry events
@@ -108,26 +187,84 @@ export function MemoryPanel() {
   const [newTitle, setNewTitle] = useState('');
   const [newBody, setNewBody] = useState('');
   const [newTags, setNewTags] = useState('');
+  const storeRef = useRef<NoteStore | null>(null);
+  const seenMissionsRef = useRef(new Set<string>());
 
-  // Try loading fortemi-react; fall back to local store if unavailable
+  // Initialize store — prefer fortemi, fall back to local
   useEffect(() => {
-    (new Function('m', 'return import(m)'))('@fortemi/react')
-      .then(() => setFortemiAvailable(true))
-      .catch(() => setFortemiAvailable(false));
+    let active = true;
+    initStore().then(({ store, isFortemi }) => {
+      if (!active) return;
+      storeRef.current = store;
+      setFortemiAvailable(isFortemi);
+    });
+    return () => { active = false; };
   }, []);
 
-  const refresh = useCallback(() => {
-    setNotes(localStore.search(query));
+  const refresh = useCallback(async () => {
+    const store = storeRef.current;
+    if (!store) return;
+    const results = await store.search(query);
+    setNotes(results);
   }, [query]);
 
   useEffect(() => { refresh(); }, [refresh]);
+
+  // Poll telemetry for mission.complete events → auto-create notes
+  useEffect(() => {
+    let active = true;
+
+    async function pollMissions() {
+      const store = storeRef.current;
+      if (!store) return;
+      try {
+        const res = await fetch('/api/telemetry');
+        if (!res.ok || !active) return;
+        const data = await res.json() as { events?: Array<{ type: string; payload: Record<string, unknown>; sessionId: string; missionId?: string }> };
+        const events = data.events ?? [];
+
+        for (const e of events) {
+          if (e.type !== 'mission.complete' || !e.missionId) continue;
+          if (seenMissionsRef.current.has(e.missionId)) continue;
+          seenMissionsRef.current.add(e.missionId);
+
+          const p = e.payload as {
+            task?: string;
+            gateResult?: 'pass' | 'fail' | 'pending';
+            iterations?: number;
+            scopeDone?: number;
+            scopeTotal?: number;
+          };
+
+          const note = createMissionNote({
+            missionId: e.missionId,
+            sessionId: e.sessionId,
+            task: p.task ?? e.missionId,
+            gateResult: p.gateResult ?? 'pending',
+            iterations: p.iterations ?? 0,
+            scopeDone: p.scopeDone ?? 0,
+            scopeTotal: p.scopeTotal ?? 0,
+          });
+          await store.add(note);
+        }
+        if (active) refresh();
+      } catch {
+        // server not ready or no telemetry endpoint
+      }
+    }
+
+    pollMissions();
+    const id = setInterval(pollMissions, 5000);
+    return () => { active = false; clearInterval(id); };
+  }, [refresh]);
 
   const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
   }, []);
 
-  const handleAdd = useCallback(() => {
-    if (!newTitle.trim()) return;
+  const handleAdd = useCallback(async () => {
+    const store = storeRef.current;
+    if (!store || !newTitle.trim()) return;
     const note: Note = {
       id: `note-${Date.now()}`,
       title: newTitle.trim(),
@@ -135,15 +272,17 @@ export function MemoryPanel() {
       tags: newTags.split(',').map((t) => t.trim()).filter(Boolean),
       createdAt: new Date().toISOString(),
     };
-    localStore.add(note);
+    await store.add(note);
     setNewTitle('');
     setNewBody('');
     setNewTags('');
     refresh();
   }, [newTitle, newBody, newTags, refresh]);
 
-  const handleDelete = useCallback((id: string) => {
-    localStore.delete(id);
+  const handleDelete = useCallback(async (id: string) => {
+    const store = storeRef.current;
+    if (!store) return;
+    await store.delete(id);
     refresh();
   }, [refresh]);
 
