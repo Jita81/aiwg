@@ -119,6 +119,8 @@ Based on your answers, I'll adjust:
 - **Architecture Decision Records (ADRs)**: 3-5 major decisions → `.aiwg/architecture/adr/ADR-*.md`
 - **Master Test Plan**: Testing strategy and coverage targets → `.aiwg/testing/master-test-plan.md`
 - **Requirements Baseline**: Use cases and NFRs → `.aiwg/requirements/`
+- **Behavioral Specifications (Layer 3)**: Use case realizations, state machines, decision tables, contracts → `.aiwg/requirements/realizations/`, `.aiwg/requirements/contracts/`, `.aiwg/requirements/state-machines/`, `.aiwg/requirements/decision-tables/`
+- **Pseudo-Code Specifications (Layer 4)**: Language-neutral algorithm specs for first iteration → `.aiwg/requirements/pseudocode/`
 - **Risk Retirement Report**: POC results and status → `.aiwg/risks/risk-retirement-report.md`
 - **Elaboration Phase Plan**: Activities and schedule → `.aiwg/planning/phase-plan-elaboration.md`
 - **ABM Report**: Milestone readiness assessment → `.aiwg/reports/abm-report.md`
@@ -126,6 +128,7 @@ Based on your answers, I'll adjust:
 **Supporting Artifacts**:
 - Architecture Baseline Plan (working doc)
 - LOM Validation Report (gate check)
+- Behavioral spec reviews (security, testability, traceability)
 - Complete audit trails (archived workflows)
 
 ## Multi-Agent Orchestration Workflow
@@ -956,6 +959,128 @@ Create .aiwg/archive/$(date +%Y-%m)/sad-$(date +%Y-%m-%d)/audit-trail.md:
 ✓ Test strategy: .aiwg/testing/master-test-plan.md
 ```
 
+### Step 6a: Generate Behavioral Specifications (Layer 3)
+
+**Purpose**: Create detailed behavioral specs for all architecturally significant use cases
+
+**Your Actions**:
+
+1. **Launch Use Case Realization Generation** (parallel per use case):
+   ```
+   # For each architecturally significant use case (top 3-5):
+   Task(
+       subagent_type="architecture-designer",
+       description="Generate use case realization for UC-{id}",
+       prompt="""
+       Read use case: .aiwg/requirements/use-case-{id}-{name}.md
+       Read SAD: .aiwg/architecture/software-architecture-doc.md
+
+       Generate use case realization (behavioral specification):
+
+       1. Sequence diagram (MermaidJS) showing object interactions
+       2. Method calls, return values, and exception paths
+       3. Interface contracts for each method in the sequence
+       4. State machines for any stateful entities involved
+       5. Decision tables for branching logic (≥3 conditions)
+
+       Templates:
+       - $AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/analysis-design/use-case-realization-template.md
+       - $AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/analysis-design/state-machine-spec-template.md
+       - $AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/analysis-design/decision-table-template.md
+       - $AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/analysis-design/method-interface-contract-template.md
+
+       Traceability: UC-{id} → BS-{id} → IC-{id}
+
+       Output:
+       - .aiwg/requirements/realizations/BS-{id}-realization.md
+       - .aiwg/requirements/contracts/IC-{id}-{method}.md (per method)
+       - .aiwg/requirements/state-machines/SM-{entity}.md (if stateful entities)
+       - .aiwg/requirements/decision-tables/DT-{id}-{rule}.md (if complex branching)
+       """
+   )
+   ```
+
+2. **Parallel Review of Behavioral Specs**:
+   ```
+   Task(
+       subagent_type="security-architect",
+       description="Review behavioral specs: security boundaries",
+       prompt="""
+       Read all behavioral specs: .aiwg/requirements/realizations/*.md
+       Verify security boundaries in sequence diagrams
+       Check authentication/authorization at each boundary crossing
+       Report: APPROVED | CONDITIONAL | NEEDS_WORK
+       Save to: .aiwg/working/elaboration/behavioral-specs/reviews/security-review.md
+       """
+   )
+
+   Task(
+       subagent_type="test-architect",
+       description="Review behavioral specs: testability",
+       prompt="""
+       Read all behavioral specs: .aiwg/requirements/realizations/*.md
+       Verify each interaction is independently testable
+       Check that exception paths have clear test scenarios
+       Report: APPROVED | CONDITIONAL | NEEDS_WORK
+       Save to: .aiwg/working/elaboration/behavioral-specs/reviews/test-review.md
+       """
+   )
+
+   Task(
+       subagent_type="requirements-analyst",
+       description="Review behavioral specs: use case traceability",
+       prompt="""
+       Read all behavioral specs: .aiwg/requirements/realizations/*.md
+       Read all use cases: .aiwg/requirements/use-case-*.md
+       Verify every use case step maps to a behavioral spec interaction
+       Check bidirectional traceability: UC ↔ BS ↔ IC
+       Report: APPROVED | CONDITIONAL | NEEDS_WORK
+       Save to: .aiwg/working/elaboration/behavioral-specs/reviews/traceability-review.md
+       """
+   )
+   ```
+
+3. **Generate Pseudo-Code Specifications (Layer 4)** for first iteration scope:
+   ```
+   Task(
+       subagent_type="architecture-designer",
+       description="Generate pseudo-code specs for first iteration methods",
+       prompt="""
+       Read behavioral specs: .aiwg/requirements/realizations/*.md
+       Read interface contracts: .aiwg/requirements/contracts/*.md
+       Read decision tables: .aiwg/requirements/decision-tables/*.md
+
+       For each method in the first iteration scope:
+       1. Generate pseudo-code from sequence diagram method calls
+       2. Map preconditions/postconditions from interface contracts to VALIDATE blocks
+       3. Map decision table logic to IF/SWITCH blocks
+       4. Create error handling tree from exception specifications
+
+       Template: $AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/analysis-design/pseudocode-spec-template.md
+
+       Traceability: BS-{id} → IC-{id} → PC-{id}
+
+       Output: .aiwg/requirements/pseudocode/PC-{id}-{method}.md (per method)
+       """
+   )
+   ```
+
+**Communicate Progress**:
+```
+⏳ Generating behavioral specifications (Layer 3)...
+  ✓ Use case realizations created (3-5 architecturally significant)
+  ✓ Interface contracts generated (per method)
+  ✓ State machine specs (for stateful entities)
+  ✓ Decision tables (for complex branching)
+  ✓ Security review: APPROVED
+  ✓ Testability review: APPROVED
+  ✓ Traceability review: APPROVED
+⏳ Generating pseudo-code specifications (Layer 4)...
+  ✓ Pseudo-code specs for first iteration methods
+✓ Behavioral specs complete: .aiwg/requirements/realizations/
+✓ Pseudo-code specs complete: .aiwg/requirements/pseudocode/
+```
+
 ### Step 7: Conduct Architecture Baseline Milestone (ABM) Review
 
 **Purpose**: Formal gate review to decide GO/NO-GO to Construction
@@ -986,6 +1111,18 @@ Create .aiwg/archive/$(date +%Y-%m)/sad-$(date +%Y-%m-%d)/audit-trail.md:
           - [ ] ≥10 use cases documented
           - [ ] Supplemental specification (NFRs) complete
           - [ ] Traceability established (use cases → SAD components)
+
+       3a. Behavioral Specifications (Layer 3)
+          - [ ] ≥80% of architecturally significant use cases have realizations
+          - [ ] State machine specs for stateful entities
+          - [ ] Decision tables for complex branching logic
+          - [ ] Method-level interface contracts for component boundaries
+          - [ ] MermaidJS diagrams render without errors
+
+       3b. Pseudo-Code Specifications (Layer 4)
+          - [ ] Pseudo-code specs for first iteration methods
+          - [ ] Error handling trees complete
+          - [ ] Traceability: UC → BS → IC → PC validated
 
        4. Test Strategy
           - [ ] Master Test Plan approved
@@ -1226,6 +1363,8 @@ This orchestration succeeds when:
 - [ ] Risks retired ≥70% (P0/P1 100% retired/mitigated)
 - [ ] POCs/Spikes completed for high-risk assumptions
 - [ ] Requirements baseline ESTABLISHED (10+ use cases + NFRs)
+- [ ] Behavioral specifications COMPLETE (Layer 3: realizations, state machines, decision tables, contracts)
+- [ ] Pseudo-code specifications COMPLETE (Layer 4: first iteration scope)
 - [ ] Master Test Plan APPROVED
 - [ ] ABM review conducted with GO/CONDITIONAL GO decision
 - [ ] Complete audit trails archived

@@ -3,14 +3,20 @@
   "path": "agentic/code/frameworks/sdlc-complete/templates/analysis-design",
   "files": [
     "README.md",
+    "activity-diagram-spec-template.md",
     "component-design-card.md",
     "data-flow-diagram-template.md",
+    "data-flow-spec-template.md",
     "database-design-template.md",
+    "decision-table-template.md",
     "interface-contract-card.md",
     "manifest.json",
     "manifest.md",
+    "method-interface-contract-template.md",
+    "pseudocode-spec-template.md",
     "sequence-diagram-template.md",
     "software-architecture-doc-template.md",
+    "state-machine-spec-template.md",
     "use-case-realization-template.md"
   ],
   "ignore": [

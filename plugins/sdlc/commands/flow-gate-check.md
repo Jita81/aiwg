@@ -241,6 +241,8 @@ Task(
     - ADRs documented (3-5 major decisions)
     - Risks ≥70% retired or mitigated
     - Requirements baseline established
+    - Behavioral specifications complete (Layer 3)
+    - Pseudo-code specifications complete for first iteration scope (Layer 4)
     - Test strategy approved
     - Development case tailored
 
@@ -264,6 +266,61 @@ Task(
     Check architecture risks retired via POCs
     Report: READY | GAPS | BLOCKED
     Save to: .aiwg/gates/abm-architecture-review.md
+    """
+)
+
+# Behavioral specification validation
+Task(
+    subagent_type="requirements-analyst",
+    description="Validate behavioral specifications (Layer 3) completeness",
+    prompt="""
+    Validate Layer 3 behavioral specifications:
+
+    Check .aiwg/requirements/realizations/ for:
+    - Use case realizations with sequence diagrams (BS-{NNN} → UC-{NNN})
+    - ≥80% coverage of architecturally significant use cases
+    - Each realization references parent use case
+
+    Check for supporting specs:
+    - State machine specs for stateful entities (.aiwg/requirements/state-machines/)
+    - Decision tables for complex branching (.aiwg/requirements/decision-tables/)
+    - Method-level interface contracts (.aiwg/requirements/contracts/)
+    - Activity diagrams for complex flows (.aiwg/requirements/activities/)
+    - Data flow specifications (.aiwg/requirements/data-flows/)
+
+    Validate:
+    - MermaidJS diagrams render without errors
+    - Completeness checklists in each spec are satisfied
+    - Traceability: UC-{NNN} ↔ BS-{NNN} ↔ IC-{NNN} bidirectional
+
+    Report: READY | GAPS | BLOCKED
+    Save to: .aiwg/gates/abm-behavioral-spec-review.md
+    """
+)
+
+# Pseudo-code specification validation
+Task(
+    subagent_type="requirements-analyst",
+    description="Validate pseudo-code specifications (Layer 4) for first iteration",
+    prompt="""
+    Validate Layer 4 pseudo-code specifications:
+
+    Check .aiwg/requirements/pseudocode/ for:
+    - Pseudo-code specs (PC-{NNN}) for all methods in first iteration scope
+    - Language-neutral notation (SET, FUNCTION, FOR EACH, IF, VALIDATE)
+    - Error handling trees complete (every VALIDATE has ON FAILURE)
+    - Data structure definitions with invariants
+
+    Validate traceability chain:
+    - UC-{NNN} → BS-{NNN} → IC-{NNN} → PC-{NNN}
+    - Every PC links back to its IC and BS
+
+    Validate review status:
+    - Requirements Analyst review: passed
+    - Domain Expert verification: passed
+
+    Report: READY | GAPS | BLOCKED
+    Save to: .aiwg/gates/abm-pseudocode-review.md
     """
 )
 

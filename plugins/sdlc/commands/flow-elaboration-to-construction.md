@@ -158,6 +158,15 @@ Based on your answers, I'll adjust:
        - All P0/P1 architectural risks RETIRED/MITIGATED
        - ≥70% of all risks retired or mitigated
        - Requirements baseline ESTABLISHED (≥10 use cases)
+       - Behavioral specifications COMPLETE (Layer 3):
+         - ≥80% of architecturally significant use cases have realizations
+         - State machine specs for stateful entities
+         - Decision tables for complex branching
+         - Method-level interface contracts at component boundaries
+       - Pseudo-code specifications COMPLETE (Layer 4):
+         - Specs exist for all first-iteration methods
+         - Error handling trees complete
+         - Traceability chain: UC → BS → IC → PC validated
        - Master Test Plan APPROVED
        - Development Case tailored
        - Test environments OPERATIONAL

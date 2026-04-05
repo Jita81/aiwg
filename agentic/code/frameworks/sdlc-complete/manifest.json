@@ -35,6 +35,38 @@
         "description": "SAD, ADRs, diagrams"
       },
       {
+        "path": ".aiwg/requirements/realizations/",
+        "description": "Use case realizations with sequence diagrams (Layer 3 behavioral specs)"
+      },
+      {
+        "path": ".aiwg/requirements/contracts/",
+        "description": "Method-level interface contracts (Layer 3)"
+      },
+      {
+        "path": ".aiwg/requirements/state-machines/",
+        "description": "State machine specifications for stateful entities (Layer 3)"
+      },
+      {
+        "path": ".aiwg/requirements/decision-tables/",
+        "description": "Decision tables for complex branching logic (Layer 3)"
+      },
+      {
+        "path": ".aiwg/requirements/activities/",
+        "description": "Activity diagram specifications (Layer 3)"
+      },
+      {
+        "path": ".aiwg/requirements/data-flows/",
+        "description": "Data flow specifications (Layer 3)"
+      },
+      {
+        "path": ".aiwg/requirements/pseudocode/",
+        "description": "Pseudo-code specifications for algorithms (Layer 4)"
+      },
+      {
+        "path": ".aiwg/traceability/",
+        "description": "Spec-to-code traceability matrices and gap reports"
+      },
+      {
         "path": ".aiwg/planning/",
         "description": "Phase plans, iteration plans"
       },

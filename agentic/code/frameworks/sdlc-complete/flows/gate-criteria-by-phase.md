@@ -208,6 +208,28 @@ Prove that the proposed architecture is viable, requirements are sufficiently el
 - [ ] Requirements traceability matrix seeded (requirements → components)
 - [ ] Requirements BASELINED (no changes without change control)
 
+#### 3a. Behavioral Specifications COMPLETE (Layer 3)
+- [ ] Use case realizations exist for all architecturally significant use cases:
+  - [ ] Sequence diagrams showing object interactions and method calls (`analysis-design/use-case-realization-template.md`)
+  - [ ] ≥80% of architecturally significant use cases have complete realizations
+  - [ ] Each realization references parent use case ID (UC-{NNN} → BS-{NNN})
+- [ ] State machine specifications exist for all stateful entities identified in SAD (`analysis-design/state-machine-spec-template.md`):
+  - [ ] All states reachable, no dead states
+  - [ ] Every transition has trigger and guard condition
+  - [ ] Initial and terminal states defined
+- [ ] Decision tables exist for all business rules with ≥3 interacting conditions (`analysis-design/decision-table-template.md`):
+  - [ ] Rules are complete (2^N rules or explicit "don't care" entries)
+  - [ ] Simplification applied where possible
+- [ ] Method-level interface contracts exist for all component boundary methods (`analysis-design/method-interface-contract-template.md`):
+  - [ ] Preconditions, postconditions, and invariants specified
+  - [ ] Exception specifications complete
+  - [ ] Data transformation descriptions provided
+- [ ] Activity diagram specifications exist for complex multi-step business logic (`analysis-design/activity-diagram-spec-template.md`)
+- [ ] Data flow specifications trace all inputs through transformations to outputs (`analysis-design/data-flow-spec-template.md`)
+- [ ] Behavioral spec coverage metric: ≥80% of architecturally significant use cases
+- [ ] All MermaidJS diagrams render without errors
+- [ ] Completeness checklist in each behavioral spec is satisfied
+
 #### 4. Risk Retirement ACHIEVED
 - [ ] Risk list updated (`management/risk-list-template.md`)
 - [ ] All "Show Stopper" (P0) risks: RETIRED or have approved mitigation
@@ -256,6 +278,24 @@ Prove that the proposed architecture is viable, requirements are sufficiently el
   - [ ] Programming guidelines (`environment/programming-guidelines-template.md`)
   - [ ] Test guidelines (`environment/test-guidelines-template.md`)
 - [ ] Team trained on process
+
+#### 8a. Pseudo-Code Specifications COMPLETE (Layer 4)
+- [ ] Pseudo-code specifications exist for all methods in the first iteration's scope (`analysis-design/pseudocode-spec-template.md`):
+  - [ ] Language-neutral notation (SET, FUNCTION, FOR EACH, IF, VALIDATE keywords)
+  - [ ] One spec per method (fine-grained enough for 1:1 code translation)
+  - [ ] Algorithm walkable by a non-programmer domain expert
+- [ ] Error handling trees complete for all pseudo-code specs:
+  - [ ] Every VALIDATE block has an ON FAILURE handler
+  - [ ] Every exception in interface contract has an error handling entry
+- [ ] Data structure definitions with invariants for all domain entities
+- [ ] Pseudo-code review passed:
+  - [ ] Requirements Analyst verified pseudo-code against behavioral specs
+  - [ ] Domain Expert confirmed business logic correctness
+- [ ] Traceability matrix complete:
+  - [ ] Every pseudo-code spec (PC-{NNN}) links to an interface contract (IC-{NNN})
+  - [ ] Every interface contract links to a behavioral spec (BS-{NNN})
+  - [ ] Every behavioral spec links to a use case (UC-{NNN})
+  - [ ] Bidirectional traceability validated (forward and backward)
 
 #### 8. Iteration Plans PREPARED
 - [ ] First 2 Construction iterations planned (`management/iteration-plan-template.md`)
@@ -693,7 +733,7 @@ Successfully transition the product to production use, validate that users can e
 
 Each gate references specific templates that must be completed:
 - **Inception**: Intake templates, vision templates, business case, initial risk list
-- **Elaboration**: Architecture doc, use-case specs, test plan, CM plan, development case
+- **Elaboration**: Architecture doc, use-case specs, behavioral specs (realizations, state machines, decision tables, interface contracts), pseudo-code specs, test plan, CM plan, development case
 - **Construction**: Test evidence, deployment plan, release notes, runbooks, ORR
 - **Transition**: Product acceptance plan, status assessment, support handover docs
 

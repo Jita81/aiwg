@@ -88,12 +88,19 @@ Record gate decision and any waivers in state file.
 
 Delegate to `/flow-inception-to-elaboration`.
 
+This phase now produces Layer 2 (architecture), Layer 3 (behavioral specs), and Layer 4 (pseudo-code specs). The flow generates:
+- SAD and ADRs (Layer 2)
+- Use case realizations, state machines, decision tables, interface contracts (Layer 3)
+- Pseudo-code specifications for first iteration scope (Layer 4)
+
 **ABM Gate** (Architecture Baseline Milestone):
 - Invoke `/flow-gate-check elaboration`
 - On CONDITIONAL, ask focused questions:
   1. "ADR [name] needs review — approve, revise, or skip?"
   2. "Test coverage target is [X%]. Confirm or adjust?"
   3. "Risk retirement at [N%] vs [target%]. Address or waive?"
+  4. "Behavioral spec coverage at [N%] vs 80% target. Generate more or waive?"
+  5. "Pseudo-code specs missing for [N] methods. Generate or defer?"
 
 Record phase completion and gate decisions.
 
