@@ -250,6 +250,22 @@ export interface EdgeExtractionConfig {
 }
 
 /**
+ * Metadata supplement configuration — merge fields from sidecar files
+ *
+ * @implements #723
+ */
+export interface MetadataSupplementConfig {
+  /** Directory to scan for sidecar files */
+  scanDir: string;
+  /** Frontmatter field to match against (e.g., "frontmatter.ref") */
+  matchOn: string;
+  /** Captured group name from filenamePattern to match against */
+  nodeKey: string;
+  /** Fields to merge from the sidecar frontmatter into the node */
+  mergeFields: string[];
+}
+
+/**
  * Graph configuration — defines what each graph indexes
  */
 export interface GraphConfig {
@@ -270,6 +286,32 @@ export interface GraphConfig {
 
   /** Optional edge extraction configuration */
   edgeExtraction?: EdgeExtractionConfig;
+
+  /**
+   * Node creation strategy.
+   * - 'default': read file content, parse frontmatter (standard behavior)
+   * - 'filename-metadata': derive metadata from filename regex, skip content reading
+   *
+   * @implements #723
+   */
+  nodeStrategy?: 'default' | 'filename-metadata';
+
+  /**
+   * Named-capture regex for extracting metadata from filenames.
+   * Only used when nodeStrategy is 'filename-metadata'.
+   * Example: "REF-(?P<ref>\\d{3})-(?P<author>[^-]+)-(?P<year>\\d{4})-(?P<slug>.+)\\.pdf"
+   *
+   * @implements #723
+   */
+  filenamePattern?: string;
+
+  /**
+   * Optional sidecar files that can enrich node metadata.
+   * Merges frontmatter fields from matching sidecar files into the node.
+   *
+   * @implements #723
+   */
+  metadataSupplements?: MetadataSupplementConfig[];
 }
 
 /**
@@ -348,6 +390,11 @@ export function loadUserGraphConfigs(cwd: string): string[] {
         shared: graphDef.shared === true,
         defaultBuild: graphDef.defaultBuild !== false, // Default true for user graphs
         edgeExtraction: graphDef.edgeExtraction as EdgeExtractionConfig | undefined,
+        nodeStrategy: graphDef.nodeStrategy as GraphConfig['nodeStrategy'],
+        filenamePattern: typeof graphDef.filenamePattern === 'string' ? graphDef.filenamePattern : undefined,
+        metadataSupplements: Array.isArray(graphDef.metadataSupplements)
+          ? graphDef.metadataSupplements as MetadataSupplementConfig[]
+          : undefined,
       };
       loaded.push(name);
     }

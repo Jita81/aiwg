@@ -14,7 +14,7 @@ import fs from 'fs';
 import path from 'path';
 import { createHash } from 'crypto';
 import { load as loadYaml } from 'js-yaml';
-import type { MetadataEntry, ArtifactIndex, TagIndex, DependencyGraph, GraphType, TypedEdge } from './types.js';
+import type { MetadataEntry, ArtifactIndex, TagIndex, DependencyGraph, GraphType, TypedEdge, MetadataSupplementConfig } from './types.js';
 import { INDEX_VERSION, INDEX_DIR, PHASE_DIRECTORIES, GRAPH_CONFIGS, loadUserGraphConfigs } from './types.js';
 import { parseCitationSidecar, citationResultToEdges, buildRefToPathMap } from './citation-parser.js';
 import { writeIndexFile, resolveIndexDir, loadGraphIndexFile } from './index-reader.js';
@@ -108,6 +108,121 @@ function inferType(data: Record<string, unknown>, filePath: string): string {
  */
 function computeChecksum(content: string): string {
   return createHash('sha256').update(content).digest('hex').slice(0, 16);
+}
+
+/**
+ * Convert Python-style named capture groups (?P<name>...) to JS-style (?<name>...)
+ */
+export function normalizeNamedCaptures(pattern: string): string {
+  return pattern.replace(/\(\?P</g, '(?<');
+}
+
+/**
+ * Build a MetadataEntry from filename regex captures instead of file content.
+ * Used when graphConfig.nodeStrategy === 'filename-metadata'.
+ *
+ * @implements #723
+ */
+export function buildFilenameMetadataEntry(
+  relativePath: string,
+  fullPath: string,
+  filenamePattern: string | undefined,
+): MetadataEntry {
+  const basename = path.basename(fullPath);
+  let captures: Record<string, string> = {};
+
+  if (filenamePattern) {
+    const normalizedPattern = normalizeNamedCaptures(filenamePattern);
+    const regex = new RegExp(normalizedPattern);
+    const match = basename.match(regex);
+    if (match?.groups) {
+      captures = match.groups;
+    }
+  }
+
+  const ref = captures.ref ? `REF-${captures.ref}` : '';
+  const titleParts = [ref, captures.author, captures.year, captures.slug].filter(Boolean);
+  const title = titleParts.length > 0 ? titleParts.join(' — ') : basename;
+
+  // Use file stat for timestamps; checksum is based on filename (content not read)
+  const stat = fs.statSync(fullPath);
+  const checksum = createHash('sha256').update(basename).digest('hex').slice(0, 16);
+
+  return {
+    path: relativePath,
+    type: captures.ref ? 'paper' : 'document',
+    phase: 'other',
+    title,
+    tags: [],
+    created: stat.birthtime.toISOString(),
+    updated: stat.mtime.toISOString(),
+    checksum,
+    summary: '',
+    dependencies: [],
+    dependents: [],
+    // Store captures as a non-standard field for downstream consumers
+    ...(Object.keys(captures).length > 0 ? { captures } : {}),
+  } as MetadataEntry;
+}
+
+/**
+ * Apply metadata supplements — merge frontmatter fields from sidecar files.
+ *
+ * @implements #723
+ */
+function applyMetadataSupplements(
+  entries: Record<string, MetadataEntry>,
+  supplements: MetadataSupplementConfig[],
+  cwd: string,
+): void {
+  for (const supplement of supplements) {
+    const sidecarDir = path.join(cwd, supplement.scanDir);
+    if (!fs.existsSync(sidecarDir)) continue;
+
+    // Parse matchOn: "frontmatter.ref" -> field "ref"
+    const matchField = supplement.matchOn.replace(/^frontmatter\./, '');
+
+    // Build a map of sidecar files: matchField value -> frontmatter data
+    const sidecarFiles = findArtifactFiles(sidecarDir, ['.md', '.yaml', '.json']);
+    const sidecarMap = new Map<string, Record<string, unknown>>();
+
+    for (const sidecarPath of sidecarFiles) {
+      const content = fs.readFileSync(sidecarPath, 'utf-8');
+      const { data } = parseFrontmatter(content);
+      const matchValue = data[matchField];
+      if (typeof matchValue === 'string') {
+        sidecarMap.set(matchValue, data);
+      }
+    }
+
+    // Match entries to sidecars and merge fields
+    for (const entry of Object.values(entries)) {
+      const entryCaptures = (entry as MetadataEntry & { captures?: Record<string, string> }).captures;
+      if (!entryCaptures) continue;
+
+      const nodeValue = entryCaptures[supplement.nodeKey];
+      if (!nodeValue) continue;
+
+      // Build the full ref ID for matching (e.g., captures.ref="008" -> "REF-008")
+      const matchValue = supplement.nodeKey === 'ref' ? `REF-${nodeValue}` : nodeValue;
+      const sidecarData = sidecarMap.get(matchValue);
+      if (!sidecarData) continue;
+
+      for (const field of supplement.mergeFields) {
+        const value = sidecarData[field];
+        if (value === undefined) continue;
+
+        if (field === 'title' && typeof value === 'string') {
+          entry.title = value;
+        } else if (field === 'tags' && Array.isArray(value)) {
+          entry.tags = [...new Set([...entry.tags, ...value.map(String)])];
+        } else if (field === 'authors' && typeof value === 'string') {
+          entry.summary = value;
+        }
+        // Other fields stored via captures — downstream consumers can access them
+      }
+    }
+  }
 }
 
 /**
@@ -210,41 +325,62 @@ export async function buildIndex(
   let updatedCount = 0;
   let unchangedCount = 0;
 
+  const useFilenameMetadata = graphConfig?.nodeStrategy === 'filename-metadata';
+
   for (const fullPath of files) {
     const relativePath = path.relative(cwd, fullPath);
-    const content = fs.readFileSync(fullPath, 'utf-8');
-    const checksum = computeChecksum(content);
 
-    // Skip unchanged files in incremental mode
-    if (!force && existingEntries[relativePath]?.checksum === checksum) {
-      entries[relativePath] = existingEntries[relativePath];
-      unchangedCount++;
-      if (verbose) console.log(`  unchanged: ${relativePath}`);
-      continue;
+    let entry: MetadataEntry;
+
+    if (useFilenameMetadata) {
+      // Filename-metadata strategy: derive metadata from filename, skip content read
+      const checksum = createHash('sha256').update(path.basename(fullPath)).digest('hex').slice(0, 16);
+
+      // Skip unchanged files in incremental mode
+      if (!force && existingEntries[relativePath]?.checksum === checksum) {
+        entries[relativePath] = existingEntries[relativePath];
+        unchangedCount++;
+        if (verbose) console.log(`  unchanged: ${relativePath}`);
+        continue;
+      }
+
+      entry = buildFilenameMetadataEntry(relativePath, fullPath, graphConfig?.filenamePattern);
+    } else {
+      // Default strategy: read content, parse frontmatter
+      const content = fs.readFileSync(fullPath, 'utf-8');
+      const checksum = computeChecksum(content);
+
+      // Skip unchanged files in incremental mode
+      if (!force && existingEntries[relativePath]?.checksum === checksum) {
+        entries[relativePath] = existingEntries[relativePath];
+        unchangedCount++;
+        if (verbose) console.log(`  unchanged: ${relativePath}`);
+        continue;
+      }
+
+      const stat = fs.statSync(fullPath);
+      const { data, body } = parseFrontmatter(content);
+      const title = extractTitle(data, body);
+      const phase = typeof data.phase === 'string' ? data.phase : inferPhase(relativePath);
+      const type = inferType(data, relativePath);
+      const tags = Array.isArray(data.tags) ? data.tags.map(String) : [];
+      const summary = extractSummary(data, body);
+      const dependencies = extractMentions(content);
+
+      entry = {
+        path: relativePath,
+        type,
+        phase,
+        title,
+        tags,
+        created: typeof data.created === 'string' ? data.created : stat.birthtime.toISOString(),
+        updated: stat.mtime.toISOString(),
+        checksum,
+        summary,
+        dependencies,
+        dependents: [], // Computed after all entries are processed
+      };
     }
-
-    const stat = fs.statSync(fullPath);
-    const { data, body } = parseFrontmatter(content);
-    const title = extractTitle(data, body);
-    const phase = typeof data.phase === 'string' ? data.phase : inferPhase(relativePath);
-    const type = inferType(data, relativePath);
-    const tags = Array.isArray(data.tags) ? data.tags.map(String) : [];
-    const summary = extractSummary(data, body);
-    const dependencies = extractMentions(content);
-
-    const entry: MetadataEntry = {
-      path: relativePath,
-      type,
-      phase,
-      title,
-      tags,
-      created: typeof data.created === 'string' ? data.created : stat.birthtime.toISOString(),
-      updated: stat.mtime.toISOString(),
-      checksum,
-      summary,
-      dependencies,
-      dependents: [], // Computed after all entries are processed
-    };
 
     entries[relativePath] = entry;
 
@@ -255,6 +391,11 @@ export async function buildIndex(
       newCount++;
       if (verbose) console.log(`  new: ${relativePath}`);
     }
+  }
+
+  // Apply metadata supplements if configured (enriches filename-metadata nodes from sidecars)
+  if (graphConfig?.metadataSupplements?.length) {
+    applyMetadataSupplements(entries, graphConfig.metadataSupplements, cwd);
   }
 
   // Build tag reverse index

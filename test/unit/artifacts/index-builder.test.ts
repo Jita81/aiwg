@@ -9,7 +9,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import { parseFrontmatter, extractMentions, buildIndex } from '../../../src/artifacts/index-builder.js';
+import { parseFrontmatter, extractMentions, buildIndex, normalizeNamedCaptures, buildFilenameMetadataEntry } from '../../../src/artifacts/index-builder.js';
 import { INDEX_DIR, GRAPH_CONFIGS, loadUserGraphConfigs, normalizeEdge, normalizeEdges } from '../../../src/artifacts/types.js';
 import type { TypedEdge, DependencyGraph } from '../../../src/artifacts/types.js';
 
@@ -409,6 +409,199 @@ Depends on @.aiwg/requirements/UC-001.md
         { path: 'old-string-edge.md', type: 'depends-on' },
         { path: 'new-typed.md', type: 'cites' },
       ]);
+    });
+  });
+
+  describe('normalizeNamedCaptures', () => {
+    it('should convert Python-style (?P<name>...) to JS-style (?<name>...)', () => {
+      const input = 'REF-(?P<ref>\\d{3})-(?P<author>[^-]+)-(?P<year>\\d{4})-(?P<slug>.+)\\.pdf';
+      const result = normalizeNamedCaptures(input);
+      expect(result).toBe('REF-(?<ref>\\d{3})-(?<author>[^-]+)-(?<year>\\d{4})-(?<slug>.+)\\.pdf');
+    });
+
+    it('should pass through JS-style patterns unchanged', () => {
+      const input = 'REF-(?<ref>\\d{3})\\.pdf';
+      expect(normalizeNamedCaptures(input)).toBe(input);
+    });
+  });
+
+  describe('buildFilenameMetadataEntry', () => {
+    let tmpDir: string;
+
+    beforeEach(() => {
+      tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'aiwg-filename-test-'));
+    });
+
+    afterEach(() => {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    });
+
+    it('should extract metadata from filename with regex captures', () => {
+      const pdfPath = path.join(tmpDir, 'REF-008-lewis-2020-rag.pdf');
+      fs.writeFileSync(pdfPath, Buffer.from('fake pdf content'));
+
+      const pattern = 'REF-(?P<ref>\\d{3})-(?P<author>[^-]+)-(?P<year>\\d{4})-(?P<slug>.+)\\.pdf';
+      const entry = buildFilenameMetadataEntry('pdfs/full/REF-008-lewis-2020-rag.pdf', pdfPath, pattern);
+
+      expect(entry.type).toBe('paper');
+      expect(entry.title).toBe('REF-008 — lewis — 2020 — rag');
+      expect(entry.dependencies).toEqual([]);
+      expect(entry.summary).toBe('');
+      expect(entry.checksum).toHaveLength(16);
+
+      // Captures should be accessible
+      const captures = (entry as Record<string, unknown>).captures as Record<string, string>;
+      expect(captures.ref).toBe('008');
+      expect(captures.author).toBe('lewis');
+      expect(captures.year).toBe('2020');
+      expect(captures.slug).toBe('rag');
+    });
+
+    it('should use basename as title when no pattern matches', () => {
+      const pdfPath = path.join(tmpDir, 'random-file.pdf');
+      fs.writeFileSync(pdfPath, Buffer.from('fake'));
+
+      const entry = buildFilenameMetadataEntry('pdfs/random-file.pdf', pdfPath, undefined);
+      expect(entry.title).toBe('random-file.pdf');
+      expect(entry.type).toBe('document');
+    });
+
+    it('should use basename as title when pattern does not match', () => {
+      const pdfPath = path.join(tmpDir, 'no-match.pdf');
+      fs.writeFileSync(pdfPath, Buffer.from('fake'));
+
+      const pattern = 'REF-(?P<ref>\\d{3})\\.pdf';
+      const entry = buildFilenameMetadataEntry('pdfs/no-match.pdf', pdfPath, pattern);
+      expect(entry.title).toBe('no-match.pdf');
+    });
+  });
+
+  describe('buildIndex with filename-metadata strategy', () => {
+    let tmpDir: string;
+
+    beforeEach(() => {
+      tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'aiwg-pdf-index-test-'));
+    });
+
+    afterEach(() => {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+      for (const key of Object.keys(GRAPH_CONFIGS)) {
+        if (!['framework', 'project', 'codebase'].includes(key)) {
+          delete GRAPH_CONFIGS[key];
+        }
+      }
+    });
+
+    it('should index PDF files as identity nodes using filename-metadata strategy', async () => {
+      // Create config with filename-metadata strategy
+      const aiwgDir = path.join(tmpDir, '.aiwg');
+      fs.mkdirSync(aiwgDir, { recursive: true });
+      fs.writeFileSync(path.join(aiwgDir, 'config.yaml'), `
+index:
+  graphs:
+    papers:
+      scanDirs:
+        - pdfs/full
+      extensions:
+        - .pdf
+      nodeStrategy: filename-metadata
+      filenamePattern: "REF-(?P<ref>\\\\d{3})-(?P<author>[^-]+)-(?P<year>\\\\d{4})-(?P<slug>.+)\\\\.pdf"
+      defaultBuild: true
+`);
+
+      // Create PDF directory and fake PDF files
+      const pdfDir = path.join(tmpDir, 'pdfs', 'full');
+      fs.mkdirSync(pdfDir, { recursive: true });
+      fs.writeFileSync(path.join(pdfDir, 'REF-001-bandara-2024-production-agentic.pdf'), Buffer.from('fake pdf'));
+      fs.writeFileSync(path.join(pdfDir, 'REF-008-lewis-2020-rag.pdf'), Buffer.from('fake pdf'));
+      fs.writeFileSync(path.join(pdfDir, 'REF-016-wei-2022-cot.pdf'), Buffer.from('fake pdf'));
+
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      await buildIndex(tmpDir, { force: true, graph: 'papers' });
+
+      consoleSpy.mockRestore();
+      consoleWarnSpy.mockRestore();
+
+      // Check index output
+      const indexDir = path.join(tmpDir, '.aiwg', '.index', 'papers');
+      expect(fs.existsSync(path.join(indexDir, 'metadata.json'))).toBe(true);
+
+      const metadata = JSON.parse(fs.readFileSync(path.join(indexDir, 'metadata.json'), 'utf-8'));
+      expect(Object.keys(metadata.entries)).toHaveLength(3);
+
+      const ref008 = metadata.entries['pdfs/full/REF-008-lewis-2020-rag.pdf'];
+      expect(ref008).toBeDefined();
+      expect(ref008.type).toBe('paper');
+      expect(ref008.title).toContain('REF-008');
+      expect(ref008.title).toContain('lewis');
+      expect(ref008.title).toContain('2020');
+      expect(ref008.dependencies).toEqual([]);
+    });
+
+    it('should apply metadata supplements from sidecar files', async () => {
+      // Create config with metadata supplements
+      const aiwgDir = path.join(tmpDir, '.aiwg');
+      fs.mkdirSync(aiwgDir, { recursive: true });
+      fs.writeFileSync(path.join(aiwgDir, 'config.yaml'), `
+index:
+  graphs:
+    papers:
+      scanDirs:
+        - pdfs/full
+      extensions:
+        - .pdf
+      nodeStrategy: filename-metadata
+      filenamePattern: "REF-(?P<ref>\\\\d{3})-(?P<author>[^-]+)-(?P<year>\\\\d{4})-(?P<slug>.+)\\\\.pdf"
+      defaultBuild: true
+      metadataSupplements:
+        - scanDir: documentation/citations
+          matchOn: frontmatter.ref
+          nodeKey: ref
+          mergeFields:
+            - title
+            - authors
+`);
+
+      // Create PDF
+      const pdfDir = path.join(tmpDir, 'pdfs', 'full');
+      fs.mkdirSync(pdfDir, { recursive: true });
+      fs.writeFileSync(path.join(pdfDir, 'REF-008-lewis-2020-rag.pdf'), Buffer.from('fake'));
+
+      // Create sidecar with enriched metadata
+      const citationDir = path.join(tmpDir, 'documentation', 'citations');
+      fs.mkdirSync(citationDir, { recursive: true });
+      fs.writeFileSync(path.join(citationDir, 'REF-008-citations.md'), `---
+ref: REF-008
+title: "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks"
+authors: "Lewis, Perez, Piktus, Petroni, Karpukhin, Goyal, Küttler, Lewis, Yih, Rocktäschel, Riedel, Kiela"
+type: citations
+---
+
+## Outgoing: Papers This Work Cites
+
+| # | Title | Inducted REF |
+|---|-------|-------------|
+| 1 | Dense passage retrieval | REF-029 |
+`);
+
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      await buildIndex(tmpDir, { force: true, graph: 'papers' });
+
+      consoleSpy.mockRestore();
+      consoleWarnSpy.mockRestore();
+
+      const indexDir = path.join(tmpDir, '.aiwg', '.index', 'papers');
+      const metadata = JSON.parse(fs.readFileSync(path.join(indexDir, 'metadata.json'), 'utf-8'));
+      const ref008 = metadata.entries['pdfs/full/REF-008-lewis-2020-rag.pdf'];
+
+      // Title should be enriched from sidecar
+      expect(ref008.title).toBe('Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks');
+      // Authors should be in summary
+      expect(ref008.summary).toContain('Lewis');
     });
   });
 });
