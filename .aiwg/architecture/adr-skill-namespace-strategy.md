@@ -180,21 +180,17 @@ Source-confirmed from each platform's skill discovery implementation.
 | Users don't notice invocation change | Medium | Medium | Migration guide (#701); deprecation notice on old slugs for one release |
 | Platform discovery behavior changes | Low | Low | Source-verified; monitoring via #698 validation |
 | `--aliases` opt-in too obscure | Low | Low | Document prominently in migration guide |
-| **`aiwg-{name}` skill slugs collide with AIWG CLI commands** | **High** | **Medium** | **OPEN — requires resolution before ADR acceptance** (see below) |
+| **`aiwg-{name}` skill slugs collide with AIWG CLI commands** | **High** | **Medium** | **RESOLVED — CLI blocklist in #698** (see below) |
 
-### Open Issue: AIWG CLI Namespace Collision
+### Resolved: AIWG CLI Namespace Collision
 
 The `aiwg-{name}` prefix strategy introduces a second-order collision: AIWG's own CLI commands occupy the same prefix (`aiwg sync`, `aiwg doctor`, `aiwg use`, `aiwg list`, `aiwg run`, etc.). A skill deployed as `aiwg-sync` or `aiwg-doctor` may be confused with the CLI command by platforms, AI assistants interpreting natural language, or users.
 
-**Options for resolution (to be decided before acceptance):**
+**Resolution: Option A — CLI blocklist in #698.**
 
-| Option | Description | Trade-off |
-|--------|-------------|-----------|
-| A — CLI blocklist in #698 | `aiwg-*` names matching CLI commands are blocked at deploy time | Keeps prefix; requires maintaining a complete CLI command name list |
-| B — Different prefix | Use `aiwgs-{name}` (skill), `aiwga-{name}` (agent), etc. | Avoids CLI collision entirely; more verbose; requires renaming all skills |
-| C — Accept + document | Keep `aiwg-{name}`; document that CLI commands take precedence | Simplest; relies on platforms correctly disambiguating |
+The collision detector (#698) maintains a blocklist of AIWG CLI command names. At deploy time, any skill slug matching a CLI command (e.g., `aiwg-sync`, `aiwg-doctor`, `aiwg-use`) is blocked from alias creation and emits a warning. The full `aiwg-{name}` invocation remains available — only the short alias (`/sync`) is suppressed when it would collide with a CLI command.
 
-**Recommendation:** At minimum, Option A (CLI blocklist) must be implemented in #698 regardless of which option is chosen. This decision must be made before implementation of #697 and #698.
+The blocklist is derived from `src/extensions/commands/definitions.ts` at build time, ensuring it stays current as CLI commands are added or removed. This avoids maintaining a separate static list.
 
 ## Implementation Sequence
 

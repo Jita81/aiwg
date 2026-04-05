@@ -184,9 +184,11 @@ describe('getAdapter', () => {
 // ============================================
 
 describe('NAMESPACE_ADAPTERS group assignments', () => {
-  const groupA = ['claude', 'cursor', 'codex', 'opencode', 'openclaw'];
-  const groupB = ['factory', 'warp', 'windsurf'];
-  const groupC = ['copilot'];
+  // Per ADR source-confirmed matrix (#695 cycle #2):
+  // Only Windsurf has 1-level recursion; all others are deep-recursion.
+  const groupA = ['claude', 'cursor', 'codex', 'opencode', 'openclaw', 'factory', 'warp', 'copilot'];
+  const groupB = ['windsurf'];
+  const groupC: string[] = [];
   const groupD = ['hermes'];
 
   for (const p of groupA) {
@@ -293,41 +295,48 @@ describe('getDeploymentPlans — Group A (deep recursion)', () => {
 });
 
 // ============================================
-// getDeploymentPlans — Group B (one-level)
+// getDeploymentPlans — Group A (promoted: Factory, Warp, Copilot)
+// ============================================
+
+describe('getDeploymentPlans — Group A (promoted platforms)', () => {
+  it('Factory: returns 2 plans with description suffix injected', () => {
+    const result = getDeploymentPlans('factory', PROJECT, 'sync', SAMPLE_SKILL_MD, NS);
+    expect(result.plans).toHaveLength(2);
+    for (const plan of result.plans) {
+      expect(plan.content).toContain('Use when relevant to the task.');
+    }
+  });
+
+  it('Warp: returns 2 plans (deep recursion confirmed)', () => {
+    const result = getDeploymentPlans('warp', PROJECT, 'sync', SAMPLE_SKILL_MD, NS);
+    expect(result.plans).toHaveLength(2);
+    const paths = result.plans.map(p => p.targetPath);
+    expect(paths.some(p => p.includes('/aiwg/aiwg-sync/'))).toBe(true);
+    expect(paths.some(p => p.includes('.warp/skills/aiwg-sync/SKILL.md'))).toBe(true);
+  });
+
+  it('Copilot: returns 2 plans (deep recursion confirmed)', () => {
+    const result = getDeploymentPlans('copilot', PROJECT, 'sync', SAMPLE_SKILL_MD, NS);
+    expect(result.skip).toBe(false);
+    expect(result.plans).toHaveLength(2);
+    const paths = result.plans.map(p => p.targetPath);
+    expect(paths.some(p => p.includes('.github/skills/aiwg/aiwg-sync/'))).toBe(true);
+    expect(paths.some(p => p.includes('.github/skills/aiwg-sync/'))).toBe(true);
+  });
+});
+
+// ============================================
+// getDeploymentPlans — Group B (one-level: Windsurf only)
 // ============================================
 
 describe('getDeploymentPlans — Group B (one-level)', () => {
-  it('Windsurf: returns 1 plan (flat slug only)', () => {
+  it('Windsurf: returns 1 plan (flat slug only — sole 1-level platform)', () => {
     const result = getDeploymentPlans('windsurf', PROJECT, 'sync', SAMPLE_SKILL_MD, NS);
     expect(result.skip).toBe(false);
     expect(result.plans).toHaveLength(1);
     expect(result.plans[0].targetPath).toContain('.windsurf/skills/aiwg-sync/SKILL.md');
     // Must NOT contain namespace subdir
     expect(result.plans[0].targetPath).not.toContain('/aiwg/aiwg-sync/');
-  });
-
-  it('Warp: returns 1 plan', () => {
-    const result = getDeploymentPlans('warp', PROJECT, 'sync', SAMPLE_SKILL_MD, NS);
-    expect(result.plans).toHaveLength(1);
-  });
-
-  it('Factory: returns 1 plan with description suffix injected', () => {
-    const result = getDeploymentPlans('factory', PROJECT, 'sync', SAMPLE_SKILL_MD, NS);
-    expect(result.plans).toHaveLength(1);
-    expect(result.plans[0].content).toContain('Use when relevant to the task.');
-  });
-});
-
-// ============================================
-// getDeploymentPlans — Group C (unknown)
-// ============================================
-
-describe('getDeploymentPlans — Group C (unknown)', () => {
-  it('Copilot: returns 1 plan (safe default slug only)', () => {
-    const result = getDeploymentPlans('copilot', PROJECT, 'sync', SAMPLE_SKILL_MD, NS);
-    expect(result.skip).toBe(false);
-    expect(result.plans).toHaveLength(1);
-    expect(result.plans[0].targetPath).toContain('.github/skills/aiwg-sync/SKILL.md');
   });
 });
 

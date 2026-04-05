@@ -149,43 +149,45 @@ export const NAMESPACE_ADAPTERS: Record<Platform | 'generic', NamespaceAdapter> 
     subdirLayout: true,
   },
 
-  // ── Group B — One-Level Subdirs ─────────────────────────────────────────
-  // These platforms discover skills at one level of subdirectory depth only.
-  // Deploy ONLY the prefixed slug — adding a second level would break discovery.
+  // Source-confirmed deep recursion (ADR §Platform Compatibility Matrix, #695 cycle #2):
+  //   Factory AI: .factory/skills/, .agent/skills/, ~/.factory/skills/
+  //   Warp:       .agents/skills/, .warp/skills/, .claude/skills/, all platform dirs
+  //   Copilot:    .github/skills/, .claude/skills/, .agents/skills/, ~/.copilot/skills/
 
   factory: {
     platform: 'factory',
-    deploymentGroup: 'one-level',
+    deploymentGroup: 'deep-recursion',
     pathType: 'project',
     skillsBaseDir: '.factory/skills',
     appendToDescription: 'Use when relevant to the task.',
-    subdirLayout: false,
+    subdirLayout: true,
   },
 
   warp: {
     platform: 'warp',
-    deploymentGroup: 'one-level',
+    deploymentGroup: 'deep-recursion',
     pathType: 'project',
     skillsBaseDir: '.warp/skills',
-    subdirLayout: false,
+    subdirLayout: true,
   },
+
+  copilot: {
+    platform: 'copilot',
+    deploymentGroup: 'deep-recursion',
+    pathType: 'project',
+    skillsBaseDir: '.github/skills',
+    subdirLayout: true,
+  },
+
+  // ── Group B — One-Level Subdirs ─────────────────────────────────────────
+  // Windsurf is the sole platform with 1-level subdirectory discovery.
+  // Deploy ONLY the prefixed slug — adding a second level would break discovery.
 
   windsurf: {
     platform: 'windsurf',
     deploymentGroup: 'one-level',
     pathType: 'project',
     skillsBaseDir: '.windsurf/skills',
-    subdirLayout: false,
-  },
-
-  // ── Group C — Unknown Recursion ─────────────────────────────────────────
-  // Deploy only the prefixed slug until recursion depth is confirmed.
-
-  copilot: {
-    platform: 'copilot',
-    deploymentGroup: 'unknown',
-    pathType: 'project',
-    skillsBaseDir: '.github/skills',
     subdirLayout: false,
   },
 
