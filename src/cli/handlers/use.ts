@@ -22,6 +22,11 @@ import { registerCliCommands, registerHooks } from '../cli-extension-loader.js';
 import { translateSkillsToCommands, providerNeedsCommands } from '../../plugin/skill-command-translator.js';
 import * as ui from '../ui.js';
 import { readAiwgConfig, writeAiwgConfig, updateInstalled, hashManifest } from '../../config/aiwg-config.js';
+import {
+  checkCollisions,
+  formatCollisionReport,
+  hasBlockingCollisions,
+} from '../../smiths/skillsmith/collision-detector.js';
 
 /**
  * Valid framework identifiers
@@ -178,6 +183,71 @@ const PROVIDER_PATHS: Record<string, { agents: string; skills: string; commands:
     behaviors: path.join(os.homedir(), '.openclaw', 'behaviors'), // Native behavior support
   },
 };
+
+/**
+ * List skill folder names from a source skills directory.
+ * Returns empty array if the directory doesn't exist.
+ */
+async function listSourceSkillNames(skillsDir: string): Promise<string[]> {
+  try {
+    const entries = await fs.readdir(skillsDir, { withFileTypes: true });
+    return entries.filter(e => e.isDirectory()).map(e => e.name);
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Run pre-deployment collision check for a framework or addon.
+ * Emits warnings/errors to stderr. Returns false if deployment should be blocked.
+ */
+async function runPreDeployCollisionCheck(opts: {
+  frameworkRoot: string;
+  framework: string;
+  target: string;
+  provider: string;
+  force: boolean;
+  skipConflicts: boolean;
+}): Promise<boolean> {
+  const { frameworkRoot, framework, target, provider, force } = opts;
+
+  // Resolve source skills dir for this framework
+  const frameworkSlug = framework === 'all' ? 'sdlc' : framework;
+  const sourceSkillsDir = path.join(
+    frameworkRoot,
+    'agentic/code/frameworks',
+    `${frameworkSlug}-complete`,
+    'skills'
+  );
+
+  const skillNames = await listSourceSkillNames(sourceSkillsDir);
+  if (skillNames.length === 0) return true; // nothing to check
+
+  const providerPaths = PROVIDER_PATHS[provider] ?? PROVIDER_PATHS.claude;
+  const skillsBaseDir = path.isAbsolute(providerPaths.skills)
+    ? providerPaths.skills
+    : path.join(target, providerPaths.skills);
+
+  const results = await checkCollisions({
+    platform: provider as any,
+    projectPath: target,
+    skillNames,
+    namespace: 'aiwg',
+    skillsBaseDir,
+  });
+
+  const report = formatCollisionReport(results);
+  if (report) {
+    process.stderr.write(report + '\n');
+  }
+
+  if (hasBlockingCollisions(results) && !force) {
+    process.stderr.write('\nDeployment blocked. Use --force to override.\n');
+    return false;
+  }
+
+  return true;
+}
 
 /**
  * Framework-specific next steps guidance
@@ -610,7 +680,11 @@ export class UseHandler implements CommandHandler {
     const verbose = remainingArgs.includes('--verbose') || remainingArgs.includes('-v');
     const dryRun = remainingArgs.includes('--dry-run');
     const ciHooksEnabled = remainingArgs.includes('--ci-hooks-enabled');
-    const filteredArgs = deployArgs.filter(a => a !== '--no-utils' && a !== '--ci-hooks-enabled');
+    const force = remainingArgs.includes('--force');
+    const skipConflicts = remainingArgs.includes('--skip-conflicts');
+    const filteredArgs = deployArgs.filter(
+      a => a !== '--no-utils' && a !== '--ci-hooks-enabled' && a !== '--force' && a !== '--skip-conflicts'
+    );
 
     // Pass --quiet to suppress deploy-agents.mjs header/footer in default mode (#460)
     // Dry-run must not capture output — its purpose is to show what would happen
@@ -646,6 +720,21 @@ export class UseHandler implements CommandHandler {
     const provider = providers[0];
     const targetIdx = remainingArgs.findIndex(a => a === '--target');
     const target = targetIdx >= 0 && remainingArgs[targetIdx + 1] ? remainingArgs[targetIdx + 1] : process.cwd();
+
+    // Pre-deployment collision check (skip in dry-run — nothing is written)
+    if (!dryRun) {
+      const canDeploy = await runPreDeployCollisionCheck({
+        frameworkRoot,
+        framework,
+        target,
+        provider,
+        force,
+        skipConflicts,
+      });
+      if (!canDeploy) {
+        return { exitCode: 1, message: 'Deployment blocked due to name collisions. See above for details.' };
+      }
+    }
 
     // Deploy main framework
     const quiet = !verbose && !dryRun;

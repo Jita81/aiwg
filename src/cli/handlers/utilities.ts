@@ -11,12 +11,17 @@
  */
 
 import fs from 'fs';
+import fsp from 'fs/promises';
 import path from 'path';
 import { CommandHandler, HandlerContext, HandlerResult } from './types.js';
 import { createScriptRunner } from './script-runner.js';
 import { getFrameworkRoot } from '../../channel/manager.mjs';
 import { forceUpdateCheck } from '../../update/checker.mjs';
 import { useHandler as useFrameworkHandler } from './use.js';
+import {
+  checkCollisions,
+  formatCollisionReport,
+} from '../../smiths/skillsmith/collision-detector.js';
 
 /**
  * Maps framework registry IDs (e.g. 'sdlc-complete') to `aiwg use` names (e.g. 'sdlc').
@@ -118,6 +123,50 @@ export const contributeStartHandler: CommandHandler = {
  *   aiwg --validate-metadata
  *   aiwg -validate-metadata --strict
  */
+/** Namespace field regex for SKILL.md frontmatter */
+const NAMESPACE_RE = /^namespace:\s*(\S+)/m;
+
+/**
+ * Scan source SKILL.md files in `agentic/code/` for namespace issues:
+ * - Missing `namespace: aiwg`
+ * - Slug (`aiwg-{name}`) that would shadow an AIWG CLI command
+ *
+ * Returns lines suitable for console output, or empty array if clean.
+ */
+async function scanSourceNamespaceIssues(frameworkRoot: string): Promise<string[]> {
+  const issues: string[] = [];
+  const sourceRoot = path.join(frameworkRoot, 'agentic/code');
+
+  async function walk(dir: string): Promise<void> {
+    let entries: fs.Dirent[];
+    try {
+      entries = fs.readdirSync(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const e of entries) {
+      const full = path.join(dir, e.name);
+      if (e.isDirectory()) {
+        await walk(full);
+      } else if (e.name === 'SKILL.md') {
+        try {
+          const content = fs.readFileSync(full, 'utf-8');
+          const nsMatch = content.match(NAMESPACE_RE);
+          if (!nsMatch) {
+            const rel = path.relative(frameworkRoot, full);
+            issues.push(`  WARN  missing namespace field: ${rel}`);
+          }
+        } catch {
+          // unreadable
+        }
+      }
+    }
+  }
+
+  await walk(sourceRoot);
+  return issues;
+}
+
 export const validateMetadataHandler: CommandHandler = {
   id: 'validate-metadata',
   name: 'Validate Metadata',
@@ -129,9 +178,34 @@ export const validateMetadataHandler: CommandHandler = {
     const frameworkRoot = await getFrameworkRoot();
     const runner = createScriptRunner(frameworkRoot);
 
-    return runner.run('tools/cli/validate-metadata.mjs', ctx.args, {
+    // Run the core metadata validation script
+    const result = await runner.run('tools/cli/validate-metadata.mjs', ctx.args, {
       cwd: ctx.cwd,
     });
+
+    // Append namespace validation: scan source SKILL.md files
+    try {
+      const issues = await scanSourceNamespaceIssues(frameworkRoot);
+      if (issues.length > 0) {
+        console.log('\n── Namespace validation ──');
+        console.log(`  ${issues.length} skill(s) missing namespace field:`);
+        // Show first 20 to avoid flooding output
+        issues.slice(0, 20).forEach(l => console.log(l));
+        if (issues.length > 20) {
+          console.log(`  ... and ${issues.length - 20} more`);
+        }
+        // Non-zero exit only in strict mode
+        if (ctx.args.includes('--strict') && result.exitCode === 0) {
+          return { exitCode: 1, message: `Namespace validation failed: ${issues.length} skill(s) missing namespace field` };
+        }
+      } else {
+        console.log('\n── Namespace validation: all skills have namespace field ✓');
+      }
+    } catch {
+      // Namespace scan is non-fatal
+    }
+
+    return result;
   },
 };
 
@@ -157,9 +231,42 @@ export const doctorHandler: CommandHandler = {
     const frameworkRoot = await getFrameworkRoot();
     const runner = createScriptRunner(frameworkRoot);
 
-    return runner.run('tools/cli/doctor.mjs', ctx.args, {
-      cwd: ctx.cwd,
-    });
+    // Run core doctor diagnostics
+    const result = await runner.run('tools/cli/doctor.mjs', ctx.args, { cwd: ctx.cwd });
+
+    // Append collision scan: check deployed skills dir for bad-state collisions
+    // (platform built-ins and AIWG CLI command shadows)
+    try {
+      const projectDir = ctx.cwd || process.cwd();
+      const skillsDir = path.join(projectDir, '.claude', 'skills');
+      let deployedSkillNames: string[] = [];
+      try {
+        const entries = await fsp.readdir(skillsDir, { withFileTypes: true });
+        deployedSkillNames = entries.filter(e => e.isDirectory()).map(e => e.name);
+      } catch {
+        // No .claude/skills — nothing to check
+      }
+
+      if (deployedSkillNames.length > 0) {
+        const collisions = await checkCollisions({
+          platform: 'claude',
+          projectPath: projectDir,
+          skillNames: deployedSkillNames,
+          namespace: 'aiwg',
+          skillsBaseDir: skillsDir,
+        });
+        const errorAndWarn = collisions.filter(r => r.severity === 'error' || r.severity === 'warn');
+        if (errorAndWarn.length > 0) {
+          const report = formatCollisionReport(errorAndWarn);
+          console.log('\n── Skill collision scan ──');
+          console.log(report);
+        }
+      }
+    } catch {
+      // Collision scan is non-fatal for doctor
+    }
+
+    return result;
   },
 };
 
