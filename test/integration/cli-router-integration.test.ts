@@ -168,11 +168,10 @@ describe('CLI Router Integration Tests', () => {
       expect(output.exitCode).toBeUndefined(); // Success
     });
 
-    it('should route use command', async () => {
-      const output = await runCli(['use']);
+    it('should route use command with invalid target', async () => {
+      const output = await runCli(['use', 'nonexistent-target']);
 
       // Handler returns error result, router calls process.exit(1)
-      // No stderr output in current implementation
       expect(output.exitCode).toBe(1);
     });
 
@@ -381,8 +380,8 @@ describe('CLI Router Integration Tests', () => {
       expect(output.exitCode).toBe(1);
     });
 
-    it('should handle missing command arguments gracefully', async () => {
-      const output = await runCli(['use']);
+    it('should handle invalid framework argument gracefully', async () => {
+      const output = await runCli(['use', 'nonexistent-framework']);
 
       // Handler returns error, router exits with code 1
       expect(output.exitCode).toBe(1);
@@ -556,7 +555,7 @@ describe('CLI Router Integration Tests', () => {
         { args: ['help'], expectedExit: undefined },
         { args: ['version'], expectedExit: undefined },
         { args: ['unknown'], expectedExit: 1 },
-        { args: ['use'], expectedExit: 1 }, // Missing required arg
+        { args: ['use', 'invalid-framework'], expectedExit: 1 }, // Unknown framework
       ];
 
       for (const scenario of scenarios) {

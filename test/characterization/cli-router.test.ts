@@ -276,10 +276,16 @@ describe('CLI Router Characterization Tests', () => {
 
     describe('use command', () => {
       it('should require framework name or config when no args given', () => {
-        // Without aiwg.config.json the zero-arg form emits an error (#621)
-        const result = runCli(['use']);
-        expect(result.stderr).toMatch(/Framework or addon name required/i);
-        expect(result.exitCode).toBe(1);
+        // Must run from a directory without aiwg.config to trigger the error (#621)
+        const tempDir = join(tmpdir(), `aiwg-test-${Date.now()}`);
+        mkdirSync(tempDir, { recursive: true });
+        try {
+          const result = runCli(['use'], { cwd: tempDir });
+          expect(result.stderr).toMatch(/Framework or addon name required/i);
+          expect(result.exitCode).toBe(1);
+        } finally {
+          rmSync(tempDir, { recursive: true, force: true });
+        }
       });
 
       it('should reject unknown frameworks', () => {

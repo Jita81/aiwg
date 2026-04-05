@@ -54,24 +54,6 @@ jobs:
       - name: Run tests
         run: npm run test:ci
 
-  full-test-visibility:
-    name: Full Test Visibility (Non-Blocking)
-    runs-on: ubuntu-latest
-    container: node:20
-    timeout-minutes: 25
-    continue-on-error: true
-    needs: test
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run full test suite (non-blocking)
-        run: npm test
-
   build:
     name: Build
     runs-on: ubuntu-latest

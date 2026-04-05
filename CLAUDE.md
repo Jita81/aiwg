@@ -347,6 +347,10 @@ Never fabricate citations, DOIs, URLs, or page numbers. Only cite sources that e
 
 Never delete tests to make them pass. Never skip tests. Never remove features instead of fixing them. Never weaken assertions. Escalate to human after 3 failed attempts.
 
+### CI Green Before Done (HIGH)
+
+A commit is not finished until CI passes. After every `git push`, check CI status via Gitea Actions API and wait for results. AIWG builds complete in ~2 minutes — always wait. If CI fails, diagnose and fix before declaring work done. Never leave main in a red state.
+
 ### Executable Feedback (HIGH)
 
 Execute tests before returning code. Track execution history. Retry on failure with root cause analysis (max 3 attempts).
