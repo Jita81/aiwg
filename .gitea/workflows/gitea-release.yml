@@ -35,11 +35,12 @@ jobs:
       - name: Verify package version matches tag
         run: |
           TAG_VERSION=${GITHUB_REF#refs/tags/v}
-          # Strip pre-release suffix (e.g. -RC1, -rc.1, -beta.2) before comparing
-          BASE_VERSION=${TAG_VERSION%%-*}
           PKG_VERSION=$(node -p "require('./package.json').version")
-          if [ "$BASE_VERSION" != "$PKG_VERSION" ]; then
-            echo "Error: Tag base version ($BASE_VERSION) does not match package.json version ($PKG_VERSION)"
+          # For pre-release tags, package.json may have either the full
+          # pre-release version or the base version — accept both.
+          BASE_VERSION=${TAG_VERSION%%-*}
+          if [ "$TAG_VERSION" != "$PKG_VERSION" ] && [ "$BASE_VERSION" != "$PKG_VERSION" ]; then
+            echo "Error: Tag version ($TAG_VERSION) does not match package.json version ($PKG_VERSION)"
             exit 1
           fi
           echo "Version verified: $PKG_VERSION (tag: $TAG_VERSION)"
