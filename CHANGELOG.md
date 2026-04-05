@@ -48,6 +48,12 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 | **`[all]` platforms token** | `platforms: [all]` replaced at deploy time. No more hardcoded provider lists. (#651–#653) |
 | **agentic-installer addon** | `setup.aiwg.io/v1` SetupManifest YAML language. Script-first installation: 11 cross-platform templates, 3 skills, 1 agent, 2 rules. (#663–#667) |
 | **`aiwg-ci-safety` rule (aiwg-dev)** | Agents may not touch `.gitea/workflows/` without human authorization. CI templates for users live in `agentic/code/frameworks/*/ci/`, never in forge dirs. HIGH. |
+| **Skill namespace strategy** | `aiwg-{name}` slug prefix + `aiwg/` subdirectory + `namespace: aiwg` frontmatter — three-layer collision prevention. Collision detection in `use`, `doctor`, `validate-metadata`. All 10 platforms covered. |
+| **`aiwg serve`** | Local HTTP server for the AIWG web dashboard. WebSocket PTY bridge streams live terminal output directly to the browser. |
+| **Mission Control Web UI** | React app with xterm.js terminal viewer, telemetry dashboard, and fortemi-react panel. |
+| **Artifact index: typed edges & filename-metadata** | Cross-graph set queries (`union`/`intersection`/`difference`), citation sidecar parser, typed edge extraction. Filename-metadata node strategy derives metadata from filename regex without reading file content. |
+| **`no-time-estimates` rule** | Agent-oriented estimation: scope count, agent count, parallelism map, pass estimate. No wall-clock figures. HIGH. |
+| **Graph backends guide** | Documentation for pluggable graph storage backends in `docs/development/`. |
 
 ### Added
 
@@ -127,6 +133,12 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 - **OpenProse research review report** (`docs/reports/openprose-review.md`) — basis for 5 new antipattern rules (#617)
 - **agentic-installer addon** — `setup.aiwg.io/v1` SetupManifest YAML language for cross-platform, script-first installation workflows; JSON Schema covering all 7 step types (`script`, `detect`, `ask`, `verify`, `agentic`, `platform-route`, `chain`), platform matrix, params, prerequisites, recovery procedures, and briefing; `installer-agent` specialized persona; 3 skills: `setup-generate` (discover project, assemble manifest + scripts), `setup-run` (execute manifest with platform detection, param collection, 6-phase flow, dry-run, recovery confirmation), `setup-validate` (schema + reference + consistency + agentic-step audit); 11 cross-platform script templates (clone, install-deps for ubuntu/fedora/macos/windows, configure, verify, reset, hub-chain); lib helpers (`detect.sh`, `params.sh`, `verify.sh`, `detect.ps1`); rules: `installer-safety` (7 mandatory behaviors) + `installer-authoring` (5 rules); script-first design — `type: agentic` is exception handling only (#663–#667)
 - **`aiwg-ci-safety` rule** (HIGH, aiwg-dev) — agents may never modify `.gitea/workflows/` without explicit human authorization; CI templates for user projects live in `agentic/code/frameworks/*/ci/` (inert source data, not AIWG's own CI); Gitea is the authoritative CI forge; GitHub is publish-only mirror; no agentic self-modification of CI pipelines; includes per-action allowed/forbidden table; `skill-placement.md` and `addon-boundaries.md` updated with CI template disambiguation sections
+- **Skill namespace strategy** — ADR-driven three-layer system: `aiwg-{name}` slug prefix (universal collision prevention), `aiwg/` subdirectory (structural isolation), `namespace: aiwg` frontmatter (MCP alignment); collision detection wired into `use`, `doctor`, and `validate-metadata`; per-platform deployment adapters for all 10 platforms (#695–#704)
+- **`aiwg serve`** — local HTTP server for AIWG web dashboard; WebSocket PTY stream bridge delivers live terminal output to the browser (#serve)
+- **Mission Control Web UI** — React app with xterm.js terminal viewer, telemetry dashboard, fortemi-react panel (#web)
+- **Artifact index: typed edges & filename-metadata** — cross-graph set queries (`union`, `intersection`, `difference`); citation sidecar parser; typed edge extraction; filename-metadata node strategy derives metadata from filename regex without reading file content; `MetadataSupplementConfig` enriches nodes from sidecar files (#723)
+- **`no-time-estimates` rule** (HIGH, aiwg-utils) — agents must express effort in agent-oriented units: scope count (atomic deliverables), agent count and roles, parallelism map (parallel vs sequential batches), pass estimate (iterations to quality gate); wall-clock estimates (`N days/hours/weeks`, "expected duration", "this should be quick") are prohibited (#708)
+- **Graph backends guide** (`docs/development/graph-backends.md`) — documentation for pluggable graph storage backends
 
 ### Fixed
 
@@ -148,6 +160,12 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 - **Incorrect provider configs** — Hermes was listed as a spawnable binary (it is not; it is model-series-only accessible via Ollama or MCP); OpenCode's `promptPrefix` was missing `['run']`, causing invocations without the required subcommand
 - **`CommandCategory` type** — added `'daemon'` variant; fixed missing categories in help order
 - **`new-project` in skills catalog** — was not registered in `skills.manifest.json`; now correctly discoverable via `aiwg skills list`
+- **OpenCode deployment** — stop deploying agents and commands to non-existent `.opencode/agent/` and `.opencode/command/` directories (#705)
+- **Windsurf skill deployment** — implement native skill deployment; remove experimental label (#703)
+- **Platform-resolver stale entries** — Factory, Warp, and Copilot corrected from one-level/unknown to deep-recursion per source-confirmed research (#702, #704)
+- **CI test scope** — `test:ci` widened to run all non-inference tests (characterization, integration, smoke); only live inference UATs excluded; removed redundant "Full Test Visibility" CI job; `package-lock.json` synced
+- **Manifest skill arrays** — 34 aiwg-utils skills and 7 RLM skills migrated from `commands[]` to `skills[]` in `manifest.json` (#706, #707)
+- **Agent-loop addon** — renamed from `ralph/`; 5 missing skills registered; Wiggum terminology removed; `al`/`agent-loop` aliases added (#705)
 
 ### Changed
 
@@ -164,6 +182,9 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 - **`CommandCategory` type** — extended with `'orchestration'` (Mission Control), `'config'`, `'ops'`, and `'daemon'` variants; CLI handler index updated with `skillsHandler`, `configHandler`, `opsHandler`
 - **BEHAVIOR.md platform lists** — all 6 behaviors updated to the full Tier 1 daemon set `[claude-code, opencode, warp, openclaw, codex]`; `cursor` removed from concierge (Tier 3 — VS Code extension host required) (#654, #656)
 - **aiwg-utils rule count** — 7 → 13 rules (added `human-authorization` + 5 OpenProse antipatterns)
+- **aiwg-utils rule count** — 13 → 14 rules (added `no-time-estimates`)
+- **CI enforcement** — "CI Green Before Done" added as HIGH enforcement rule in `CLAUDE.md`
+- **`test:ci` simplified** — single `vitest run` covering unit + integration + characterization + smoke; UAT config kept separate
 
 [2026.3.2]: https://github.com/jmagly/aiwg/compare/v2026.3.2...v2026.4.0
 
