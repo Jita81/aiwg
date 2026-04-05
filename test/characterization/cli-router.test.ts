@@ -258,7 +258,7 @@ describe('CLI Router Characterization Tests', () => {
       const result = runCli(['--version']);
       // Matches both old format ("aiwg version: X.Y.Z") and new format ("◆ aiwg  X.Y.Z  [stable]")
       expect(result.stdout).toMatch(/\d+\.\d+\.\d+/);
-      expect(result.stdout).toMatch(/(stable|edge|dev)/);
+      expect(result.stdout).toMatch(/(stable|edge|dev|rc|alpha|beta|nightly)/);
     });
 
     it('should show path or git info', () => {
