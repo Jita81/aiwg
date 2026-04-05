@@ -289,7 +289,7 @@ interface SkillReference {
     cursor: 'experimental'
   },
   deployment: {
-    pathTemplate: '.{platform}/skills/{id}/SKILL.md',
+    pathTemplate: '.{platform}/skills/aiwg/{name}/SKILL.md',  // namespaced subdir
     additionalFiles: ['references/phase-guide.md'],
     core: true,
     autoInstall: true
@@ -297,6 +297,7 @@ interface SkillReference {
   requires: ['aiwg-utils'],
   metadata: {
     type: 'skill',
+    namespace: 'aiwg',               // Canonical invocation: /aiwg-project-awareness
     triggerPhrases: [
       'what project is this',
       'project context',
