@@ -9,3 +9,4 @@
 export * from './types.js';
 export * from './generator.js';
 export * from './platform-resolver.js';
+export * from './namespace-adapter.js';
