@@ -10,9 +10,9 @@ Scan component indexes to find relevant rules; load the full rule file via @-lin
 | Component | Type | Rules | Index |
 |-----------|------|-------|-------|
 | sdlc-complete | framework | 33 | @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/RULES-INDEX.md |
-| aiwg-utils | addon (core) | 7 | @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/RULES-INDEX.md |
+| aiwg-utils | addon (core) | 14 | @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/RULES-INDEX.md |
 
-**Total**: 40 rules across 2 components
+**Total**: 47 rules across 2 components
 
 ---
 
@@ -37,8 +37,9 @@ Combined context table across all components. Use to identify which component in
 | **Agent deployment** | aiwg-utils | agent-deployment |
 | **Diagrams** | aiwg-utils | diagram-generation |
 | **Research/decisions** | aiwg-utils | research-before-decision |
+| **Estimation and planning** | aiwg-utils | no-time-estimates, vague-discretion, subagent-scoping |
 
 ---
 
-*Assembled from 2 component indexes — 40 rules total*
+*Assembled from 2 component indexes — 47 rules total*
 *Each component index contains full rule summaries with @-links to complete rule files*
