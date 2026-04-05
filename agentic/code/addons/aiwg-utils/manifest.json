@@ -38,7 +38,25 @@
     "rulesIndex": "rules/RULES-INDEX.md",
     "deployIndexOnly": true
   },
-  "commands": [
+  "commands": [],
+  "agents": [
+    "context-regenerator",
+    "aiwg-developer",
+    "consortium-coordinator",
+    "self-debug",
+    "aiwg-steward"
+  ],
+  "skills": [
+    "project-awareness",
+    "schedule",
+    "soul-create",
+    "soul-validate",
+    "soul-enhance",
+    "soul-apply",
+    "soul-blend",
+    "aiwg-sync",
+    "aiwg-guide",
+    "new-project",
     "aiwg-refresh",
     "aiwg-regenerate",
     "aiwg-regenerate-claude",
@@ -73,25 +91,6 @@
     "aiwg-regenerate-windsurfrules",
     "aiwg-regenerate-opencode",
     "aiwg-regenerate-codex"
-  ],
-  "agents": [
-    "context-regenerator",
-    "aiwg-developer",
-    "consortium-coordinator",
-    "self-debug",
-    "aiwg-steward"
-  ],
-  "skills": [
-    "project-awareness",
-    "schedule",
-    "soul-create",
-    "soul-validate",
-    "soul-enhance",
-    "soul-apply",
-    "soul-blend",
-    "aiwg-sync",
-    "aiwg-guide",
-    "new-project"
   ],
   "rules": [
     "no-time-estimates",
