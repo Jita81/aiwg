@@ -93,7 +93,7 @@ interface SkillFrontmatter {
  */
 const PROVIDERS_NEEDING_COMMANDS = new Set([
   'factory',
-  'opencode',
+  // opencode: commands derive from skills automatically in OpenCode — no separate command dir
   'warp',
   'windsurf',
   'copilot',
@@ -108,6 +108,7 @@ const SKILLS_ONLY_PROVIDERS = new Set([
   'claude',
   'cursor',
   'hermes',
+  'opencode', // commands derive from skills automatically in OpenCode
 ]);
 
 /**

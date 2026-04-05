@@ -8,38 +8,20 @@ This file provides project-specific guidance for OpenCode's AI coding agent.
 
 This project uses the AIWG SDLC Framework for software development lifecycle management.
 
-### Available Agents
+### Available Skills
 
-AIWG agents are deployed to `.opencode/agent/` and can be invoked via `@agent-name`:
+AIWG skills are deployed to `.opencode/skill/` and are automatically available as commands in OpenCode:
 
-**Planning & Architecture**:
-- `@architecture-designer` - System architecture and design decisions
-- `@requirements-analyst` - Requirements gathering and analysis
-- `@api-designer` - API design and contract definitions
+- `project-status` - Current project status and next steps
+- `flow-gate-check` - Validate phase gate criteria
+- `security-gate` - Run security validation
+- `generate-tests` - Generate test suite
 
-**Implementation**:
-- `@software-implementer` - Production code implementation
-- `@test-engineer` - Test development and coverage
-- `@code-reviewer` - Code review and quality
+Skills double as OpenCode commands — no separate command files needed.
 
-**Security & Quality**:
-- `@security-architect` - Security architecture and threat modeling
-- `@security-auditor` - Security review and vulnerability assessment
-- `@performance-engineer` - Performance optimization
+### AIWG Agents via MCP
 
-**Documentation**:
-- `@technical-writer` - Technical documentation
-- `@architecture-documenter` - Architecture documentation
-- `@documentation-synthesizer` - Multi-source documentation consolidation
-
-### Available Commands
-
-AIWG commands are deployed to `.opencode/command/` and can be invoked via `/command`:
-
-- `/project-status` - Current project status and next steps
-- `/flow-gate-check <phase>` - Validate phase gate criteria
-- `/security-gate` - Run security validation
-- `/generate-tests` - Generate test suite
+AIWG specialized agents are available as MCP tools when `aiwg mcp serve` is running (configured via `opencode.json`). Define custom agents in `opencode.json` under the `agent` key.
 
 ### SDLC Artifacts Location
 

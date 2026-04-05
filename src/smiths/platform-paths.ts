@@ -23,7 +23,7 @@ export function getCommandsDirectory(platform: Platform, projectPath: string): s
     'codex': '.codex/commands',
     'copilot': '.github/agents',
     'hermes': '', // Served via MCP, not file-deployed
-    'opencode': '.opencode/commands',
+    'opencode': '', // Commands derive from skills automatically — no .opencode/command/ directory scanned
     'openclaw': join(homedir(), '.openclaw', 'commands'),
     'warp': '.warp/commands', // Not natively discovered — content delivered via WARP.md
     'windsurf': '.windsurf/workflows',
@@ -51,7 +51,7 @@ export function getAgentsDirectory(platform: Platform, projectPath: string): str
     'codex': '.codex/agents',
     'copilot': '.github/agents',
     'hermes': '', // Aggregated into AGENTS.md at project root
-    'opencode': '.opencode/agent',
+    'opencode': '', // Agents are config-only in OpenCode (opencode.json agent key) — no directory scanned
     'openclaw': join(homedir(), '.openclaw', 'agents'),
     'warp': '.warp/agents', // Not natively discovered — content delivered via WARP.md
     'windsurf': '.windsurf/agents',

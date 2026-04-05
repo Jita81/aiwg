@@ -81,73 +81,25 @@ describe('OpenCode Deployment', () => {
   });
 
   describe('Agent Deployment', () => {
-    it('should deploy agents to .opencode/agent/ directory', () => {
+    it('should NOT deploy agents to .opencode/agent/ (agents are config-only in OpenCode)', () => {
+      // OpenCode agents are defined in opencode.json under the `agent` key.
+      // No directory is scanned. AIWG should not write to .opencode/agent/.
       execSync(`node ${deployScript} --target ${testDir} --provider opencode --mode sdlc`, {
         encoding: 'utf-8'
       });
 
       const agentDir = path.join(testDir, '.opencode', 'agent');
-      expect(fs.existsSync(agentDir)).toBe(true);
-
-      const agents = fs.readdirSync(agentDir);
-      expect(agents.length).toBeGreaterThan(0);
-      expect(agents.some(a => a.endsWith('.md'))).toBe(true);
+      expect(fs.existsSync(agentDir)).toBe(false);
     });
 
-    it('should transform agent frontmatter to OpenCode format', () => {
-      execSync(`node ${deployScript} --target ${testDir} --provider opencode --mode sdlc`, {
+    it('should NOT deploy commands to .opencode/commands/ (commands derive from skills in OpenCode)', () => {
+      // OpenCode commands come from skills automatically — no .opencode/commands/ dir is scanned.
+      execSync(`node ${deployScript} --target ${testDir} --provider opencode --mode sdlc --deploy-commands`, {
         encoding: 'utf-8'
       });
 
-      const agentDir = path.join(testDir, '.opencode', 'agent');
-      const agents = fs.readdirSync(agentDir).filter(f => f.endsWith('.md'));
-
-      // Pick first agent to verify format
-      const agentContent = fs.readFileSync(path.join(agentDir, agents[0]), 'utf-8');
-
-      // Verify OpenCode frontmatter fields
-      expect(agentContent).toMatch(/^---/);
-      expect(agentContent).toMatch(/description:/);
-      expect(agentContent).toMatch(/mode:\s*(primary|subagent)/);
-      expect(agentContent).toMatch(/model:\s*anthropic\//);
-      expect(agentContent).toMatch(/temperature:/);
-      expect(agentContent).toMatch(/steps:/);
-    });
-
-    it('should include tools configuration for agents', () => {
-      execSync(`node ${deployScript} --target ${testDir} --provider opencode --mode sdlc`, {
-        encoding: 'utf-8'
-      });
-
-      const agentDir = path.join(testDir, '.opencode', 'agent');
-      const agents = fs.readdirSync(agentDir).filter(f => f.endsWith('.md'));
-
-      // Check at least one agent has tools configuration
-      let hasToolsConfig = false;
-      for (const agent of agents) {
-        const content = fs.readFileSync(path.join(agentDir, agent), 'utf-8');
-        if (content.includes('permission:') && content.includes('bash:')) {
-          hasToolsConfig = true;
-          break;
-        }
-      }
-      expect(hasToolsConfig).toBe(true);
-    });
-
-    it('should include permission configuration for implementation agents', () => {
-      execSync(`node ${deployScript} --target ${testDir} --provider opencode --mode sdlc`, {
-        encoding: 'utf-8'
-      });
-
-      const agentDir = path.join(testDir, '.opencode', 'agent');
-
-      // Find an implementation-type agent
-      const implementerAgent = path.join(agentDir, 'software-implementer.md');
-      if (fs.existsSync(implementerAgent)) {
-        const content = fs.readFileSync(implementerAgent, 'utf-8');
-        expect(content).toMatch(/permission:/);
-        expect(content).toMatch(/bash:/);
-      }
+      const commandDir = path.join(testDir, '.opencode', 'commands');
+      expect(fs.existsSync(commandDir)).toBe(false);
     });
   });
 
@@ -192,7 +144,7 @@ describe('OpenCode Deployment', () => {
 
       const content = fs.readFileSync(agentsMdPath, 'utf-8');
       expect(content).toContain('AIWG SDLC Framework');
-      expect(content).toContain('.opencode/agent/');
+      expect(content).toContain('.opencode/skill/');
     });
 
     it('should append to existing AGENTS.md without duplicating', () => {
@@ -225,65 +177,30 @@ describe('OpenCode Deployment', () => {
   });
 
   describe('Model Configuration', () => {
-    it('should use OpenCode model format (anthropic/model-name)', () => {
-      execSync(`node ${deployScript} --target ${testDir} --provider opencode --mode sdlc`, {
+    it('should deploy skills without errors (model config applies to MCP, not file artifacts)', () => {
+      // OpenCode agents are config-only — model format is validated via opencode.json, not file deployment.
+      // Skills are the deployable artifacts; verify they deploy cleanly.
+      execSync(`node ${deployScript} --target ${testDir} --provider opencode --mode sdlc --deploy-skills`, {
         encoding: 'utf-8'
       });
 
-      const agentDir = path.join(testDir, '.opencode', 'agent');
-      const agents = fs.readdirSync(agentDir).filter(f => f.endsWith('.md'));
-
-      for (const agent of agents.slice(0, 5)) {
-        const content = fs.readFileSync(path.join(agentDir, agent), 'utf-8');
-        const modelMatch = content.match(/model:\s*([^\n]+)/);
-        if (modelMatch) {
-          expect(modelMatch[1]).toMatch(/^anthropic\//);
-        }
-      }
-    });
-
-    it('should accept model overrides', () => {
-      execSync(
-        `node ${deployScript} --target ${testDir} --provider opencode --mode sdlc ` +
-        `--reasoning-model ${OPENCODE_DEPLOY_MODELS.reasoning} ` +
-        `--coding-model ${OPENCODE_DEPLOY_MODELS.coding}`,
-        { encoding: 'utf-8' }
-      );
-
-      const agentDir = path.join(testDir, '.opencode', 'agent');
-      const agents = fs.readdirSync(agentDir).filter(f => f.endsWith('.md'));
-
-      // Verify at least one agent uses the override model
-      let foundOverride = false;
-      for (const agent of agents) {
-        const content = fs.readFileSync(path.join(agentDir, agent), 'utf-8');
-        if (content.includes(OPENCODE_DEPLOY_MODELS.coding) ||
-            content.includes(OPENCODE_DEPLOY_MODELS.reasoning)) {
-          foundOverride = true;
-          break;
-        }
-      }
-      expect(foundOverride).toBe(true);
+      const skillDir = path.join(testDir, '.opencode', 'skill');
+      expect(fs.existsSync(skillDir)).toBe(true);
     });
   });
 
   describe('Marketing Mode', () => {
-    it('should deploy marketing agents when mode is marketing', () => {
-      execSync(`node ${deployScript} --target ${testDir} --provider opencode --mode marketing`, {
+    it('should deploy marketing skills when mode is marketing', () => {
+      execSync(`node ${deployScript} --target ${testDir} --provider opencode --mode marketing --deploy-skills`, {
         encoding: 'utf-8'
       });
 
+      // Agents are not deployed (config-only in OpenCode), but skills should be
       const agentDir = path.join(testDir, '.opencode', 'agent');
-      expect(fs.existsSync(agentDir)).toBe(true);
+      expect(fs.existsSync(agentDir)).toBe(false);
 
-      const agents = fs.readdirSync(agentDir);
-      // Marketing agents should include content-related agents
-      expect(agents.some(a =>
-        a.includes('content') ||
-        a.includes('marketing') ||
-        a.includes('campaign') ||
-        a.includes('copywriter')
-      )).toBe(true);
+      const skillDir = path.join(testDir, '.opencode', 'skill');
+      expect(fs.existsSync(skillDir)).toBe(true);
     });
   });
 

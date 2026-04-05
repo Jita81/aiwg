@@ -397,7 +397,7 @@ export class AgentDeployer {
       copilot: '.github/agents',
       cursor: '.cursor/agents',
       factory: '.factory/droids',
-      opencode: '.opencode/agent',
+      opencode: '', // Agents are config-only in OpenCode — no directory scanned
       warp: '.warp/agents',
       generic: 'agents',
       windsurf: '.windsurf/agents',

@@ -25,7 +25,8 @@ describe('Provider classification', () => {
   describe('providerNeedsCommands', () => {
     it('should return true for legacy/native-command providers', () => {
       expect(providerNeedsCommands('factory')).toBe(true);
-      expect(providerNeedsCommands('opencode')).toBe(true);
+      // opencode: commands derive from skills automatically — no separate command dir
+      expect(providerNeedsCommands('opencode')).toBe(false);
       expect(providerNeedsCommands('warp')).toBe(true);
       expect(providerNeedsCommands('windsurf')).toBe(true);
       expect(providerNeedsCommands('copilot')).toBe(true);
@@ -53,7 +54,8 @@ describe('Provider classification', () => {
 
     it('should return false for command-needing providers', () => {
       expect(providerUsesSkillsNatively('factory')).toBe(false);
-      expect(providerUsesSkillsNatively('opencode')).toBe(false);
+      // opencode uses skills natively (commands derive from skills automatically)
+      expect(providerUsesSkillsNatively('opencode')).toBe(true);
     });
   });
 });
@@ -402,7 +404,8 @@ Does simple things.`,
   });
 
   it('should work for all command-needing providers', async () => {
-    for (const provider of ['factory', 'opencode', 'warp', 'windsurf', 'copilot', 'codex', 'openclaw']) {
+    // opencode removed: commands derive from skills automatically
+    for (const provider of ['factory', 'warp', 'windsurf', 'copilot', 'codex', 'openclaw']) {
       const providerTarget = path.join(tmpDir, `commands-${provider}`);
       const result = await translateSkillsToCommands(skillsDir, {
         provider,

@@ -1,14 +1,14 @@
 /**
  * OpenCode Provider
  *
- * Deploys agents, commands, skills, and rules in OpenCode format with mode, temperature,
+ * Deploys skills and rules in OpenCode format with mode, temperature,
  * tools, and permission configurations based on agent category.
  *
  * Deployment paths:
- *   - Agents: .opencode/agent/
- *   - Commands: .opencode/commands/
- *   - Skills: .opencode/skill/
- *   - Rules: .opencode/rule/
+ *   - Agents: NOT DEPLOYED — OpenCode agents are config-only (opencode.json `agent` key)
+ *   - Commands: NOT DEPLOYED — Commands derive from skills automatically
+ *   - Skills: .opencode/skill/  (discovered via skill glob: SKILL.md)
+ *   - Rules: .opencode/rule/    (loaded via `instructions` array in opencode.json)
  *
  * Special features:
  *   - Category-based configuration (analysis, documentation, planning, implementation)
@@ -47,17 +47,17 @@ export const name = 'opencode';
 export const aliases = [];
 
 export const paths = {
-  agents: '.opencode/agent/',
-  commands: '.opencode/commands/',
+  agents: '',             // Not deployed — OpenCode agents are config-only
+  commands: '',           // Not deployed — commands derive from skills automatically
   skills: '.opencode/skill/',
   rules: '.opencode/rule/'
 };
 
 export const support = {
-  agents: 'native',
-  commands: 'native',
-  skills: 'native',      // Discovered via {skill,skills}/**/SKILL.md
-  rules: 'conventional'  // Requires instructions[] entry in opencode.json
+  agents: 'none',         // Agents defined in opencode.json config, not file-based
+  commands: 'none',       // Commands derived from skills automatically
+  skills: 'native',       // Discovered via {skill,skills}/**/SKILL.md
+  rules: 'conventional',  // Requires instructions[] entry in opencode.json
 };
 
 export const capabilities = {
@@ -263,21 +263,24 @@ export function transformCommand(srcPath, content, opts) {
 // ============================================================================
 
 /**
- * Deploy agents to .opencode/agent/
+ * Deploy agents — no-op for OpenCode.
+ *
+ * OpenCode agents are defined in opencode.json under the `agent` key or are built-ins.
+ * No directory is scanned for agent files. See: packages/opencode/src/agent/agent.ts
  */
-export function deployAgents(agentFiles, targetDir, opts) {
-  const destDir = path.join(targetDir, paths.agents);
-  ensureDir(destDir, opts.dryRun);
-  return deployFiles(agentFiles, destDir, { ...opts, injectPlatform: true }, transformAgent);
+export function deployAgents(_agentFiles, _targetDir, _opts) {
+  // No-op: OpenCode does not discover agents from a directory
 }
 
 /**
- * Deploy commands to .opencode/commands/
+ * Deploy commands — no-op for OpenCode.
+ *
+ * OpenCode commands derive from skills automatically (SKILL.md discovery).
+ * No .opencode/command/ or .opencode/commands/ directory is scanned.
+ * See: packages/opencode/src/command/index.ts
  */
-export function deployCommands(commandFiles, targetDir, opts) {
-  const destDir = path.join(targetDir, paths.commands);
-  ensureDir(destDir, opts.dryRun);
-  return deployFiles(commandFiles, destDir, opts, transformCommand);
+export function deployCommands(_commandFiles, _targetDir, _opts) {
+  // No-op: OpenCode does not discover commands from a directory
 }
 
 /**
@@ -391,15 +394,11 @@ export async function deploy(opts) {
 
   // Deploy
   if (!commandsOnly && !skillsOnly && !rulesOnly) {
-    console.log(`\nDeploying ${agentFiles.length} agents...`);
-    deployAgents(agentFiles, target, opts);
-
-    // Deploy soul companion files alongside agents
-    if (soulFiles.length > 0) {
-      const destDir = path.join(target, paths.agents);
-      console.log(`\nDeploying ${soulFiles.length} soul files...`);
-      deploySoulCompanions(soulFiles, destDir, opts);
-    }
+    // Agents are config-only in OpenCode — no file deployment
+    // deployAgents is a no-op; soul files are skipped since there's no agent dir
+    console.log(`\nSkipping ${agentFiles.length} agents (OpenCode agents are config-only)`);
+    deployAgents(agentFiles, target, opts); // no-op
+    // Soul files require an agent directory — skip for OpenCode
   }
 
   // Filter commands that collide with skills (skills take precedence)

@@ -1,6 +1,6 @@
 # OpenCode Quick Start
 
-OpenCode is an open-source terminal AI coding agent by Anomaly (opencode.ai). AIWG deploys agents, commands, skills, and rules natively to OpenCode's discovery paths.
+OpenCode is an open-source terminal AI coding agent by Anomaly (opencode.ai). AIWG deploys skills and rules natively to OpenCode's discovery paths.
 
 ---
 
@@ -69,8 +69,6 @@ The `instructions` array is how OpenCode loads rules — the `.opencode/rule/*.m
 
 ```text
 .opencode/
-├── agent/       # SDLC agent personas (natively discovered)
-├── commands/    # Workflow commands (Ctrl+K palette)
 ├── skill/       # Skill definitions (natively discovered via SKILL.md)
 └── rule/        # Context rules (loaded via instructions in opencode.json)
 
@@ -84,41 +82,19 @@ AGENTS.md        # Project context (auto-loaded by OpenCode)
 
 | AIWG Artifact | Path | How OpenCode Uses It |
 |---------------|------|---------------------|
-| Agent personas | `.opencode/agent/` | Natively discovered — `{agent,agents}/**/*.md` |
-| Commands | `.opencode/commands/` | Ctrl+K palette — `{command,commands}/**/*.md` |
+| Agent personas | Not deployed | OpenCode agents are config-only (`opencode.json` `agent` key) |
+| Commands | Not deployed | Commands derive from skills automatically |
 | Skills | `.opencode/skill/` | Natively discovered — `{skill,skills}/**/SKILL.md` |
 | Rules | `.opencode/rule/` | Loaded via `instructions` array in `opencode.json` |
 | Project context | `AGENTS.md` | Auto-loaded (same file as Claude Code) |
 
 ---
 
-## Using Commands
-
-AIWG commands deploy to `.opencode/commands/` and appear in the command palette.
-
-Press `Ctrl+K` to open the picker, then search:
-
-```
-project:project-status
-project:flow-gate-check
-project:security-gate
-```
-
-Commands use `project:` prefix. Subdirectory nesting maps to colon-separated IDs.
-
----
-
-## Using Agents
-
-AIWG agent personas are natively discovered from `.opencode/agent/`. OpenCode loads them as selectable agent personas.
-
-To switch agents, use the agent list keybinding (`<leader>a` by default).
-
----
-
 ## Using Skills
 
 Skills in `.opencode/skill/` are discovered when they contain a `SKILL.md` file. OpenCode loads them on demand when the agent recognizes a matching task.
+
+Skills also serve as the source for OpenCode's command palette — you do not need separate command files.
 
 ---
 
@@ -155,14 +131,9 @@ See [Al Guide](../ralph-guide.md) for full documentation.
 
 **Rules not being applied?** Verify `instructions` in `.opencode/opencode.json` includes `.opencode/rule/*.md`.
 
-**Commands not appearing in Ctrl+K?** Confirm deployment:
+**Skills not available?** Confirm deployment:
 ```bash
-ls .opencode/commands/
-```
-
-**Agents not available?** Confirm deployment:
-```bash
-ls .opencode/agent/
+ls .opencode/skill/
 ```
 
 **Redeploy if needed:**
