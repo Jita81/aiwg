@@ -26,6 +26,8 @@ const SESSIONS_DIR = join(MC_ROOT, 'sessions');
 type MissionStatus = 'queued' | 'running' | 'done' | 'failed' | 'aborted' | 'paused';
 type SessionState = 'active' | 'paused' | 'stopped';
 
+type MissionMode = 'direct' | 'pty-orchestrator';
+
 interface Mission {
   id: string;
   objective: string;
@@ -34,6 +36,9 @@ interface Mission {
   loop: number;
   maxIterations: number;
   priority: string;
+  mode: MissionMode;
+  targetAgent?: string;
+  lastAction?: string;
   startedAt?: string;
   completedAt?: string;
   error?: string;
@@ -168,9 +173,17 @@ async function mcDispatch(ctx: HandlerContext): Promise<HandlerResult> {
   const completion = parseFlag(ctx.args, '--completion');
   const priority = parseFlag(ctx.args, '--priority') || 'normal';
   const maxIterations = parseInt(parseFlag(ctx.args, '--max-iterations') || '10', 10);
+  const modeRaw = parseFlag(ctx.args, '--mode') || 'direct';
+  const mode: MissionMode = modeRaw === 'pty-orchestrator' ? 'pty-orchestrator' : 'direct';
+  const targetAgent = parseFlag(ctx.args, '--target-agent');
 
   if (!objective) {
-    ui.error('Usage: aiwg mc dispatch <session-id> "<objective>" [--completion "<criteria>"]');
+    ui.error('Usage: aiwg mc dispatch <session-id> "<objective>" [--completion "<criteria>"] [--mode pty-orchestrator] [--target-agent <agent-id>]');
+    return { exitCode: 1 };
+  }
+
+  if (mode === 'pty-orchestrator' && !targetAgent) {
+    ui.error('--mode pty-orchestrator requires --target-agent <agent-id>');
     return { exitCode: 1 };
   }
 
@@ -193,14 +206,17 @@ async function mcDispatch(ctx: HandlerContext): Promise<HandlerResult> {
     loop: 0,
     maxIterations,
     priority,
+    mode,
+    targetAgent: targetAgent || undefined,
   };
 
   session.missions.push(mission);
   await writeSession(session);
-  await appendLog(session.id, { event: 'mission_dispatched', missionId: mission.id, objective, priority });
+  await appendLog(session.id, { event: 'mission_dispatched', missionId: mission.id, objective, priority, mode, targetAgent });
 
   ui.success(`Dispatched mission ${mission.id}: ${objective}`);
-  ui.info(`Priority: ${priority} | Max iterations: ${maxIterations}`);
+  const modeLabel = mode === 'pty-orchestrator' ? ` | Mode: PTY orchestrator → ${targetAgent}` : '';
+  ui.info(`Priority: ${priority} | Max iterations: ${maxIterations}${modeLabel}`);
 
   return { exitCode: 0, message: mission.id };
 }
@@ -239,22 +255,27 @@ async function mcStatus(ctx: HandlerContext): Promise<HandlerResult> {
   ui.rule(60);
 
   // Header
-  const header = `  ${'#'.padEnd(4)} ${'Mission'.padEnd(36)} ${'Status'.padEnd(12)} ${'Loop'.padEnd(8)} ${'Started'.padEnd(8)}`;
+  const header = `  ${'#'.padEnd(4)} ${'Mission'.padEnd(32)} ${'Mode'.padEnd(6)} ${'Status'.padEnd(12)} ${'Loop'.padEnd(8)} ${'Started'.padEnd(8)}`;
   console.log(ui.dim(header));
-  ui.rule(60);
+  ui.rule(68);
 
   for (let i = 0; i < session.missions.length; i++) {
     const m = session.missions[i];
     const icon = statusIcons[m.status] || '?';
     const num = String(i + 1).padEnd(4);
-    const obj = m.objective.length > 34 ? m.objective.slice(0, 31) + '...' : m.objective.padEnd(36);
+    const obj = m.objective.length > 30 ? m.objective.slice(0, 27) + '...' : m.objective.padEnd(32);
+    const modeTag = m.mode === 'pty-orchestrator' ? 'PTY'.padEnd(6) : '—'.padEnd(6);
     const status = `${icon} ${m.status.toUpperCase()}`.padEnd(12);
     const loop = m.status === 'queued' ? '—'.padEnd(8) : `${m.loop}/${m.maxIterations}`.padEnd(8);
     const started = m.startedAt ? new Date(m.startedAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }) : '—';
-    console.log(`  ${num} ${obj} ${status} ${loop} ${started}`);
+    console.log(`  ${num} ${obj} ${modeTag} ${status} ${loop} ${started}`);
+    // Show last action for PTY-orchestrated missions
+    if (m.mode === 'pty-orchestrator' && m.lastAction && m.status === 'running') {
+      console.log(ui.dim(`       └─ Last: ${m.lastAction}`));
+    }
   }
 
-  ui.rule(60);
+  ui.rule(68);
 
   const counts = {
     done: session.missions.filter(m => m.status === 'done').length,
@@ -461,6 +482,7 @@ function showMcHelp(): void {
   ${ui.bold('Subcommands:')}
     start                         Start a new Mission Control session
     dispatch <id> "<objective>"   Add a background mission to session
+                                  [--mode pty-orchestrator] [--target-agent <id>]
     status [<id>] [--json]        View mission status dashboard
     watch [<id>]                  Live monitor (streaming)
     abort <session> <mission>     Abort a specific mission
@@ -472,6 +494,7 @@ function showMcHelp(): void {
   ${ui.bold('Examples:')}
     aiwg mc start --name "Sprint 4"
     aiwg mc dispatch mc-abc123 "Fix auth" --completion "tests pass"
+    aiwg mc dispatch mc-abc123 "Supervise agent-01" --mode pty-orchestrator --target-agent agent-01 --completion "migration complete"
     aiwg mc status mc-abc123
     aiwg mc stop mc-abc123 --drain
 `);
