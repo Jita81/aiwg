@@ -145,6 +145,8 @@ Based on your answers, I'll adjust:
    - .aiwg/requirements/supplemental-specification.md
    - .aiwg/testing/master-test-plan.md
    - .aiwg/risks/risk-list.md (≥70% retired)
+   - .aiwg/requirements/realizations/DES-UCR-*.md (behavioral specs — Layer 3)
+   - .aiwg/architecture/method-contracts/DES-MIC-*.md (interface contracts)
    ```
 
 2. **Launch ABM Validation Agent**:
@@ -161,6 +163,16 @@ Based on your answers, I'll adjust:
        - All P0/P1 architectural risks RETIRED/MITIGATED
        - ≥70% of all risks retired or mitigated
        - Requirements baseline ESTABLISHED (≥10 use cases)
+       - Behavioral specifications COMPLETE (Layer 3):
+         - ≥80% of architecturally significant UCs have realizations
+         - State machine specs for stateful entities
+         - Decision tables for complex branching logic
+         - Method-level interface contracts for key components
+       - Pseudo-code specifications COMPLETE for first iteration scope (Layer 4):
+         - Algorithm specs for non-trivial logic
+         - Error handling trees for critical paths
+         - Data structure definitions with invariants
+         - Spec-to-UC traceability chain validated
        - Master Test Plan APPROVED
        - Development Case tailored
        - Test environments OPERATIONAL
@@ -168,8 +180,10 @@ Based on your answers, I'll adjust:
        Generate ABM Validation Report:
        - Status: PASS | FAIL
        - Criteria checklist with evidence
+       - Behavioral spec coverage: X/Y use cases with realizations
+       - Pseudo-code spec coverage: X/Y methods with specs
        - Decision: GO to Construction | NO-GO
-       - Gaps (if NO-GO): List missing artifacts
+       - Gaps (if NO-GO): List missing artifacts and specs
 
        Save to: .aiwg/reports/abm-validation-report.md
        """

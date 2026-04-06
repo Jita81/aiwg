@@ -239,6 +239,13 @@ Task(
     - .aiwg/testing/master-test-plan.md (APPROVED)
     - .aiwg/risks/risk-retirement-report.md
 
+    Check for Layer 3 behavioral specifications:
+    - .aiwg/requirements/realizations/DES-UCR-*.md (use case realizations)
+    - .aiwg/architecture/state-machines/DES-SM-*.md (state machine specs)
+    - .aiwg/architecture/decision-tables/DES-DT-*.md (decision tables)
+    - .aiwg/architecture/method-contracts/DES-MIC-*.md (method interface contracts)
+    - .aiwg/architecture/activity-diagrams/DES-ACT-*.md (activity diagrams)
+
     Validate ABM criteria:
     - Architecture BASELINED and peer-reviewed
     - ADRs documented (3-5 major decisions)
@@ -246,8 +253,16 @@ Task(
     - Requirements baseline established
     - Test strategy approved
     - Development case tailored
+    - Behavioral spec coverage ≥80% of architecturally significant use cases
+    - Every behavioral spec has a completeness checklist satisfied
+    - Traceability: UC → behavioral spec IDs present in realizations
 
-    Generate validation report with pass/fail status
+    Generate validation report:
+    - List each use case and whether it has a behavioral spec (realization)
+    - Report behavioral spec coverage percentage
+    - Flag use cases without realizations as GAPS
+    - Overall status: PASS requires ≥80% coverage of architecturally significant UCs
+
     Save to: .aiwg/gates/abm-validation-report.md
     """
 )
@@ -267,6 +282,34 @@ Task(
     Check architecture risks retired via POCs
     Report: READY | GAPS | BLOCKED
     Save to: .aiwg/gates/abm-architecture-review.md
+    """
+)
+
+# Behavioral specification validation
+Task(
+    subagent_type="requirements-analyst",
+    description="Validate behavioral specifications (Layer 3) completeness",
+    prompt="""
+    Validate Layer 3 behavioral specifications:
+
+    Check for use case realizations:
+    - .aiwg/requirements/realizations/DES-UCR-*.md
+    - ≥80% coverage of architecturally significant use cases
+
+    Check for supporting specs:
+    - .aiwg/architecture/state-machines/DES-SM-*.md (stateful entities)
+    - .aiwg/architecture/decision-tables/DES-DT-*.md (branching logic)
+    - .aiwg/architecture/method-contracts/DES-MIC-*.md (method interfaces)
+    - .aiwg/architecture/activity-diagrams/DES-ACT-*.md (complex flows)
+
+    For each use case in .aiwg/requirements/:
+    - List whether it has a corresponding realization
+    - Report coverage percentage
+    - Flag gaps
+
+    Report: READY | GAPS | BLOCKED
+    Include per-UC coverage table in report
+    Save to: .aiwg/gates/abm-behavioral-spec-review.md
     """
 )
 
@@ -307,6 +350,12 @@ Task(
     - Security scans passing
     - Documentation current
 
+    Check pseudo-code spec coverage (Layer 4):
+    - Every implemented method has a DES-PSC-*.md spec
+    - Spec coverage ≥80% of critical-path methods (configurable threshold)
+    - Error handling trees exist for critical paths
+    - Data structure specs match implementation
+
     Validate IOC criteria:
     - Unit test coverage ≥80%
     - Integration tests 100% passing
@@ -314,8 +363,11 @@ Task(
     - No High/Critical vulnerabilities
     - Release notes complete
     - Runbooks documented
+    - Traceability complete: UC → behavioral → pseudo-code → code → test
 
-    Generate comprehensive IOC report
+    Generate comprehensive IOC report with:
+    - Behavioral spec → pseudo-code coverage matrix
+    - Spec-to-code traceability gaps
     Save to: .aiwg/gates/ioc-validation-report.md
     """
 )

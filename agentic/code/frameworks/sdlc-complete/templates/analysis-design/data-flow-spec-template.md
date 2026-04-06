@@ -184,6 +184,18 @@ flowchart LR
 | dateOfBirth | confidential | yes | none in internal logs | no | yes (at rest) |
 | marketingOptIn | internal | no | none | yes (write) | no |
 
+## How to Fill This Template
+
+1. **Identify Source and Destination**: What data enters the flow and where does it end up? Document every source field with its type, format, and constraints.
+2. **Draw the Diagram First**: Sketch the data flow using MermaidJS `flowchart LR`. Show sources, transformations, intermediate stores, destinations, and error paths.
+3. **Fill the Flow Steps Table**: One row per processing step. Every step must name the actor/system performing the transformation.
+4. **Fill the Transformation Catalog**: One row per named transformation in the diagram. Include input schema, logic, output schema, and failure mode.
+5. **Document Intermediate States**: Every place where data rests between transformations (database, queue, cache) gets a row with schema, retention, and access control.
+6. **Fill the Destination Specification**: Map each output field back to its source. Verify every source field is traceable to a destination or documented as intentionally dropped.
+7. **Document Validation Constraints**: At each stage, what can go wrong? Every constraint must produce a specific error — no silent data loss.
+8. **Classify Data Sensitivity**: Identify PII fields, masking rules, audit logging requirements, and encryption needs. This is a compliance checkpoint.
+9. **Validate**: Walk the completeness checklist. Every diagram element must appear in a table; every source field must reach a destination or be explicitly dropped.
+
 ## Agent Notes
 
 - Trace every source field to its destination; any field that is intentionally discarded must be documented with a justification.

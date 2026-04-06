@@ -124,6 +124,19 @@ List every observable effect beyond the return value. Write `none` if the method
 - [ ] Side effects section is present (even if `none`)
 - [ ] Thread safety and idempotency are explicitly stated
 
+## How to Fill This Template
+
+1. **Identify the Method**: Specify the class/module, method name, visibility, and behavioral properties (thread safety, idempotency, purity).
+2. **Write the Signature**: Use language-neutral notation: `methodName(param: Type) → ReturnType`. Document every parameter with constraints and null policy.
+3. **Define Preconditions**: What must be true before the method is called? These are the caller's responsibility — violations are programming errors.
+4. **Define Postconditions**: What must be true after the method returns normally? These are the implementer's guarantee.
+5. **Define Invariants**: What object-level conditions must hold before and after every call?
+6. **Describe the Transformation**: Explain how inputs map to outputs. Use pseudocode or a mapping table — whichever is clearer.
+7. **List Exceptions**: Every exception the method may throw, its trigger condition, and what the caller should do about it.
+8. **List Side Effects**: Every observable effect beyond the return value. Write `none` if the method is pure.
+9. **Estimate Performance**: Time/space complexity, I/O calls, caching behavior. This informs callers and testers.
+10. **Validate**: Walk the completeness checklist. Every parameter needs a row; every exception needs a trigger; side effects must be explicit.
+
 ## Example
 
 ### Method: `calculateOrderTotal`

@@ -92,6 +92,16 @@ State what happens when no rule matches (should be explicit, not a silent fall-t
 - [ ] Evaluation order is specified and consistent with implementation
 - [ ] Each rule maps to at least one test case
 
+## How to Fill This Template
+
+1. **Name the Decision**: What branching logic is this table formalizing? Link it to the parent use case and behavioral spec.
+2. **List Conditions**: Identify all boolean-evaluable conditions that affect the outcome. Each condition becomes a row in the Rules Matrix.
+3. **List Actions**: Identify all possible outcomes. Each action must be a concrete operation (return value, side effect, or exception).
+4. **Build the Rules Matrix**: For N conditions, start with 2^N columns. Fill in Y/N for each condition, then mark which action(s) each rule triggers.
+5. **Simplify**: Look for rules that produce identical actions regardless of one condition — merge them using `-` (don't care) and document the justification.
+6. **Define the Default**: What happens when no rule matches? This must be explicit (exception, fallback, or log-and-skip).
+7. **Validate**: Walk the completeness checklist. Confirm total rules equal 2^N or all collapses are justified. Every rule must have at least one action.
+
 ## Example
 
 ### Decision: Discount Calculation

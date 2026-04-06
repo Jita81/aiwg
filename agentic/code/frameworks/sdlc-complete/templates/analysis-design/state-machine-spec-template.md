@@ -89,6 +89,17 @@ Conditions that must hold true regardless of state. Violations indicate a data-i
 - [ ] Nested state machines are individually complete by this same checklist
 - [ ] State diagram matches Transition Table exactly (no discrepancies)
 
+## How to Fill This Template
+
+1. **Identify the Entity**: Name the domain object, aggregate, or process whose lifecycle this state machine governs. Specify persistence and concurrency model.
+2. **List All States**: Enumerate every reachable state. Each state should have a clear business meaning, not just a technical label.
+3. **Draw the Diagram**: Use MermaidJS `stateDiagram-v2`. Include all transitions with triggers and guards.
+4. **Fill the State Catalog**: One row per state. Entry and exit actions must be concrete operations (or explicitly `none`). Every state needs at least one invariant.
+5. **Fill the Transition Table**: One row per arrow in the diagram. Every transition needs a trigger; guards and actions can be `none` but must be explicitly stated.
+6. **Document Nested States**: If any state contains a sub-state machine, create a separate DES-SM for it and cross-reference.
+7. **Define Invariants**: List conditions that hold across all states. These become runtime assertions in the implementation.
+8. **Validate**: Walk the completeness checklist. Confirm the diagram and table match exactly — no orphaned states, no missing transitions.
+
 ## Example
 
 ### Entity: Order

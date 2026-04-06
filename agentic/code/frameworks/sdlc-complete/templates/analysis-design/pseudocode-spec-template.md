@@ -104,6 +104,18 @@ END STRUCTURE
 - [ ] All VALIDATE blocks have ON FAILURE handlers
 - [ ] Preconditions and postconditions match interface contract
 
+## How to Fill This Template
+
+1. **Start from the Interface Contract**: Read the parent DES-MIC. The method signature, preconditions, postconditions, and exception specs define what your pseudo-code must accomplish.
+2. **Write the Signature**: Copy the function signature from the interface contract, using the pseudo-code notation (`FUNCTION name(param: Type) → ReturnType`).
+3. **Copy Preconditions and Postconditions**: These come directly from the DES-MIC. Every precondition becomes a `VALIDATE` block at the start of the algorithm.
+4. **Write the Algorithm**: Express the logic step-by-step using the pseudo-code keywords (`SET`, `FOR EACH`, `IF`, `VALIDATE`, `RETURN`). Keep it language-neutral — no syntax from any specific programming language.
+5. **Fill the Error Handling Tree**: For every `VALIDATE ... ON FAILURE` block and every exception in the interface contract, add a row mapping exception → handler → recovery strategy.
+6. **Define Data Structures**: Document any intermediate data structures the algorithm creates or consumes using the `STRUCTURE` notation.
+7. **State Invariants**: Conditions that must hold throughout execution (not just pre/post).
+8. **Note Concurrency**: If the algorithm touches shared state or crosses async boundaries, document mutex requirements or await points.
+9. **Validate**: Walk the completeness checklist. Every behavioral spec branch must have a pseudo-code path; every interface contract exception must have a handler.
+
 ## Ownership & Collaboration
 
 - Document Owner: Architecture Designer

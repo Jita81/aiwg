@@ -111,6 +111,18 @@ Document all error and exception paths. Every decision node with a failure branc
 - [ ] All parallel activities in the same fork are independent (no shared mutable state)
 - [ ] Diagram syntax is valid MermaidJS `flowchart TD`
 
+## How to Fill This Template
+
+1. **Identify the Process**: Name the business process or technical flow being modeled. Link it to the parent use case (UC-`id`).
+2. **Define Trigger and Termination**: What event starts this process? What conditions end it normally?
+3. **Draw the Diagram First**: Sketch the flow using MermaidJS `flowchart TD`. Start with the happy path, then add decision branches and parallel paths.
+4. **Fill the Activity Catalog**: One row per diagram node. Every activity must have a swim lane, input, and output — this is the authoritative spec the diagram visualizes.
+5. **Fill the Decision Node Catalog**: One row per diamond. Every decision must have a boolean condition and explicit true/false paths.
+6. **Assign Swim Lanes**: Map each activity to the actor or component responsible. If multiple components collaborate, split into separate activities.
+7. **Document Parallel Paths**: For every fork, specify the synchronization rule (all must complete, first wins, etc.). Verify parallel activities share no mutable state.
+8. **Document Exception Flows**: Every decision node with a failure branch needs an entry. Specify the compensation or recovery activity.
+9. **Validate**: Walk the completeness checklist. Every diagram node must appear in a catalog table; every fork must have a join.
+
 ## Example
 
 ### Process: Order Fulfillment

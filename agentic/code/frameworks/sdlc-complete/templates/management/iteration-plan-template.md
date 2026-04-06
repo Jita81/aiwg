@@ -25,8 +25,12 @@ Define objectives, scope, tasks, and evaluation criteria for a single iteration 
    - Describe business and technical goals plus acceptance criteria.
 3. **Scope of Work**
    - List features, use cases, or components targeted this iteration.
+   - For Elaboration iterations: include behavioral specification tasks (use case realizations, state machines, decision tables, interface contracts) alongside architecture tasks.
+   - For Construction iterations: reference pseudo-code specifications as input to implementation tasks.
 4. **Task Breakdown**
    - Provide table with task IDs, descriptions, owners, dependencies, and estimates.
+   - Elaboration iterations should include rows for: create use case realization (DES-UCR), create state machine spec (DES-SM), create decision table (DES-DT), create method interface contract (DES-MIC) as appropriate per use case.
+   - Construction iterations should include rows for: create pseudo-code spec (DES-PSC), implement from spec, derive tests from behavioral spec.
 5. **Milestones and Deliverables**
    - Identify intermediate checkpoints and expected outputs.
 6. **Resource Allocation**
