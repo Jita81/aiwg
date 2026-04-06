@@ -13,6 +13,11 @@ import path from 'path';
 import type { CommandHandler, HandlerContext, HandlerResult } from './types.js';
 import { createPtyWsHandler, registry as ptyRegistry } from '../../serve/pty-bridge.js';
 import { telemetryStore, createEvent } from '../../serve/telemetry.js';
+import {
+  sandboxRegistry,
+  type RegisterRequest,
+  type SandboxEvent,
+} from '../../serve/sandbox-registry.js';
 
 const DEFAULT_PORT = 7337;
 const DEFAULT_HOST = '127.0.0.1';
@@ -25,11 +30,13 @@ function parseServeArgs(args: string[]): {
   host: string;
   open: boolean;
   readOnly: boolean;
+  sandbox: string | null;
 } {
   let port = DEFAULT_PORT;
   let host = DEFAULT_HOST;
   let open = true;
   let readOnly = false;
+  let sandbox: string | null = null;
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
@@ -40,6 +47,9 @@ function parseServeArgs(args: string[]): {
     } else if (arg === '--bind' && args[i + 1]) {
       host = args[i + 1];
       i++;
+    } else if (arg === '--sandbox' && args[i + 1]) {
+      sandbox = args[i + 1];
+      i++;
     } else if (arg === '--no-open') {
       open = false;
     } else if (arg === '--read-only') {
@@ -47,7 +57,7 @@ function parseServeArgs(args: string[]): {
     }
   }
 
-  return { port, host, open, readOnly };
+  return { port, host, open, readOnly, sandbox };
 }
 
 /**
@@ -83,17 +93,21 @@ async function startServer(opts: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const app = new Hono() as any;
 
-  // WebSocket PTY bridge (#712) — must be set up before serve() is called
+  // WebSocket setup — shared by PTY bridge (#712) and sandbox event push (#731)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let injectWebSocket: ((server: any) => void) | null = null;
-  if (!opts.readOnly) {
-    try {
-      const { upgradeWebSocket, injectWebSocket: inject } = createNodeWebSocket({ app });
-      injectWebSocket = inject;
-      app.get('/ws/pty/:sessionId', upgradeWebSocket(createPtyWsHandler));
-    } catch {
-      // @hono/node-server/ws not available — WebSocket routes skipped
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let upgradeWebSocket: ((handler: any) => any) | null = null;
+  try {
+    const wsSetup = createNodeWebSocket({ app });
+    injectWebSocket = wsSetup.injectWebSocket;
+    upgradeWebSocket = wsSetup.upgradeWebSocket;
+    // PTY bridge only available when not in read-only mode
+    if (!opts.readOnly) {
+      app.get('/ws/pty/:sessionId', wsSetup.upgradeWebSocket(createPtyWsHandler));
     }
+  } catch {
+    // @hono/node-server/ws not available — WebSocket routes skipped
   }
 
   // Health check
@@ -143,6 +157,182 @@ async function startServer(opts: {
     app.post('/api/sessions', (c: any) => c.json({ id: null, error: 'Use /ws/pty/:sessionId to start a PTY session' }, 501));
   }
 
+  // ---- Sandbox Registration API (#731) ----
+
+  // Register a sandbox instance
+  app.post('/api/sandboxes/register', async (c: any) => {
+    try {
+      const body: RegisterRequest = await c.req.json();
+      if (!body.name || !body.grpc_endpoint || !body.ws_endpoint || !body.http_endpoint) {
+        return c.json({ error: 'Missing required fields: name, grpc_endpoint, ws_endpoint, http_endpoint' }, 400);
+      }
+      const result = sandboxRegistry.register(body);
+      return c.json(result, 201);
+    } catch {
+      return c.json({ error: 'Invalid request body' }, 400);
+    }
+  });
+
+  // Deregister a sandbox
+  app.delete('/api/sandboxes/:id', (c: any) => {
+    const id: string = c.req.param('id');
+    const token = (c.req.header('authorization') ?? '').replace(/^Bearer\s+/i, '');
+    if (!sandboxRegistry.authenticate(id, token)) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+    sandboxRegistry.deregister(id);
+    return c.json({ ok: true });
+  });
+
+  // List all registered sandboxes
+  app.get('/api/sandboxes', (c: any) => {
+    return c.json({ sandboxes: sandboxRegistry.list() });
+  });
+
+  // Get a single sandbox
+  app.get('/api/sandboxes/:id', (c: any) => {
+    const summary = sandboxRegistry.getSummary(c.req.param('id'));
+    if (!summary) return c.json({ error: 'Sandbox not found' }, 404);
+    return c.json(summary);
+  });
+
+  // List agents for a specific sandbox
+  app.get('/api/sandboxes/:id/agents', (c: any) => {
+    const sandbox = sandboxRegistry.get(c.req.param('id'));
+    if (!sandbox) return c.json({ error: 'Sandbox not found' }, 404);
+    return c.json({ agents: [...sandbox.agents.values()] });
+  });
+
+  // List all agents across all sandboxes
+  app.get('/api/agents', (c: any) => {
+    return c.json({ agents: sandboxRegistry.allAgents() });
+  });
+
+  // Proxy endpoints for sandbox lifecycle (#733)
+  // These forward to the registered sandbox's HTTP endpoint
+  app.get('/api/sandboxes/:id/loadouts', async (c: any) => {
+    const sandbox = sandboxRegistry.get(c.req.param('id'));
+    if (!sandbox) return c.json({ error: 'Sandbox not found' }, 404);
+    try {
+      const resp = await fetch(`${sandbox.httpEndpoint}/api/v1/loadouts`);
+      return c.json(await resp.json(), resp.status);
+    } catch (err) {
+      return c.json({ error: `Sandbox unreachable: ${err instanceof Error ? err.message : String(err)}` }, 502);
+    }
+  });
+
+  app.post('/api/sandboxes/:id/provision', async (c: any) => {
+    const sandbox = sandboxRegistry.get(c.req.param('id'));
+    if (!sandbox) return c.json({ error: 'Sandbox not found' }, 404);
+    try {
+      const body = await c.req.json();
+      const resp = await fetch(`${sandbox.httpEndpoint}/api/v1/provision`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      return c.json(await resp.json(), resp.status);
+    } catch (err) {
+      return c.json({ error: `Sandbox unreachable: ${err instanceof Error ? err.message : String(err)}` }, 502);
+    }
+  });
+
+  // Proxy agent lifecycle actions to sandbox
+  for (const action of ['start', 'stop', 'destroy', 'reprovision'] as const) {
+    app.post(`/api/sandboxes/:id/agents/:aid/${action}`, async (c: any) => {
+      const sandbox = sandboxRegistry.get(c.req.param('id'));
+      if (!sandbox) return c.json({ error: 'Sandbox not found' }, 404);
+      try {
+        const resp = await fetch(`${sandbox.httpEndpoint}/api/v1/agents/${c.req.param('aid')}/${action}`, {
+          method: 'POST',
+        });
+        return c.json(await resp.json(), resp.status);
+      } catch (err) {
+        return c.json({ error: `Sandbox unreachable: ${err instanceof Error ? err.message : String(err)}` }, 502);
+      }
+    });
+  }
+
+  app.delete('/api/sandboxes/:id/agents/:aid', async (c: any) => {
+    const sandbox = sandboxRegistry.get(c.req.param('id'));
+    if (!sandbox) return c.json({ error: 'Sandbox not found' }, 404);
+    try {
+      const resp = await fetch(`${sandbox.httpEndpoint}/api/v1/agents/${c.req.param('aid')}`, {
+        method: 'DELETE',
+      });
+      return c.json(await resp.json(), resp.status);
+    } catch (err) {
+      return c.json({ error: `Sandbox unreachable: ${err instanceof Error ? err.message : String(err)}` }, 502);
+    }
+  });
+
+  // HITL endpoints (#732)
+  app.get('/api/hitl', (c: any) => {
+    return c.json({ requests: sandboxRegistry.pendingHitl() });
+  });
+
+  app.post('/api/hitl/:id/respond', async (c: any) => {
+    const hitlId: string = c.req.param('id');
+    const hitl = sandboxRegistry.resolveHitl(hitlId);
+    if (!hitl) return c.json({ error: 'HITL request not found or already resolved' }, 404);
+    const sandbox = sandboxRegistry.get(hitl.sandboxId);
+    if (!sandbox) return c.json({ error: 'Sandbox no longer registered' }, 410);
+    try {
+      const { text } = await c.req.json();
+      const resp = await fetch(`${sandbox.httpEndpoint}/api/v1/hitl/${hitlId}/respond`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+      return c.json({ ok: true }, resp.status);
+    } catch (err) {
+      return c.json({ error: `Sandbox unreachable: ${err instanceof Error ? err.message : String(err)}` }, 502);
+    }
+  });
+
+  app.post('/api/hitl/:id/dismiss', (c: any) => {
+    const hitl = sandboxRegistry.resolveHitl(c.req.param('id'));
+    if (!hitl) return c.json({ error: 'HITL request not found or already resolved' }, 404);
+    return c.json({ ok: true });
+  });
+
+  // WebSocket endpoint for sandbox event push (#731)
+  // agentic-sandbox connects here after registration to stream events
+  if (upgradeWebSocket) {
+    try {
+      app.get('/ws/sandbox/:sandboxId', upgradeWebSocket((c: any) => {
+        const sandboxId: string = c.req.param('sandboxId');
+        const token = c.req.query('token') ?? '';
+
+        return {
+          onOpen() {
+            if (!sandboxRegistry.authenticate(sandboxId, token)) {
+              return; // will be closed in onMessage or by client
+            }
+            sandboxRegistry.setConnected(sandboxId, true);
+          },
+          onMessage(evt: { data: string }) {
+            if (!sandboxRegistry.authenticate(sandboxId, token)) return;
+            try {
+              const event: SandboxEvent = JSON.parse(evt.data);
+              event.sandboxId = sandboxId;
+              if (!event.timestamp) event.timestamp = new Date().toISOString();
+              sandboxRegistry.handleEvent(event);
+            } catch { /* ignore malformed events */ }
+          },
+          onClose() {
+            sandboxRegistry.setConnected(sandboxId, false);
+          },
+          onError(err: unknown) {
+            console.error(`[sandbox-registry] WebSocket error for ${sandboxId}:`, err);
+          },
+        };
+      }));
+    } catch {
+      // WebSocket upgrade not available for sandbox push — REST-only mode
+    }
+  }
+
   // Static file serving — apps/web/dist/ (#714)
   // Served with @hono/node-server/serve-static if the dist exists
   const webDistDir = path.join(opts.frameworkRoot, 'apps', 'web', 'dist');
@@ -178,6 +368,7 @@ async function startServer(opts: {
     url,
     close: () => {
       ptyRegistry.shutdown();
+      sandboxRegistry.shutdown();
       if (typeof (server as { close?: () => void }).close === 'function') {
         (server as { close: () => void }).close();
       }
