@@ -782,5 +782,57 @@ type: citations
       // Authors should be in summary
       expect(ref008.summary).toContain('Lewis');
     });
+
+    it('accepts match shorthand in metadataSupplements config (#738)', async () => {
+      // Use "match" shorthand instead of separate matchOn + nodeKey
+      const aiwgDir = path.join(tmpDir, '.aiwg');
+      fs.mkdirSync(aiwgDir, { recursive: true });
+      fs.writeFileSync(path.join(aiwgDir, 'config.yaml'), `
+index:
+  graphs:
+    papers:
+      scanDirs:
+        - pdfs/full
+      extensions:
+        - .pdf
+      nodeStrategy: filename-metadata
+      filenamePattern: "REF-(?P<ref>\\\\d{3})-(?P<slug>.+)\\\\.pdf"
+      defaultBuild: true
+      metadataSupplements:
+        - scanDir: documentation/citations
+          match: frontmatter.ref
+          mergeFields:
+            - title
+            - authors
+`);
+
+      const pdfDir = path.join(tmpDir, 'pdfs', 'full');
+      fs.mkdirSync(pdfDir, { recursive: true });
+      fs.writeFileSync(path.join(pdfDir, 'REF-008-rag.pdf'), Buffer.from('fake'));
+
+      const citationDir = path.join(tmpDir, 'documentation', 'citations');
+      fs.mkdirSync(citationDir, { recursive: true });
+      fs.writeFileSync(path.join(citationDir, 'REF-008-citations.md'), `---
+ref: REF-008
+title: "RAG for Knowledge-Intensive NLP"
+authors: "Lewis et al."
+---
+`);
+
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      await buildIndex(tmpDir, { force: true, graph: 'papers' });
+
+      consoleSpy.mockRestore();
+      consoleWarnSpy.mockRestore();
+
+      const indexDir = path.join(tmpDir, '.aiwg', '.index', 'papers');
+      const metadata = JSON.parse(fs.readFileSync(path.join(indexDir, 'metadata.json'), 'utf-8'));
+      const ref008 = metadata.entries['pdfs/full/REF-008-rag.pdf'];
+
+      expect(ref008.title).toBe('RAG for Knowledge-Intensive NLP');
+      expect(ref008.summary).toContain('Lewis');
+    });
   });
 });

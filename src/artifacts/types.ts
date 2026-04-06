@@ -376,6 +376,46 @@ export const BUILTIN_GRAPH_CONFIGS: Record<BuiltinGraphType, GraphConfig> = {
 export const GRAPH_CONFIGS: Record<string, GraphConfig> = { ...BUILTIN_GRAPH_CONFIGS };
 
 /**
+ * Normalize metadataSupplements entries.
+ *
+ * Accepts the shorthand `match: "frontmatter.<field>"` and expands it to
+ * `matchOn` + `nodeKey`. This lets users write the compact form in config:
+ *
+ *   match: frontmatter.ref
+ *
+ * instead of the explicit two-field form:
+ *
+ *   matchOn: frontmatter.ref
+ *   nodeKey: ref
+ *
+ * @implements #738
+ */
+function normalizeSupplements(raw: Record<string, unknown>[]): MetadataSupplementConfig[] {
+  return raw.map((entry) => {
+    let matchOn = entry.matchOn as string | undefined;
+    let nodeKey = entry.nodeKey as string | undefined;
+
+    // Accept "match" shorthand: derive matchOn and nodeKey from it
+    if (!matchOn && typeof entry.match === 'string') {
+      matchOn = entry.match;
+    }
+
+    // Derive nodeKey from matchOn if not explicitly provided
+    // e.g. "frontmatter.ref" -> nodeKey "ref"
+    if (!nodeKey && matchOn) {
+      nodeKey = matchOn.replace(/^frontmatter\./, '');
+    }
+
+    return {
+      scanDir: entry.scanDir as string,
+      matchOn: matchOn ?? '',
+      nodeKey: nodeKey ?? '',
+      mergeFields: Array.isArray(entry.mergeFields) ? entry.mergeFields as string[] : [],
+    };
+  });
+}
+
+/**
  * Parse a raw graph definition object into a GraphConfig.
  *
  * Shared between loadUserGraphConfigs and loadModuleGraphConfigs.
@@ -393,7 +433,7 @@ function parseGraphDef(name: string, graphDef: Record<string, unknown>): GraphCo
     nodeStrategy: graphDef.nodeStrategy as GraphConfig['nodeStrategy'],
     filenamePattern: typeof graphDef.filenamePattern === 'string' ? graphDef.filenamePattern : undefined,
     metadataSupplements: Array.isArray(graphDef.metadataSupplements)
-      ? graphDef.metadataSupplements as MetadataSupplementConfig[]
+      ? normalizeSupplements(graphDef.metadataSupplements as Record<string, unknown>[])
       : undefined,
     graphBackend: typeof graphDef.graphBackend === 'string'
       ? graphDef.graphBackend as GraphConfig['graphBackend']

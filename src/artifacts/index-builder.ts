@@ -179,6 +179,8 @@ function applyMetadataSupplements(
     const sidecarDir = path.join(cwd, supplement.scanDir);
     if (!fs.existsSync(sidecarDir)) continue;
 
+    if (!supplement.matchOn || !supplement.nodeKey) continue;
+
     // Parse matchOn: "frontmatter.ref" -> field "ref"
     const matchField = supplement.matchOn.replace(/^frontmatter\./, '');
 
