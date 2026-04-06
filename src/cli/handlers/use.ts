@@ -552,8 +552,21 @@ export class UseHandler implements CommandHandler {
     const framework = ctx.args[0];
     const remainingArgs = ctx.args.slice(1);
 
+    // Resolve --prefix as alias for --target (#734)
+    // --prefix is more intuitive for "deploy to a project directory" in cloud-init/CI
+    const prefixIdx = remainingArgs.findIndex(a => a === '--prefix');
+    if (prefixIdx >= 0 && remainingArgs[prefixIdx + 1]) {
+      // Rewrite --prefix to --target for downstream compatibility
+      remainingArgs[prefixIdx] = '--target';
+    }
+
     // Read project config for config-first resolution (#621)
-    const projectDir = ctx.cwd || process.cwd();
+    // When --target/--prefix is set, resolve config from that directory instead of cwd
+    const targetFlagIdx = remainingArgs.findIndex(a => a === '--target');
+    const targetDir = targetFlagIdx >= 0 && remainingArgs[targetFlagIdx + 1]
+      ? remainingArgs[targetFlagIdx + 1]
+      : null;
+    const projectDir = targetDir || ctx.cwd || process.cwd();
     let config = await readAiwgConfig(projectDir);
 
     // Auto-init when no config found (#720)
@@ -571,13 +584,18 @@ export class UseHandler implements CommandHandler {
           : _providersValue.split(',').map(s => s.trim()).filter(Boolean);
         config = emptyConfig(pList.length > 0 ? pList : ['claude']);
         await writeAiwgConfig(projectDir, config);
-      } else if (!_hasExplicitProvider && process.stdin.isTTY) {
+      } else if (targetDir || _hasExplicitProvider || !process.stdin.isTTY) {
+        // Non-interactive: auto-create minimal config with explicit provider or default (#734)
+        // When --prefix/--target is set, we're in automated mode — no wizard
+        const autoProvider = _hasExplicitProvider ? remainingArgs[_providerFlagIdx + 1] : 'claude';
+        config = emptyConfig([autoProvider]);
+        await writeAiwgConfig(projectDir, config);
+      } else if (process.stdin.isTTY) {
         // Interactive terminal with no config → run init wizard inline (#720)
         const initResult = await initHandler.execute({ ...ctx, args: [] });
         if (initResult.exitCode !== 0) return initResult;
         config = await readAiwgConfig(projectDir);
       }
-      // Non-interactive (CI/pipes) or explicit provider: fall through and warn below
     }
 
     // Zero-arg form: `aiwg use` with no framework → redeploy all installed to all providers
