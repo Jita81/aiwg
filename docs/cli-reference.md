@@ -457,6 +457,30 @@ cd customer-portal
 /intake-wizard "Customer portal with real-time chat"
 ```
 
+### serve
+
+Start local HTTP dashboard server for sandbox fleet management and HITL relay.
+
+```bash
+aiwg serve
+aiwg serve --port 8080 --bind 0.0.0.0
+aiwg serve --no-open --read-only
+```
+
+**Options:**
+- `--port <n>` - Port to listen on (default: `7337`)
+- `--bind <host>` - Interface to bind (default: `127.0.0.1`)
+- `--no-open` - Skip auto-opening browser
+- `--read-only` - Disable PTY sessions and session creation
+
+**Capabilities:** cli, server
+**Platforms:** All
+**Tools:** Read, Bash
+
+**Requires:** `hono`, `@hono/node-server` (install via `npm install hono @hono/node-server`)
+
+**See also:** [Serve Guide](serve-guide.md) for full API reference, WebSocket protocols, and integration details.
+
 ---
 
 ## Workspace Management
