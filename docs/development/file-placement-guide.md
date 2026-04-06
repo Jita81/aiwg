@@ -11,18 +11,28 @@ These folders are deployment targets, not source locations. The AIWG CLI manages
 ## Architecture Overview
 
 ```
-AIWG Source (you edit here)          CLI Deploy          Platform Folders (don't edit)
+Source (you edit here)                CLI Deploy          Platform Folders (don't edit)
 ─────────────────────────────────────────────────────────────────────────────────────────
 agentic/code/frameworks/             ───────────>        .claude/agents/
 agentic/code/frameworks/             ───────────>        .factory/droids/
 agentic/code/addons/                 ───────────>        .codex/agents/
 agentic/code/agents/                 ───────────>        .cursor/rules/
                                                          .opencode/agent/
+
+.aiwg/.project/agents/               ───────────>        .claude/agents/{namespace}/
+.aiwg/.project/skills/               ───────────>        .claude/skills/{namespace}/
 ```
+
+There are two source tiers:
+
+1. **Framework source** (`agentic/code/`) — ships with AIWG; editing here changes the framework for all projects
+2. **Project-local source** (`.aiwg/.project/`) — lives in your project repo; deploys project-specific customizations alongside the framework assets
 
 ## Where Content Lives
 
 ### Source Locations (Edit These)
+
+**Framework source** — ships with AIWG, available in all projects:
 
 | Content Type | Source Location | Example |
 |--------------|-----------------|---------|
@@ -35,6 +45,17 @@ agentic/code/agents/                 ───────────>        .
 | Addon Commands | `agentic/code/addons/{addon}/commands/` | `commit-and-push.md` |
 | Addon Skills | `agentic/code/addons/{addon}/skills/` | `tdd-enforce/SKILL.md` |
 | General Agents | `agentic/code/agents/` | `prompt-optimizer.md` |
+
+**Project-local source** — lives in your project repo, specific to this project:
+
+| Content Type | Source Location | Example |
+|--------------|-----------------|---------|
+| Project agents | `.aiwg/.project/agents/` | `corpus-curator.md` |
+| Project skills | `.aiwg/.project/skills/{name}/SKILL.md` | `paper-intake/SKILL.md` |
+| Project scripts | `.aiwg/.project/scripts/` | `import-data.sh` |
+| Container manifest | `.aiwg/.project/manifest.json` | — |
+
+Project-local assets deploy into a namespace subdirectory (e.g., `.claude/agents/corpus/`) so they do not conflict with framework assets. See [Project-Local Customization](../project-local/overview.md) for the full guide.
 
 ### Deployment Targets (Never Edit Directly)
 
@@ -162,6 +183,8 @@ When working on the AIWG repository itself:
 | Add marketing command | `agentic/code/frameworks/media-marketing-kit/commands/` | `aiwg -deploy-commands` |
 | Add addon skill | `agentic/code/addons/{addon}/skills/` | `aiwg -deploy-agents` |
 | Modify any deployed file | Find source in `agentic/code/` | Re-deploy |
+| Add **project-specific** agent | `.aiwg/.project/agents/` | `aiwg use` |
+| Add **project-specific** skill | `.aiwg/.project/skills/{name}/SKILL.md` | `aiwg use` |
 
 ## See Also
 

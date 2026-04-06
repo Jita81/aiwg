@@ -82,6 +82,63 @@ All research artifacts go in `.aiwg/research/`:
 └── config/                 # Per-agent configuration YAML files
 ```
 
+## Artifact Index and Graph Configuration
+
+The research-complete framework declares five built-in index graphs in its `manifest.json`. When you run `aiwg use research` (or `aiwg use all`), these graphs are automatically available — no manual `.aiwg/config.yaml` changes needed.
+
+| Graph | What it indexes | Edge type |
+|-------|----------------|-----------|
+| `papers` | `pdfs/full/` — one node per PDF, metadata from filename | — |
+| `summaries` | `documentation/references/` — deep analysis docs | — |
+| `web-sources` | `sources/web/` — article snapshots | — |
+| `indices` | `indices/` — by-topic, by-year | — |
+| `citation-network` | `documentation/citations/` — citation sidecars | `cites` / `cited-by` |
+
+The `citation-network` graph uses **citation sidecar edge extraction** — edges are read from structured tables in `REF-NNN-citations.md` files rather than `@-mentions`. This enables set-theoretic queries across the citation graph:
+
+```bash
+# Papers that cited both REF-008 and REF-016
+aiwg index query --set-query "cited_by(REF-008) AND cited_by(REF-016)" \
+  --graph citation-network
+
+# Semantic neighbors of a paper
+aiwg index neighbors --node REF-008 --semantic --top-k 5
+
+# Full citation neighborhood
+aiwg index neighbors --node REF-008 --depth 2 --graph citation-network
+```
+
+**Graph backends**: For large corpora (>1,000 papers), install optional backends:
+
+```bash
+npm install better-sqlite3         # SQLite: persistent, SQL set ops, best for citation queries
+npm install graphology graphology-operators graphology-traversal  # Louvain community detection
+```
+
+Activate in `.aiwg/config.yaml` (operator config overrides framework defaults):
+
+```yaml
+index:
+  graphs:
+    citation-network:
+      graphBackend: sqlite
+```
+
+**Semantic embedding**: Add similarity search:
+
+```bash
+npm install @xenova/transformers hnswlib-node
+```
+
+```yaml
+index:
+  embedding:
+    enabled: true
+    model: Xenova/all-MiniLM-L6-v2
+```
+
+See [Graph Backends](../../extensions/graph-backends.md) for the full tier comparison and configuration reference.
+
 ## Integration with SDLC
 
 The research framework can be used alongside sdlc-complete. The artifact directories do not overlap (`.aiwg/research/` vs `.aiwg/requirements/` etc.). A common pattern is using the discovery and documentation agents during Inception and Elaboration phases to ground architectural decisions in the literature:

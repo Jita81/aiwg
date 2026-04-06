@@ -502,6 +502,7 @@ Existing formats automatically migrate to unified schema:
 
 - [Creating Extensions](creating-extensions.md) - How to create your own
 - [Extension Types Reference](extension-types.md) - Detailed type definitions
+- [Graph Backends](graph-backends.md) - Artifact index graph storage tiers and configuration
 - @src/extensions/types.ts - Source code
 - @.aiwg/architecture/unified-extension-schema.md - Full specification
 - @docs/cli-reference.md - CLI command reference

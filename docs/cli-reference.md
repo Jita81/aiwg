@@ -2284,6 +2284,57 @@ Fields:
 
 User-defined graph names cannot override built-in names (`project`, `codebase`, `framework`).
 
+**Advanced graph config fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `scanDirs` | string[] | Directories to scan (required) |
+| `extensions` | string[] | File extensions (default: `.md`, `.yaml`, `.json`) |
+| `defaultBuild` | boolean | Include in default `aiwg index build` (default: `true`) |
+| `shared` | boolean | Shared across projects (default: `false`) |
+| `graphBackend` | `json` \| `graphology` \| `sqlite` | Graph storage backend (default: `json`) |
+| `nodeStrategy` | `default` \| `filename-metadata` | How node metadata is derived (default: `default`) |
+| `filenamePattern` | string | Regex with named groups for `filename-metadata` strategy |
+| `edgeExtraction.parser` | string | Parser for edge extraction (e.g., `citation-sidecar`) |
+| `edgeExtraction.edges` | array | Edge type declarations for the parser |
+
+**Graph backends**: The default `json` backend requires no extra packages. For larger corpora or richer traversal, install an optional backend:
+
+```bash
+# Graphology — community detection, shortest path, <50k nodes
+npm install graphology graphology-operators graphology-traversal
+
+# SQLite — persistent, incremental, SQL set ops, 5k–500k nodes
+npm install better-sqlite3
+```
+
+Activate per-graph in `.aiwg/config.yaml`:
+
+```yaml
+index:
+  graphs:
+    citation-network:
+      graphBackend: sqlite
+    summaries:
+      graphBackend: graphology
+```
+
+**Semantic embedding index**: Orthogonal to graph backends — adds dense vector search to any tier:
+
+```bash
+npm install @xenova/transformers hnswlib-node
+```
+
+```yaml
+index:
+  embedding:
+    enabled: true
+    model: Xenova/all-MiniLM-L6-v2   # ~22MB, cached to ~/.cache/aiwg/models/
+    topK: 10
+```
+
+See [Graph Backends](../extensions/graph-backends.md) for full backend documentation.
+
 **Documentation-only repos**: If your repo has no `src/`, `test/`, or `tools/` directories, `aiwg index build` will skip the `codebase` graph with a warning and still build the `project` graph. To index documentation under a custom path, define a user-defined graph:
 
 ```yaml
@@ -2365,6 +2416,8 @@ aiwg index query [search-text] [options]
 - `--updated-after <date>` - Filter by last-modified date
 - `--limit <n>` - Maximum number of results (default: 20)
 - `--graph <type>` - Search a specific graph only
+- `--semantic` - Use semantic similarity search (requires embedding index)
+- `--set-query <expr>` - Set-theoretic query, e.g. `"cited_by(REF-008) AND cited_by(REF-016)"` (SQLite backend recommended)
 - `--json` - Output as JSON (recommended for agents)
 
 **Default behavior** (no `--graph`): Searches across `project` + `codebase` graphs combined.
@@ -2384,9 +2437,64 @@ aiwg index query --type use-case
 # Combined filters
 aiwg index query "login" --type use-case --phase requirements
 
+# Semantic similarity search (embedding index required)
+aiwg index query "dense retrieval for question answering" --semantic --graph citation-network
+
+# Set-theoretic: papers citing both REF-008 and REF-016
+aiwg index query --set-query "cited_by(REF-008) AND cited_by(REF-016)" --graph citation-network
+
 # JSON output for agents
 aiwg index query "auth" --json
 ```
+
+---
+
+### index neighbors
+
+Show graph neighbors of a node — direct dependencies, typed edges, or semantic similarity matches.
+
+```bash
+aiwg index neighbors --node <id> [options]
+```
+
+**Options:**
+- `--node <id>` - Node identifier (e.g., `REF-008`, `.aiwg/requirements/UC-001.md`)
+- `--direction <dir>` - `in`, `out`, or `both` (default: `both`)
+- `--edge-type <type>` - Filter by edge type (e.g., `cites`, `cited-by`, `implements`, `depends-on`)
+- `--depth <n>` - Traversal depth (default: 1)
+- `--semantic` - Return semantically similar nodes instead of graph neighbors (embedding index required)
+- `--top-k <n>` - Number of semantic results (default: 10, only with `--semantic`)
+- `--graph <name>` - Target a specific graph
+- `--json` - Output as JSON
+
+**Examples:**
+
+```bash
+# All neighbors of a node
+aiwg index neighbors --node REF-008
+
+# Papers that cite REF-008 (incoming cites edges)
+aiwg index neighbors --node REF-008 --direction in --edge-type cites
+
+# What REF-008 cites (outgoing)
+aiwg index neighbors --node REF-008 --direction out --edge-type cites
+
+# Citation neighborhood at depth 2
+aiwg index neighbors --node REF-008 --depth 2 --graph citation-network
+
+# 5 semantically similar papers
+aiwg index neighbors --node REF-008 --semantic --top-k 5
+
+# Artifacts that implement a use case (SDLC)
+aiwg index neighbors --node .aiwg/requirements/UC-001.md --edge-type implements
+```
+
+**Typed edge types:**
+
+| Domain | Edge types |
+|--------|-----------|
+| Research / citation | `cites`, `cited-by`, `summarizes`, `discusses` |
+| SDLC | `depends-on` (default), `implements`, `tests`, `supersedes` |
 
 ---
 
