@@ -312,6 +312,33 @@ export interface GraphConfig {
    * @implements #723
    */
   metadataSupplements?: MetadataSupplementConfig[];
+
+  /**
+   * Graph storage backend for this graph.
+   * - 'json' (default): zero-dep adjacency list
+   * - 'graphology': rich traversal, community detection (requires npm install graphology)
+   * - 'sqlite': persistent on-disk, SQL set operations (requires npm install better-sqlite3)
+   *
+   * @implements #727
+   */
+  graphBackend?: 'json' | 'graphology' | 'sqlite';
+
+  /**
+   * Optional embedding index configuration for semantic similarity queries.
+   * Requires: npm install @xenova/transformers hnswlib-node
+   *
+   * @implements #730
+   */
+  embedding?: {
+    /** Enable embedding index for this graph */
+    enabled: boolean;
+    /** Model to use (default: Xenova/all-MiniLM-L6-v2) */
+    model?: string;
+    /** Number of results for semantic queries (default: 10) */
+    topK?: number;
+    /** When to rebuild: 'content-change' | 'always' | 'never' */
+    rebuildOn?: 'content-change' | 'always' | 'never';
+  };
 }
 
 /**
@@ -349,18 +376,129 @@ export const BUILTIN_GRAPH_CONFIGS: Record<BuiltinGraphType, GraphConfig> = {
 export const GRAPH_CONFIGS: Record<string, GraphConfig> = { ...BUILTIN_GRAPH_CONFIGS };
 
 /**
- * Load user-defined graph configs from .aiwg/config.yaml
+ * Parse a raw graph definition object into a GraphConfig.
  *
- * Merges user graphs into GRAPH_CONFIGS. User graphs cannot override built-in names.
+ * Shared between loadUserGraphConfigs and loadModuleGraphConfigs.
+ */
+function parseGraphDef(name: string, graphDef: Record<string, unknown>): GraphConfig | null {
+  if (!Array.isArray(graphDef.scanDirs)) return null;
+
+  return {
+    type: name,
+    scanDirs: graphDef.scanDirs as string[],
+    extensions: Array.isArray(graphDef.extensions) ? graphDef.extensions as string[] : ['.md', '.yaml', '.json'],
+    shared: graphDef.shared === true,
+    defaultBuild: graphDef.defaultBuild !== false,
+    edgeExtraction: graphDef.edgeExtraction as EdgeExtractionConfig | undefined,
+    nodeStrategy: graphDef.nodeStrategy as GraphConfig['nodeStrategy'],
+    filenamePattern: typeof graphDef.filenamePattern === 'string' ? graphDef.filenamePattern : undefined,
+    metadataSupplements: Array.isArray(graphDef.metadataSupplements)
+      ? graphDef.metadataSupplements as MetadataSupplementConfig[]
+      : undefined,
+    graphBackend: typeof graphDef.graphBackend === 'string'
+      ? graphDef.graphBackend as GraphConfig['graphBackend']
+      : undefined,
+  };
+}
+
+/**
+ * Load graph configs declared in framework/addon manifest.json files.
+ *
+ * Reads `.aiwg/frameworks/registry.json` to find installed modules,
+ * then loads each module's manifest and merges `index.graphs` declarations
+ * into GRAPH_CONFIGS. Module-declared graphs cannot override built-in names.
+ *
+ * This runs before operator config so that .aiwg/config.yaml can override
+ * module-declared graphs.
  *
  * @param cwd - Project root directory
- * @returns Names of user-defined graphs that were loaded
+ * @returns Names of module-declared graphs that were loaded
  *
- * @implements #426
+ * @implements #726
+ */
+export function loadModuleGraphConfigs(cwd: string): string[] {
+  const registryPath = `${cwd}/.aiwg/frameworks/registry.json`;
+  const loaded: string[] = [];
+
+  try {
+    if (!fs.existsSync(registryPath)) return loaded;
+
+    const registryContent = fs.readFileSync(registryPath, 'utf-8');
+    const registry = JSON.parse(registryContent) as {
+      frameworks?: Array<{ id: string }>;
+    };
+
+    if (!Array.isArray(registry.frameworks)) return loaded;
+
+    // Search paths for manifest.json (framework source locations)
+    const searchRoots = [
+      `${cwd}/agentic/code/frameworks`,
+      `${cwd}/agentic/code/addons`,
+    ];
+
+    for (const entry of registry.frameworks) {
+      const id = entry.id;
+      let manifestData: Record<string, unknown> | null = null;
+
+      // Try each search root to find the manifest
+      for (const root of searchRoots) {
+        const manifestPath = `${root}/${id}/manifest.json`;
+        if (fs.existsSync(manifestPath)) {
+          try {
+            manifestData = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+          } catch {
+            // Malformed manifest — skip
+          }
+          break;
+        }
+      }
+
+      if (!manifestData) continue;
+
+      // Extract index.graphs from manifest
+      const indexSection = manifestData.index as Record<string, unknown> | undefined;
+      if (!indexSection || typeof indexSection !== 'object') continue;
+
+      const graphs = indexSection.graphs as Record<string, unknown> | undefined;
+      if (!graphs || typeof graphs !== 'object') continue;
+
+      for (const [name, def] of Object.entries(graphs)) {
+        if (name in BUILTIN_GRAPH_CONFIGS) continue;
+        // Module graphs don't override already-loaded graphs (first module wins)
+        if (name in GRAPH_CONFIGS && !(name in BUILTIN_GRAPH_CONFIGS)) continue;
+
+        const config = parseGraphDef(name, def as Record<string, unknown>);
+        if (config) {
+          GRAPH_CONFIGS[name] = config;
+          loaded.push(name);
+        }
+      }
+    }
+  } catch {
+    // Module config loading is best-effort
+  }
+
+  return loaded;
+}
+
+/**
+ * Load user-defined graph configs from .aiwg/config.yaml
+ *
+ * Also loads module-declared graphs from installed framework manifests.
+ * Module graphs are loaded first; operator config overrides them.
+ * Neither can override built-in graph names.
+ *
+ * @param cwd - Project root directory
+ * @returns Names of user-defined graphs that were loaded (includes module graphs)
+ *
+ * @implements #426 #726
  */
 export function loadUserGraphConfigs(cwd: string): string[] {
+  // Load module-declared graphs first (frameworks/addons)
+  const moduleLoaded = loadModuleGraphConfigs(cwd);
+
   const configPath = `${cwd}/.aiwg/config.yaml`;
-  const loaded: string[] = [];
+  const loaded: string[] = [...moduleLoaded];
 
   try {
     if (!fs.existsSync(configPath)) return loaded;
@@ -380,23 +518,19 @@ export function loadUserGraphConfigs(cwd: string): string[] {
         // Cannot override built-in graph names
         continue;
       }
-      const graphDef = def as Record<string, unknown>;
-      if (!Array.isArray(graphDef.scanDirs)) continue;
 
-      GRAPH_CONFIGS[name] = {
-        type: name,
-        scanDirs: graphDef.scanDirs as string[],
-        extensions: Array.isArray(graphDef.extensions) ? graphDef.extensions as string[] : ['.md', '.yaml', '.json'],
-        shared: graphDef.shared === true,
-        defaultBuild: graphDef.defaultBuild !== false, // Default true for user graphs
-        edgeExtraction: graphDef.edgeExtraction as EdgeExtractionConfig | undefined,
-        nodeStrategy: graphDef.nodeStrategy as GraphConfig['nodeStrategy'],
-        filenamePattern: typeof graphDef.filenamePattern === 'string' ? graphDef.filenamePattern : undefined,
-        metadataSupplements: Array.isArray(graphDef.metadataSupplements)
-          ? graphDef.metadataSupplements as MetadataSupplementConfig[]
-          : undefined,
-      };
-      loaded.push(name);
+      const graphConfig = parseGraphDef(name, def as Record<string, unknown>);
+      if (!graphConfig) continue;
+
+      // Operator config overrides module-declared graphs (emit warning if overriding)
+      if (moduleLoaded.includes(name)) {
+        // Operator override of a module-declared graph
+        GRAPH_CONFIGS[name] = graphConfig;
+        // Already in loaded list from module phase
+      } else {
+        GRAPH_CONFIGS[name] = graphConfig;
+        loaded.push(name);
+      }
     }
   } catch {
     // Config loading is best-effort

@@ -10,7 +10,7 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import { parseFrontmatter, extractMentions, buildIndex, normalizeNamedCaptures, buildFilenameMetadataEntry } from '../../../src/artifacts/index-builder.js';
-import { INDEX_DIR, GRAPH_CONFIGS, loadUserGraphConfigs, normalizeEdge, normalizeEdges } from '../../../src/artifacts/types.js';
+import { INDEX_DIR, GRAPH_CONFIGS, loadUserGraphConfigs, loadModuleGraphConfigs, normalizeEdge, normalizeEdges } from '../../../src/artifacts/types.js';
 import type { TypedEdge, DependencyGraph } from '../../../src/artifacts/types.js';
 
 describe('loadUserGraphConfigs', () => {
@@ -73,6 +73,185 @@ index:
   it('should return empty array when config.yaml does not exist', () => {
     const loaded = loadUserGraphConfigs(tmpDir);
     expect(loaded).toEqual([]);
+  });
+});
+
+describe('loadModuleGraphConfigs', () => {
+  let tmpDir: string;
+
+  beforeEach(() => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'aiwg-module-graphs-test-'));
+  });
+
+  afterEach(() => {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+    for (const key of Object.keys(GRAPH_CONFIGS)) {
+      if (!['framework', 'project', 'codebase'].includes(key)) {
+        delete GRAPH_CONFIGS[key];
+      }
+    }
+  });
+
+  it('should load graph declarations from framework manifest.json', () => {
+    // Create registry
+    const registryDir = path.join(tmpDir, '.aiwg', 'frameworks');
+    fs.mkdirSync(registryDir, { recursive: true });
+    fs.writeFileSync(path.join(registryDir, 'registry.json'), JSON.stringify({
+      version: '1.0.0',
+      frameworks: [{ id: 'research-complete', installed: '2026-01-01', version: '1.0.0' }],
+    }));
+
+    // Create framework manifest with graph declarations
+    const frameworkDir = path.join(tmpDir, 'agentic', 'code', 'frameworks', 'research-complete');
+    fs.mkdirSync(frameworkDir, { recursive: true });
+    fs.writeFileSync(path.join(frameworkDir, 'manifest.json'), JSON.stringify({
+      id: 'research-complete',
+      type: 'framework',
+      index: {
+        graphs: {
+          papers: {
+            scanDirs: ['pdfs/full'],
+            extensions: ['.pdf'],
+            nodeStrategy: 'filename-metadata',
+            defaultBuild: true,
+          },
+          'citation-network': {
+            scanDirs: ['documentation/citations'],
+            extensions: ['.md'],
+            edgeExtraction: { parser: 'citation-sidecar', edges: [] },
+            defaultBuild: true,
+          },
+        },
+      },
+    }));
+
+    const loaded = loadModuleGraphConfigs(tmpDir);
+
+    expect(loaded).toContain('papers');
+    expect(loaded).toContain('citation-network');
+    expect(GRAPH_CONFIGS['papers']).toBeDefined();
+    expect(GRAPH_CONFIGS['papers'].scanDirs).toEqual(['pdfs/full']);
+    expect(GRAPH_CONFIGS['papers'].extensions).toEqual(['.pdf']);
+    expect(GRAPH_CONFIGS['papers'].nodeStrategy).toBe('filename-metadata');
+    expect(GRAPH_CONFIGS['citation-network']).toBeDefined();
+    expect(GRAPH_CONFIGS['citation-network'].edgeExtraction?.parser).toBe('citation-sidecar');
+  });
+
+  it('should not override built-in graph names from manifests', () => {
+    const registryDir = path.join(tmpDir, '.aiwg', 'frameworks');
+    fs.mkdirSync(registryDir, { recursive: true });
+    fs.writeFileSync(path.join(registryDir, 'registry.json'), JSON.stringify({
+      version: '1.0.0',
+      frameworks: [{ id: 'evil-framework' }],
+    }));
+
+    const frameworkDir = path.join(tmpDir, 'agentic', 'code', 'frameworks', 'evil-framework');
+    fs.mkdirSync(frameworkDir, { recursive: true });
+    fs.writeFileSync(path.join(frameworkDir, 'manifest.json'), JSON.stringify({
+      id: 'evil-framework',
+      index: { graphs: { project: { scanDirs: ['hacked'] } } },
+    }));
+
+    loadModuleGraphConfigs(tmpDir);
+
+    expect(GRAPH_CONFIGS['project'].scanDirs).toEqual(['.aiwg']);
+  });
+
+  it('should return empty when registry does not exist', () => {
+    const loaded = loadModuleGraphConfigs(tmpDir);
+    expect(loaded).toEqual([]);
+  });
+
+  it('should skip frameworks with no manifest', () => {
+    const registryDir = path.join(tmpDir, '.aiwg', 'frameworks');
+    fs.mkdirSync(registryDir, { recursive: true });
+    fs.writeFileSync(path.join(registryDir, 'registry.json'), JSON.stringify({
+      version: '1.0.0',
+      frameworks: [{ id: 'ghost-framework' }],
+    }));
+
+    const loaded = loadModuleGraphConfigs(tmpDir);
+    expect(loaded).toEqual([]);
+  });
+
+  it('should also check addons directory', () => {
+    const registryDir = path.join(tmpDir, '.aiwg', 'frameworks');
+    fs.mkdirSync(registryDir, { recursive: true });
+    fs.writeFileSync(path.join(registryDir, 'registry.json'), JSON.stringify({
+      version: '1.0.0',
+      frameworks: [{ id: 'my-addon' }],
+    }));
+
+    const addonDir = path.join(tmpDir, 'agentic', 'code', 'addons', 'my-addon');
+    fs.mkdirSync(addonDir, { recursive: true });
+    fs.writeFileSync(path.join(addonDir, 'manifest.json'), JSON.stringify({
+      id: 'my-addon',
+      type: 'addon',
+      index: {
+        graphs: {
+          'addon-graph': { scanDirs: ['addon-data'], extensions: ['.csv'] },
+        },
+      },
+    }));
+
+    const loaded = loadModuleGraphConfigs(tmpDir);
+    expect(loaded).toContain('addon-graph');
+    expect(GRAPH_CONFIGS['addon-graph'].scanDirs).toEqual(['addon-data']);
+  });
+});
+
+describe('loadUserGraphConfigs with module graphs', () => {
+  let tmpDir: string;
+
+  beforeEach(() => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'aiwg-combined-graphs-test-'));
+  });
+
+  afterEach(() => {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+    for (const key of Object.keys(GRAPH_CONFIGS)) {
+      if (!['framework', 'project', 'codebase'].includes(key)) {
+        delete GRAPH_CONFIGS[key];
+      }
+    }
+  });
+
+  it('should let operator config.yaml override module-declared graphs', () => {
+    // Create module graph
+    const registryDir = path.join(tmpDir, '.aiwg', 'frameworks');
+    fs.mkdirSync(registryDir, { recursive: true });
+    fs.writeFileSync(path.join(registryDir, 'registry.json'), JSON.stringify({
+      version: '1.0.0',
+      frameworks: [{ id: 'research-complete' }],
+    }));
+
+    const frameworkDir = path.join(tmpDir, 'agentic', 'code', 'frameworks', 'research-complete');
+    fs.mkdirSync(frameworkDir, { recursive: true });
+    fs.writeFileSync(path.join(frameworkDir, 'manifest.json'), JSON.stringify({
+      id: 'research-complete',
+      index: {
+        graphs: {
+          papers: { scanDirs: ['pdfs/full'], extensions: ['.pdf'], defaultBuild: true },
+        },
+      },
+    }));
+
+    // Create operator override
+    fs.writeFileSync(path.join(tmpDir, '.aiwg', 'config.yaml'), `
+index:
+  graphs:
+    papers:
+      scanDirs:
+        - my/custom/pdfs
+      extensions:
+        - .pdf
+`);
+
+    const loaded = loadUserGraphConfigs(tmpDir);
+
+    expect(loaded).toContain('papers');
+    // Operator config wins over module config
+    expect(GRAPH_CONFIGS['papers'].scanDirs).toEqual(['my/custom/pdfs']);
   });
 });
 
