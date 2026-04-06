@@ -25,25 +25,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Extract version
+      - name: Extract version from package.json
         id: version
         run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Version: $VERSION"
-
-      - name: Verify package version matches tag
-        run: |
+          VERSION=$(node -p "require('./package.json').version")
           TAG_VERSION=${GITHUB_REF#refs/tags/v}
-          PKG_VERSION=$(node -p "require('./package.json').version")
-          # For pre-release tags, package.json may have either the full
-          # pre-release version or the base version — accept both.
-          BASE_VERSION=${TAG_VERSION%%-*}
-          if [ "$TAG_VERSION" != "$PKG_VERSION" ] && [ "$BASE_VERSION" != "$PKG_VERSION" ]; then
-            echo "Error: Tag version ($TAG_VERSION) does not match package.json version ($PKG_VERSION)"
+          if [ "$TAG_VERSION" != "$VERSION" ]; then
+            echo "Error: Tag ($TAG_VERSION) does not match package.json ($VERSION)"
             exit 1
           fi
-          echo "Version verified: $PKG_VERSION (tag: $TAG_VERSION)"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version verified: $VERSION"
 
       - name: Create or reuse Gitea release
         run: |

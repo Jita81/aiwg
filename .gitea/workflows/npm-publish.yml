@@ -69,25 +69,12 @@ jobs:
       - name: Set pre-release version in package.json
         id: rcversion
         run: |
-          TAG_VERSION=${GITHUB_REF#refs/tags/v}
-          # Normalize pre-release suffix to npm semver format (add dot if missing)
-          # Already-dotted forms (alpha.1, beta.1, nightly.20260324) pass through unchanged
-          NPM_VERSION=$(echo "$TAG_VERSION" | sed -E \
-            's/-([Nn]ightly)([0-9]+)$/-nightly.\2/;
-             s/-([Aa]lpha)([0-9]+)$/-alpha.\2/;
-             s/-([Bb]eta)([0-9]+)$/-beta.\2/;
-             s/-[Rr][Cc]([0-9]+)$/-rc.\1/')
+          NPM_VERSION=$(node -p "require('./package.json').version")
           # Determine npm dist-tag: nightly gets its own channel; others go to next
           if echo "$NPM_VERSION" | grep -qiE '\-nightly\.'; then
             NPM_TAG=nightly
           else
             NPM_TAG=next
-          fi
-          CURRENT=$(node -p "require('./package.json').version")
-          if [ "$CURRENT" = "$NPM_VERSION" ]; then
-            echo "package.json already at $NPM_VERSION — skipping npm version"
-          else
-            npm version "$NPM_VERSION" --no-git-tag-version
           fi
           echo "npm_version=$NPM_VERSION" >> $GITHUB_OUTPUT
           echo "npm_tag=$NPM_TAG" >> $GITHUB_OUTPUT
@@ -148,27 +135,19 @@ jobs:
       - name: Build TypeScript
         run: npm run build
 
-      - name: Extract version info
+      - name: Extract and verify version
         id: version
         run: |
+          VERSION=$(node -p "require('./package.json').version")
           if [ "${{ github.event_name }}" = "push" ]; then
-            VERSION=${GITHUB_REF#refs/tags/v}
-          else
-            VERSION=$(node -p "require('./package.json').version")
+            TAG_VERSION=${GITHUB_REF#refs/tags/v}
+            if [ "$TAG_VERSION" != "$VERSION" ]; then
+              echo "Error: Tag ($TAG_VERSION) does not match package.json ($VERSION)"
+              exit 1
+            fi
           fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Version: $VERSION"
-
-      - name: Verify package version matches tag
-        if: github.event_name == 'push'
-        run: |
-          TAG_VERSION=${GITHUB_REF#refs/tags/v}
-          PKG_VERSION=$(node -p "require('./package.json').version")
-          if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
-            echo "Error: Tag version ($TAG_VERSION) does not match package.json version ($PKG_VERSION)"
-            exit 1
-          fi
-          echo "Version verified: $PKG_VERSION"
 
       - name: Check package contents
         run: |
