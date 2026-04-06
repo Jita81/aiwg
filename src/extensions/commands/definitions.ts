@@ -1585,6 +1585,42 @@ export const docSyncCommand: Extension = {
   } satisfies SkillMetadata,
 };
 
+export const docConsolidateCommand: Extension = {
+  id: 'doc-consolidate',
+  type: 'skill',
+  name: 'Doc Consolidate',
+  description: 'Crawl repository for scattered docs and consolidate into categorized reference index',
+  version: '1.0.0',
+  capabilities: ['cli', 'documentation', 'discovery', 'classification'],
+  keywords: ['doc-consolidate', 'consolidate', 'docs', 'documentation', 'inventory', 'catalog'],
+  category: 'documentation',
+  platforms: {
+    claude: 'full',
+    generic: 'full',
+  },
+  deployment: {
+    pathTemplate: '.{platform}/commands/{id}.md',
+    core: false,
+  },
+  metadata: {
+    type: 'skill',
+    triggerPhrases: ['consolidate docs', 'doc consolidate', 'find all docs', 'catalog docs', 'inventory docs', 'doc inventory'],
+    commandHint: {
+      template: 'orchestration',
+      argumentHint: '[--dry-run] [--scope <path>] [--incremental] [--prefix <dir>]',
+      allowedTools: ['Read', 'Write', 'Bash', 'Glob', 'Grep'],
+      executionSteps: [
+        'Discover doc-like files across repository',
+        'Classify each doc by purpose category',
+        'Generate consolidated manifest',
+        'Create stub files with source references',
+        'Write run report and incremental state',
+      ],
+      cliDisabled: true,
+    },
+  } satisfies SkillMetadata,
+};
+
 // Code Analysis Commands
 
 export const cleanupAuditCommand: Extension = {
@@ -2197,8 +2233,9 @@ export const commandDefinitions: Extension[] = [
   costHistoryCommand,
   metricsTokensCommand,
 
-  // Documentation (1)
+  // Documentation (2)
   docSyncCommand,
+  docConsolidateCommand,
 
   // Code Analysis (1)
   cleanupAuditCommand,

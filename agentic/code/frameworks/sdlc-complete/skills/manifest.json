@@ -90,6 +90,11 @@
       "triggers": ["align docs to code", "align code to docs", "sync documentation", "doc audit", "check doc drift", "are docs up to date", "find stale documentation", "reconcile docs and code"]
     },
     {
+      "name": "doc-consolidate",
+      "description": "Crawl repository for scattered docs and consolidate into categorized reference index in .aiwg/docs/",
+      "triggers": ["consolidate docs", "find all docs", "catalog docs", "inventory docs", "where are all the docs", "what docs do we have", "gather documentation", "index documentation"]
+    },
+    {
       "name": "sdlc-accelerate",
       "description": "End-to-end SDLC ramp-up from idea to construction-ready with automated phase transitions and focused gate questions",
       "triggers": ["set up project", "take me to construction", "bootstrap SDLC", "ramp up project", "accelerate project", "full SDLC setup", "prepare project for development", "get this project construction-ready"]
