@@ -1,6 +1,6 @@
 # Daemon Mode Guide
 
-AIWG daemon mode runs a persistent background process that monitors your project, executes automated tasks, and bridges messaging platforms. It extends the agent loop pattern into always-on project supervision.
+AIWG daemon mode runs a persistent background process that monitors your project, executes automated tasks, supervises AI agent sessions, and coordinates multi-agent orchestration. It extends the agent loop pattern into always-on autonomous project supervision — from a local background helper to a distributed orchestration node managing sandbox sessions.
 
 ## Overview
 
@@ -8,12 +8,16 @@ The daemon provides:
 
 - **File watching** — Trigger actions when project files change
 - **Scheduled tasks** — Cron-like scheduling for health checks and audits
-- **Agent supervision** — Spawn and manage `claude -p` subprocesses
+- **Agent supervision** — Spawn and manage AI agent subprocesses with governance
+- **PTY orchestration** — AI-driven terminal supervision: read screen, assess state, inject input autonomously
+- **Multi-session management** — Supervise multiple concurrent agent sessions per daemon
+- **Operator override** — Human-in-the-loop handoff: pause the AI, take manual control, resume
 - **Task queue** — Persistent task management with priority support
 - **Automation rules** — Event-driven trigger→condition→action workflows
 - **IPC communication** — CLI↔daemon communication via Unix domain socket
 - **Messaging integration** — Slack, Discord, and Telegram notifications and commands
 - **2-way AI chat** — Ask questions from messaging platforms
+- **Headless operation** — Runs inside agentic-sandbox containers without a display server
 
 ## Platform Support
 
@@ -104,6 +108,218 @@ adapter.on('data', (chunk) => process.stdout.write(chunk));
 ```
 
 The sandbox transport uses the management server's REST API (`:8122`) to submit tasks and poll for output. The browser terminal viewer connects directly to the sandbox WebSocket (`:8121`) for real-time PTY streaming with full ANSI color support.
+
+---
+
+## PTY Orchestrator
+
+The PTY Orchestrator is an AI supervisor that attaches to a live PTY session and operates it the way a human operator would: reading the screen, understanding the current state, and injecting input at the right moments. This elevates the daemon from a process manager to an autonomous agent driver.
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────┐
+│  PTY Orchestrator                                   │
+│                                                     │
+│  ┌──────────┐    ┌───────────────┐    ┌──────────┐  │
+│  │ Screen   │───▶│ OrchestratorPTY│───▶│ Session  │  │
+│  │ Reader   │    │ (assess loop) │    │ Adapter  │  │
+│  └──────────┘    └───────────────┘    └──────────┘  │
+│       ▲               │    ▲               │        │
+│       │               ▼    │               ▼        │
+│   PTY stdout     LLM Assessor    PTY stdin/signals  │
+│                                                     │
+│  ┌──────────────────┐                               │
+│  │ Override Manager  │◄── Operator HITL handoff      │
+│  └──────────────────┘                               │
+└─────────────────────────────────────────────────────┘
+```
+
+**Components** (all in `src/serve/`):
+
+| Component | File | Purpose |
+|-----------|------|---------|
+| **ScreenReader** | `screen-reader.ts` | Parses raw PTY byte stream into structured `ScreenState` using `@xterm/headless`. Extracts visible text grid, cursor position, scrollback, and detects prompts. |
+| **OrchestratorPTY** | `orchestrator-pty.ts` | Runs a continuous read→assess→act loop. Calls an LLM assessor each cycle to decide: `type` (inject text), `wait` (observe), `signal` (SIGINT etc.), or `complete` (mission done). |
+| **Orchestrator Adapter** | `orchestrator-adapter.ts` | Wires ScreenReader + OrchestratorPTY to live PTY sessions from the WebSocket bridge. Supports attach, detach, and re-attach without killing the PTY. |
+| **Override Manager** | `orchestrator-override.ts` | Enables operator HITL handoff: pause the orchestrator, let a human interact directly, then resume. Maintains an audit trail of override events. |
+
+### Assess Loop
+
+Each cycle of the orchestrator follows this pattern:
+
+```
+READ screen state (via ScreenReader.awaitChange)
+  → ASSESS: LLM evaluates screen + mission context + recent history
+  → PLAN: LLM returns a decision as structured JSON
+  → ACT: inject keystrokes, wait, send signal, or signal completion
+  → REPEAT (until complete or max cycles reached)
+```
+
+The LLM assessment prompt includes:
+- Current screen summary (ANSI-stripped, human-readable)
+- Whether a prompt was detected and its text
+- The mission brief (what the orchestrator is trying to accomplish)
+- The last 10 actions taken (to avoid loops)
+
+Decisions are one of:
+
+| Action | Effect | When |
+|--------|--------|------|
+| `type` | Writes text + newline to PTY stdin | Prompt detected, agent needs input |
+| `wait` | No-op, observes next screen change | Agent is running, making progress |
+| `signal` | Sends SIGINT/SIGTERM to PTY | Agent is stuck, needs interruption |
+| `complete` | Exits the loop | Mission accomplished |
+
+### Screen State Parsing
+
+The `ScreenReader` uses `@xterm/headless` (a headless xterm.js terminal) as its VT100/ANSI state machine. This means all escape sequences — colors, cursor movement, line wrapping, clear screen — are handled correctly without a DOM.
+
+The parsed `ScreenState` exposes:
+
+```typescript
+interface ScreenState {
+  text: string[][]          // visible text grid (rows × cols)
+  cursor: { row, col }     // cursor position
+  scrollback: string[]      // lines scrolled past viewport
+  summary: string           // human/LLM-readable text
+  prompt_detected: boolean  // terminal waiting for input?
+  prompt_text?: string      // the detected prompt line
+}
+```
+
+**Prompt detection** checks the cursor row and last non-empty line against patterns:
+- Shell prompts: `$`, `#`, `>`, `%` at end of line
+- Interactive prompts: `?` prefix (inquirer-style), `[y/N]`, `(yes/no)`
+- Claude Code prompts: `>` prefix at cursor position
+
+### Operator Override (HITL Handoff)
+
+A human operator can take manual control of an orchestrator-supervised session at any time:
+
+```
+Orchestrator running
+  → operator triggers override
+  → OrchestratorPTY.pause() — finishes current cycle, then halts
+  → PTY stdin routes to operator input
+  → Operator interacts directly with the terminal
+  → Operator triggers release
+  → OrchestratorPTY.resume() — reads current screen, continues loop
+```
+
+Override events are recorded with timestamps for audit. Multiple override/release cycles are supported without state corruption. If the orchestrator has already completed, override is a no-op.
+
+### Mission Control Integration
+
+PTY-orchestrated missions can be dispatched via Mission Control:
+
+```bash
+aiwg mc dispatch <session-id> \
+  "Supervise agent-01: complete the database migration" \
+  --mode pty-orchestrator \
+  --target-agent agent-01 \
+  --completion "migration complete and tests green"
+```
+
+MC treats this as a standard mission, but the executor is `OrchestratorPTY` instead of a direct task runner. Status displays show PTY missions distinctly:
+
+```
+  #    Mission                          Mode   Status       Loop     Started
+  ────────────────────────────────────────────────────────────────────────
+  1    Fix authentication bug           —      ✓ DONE       3/10     14:30
+  2    Supervise agent-01: migrate DB   PTY    ⏳ RUNNING   12/50    14:35
+       └─ Last: type "npm run test"
+```
+
+---
+
+## Daemon-in-Sandbox Deployment
+
+The primary deployment model for autonomous agent supervision is a **daemon running inside an agentic-sandbox container**. Both the daemon and the sandbox can run fully headless — no display server, no local terminal session required.
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────┐
+│  AIWG Service (operator interface)          │
+│  aiwg serve — dashboard on port 7337        │
+└──────────┬────────────────────┬─────────────┘
+           │                    │
+     ┌─────▼──────┐      ┌─────▼──────┐
+     │  Daemon A   │      │  Daemon B   │
+     │  (sandbox)  │      │  (sandbox)  │
+     ├─────────────┤      ├─────────────┤
+     │ Session 1   │      │ Session 3   │
+     │ (PTY orch.) │      │ (PTY orch.) │
+     ├─────────────┤      ├─────────────┤
+     │ Session 2   │      │ Session 4   │
+     │ (PTY orch.) │      │ (direct)    │
+     └─────────────┘      └─────────────┘
+           │                    │
+     Mission Control coordinates across daemons
+```
+
+**The pattern:** Each daemon runs inside an agentic-sandbox (Docker container or Firecracker VM). Each daemon manages one or more PTY-orchestrated agent sessions. Multiple daemons coordinate through Mission Control. The AIWG service (`aiwg serve`) provides the operator dashboard for the fleet.
+
+### Deployment Topology
+
+| Layer | Component | Role |
+|-------|-----------|------|
+| **Operator** | `aiwg serve` | Web dashboard, sandbox registry, HITL relay |
+| **Control plane** | AIWG daemon (1 per sandbox) | PTY orchestration, agent supervision, task queue |
+| **Execution plane** | Agentic sandbox | Container/VM isolation, PTY allocation, process lifecycle |
+| **Agent** | Claude Code / OpenCode / Codex | AI coding agent running inside the sandbox |
+
+### How It Works
+
+1. **Sandbox provisioning**: An agentic-sandbox instance starts with the AIWG daemon pre-installed. The daemon starts automatically and registers with the AIWG service.
+
+2. **Session creation**: The operator (or Mission Control) dispatches a task. The daemon spawns an agent session inside the sandbox via the PTY bridge.
+
+3. **PTY orchestration**: The daemon's OrchestratorPTY attaches to the agent's PTY session. The ScreenReader parses terminal output; the LLM assessor decides what to type; the session adapter injects input.
+
+4. **Multi-session**: A single daemon can supervise multiple concurrent agent sessions (up to `max_concurrent` from the supervisor config).
+
+5. **Multi-daemon coordination**: Mission Control dispatches work across daemons. Each daemon reports status back. The AIWG service aggregates the view.
+
+6. **Operator intervention**: At any time, the operator can override a session via the HITL relay — the orchestrator pauses, the operator interacts directly, then the orchestrator resumes.
+
+### Configuration
+
+```json
+{
+  "supervisor": {
+    "max_concurrent": 4,
+    "default_mode": "pty-orchestrator"
+  },
+  "sandbox": {
+    "auto_register": true,
+    "service_endpoint": "http://aiwg-service:7337"
+  }
+}
+```
+
+Environment variables for sandbox deployment:
+
+| Variable | Purpose |
+|----------|---------|
+| `AIWG_SANDBOX_ENDPOINT` | Sandbox management server URL |
+| `AIWG_SERVE_ENDPOINT` | AIWG service URL for auto-registration |
+| `AIWG_DAEMON_HEADLESS` | Set to `1` for headless operation (no TTY required) |
+
+### Capability Levels
+
+With the daemon-in-sandbox deployment, AIWG supports increasingly autonomous operation:
+
+| Level | Capability | Requirements |
+|-------|------------|-------------|
+| **Level 1** | CLI tool — human drives, AI assists | AIWG CLI + any platform |
+| **Level 2** | Agent loop — AI works, human reviews | External Ralph + agent supervisor |
+| **Level 3** | PTY orchestration — AI drives terminal sessions | Daemon + ScreenReader + OrchestratorPTY |
+| **Level 4** | Multi-session — one daemon supervises multiple agents | Daemon + concurrent PTY sessions |
+| **Level 5** | Multi-daemon — fleet of daemons coordinated by MC | Multiple sandboxes + AIWG service + MC |
+
+Level 3 and above require the daemon-in-sandbox deployment. Level 5 is the full distributed orchestration topology.
 
 ---
 
@@ -1059,12 +1275,27 @@ aiwg daemon status
 
 ## Cross-References
 
+### PTY Orchestrator
+- `src/serve/screen-reader.ts` — VT100/ANSI parser using `@xterm/headless`
+- `src/serve/orchestrator-pty.ts` — LLM-driven assess loop
+- `src/serve/orchestrator-adapter.ts` — Live PTY session wiring (attach/detach)
+- `src/serve/orchestrator-override.ts` — Operator HITL handoff manager
+- `src/serve/pty-bridge.ts` — WebSocket PTY bridge
+
+### Guides
+- [Serve Guide](serve-guide.md) — Operator web dashboard, sandbox registration, HITL relay
 - [Messaging Guide](messaging-guide.md) — Platform integration
 - [Al Guide](ralph-guide.md) — Iterative task loops via daemon
 - [Behaviors Guide](behaviors-guide.md) — Attaching capabilities to daemon and long-running agents
+- [HITL Integration](addons/agent-persistence/hitl-integration.md) — HITL gates for agent recovery
 - [Provider Capability Matrix](providers/capability-matrix.md) — Per-provider daemon tier and feature support
+
+### Source References
 - `agentic/code/providers/capability-matrix.yaml` — Authoritative `daemon_tier` and feature data
-- `agentic/code/behaviors/concierge/BEHAVIOR.md` — Concierge behavior definition (reference implementation for agent-based behaviors)
+- `agentic/code/behaviors/concierge/BEHAVIOR.md` — Concierge behavior definition
+- `src/cli/handlers/mc.ts` — Mission Control with `--mode pty-orchestrator`
+
+### Architecture Decisions
 - `.aiwg/architecture/adrs/ADR-daemon-mode.md` — Original daemon architecture decision
 - `.aiwg/architecture/adrs/ADR-ipc-protocol.md` — IPC protocol specification
 - `.aiwg/architecture/adr-daemon-as-headend.md` — DaemonSupervisor headend architecture
