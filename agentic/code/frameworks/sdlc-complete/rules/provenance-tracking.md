@@ -46,7 +46,7 @@ activity:
 agent:
   id: "urn:aiwg:agent:claude-sonnet-4.5"
   type: "ai_assistant"
-  version: "claude-sonnet-4-5-20250929"
+  version: "claude-sonnet-4-6"
 
 relationships:
   wasGeneratedBy:

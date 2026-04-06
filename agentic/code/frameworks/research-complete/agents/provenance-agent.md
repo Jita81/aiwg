@@ -297,7 +297,7 @@ Collecting artifacts:
 - Checksums (integrity verification)
 - Software versions:
   - AIWG: 2026.1.5
-  - LLM: claude-opus-4-5-20251101
+  - LLM: claude-opus-4-6
   - Semantic Scholar API: v1
   - CrossRef API: v1
 

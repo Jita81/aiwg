@@ -22,11 +22,11 @@ Models are defined in `models.json` files with the following priority:
 
   "claude": {
     "reasoning": {
-      "model": "claude-opus-4-1-20250805",
+      "model": "claude-opus-4-6",
       "description": "Best for complex reasoning, architecture design"
     },
     "coding": {
-      "model": "claude-sonnet-4-5-20250929",
+      "model": "claude-sonnet-4-6",
       "description": "Best for code generation, implementation"
     },
     "efficiency": {
@@ -37,10 +37,10 @@ Models are defined in `models.json` files with the following priority:
 
   "factory": {
     "reasoning": {
-      "model": "claude-opus-4-1-20250805"
+      "model": "claude-opus-4-6"
     },
     "coding": {
-      "model": "claude-sonnet-4-5-20250929"
+      "model": "claude-sonnet-4-6"
     },
     "efficiency": {
       "model": "claude-haiku-3-5"
@@ -60,8 +60,8 @@ Models are defined in `models.json` files with the following priority:
   },
 
   "shorthand": {
-    "opus": "claude-opus-4-1-20250805",
-    "sonnet": "claude-sonnet-4-5-20250929",
+    "opus": "claude-opus-4-6",
+    "sonnet": "claude-sonnet-4-6",
     "haiku": "claude-haiku-3-5",
     "inherit": "inherit"
   }
@@ -124,9 +124,9 @@ Create `models.json` in your project root:
 ```json
 {
   "factory": {
-    "reasoning": { "model": "claude-sonnet-4-5-20250929" },
-    "coding": { "model": "claude-sonnet-4-5-20250929" },
-    "efficiency": { "model": "claude-sonnet-4-5-20250929" }
+    "reasoning": { "model": "claude-sonnet-4-6" },
+    "coding": { "model": "claude-sonnet-4-6" },
+    "efficiency": { "model": "claude-sonnet-4-6" }
   }
 }
 ```
@@ -137,7 +137,7 @@ Create `models.json` in your project root:
 {
   "factory": {
     "reasoning": { "model": "claude-opus-custom-finetuned" },
-    "coding": { "model": "claude-sonnet-4-5-20250929" },
+    "coding": { "model": "claude-sonnet-4-6" },
     "efficiency": { "model": "claude-haiku-3-5" }
   }
 }
@@ -167,13 +167,13 @@ mkdir -p ~/.config/aiwg
 cat > ~/.config/aiwg/models.json <<'EOF'
 {
   "factory": {
-    "reasoning": { "model": "claude-opus-4-1-20250805" },
-    "coding": { "model": "claude-sonnet-4-5-20250929" },
+    "reasoning": { "model": "claude-opus-4-6" },
+    "coding": { "model": "claude-sonnet-4-6" },
     "efficiency": { "model": "claude-haiku-3-5" }
   },
   "shorthand": {
-    "opus": "claude-opus-4-1-20250805",
-    "sonnet": "claude-sonnet-4-5-20250929",
+    "opus": "claude-opus-4-6",
+    "sonnet": "claude-sonnet-4-6",
     "haiku": "claude-haiku-3-5"
   }
 }

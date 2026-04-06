@@ -276,7 +276,7 @@ export async function main(args: string[]): Promise<void> {
       console.log('Examples:');
       console.log('  aiwg catalog list');
       console.log('  aiwg catalog list --provider anthropic');
-      console.log('  aiwg catalog info claude-opus-4-5-20251101');
+      console.log('  aiwg catalog info claude-opus-4-6');
       console.log('  aiwg catalog search opus');
       process.exit(1);
       break;

@@ -26,14 +26,14 @@ Based on `agentic/code/frameworks/sdlc-complete/config/models.json`:
 
 | Provider | opus → | sonnet → | haiku → |
 |----------|--------|----------|---------|
-| **Claude** | claude-opus-4-5-20251101 | claude-sonnet-4-5-20250929 | claude-haiku-3-5 |
+| **Claude** | claude-opus-4-6 | claude-sonnet-4-6 | claude-haiku-3-5 |
 | **OpenAI/Codex** | gpt-5.3-codex | codex-mini-latest | gpt-5-codex-mini |
-| **Factory** | claude-opus-4-5-20251101 | claude-sonnet-4-5-20250929 | claude-haiku-3-5 |
+| **Factory** | claude-opus-4-6 | claude-sonnet-4-6 | claude-haiku-3-5 |
 | **Copilot** | gpt-4-turbo | gpt-4 | gpt-3.5-turbo |
 | **Cursor** | claude-opus-latest | claude-sonnet-latest | claude-haiku-latest |
 | **OpenCode** | provider-default | provider-default | provider-default |
 | **Warp** | claude-opus-latest | claude-sonnet-latest | claude-haiku-latest |
-| **Windsurf** | claude-opus-4-5-20251101 | claude-sonnet-4-5-20250929 | claude-haiku-3-5 |
+| **Windsurf** | claude-opus-4-6 | claude-sonnet-4-6 | claude-haiku-3-5 |
 
 ### Root Model vs Sub-Call Model Selection
 
@@ -188,7 +188,7 @@ gh copilot --model gpt-4-turbo --sub-model gpt-3.5-turbo
 
 **Invocation**:
 ```bash
-factory-ai --model claude-opus-4-5-20251101 --sub-model claude-sonnet-4-5-20250929
+factory-ai --model claude-opus-4-6 --sub-model claude-sonnet-4-6
 ```
 
 **Model selection**: Uses full Claude model identifiers.
@@ -227,7 +227,7 @@ warp-agent --model opus --sub-model sonnet
 
 **Invocation**:
 ```bash
-windsurf --model claude-opus-4-5-20251101 --sub-model claude-sonnet-4-5-20250929
+windsurf --model claude-opus-4-6 --sub-model claude-sonnet-4-6
 ```
 
 **Notes**: Windsurf uses Claude models via API (experimental support).

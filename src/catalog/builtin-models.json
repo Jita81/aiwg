@@ -4,9 +4,9 @@
   "title": "AIWG Built-in Model Catalog",
   "description": "Core models shipped with AIWG, manually curated and verified",
   "models": {
-    "claude-opus-4-5-20251101": {
+    "claude-opus-4-6": {
       "provider": "anthropic",
-      "displayName": "Claude Opus 4.5",
+      "displayName": "Claude Opus 4.6",
       "releaseDate": "2025-11-01",
       "status": "active",
       "deprecated": false,
@@ -28,43 +28,14 @@
         "currency": "USD",
         "lastUpdated": "2025-12-01"
       },
-      "aliases": ["opus", "opus-4.5", "claude-opus"],
+      "aliases": ["opus", "opus-4.6", "claude-opus"],
       "tags": ["flagship", "reasoning", "long-context"],
       "source": "builtin",
       "lastVerified": "2025-12-12"
     },
-    "claude-opus-4-1-20250805": {
+    "claude-sonnet-4-6": {
       "provider": "anthropic",
-      "displayName": "Claude Opus 4.1",
-      "releaseDate": "2025-08-05",
-      "status": "active",
-      "deprecated": false,
-      "deprecationDate": null,
-      "successorModel": null,
-      "capabilities": {
-        "contextWindow": 200000,
-        "maxOutputTokens": 8192,
-        "vision": true,
-        "toolUse": true,
-        "streaming": true,
-        "reasoning": "excellent",
-        "coding": "excellent",
-        "speed": "fair"
-      },
-      "pricing": {
-        "inputPer1kTokens": 0.015,
-        "outputPer1kTokens": 0.075,
-        "currency": "USD",
-        "lastUpdated": "2025-12-01"
-      },
-      "aliases": ["opus-4.1"],
-      "tags": ["reasoning", "long-context"],
-      "source": "builtin",
-      "lastVerified": "2025-12-12"
-    },
-    "claude-sonnet-4-5-20250929": {
-      "provider": "anthropic",
-      "displayName": "Claude Sonnet 4.5",
+      "displayName": "Claude Sonnet 4.6",
       "releaseDate": "2025-09-29",
       "status": "active",
       "deprecated": false,
@@ -86,7 +57,7 @@
         "currency": "USD",
         "lastUpdated": "2025-12-01"
       },
-      "aliases": ["sonnet", "sonnet-4.5", "claude-sonnet"],
+      "aliases": ["sonnet", "sonnet-4.6", "claude-sonnet"],
       "tags": ["balanced", "coding", "long-context"],
       "source": "builtin",
       "lastVerified": "2025-12-12"
@@ -156,7 +127,7 @@
       "status": "deprecated",
       "deprecated": true,
       "deprecationDate": "2025-08-01",
-      "successorModel": "claude-opus-4-1-20250805",
+      "successorModel": "claude-opus-4-6",
       "capabilities": {
         "contextWindow": 200000,
         "maxOutputTokens": 4096,

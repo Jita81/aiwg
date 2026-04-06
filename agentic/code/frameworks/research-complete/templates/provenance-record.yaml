@@ -166,13 +166,13 @@ activity:
     mode: "interactive"  # strict | seeded | logged | default | interactive
     temperature: 0.7
     seed: null  # Fixed seed if seeded mode, null otherwise
-    model_id: "claude-sonnet-4-5-20250929"
+    model_id: "claude-sonnet-4-6"
 
     # EXAMPLE:
     # mode: "interactive"
     # temperature: 0.7
     # seed: null
-    # model_id: "claude-sonnet-4-5-20250929"
+    # model_id: "claude-sonnet-4-6"
 
   inputs:
     prompt: "[User prompt or task description]"
@@ -214,14 +214,14 @@ agent:
 
   attributes:
     version: "1.0.0"
-    tool: "claude-sonnet-4-5-20250929"  # Base LLM used
+    tool: "claude-sonnet-4-6"  # Base LLM used
     capabilities:
       - "[capability1]"
       - "[capability2]"
 
     # EXAMPLE:
     # version: "1.0.0"
-    # tool: "claude-sonnet-4-5-20250929"
+    # tool: "claude-sonnet-4-6"
     # capabilities:
     #   - "literature-review"
     #   - "insight-extraction"

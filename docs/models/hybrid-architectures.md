@@ -27,8 +27,8 @@ aiwg use sdlc
 
 # Override specific tiers for cost reduction
 aiwg use sdlc \
-  --reasoning-model claude-opus-4-5-20251101 \
-  --coding-model claude-sonnet-4-5-20250929 \
+  --reasoning-model claude-opus-4-6 \
+  --coding-model claude-sonnet-4-6 \
   --efficiency-model claude-haiku-3-5
 
 # Preview without deploying
@@ -121,10 +121,10 @@ Code:
         model = "claude-haiku-3-5"
     elif complexity == "medium":
         # Escalate to sonnet
-        model = "claude-sonnet-4-5-20250929"
+        model = "claude-sonnet-4-6"
     else:
         # Escalate to opus for complex cases
-        model = "claude-opus-4-5-20251101"
+        model = "claude-opus-4-6"
 
     review_response = client.messages.create(
         model=model,
@@ -268,8 +268,8 @@ Classify tasks before assigning a model. This prevents over-spending on simple t
 
 | Provider | Model | Input (per 1M tokens) | Output (per 1M tokens) |
 |----------|-------|----------------------|------------------------|
-| Anthropic | claude-opus-4-5-20251101 | ~$15 | ~$75 |
-| Anthropic | claude-sonnet-4-5-20250929 | ~$3 | ~$15 |
+| Anthropic | claude-opus-4-6 | ~$15 | ~$75 |
+| Anthropic | claude-sonnet-4-6 | ~$3 | ~$15 |
 | Anthropic | claude-haiku-3-5 | ~$0.25 | ~$1.25 |
 | OpenAI | gpt-5.3-codex | Premium tier | Premium tier |
 | OpenAI | codex-mini-latest | $1.50 | $6.00 |
@@ -371,7 +371,7 @@ Orchestrator (Claude Code, opus)
     │
     ├── Code review sub-agents → codex-mini-latest (Codex provider)
     │
-    └── Security review → claude-opus-4-5-20251101 (Claude provider)
+    └── Security review → claude-opus-4-6 (Claude provider)
 ```
 
 This requires deploying AIWG to multiple providers and configuring environment-based routing.
@@ -387,13 +387,13 @@ For teams using Claude Code exclusively:
 ```json
 {
   "claude": {
-    "reasoning": { "model": "claude-opus-4-5-20251101" },
-    "coding": { "model": "claude-sonnet-4-5-20250929" },
+    "reasoning": { "model": "claude-opus-4-6" },
+    "coding": { "model": "claude-sonnet-4-6" },
     "efficiency": { "model": "claude-haiku-3-5" }
   },
   "shorthand": {
-    "opus": "claude-opus-4-5-20251101",
-    "sonnet": "claude-sonnet-4-5-20250929",
+    "opus": "claude-opus-4-6",
+    "sonnet": "claude-sonnet-4-6",
     "haiku": "claude-haiku-3-5"
   }
 }
@@ -406,8 +406,8 @@ Routing efficiency tasks to local models, keeping reasoning on Claude:
 ```json
 {
   "claude": {
-    "reasoning": { "model": "claude-opus-4-5-20251101" },
-    "coding": { "model": "claude-sonnet-4-5-20250929" },
+    "reasoning": { "model": "claude-opus-4-6" },
+    "coding": { "model": "claude-sonnet-4-6" },
     "efficiency": { "model": "claude-haiku-3-5" }
   },
   "openai": {

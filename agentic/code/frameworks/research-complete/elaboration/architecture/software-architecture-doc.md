@@ -969,7 +969,7 @@ const ConcurrencyConfig = {
   },
   "documentation": {
     "llmProvider": "anthropic",
-    "llmModel": "claude-opus-4-5-20251101",
+    "llmModel": "claude-opus-4-6",
     "temperature": 0.3,
     "maxTokensPerRequest": 8000,
     "enableProgressiveSummarization": true,
@@ -1420,7 +1420,7 @@ interface LLMService {
 // LLM configuration
 const LLMConfig = {
   anthropic: {
-    model: 'claude-opus-4-5-20251101',
+    model: 'claude-opus-4-6',
     maxTokens: 8000,
     temperature: 0.3
   },

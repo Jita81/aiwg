@@ -54,14 +54,14 @@
     "claude": {
       "models": {
         "reasoning": {
-          "default": "claude-opus-4-5-20251101",
+          "default": "claude-opus-4-6",
           "aliases": ["opus", "opus-4.5", "claude-opus"],
           "capabilities": ["long-context", "reasoning", "code-generation", "vision", "tool-use"],
           "contextWindow": 200000,
           "costPer1kTokens": { "input": 0.015, "output": 0.075 }
         },
         "coding": {
-          "default": "claude-sonnet-4-5-20250929",
+          "default": "claude-sonnet-4-6",
           "aliases": ["sonnet", "sonnet-4.5", "claude-sonnet"],
           "capabilities": ["code-generation", "reasoning", "vision", "tool-use"],
           "contextWindow": 200000,
@@ -77,9 +77,9 @@
       },
       "tierOverrides": {
         "max-quality": {
-          "reasoning": "claude-opus-4-5-20251101",
-          "coding": "claude-opus-4-5-20251101",
-          "efficiency": "claude-sonnet-4-5-20250929"
+          "reasoning": "claude-opus-4-6",
+          "coding": "claude-opus-4-6",
+          "efficiency": "claude-sonnet-4-6"
         }
       }
     },
@@ -287,9 +287,9 @@
   },
 
   "shorthand": {
-    "opus": "claude-opus-4-5-20251101",
-    "opus-4.1": "claude-opus-4-1-20250805",
-    "sonnet": "claude-sonnet-4-5-20250929",
+    "opus": "claude-opus-4-6",
+    "opus-4.1": "claude-opus-4-6",
+    "sonnet": "claude-sonnet-4-6",
     "haiku": "claude-haiku-3-5",
     "gpt5": "gpt-5",
     "gpt5.2": "gpt-5.2",

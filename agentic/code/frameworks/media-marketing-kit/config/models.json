@@ -8,11 +8,11 @@
 
   "claude": {
     "reasoning": {
-      "model": "claude-opus-4-5-20251101",
+      "model": "claude-opus-4-6",
       "description": "Claude Opus 4.5 - Best for complex reasoning, strategic planning, brand architecture"
     },
     "coding": {
-      "model": "claude-sonnet-4-5-20250929",
+      "model": "claude-sonnet-4-6",
       "description": "Claude Sonnet 4.5 - Best for content creation, copywriting, campaign development"
     },
     "efficiency": {
@@ -23,11 +23,11 @@
 
   "factory": {
     "reasoning": {
-      "model": "claude-opus-4-5-20251101",
+      "model": "claude-opus-4-6",
       "description": "Factory AI uses full Claude model identifiers"
     },
     "coding": {
-      "model": "claude-sonnet-4-5-20250929",
+      "model": "claude-sonnet-4-6",
       "description": "Factory AI uses full Claude model identifiers"
     },
     "efficiency": {
@@ -52,8 +52,8 @@
   },
 
   "shorthand": {
-    "opus": "claude-opus-4-5-20251101",
-    "sonnet": "claude-sonnet-4-5-20250929",
+    "opus": "claude-opus-4-6",
+    "sonnet": "claude-sonnet-4-6",
     "haiku": "claude-haiku-3-5",
     "inherit": "inherit"
   },

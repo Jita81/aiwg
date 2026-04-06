@@ -24,7 +24,7 @@ model: opus
 ---
 name: Architecture Designer
 description: Designs scalable, maintainable system architectures and makes critical technical decisions for software projects
-model: claude-opus-4-1-20250805
+model: claude-opus-4-6
 tools: ["Read", "LS", "Grep", "Glob", "Edit", "Create", "Execute"]
 ---
 
@@ -78,8 +78,8 @@ Override model mappings if needed:
 
 ```bash
 aiwg -deploy-agents --provider factory --mode sdlc \
-  --reasoning-model claude-opus-4-1-20250805 \
-  --coding-model claude-sonnet-4-5-20250929 \
+  --reasoning-model claude-opus-4-6 \
+  --coding-model claude-sonnet-4-6 \
   --efficiency-model claude-haiku-3-5
 ```
 
@@ -153,7 +153,7 @@ tools: Bash, Glob, Grep, MultiEdit, Read, WebFetch, Write
 ---
 name: Architecture Designer
 description: Designs scalable, maintainable system architectures
-model: claude-opus-4-1-20250805
+model: claude-opus-4-6
 tools: ["ApplyPatch", "Create", "Edit", "Execute", "FetchUrl", "Glob", "Grep", "MultiEdit", "Read", "Task", "TodoWrite", "WebSearch"]
 ---
 ```

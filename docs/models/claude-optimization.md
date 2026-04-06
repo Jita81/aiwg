@@ -22,8 +22,8 @@ Use this guide if you are:
 aiwg use sdlc
 
 # Deploy with explicit model overrides
-aiwg use sdlc --reasoning-model claude-opus-4-5-20251101 \
-              --coding-model claude-sonnet-4-5-20250929 \
+aiwg use sdlc --reasoning-model claude-opus-4-6 \
+              --coding-model claude-sonnet-4-6 \
               --efficiency-model claude-haiku-3-5
 
 # Check what models are deployed
@@ -38,8 +38,8 @@ AIWG maps three tiers to Claude models. The canonical defaults come from `agenti
 
 | AIWG Tier | Claude Model | Use For | Context Window |
 |-----------|--------------|---------|----------------|
-| `opus` (reasoning) | claude-opus-4-5-20251101 | Architecture, security review, complex analysis | 200K tokens |
-| `sonnet` (coding) | claude-sonnet-4-5-20250929 | Code generation, debugging, implementation | 200K tokens |
+| `opus` (reasoning) | claude-opus-4-6 | Architecture, security review, complex analysis | 200K tokens |
+| `sonnet` (coding) | claude-sonnet-4-6 | Code generation, debugging, implementation | 200K tokens |
 | `haiku` (efficiency) | claude-haiku-3-5 | File ops, summaries, simple edits | 200K tokens |
 
 ### Decision Tree: Which Model Tier to Assign an Agent
@@ -395,11 +395,11 @@ Override Claude model assignments in `models.json`:
 {
   "claude": {
     "reasoning": {
-      "model": "claude-opus-4-5-20251101",
+      "model": "claude-opus-4-6",
       "description": "Complex reasoning and architecture"
     },
     "coding": {
-      "model": "claude-sonnet-4-5-20250929",
+      "model": "claude-sonnet-4-6",
       "description": "Code generation and review"
     },
     "efficiency": {
@@ -408,8 +408,8 @@ Override Claude model assignments in `models.json`:
     }
   },
   "shorthand": {
-    "opus": "claude-opus-4-5-20251101",
-    "sonnet": "claude-sonnet-4-5-20250929",
+    "opus": "claude-opus-4-6",
+    "sonnet": "claude-sonnet-4-6",
     "haiku": "claude-haiku-3-5"
   }
 }
@@ -424,14 +424,14 @@ Place this file at:
 ```yaml
 ---
 name: my-agent
-model: opus    # resolves to claude-opus-4-5-20251101
+model: opus    # resolves to claude-opus-4-6
 ---
 ```
 
 ```yaml
 ---
 name: my-agent
-model: sonnet  # resolves to claude-sonnet-4-5-20250929
+model: sonnet  # resolves to claude-sonnet-4-6
 ---
 ```
 

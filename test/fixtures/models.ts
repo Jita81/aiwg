@@ -17,8 +17,8 @@
 // ---------------------------------------------------------------------------
 
 export const CLAUDE_MODELS = {
-  reasoning: 'claude-opus-4-5-20251101',
-  coding: 'claude-sonnet-4-5-20250929',
+  reasoning: 'claude-opus-4-6',
+  coding: 'claude-sonnet-4-6',
   efficiency: 'claude-haiku-3-5',
 } as const;
 
@@ -38,8 +38,8 @@ export const CODEX_ADAPTER_MODEL = 'gpt-5.4';
 export const OPENCODE_ADAPTER_MODEL = 'opencode/big-pickle';
 
 export const FACTORY_ADAPTER_MODELS = {
-  opus: 'claude-opus-4-5-20251101',
-  sonnet: 'claude-sonnet-4-5-20250929',
+  opus: 'claude-opus-4-6',
+  sonnet: 'claude-sonnet-4-6',
   haiku: 'claude-haiku-4-5-20251001',
 } as const;
 

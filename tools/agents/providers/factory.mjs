@@ -114,9 +114,10 @@ export function mapToolsToFactory(toolsString, agentName) {
 
   // Map original tools
   for (const tool of originalTools) {
-    // Special handling for MultiEdit - Factory doesn't have it
+    // MultiEdit maps to Edit + ApplyPatch in Factory
     if (tool === 'MultiEdit') {
       factoryTools.add('Edit');
+      factoryTools.add('ApplyPatch');
       continue;
     }
 

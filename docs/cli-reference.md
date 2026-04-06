@@ -697,7 +697,7 @@ aiwg catalog info <model-id>
 ```
 
 **Arguments:**
-- `<model-id>` - Model identifier (e.g., `claude-opus-4-5-20251101`)
+- `<model-id>` - Model identifier (e.g., `claude-opus-4-6`)
 
 #### catalog search
 
@@ -740,7 +740,7 @@ aiwg runtime-info
 **Example output:**
 ```
 Platform: Claude Code
-AI Model: claude-sonnet-4-5-20250929
+AI Model: claude-sonnet-4-6
 
 Available Tools:
   ✓ Read (supports images, PDFs)
