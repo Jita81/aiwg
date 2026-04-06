@@ -148,13 +148,13 @@ Extend the provider with external tool servers via the Model Context Protocol.
 | Codex | Not supported | — | — |
 | GitHub Copilot | Not supported | — | — |
 | Cursor | Native | MCP protocol (built-in) | `aiwg mcp install cursor` |
-| Factory AI | Partial | — | — |
+| Factory AI | Native | MCP protocol (stdio + HTTP) | `aiwg mcp install factory` |
 | OpenCode | Native | MCP protocol (built-in) | `aiwg mcp install opencode` |
 | Warp Terminal | Not supported | — | — |
 | Windsurf | Not supported | — | — |
 | OpenClaw | Not supported | — | — |
 
-**Factory AI note:** Partial MCP support — check Factory AI documentation for the current integration status before relying on it.
+**Factory AI:** Native MCP support with both `stdio` (local process) and `http` (remote endpoint) transports. Configuration in `.factory/mcp.json` (project) and `~/.factory/mcp.json` (user). Built-in registry of 40+ pre-configured servers.
 
 **Codex, Copilot, Warp, Windsurf, OpenClaw:** MCP tools must be accessed through the AIWG CLI layer (`aiwg mcp serve`) rather than native platform integration.
 
@@ -170,15 +170,15 @@ Platforms are grouped into three daemon tiers:
 |----------|------|------|--------------|
 | Claude Code | Tier 1 (native) + Tier 2 (PTY) | Headless + PTY bridge | `aiwg daemon start` |
 | Codex | Tier 1 (native) + Tier 2 (PTY) | Headless + PTY bridge | `aiwg daemon start` |
+| Factory AI | Tier 1 (native) | Headless via `droid exec` | `aiwg daemon start` |
 | OpenCode | Tier 1 (native) | Headless | `aiwg daemon start` |
 | Warp Terminal | Tier 1 (native) | Headless | `aiwg daemon start` |
 | OpenClaw | Tier 1 (native) | Headless | `aiwg daemon start` |
-| Cursor | Tier 3 — unsupported | IDE extension (VS Code host required) | — |
-| Windsurf | Tier 3 — unsupported | IDE extension (VS Code host required) | — |
-| GitHub Copilot | Tier 3 — unsupported | IDE extension | — |
-| Factory AI | Tier 3 — unsupported | Web-based | — |
+| Cursor | Tier 3 — IDE-hosted | IDE extension (VS Code host required) | — |
+| Windsurf | Tier 3 — IDE-hosted | IDE extension (VS Code host required) | — |
+| GitHub Copilot | Tier 3 — IDE-hosted | IDE extension | — |
 
-**Tier 1 (native):** Full daemon support. `aiwg daemon start/stop/status/attach` all work. The daemon manages its own process lifecycle, IPC socket, and state files. Behaviors, automation rules, and all daemon subsystems are available.
+**Tier 1 (native):** Full daemon support. `aiwg daemon start/stop/status/attach` all work. The daemon manages its own process lifecycle, IPC socket, and state files. Behaviors, automation rules, PTY orchestration, and all daemon subsystems are available. Factory AI's `droid exec` provides headless one-shot execution; the AIWG daemon wraps it with persistence, scheduling, and multi-session coordination.
 
 **Tier 2 (PTY adapter):** Optional secondary mode for Claude Code and Codex. Spawns the platform's TUI under a pseudo-terminal and bridges I/O through the chat channel — enabling remote operation from messaging platforms, shell scripts, or agentic LLMs. Requires `node-pty`:
 
@@ -188,7 +188,7 @@ aiwg daemon pty start opencode
 aiwg daemon pty start codex --cols 120
 ```
 
-**Tier 3 (unsupported):** These providers run inside an IDE extension or web host that does not support background processes or headless CLI operation. The AIWG daemon cannot run within them. All other AIWG features (agents, commands, skills, rules, Mission Control emulation) remain fully available.
+**Tier 3 (IDE-hosted):** These providers run as extensions inside a desktop IDE process that requires a display server. No standalone CLI process to bridge or supervise. The AIWG daemon cannot run within them, but they can *connect to* a daemon running elsewhere via HTTP/WS. All other AIWG features (agents, commands, skills, rules, Mission Control emulation) remain fully available.
 
 See `docs/daemon-guide.md` for full configuration and usage.
 

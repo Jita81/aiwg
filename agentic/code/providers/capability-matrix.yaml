@@ -123,8 +123,9 @@ providers:
   factory:
     display_name: Factory AI
     status: stable
-    daemon_tier: unsupported
-    daemon_pty_adapter: false
+    # droid CLI runs headless via `droid exec`; AIWG daemon provides persistence layer
+    daemon_tier: tier1
+    daemon_pty_adapter: true
     artifact_paths:
       agents: .factory/droids/
       commands: .factory/commands/
@@ -133,20 +134,20 @@ providers:
       behaviors: null
     native_features:
       cron: false
-      agent_teams: false
-      tasks: false
-      mcp: false
+      agent_teams: true       # Missions (multi-agent orchestration)
+      tasks: true             # Task tool for subagent delegation
+      mcp: true               # Native MCP support (stdio + HTTP transports)
       behaviors: false
-      mission_control: false
-      daemon: false
+      mission_control: true   # Factory Missions maps to MC concept
+      daemon: false           # No native persistent daemon; AIWG daemon wraps droid exec
     emulation:
       cron: aiwg-schedule
-      agent_teams: aiwg-mc
-      tasks: aiwg-mc
-      mcp: null
+      agent_teams: null       # native Missions
+      tasks: null             # native Task tool
+      mcp: null               # native MCP
       behaviors: aiwg-mc
-      mission_control: aiwg-mc
-      daemon: null
+      mission_control: null   # native Missions
+      daemon: aiwg-daemon     # AIWG daemon provides persistence for headless droid exec
     hook_wiring:
       at_link_support: false
       hook_file: AIWG-factory.md

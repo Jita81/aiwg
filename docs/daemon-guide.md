@@ -25,11 +25,11 @@ The daemon runs on any CLI-based platform. Platforms are grouped into three tier
 
 | Tier | Meaning | Platforms |
 |------|---------|-----------|
-| **Tier 1 — Native** | Full headless daemon support. `aiwg daemon start/stop/status` work out of the box. | Claude Code, OpenCode, Warp Terminal, OpenClaw, Codex |
-| **Tier 2 — PTY Adapter** | Platform has a TUI that can be bridged over a PTY. Not headless, but operable remotely via `aiwg daemon pty`. | Claude Code (secondary), Codex (secondary) |
-| **Tier 3 — Unsupported** | Requires a display server or IDE host. Daemon is not applicable. | Cursor, Windsurf, GitHub Copilot, Factory AI |
+| **Tier 1 — Native** | Full headless daemon support. `aiwg daemon start/stop/status` work out of the box. Platform has a headless CLI that can be supervised by the daemon's PTY orchestrator. | Claude Code, OpenCode, Warp Terminal, OpenClaw, Codex, Factory AI |
+| **Tier 2 — PTY Adapter** | Platform has a TUI that can be bridged over a PTY. Not headless natively, but operable remotely via `aiwg daemon pty`. | Claude Code (secondary), Codex (secondary) |
+| **Tier 3 — IDE-hosted** | Runs as an extension inside a desktop IDE process that requires a display server. No standalone CLI process to bridge or supervise. Can *connect to* a daemon over HTTP/WS but cannot *host* one. | Cursor, Windsurf, GitHub Copilot |
 
-Tier 1 platforms receive the full daemon feature set: file watching, cron scheduling, agent supervision, IPC, automation rules, and behaviors. Tier 3 platforms still benefit from AIWG's agent loop, Mission Control, and scheduling via AIWG emulation.
+Tier 1 platforms receive the full daemon feature set: file watching, cron scheduling, agent supervision, PTY orchestration, IPC, automation rules, and behaviors. Factory AI's `droid exec` provides headless one-shot execution; the AIWG daemon wraps it with persistence, scheduling, and multi-session coordination. Tier 3 platforms still benefit from AIWG's agent loop, Mission Control, and scheduling via AIWG emulation — they connect to a daemon running elsewhere rather than hosting one locally.
 
 See `agentic/code/providers/capability-matrix.yaml` for the authoritative `daemon_tier` field per provider.
 
