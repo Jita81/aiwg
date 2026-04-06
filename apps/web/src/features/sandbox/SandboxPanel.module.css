@@ -1,0 +1,241 @@
+/* Sandbox Operator Panel */
+
+.panel {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  height: 100%;
+  gap: 0;
+  overflow: hidden;
+}
+
+/* Sidebar */
+.sidebar {
+  background: #111;
+  border-right: 1px solid #2a2a2a;
+  overflow-y: auto;
+  padding: 12px 0;
+}
+
+.sidebarTitle {
+  padding: 0 12px 8px;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #666;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.sandboxList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sandboxItem, .sandboxItemActive {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: #ccc;
+  cursor: pointer;
+  text-align: left;
+  font-size: 13px;
+}
+
+.sandboxItem:hover {
+  background: #1a1a1a;
+}
+
+.sandboxItemActive {
+  background: #1a2a4a;
+  color: #fff;
+  border-left: 3px solid #5a8fff;
+}
+
+.sandboxName {
+  font-weight: 500;
+}
+
+.sandboxMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #888;
+}
+
+/* Main area */
+.main {
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.emptyMain, .empty {
+  color: #666;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.empty p { margin: 4px 0; }
+.hint { font-size: 12px; color: #555; }
+.hint code {
+  background: #1a1a1a;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 11px;
+}
+
+/* Sandbox header */
+.sandboxHeader {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.sandboxTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  margin: 0 0 6px;
+  color: #e0e0e0;
+}
+
+.sandboxInfo {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: #888;
+}
+
+/* Status dot */
+.statusDot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Agent grid */
+.agentGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.emptyAgents {
+  color: #666;
+  font-size: 13px;
+  padding: 20px;
+  text-align: center;
+  grid-column: 1 / -1;
+}
+
+/* Agent card */
+.agentCard {
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.agentHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.agentId {
+  color: #e0e0e0;
+  font-size: 14px;
+}
+
+.loadoutBadge {
+  margin-left: auto;
+  background: #2a2a4a;
+  color: #8a8aff;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+}
+
+.frameworks {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.fwBadge {
+  background: #1a3a2a;
+  color: #6adb6a;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+/* Agent action buttons */
+.agentActions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.actionBtn, .actionBtnSecondary, .actionBtnDanger {
+  padding: 4px 10px;
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+  background: transparent;
+  color: #ccc;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.actionBtn:hover:not(:disabled) {
+  background: #5a8fff;
+  color: #fff;
+  border-color: #5a8fff;
+}
+
+.actionBtnSecondary:hover:not(:disabled) {
+  background: #444;
+  border-color: #666;
+}
+
+.actionBtnDanger:hover:not(:disabled) {
+  background: #6a1a1a;
+  border-color: #f44336;
+  color: #ff8888;
+}
+
+.actionBtn:disabled, .actionBtnSecondary:disabled, .actionBtnDanger:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Error banner */
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: #3a1a1a;
+  border: 1px solid #ff4444;
+  border-radius: 4px;
+  color: #ff8888;
+  font-size: 12px;
+}
+
+.error button {
+  background: none;
+  border: none;
+  color: #ff8888;
+  cursor: pointer;
+  padding: 0 4px;
+}

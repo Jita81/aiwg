@@ -32,6 +32,7 @@ import fs from 'fs';
 import path from 'path';
 import { EventEmitter } from 'events';
 import { createHash, randomBytes } from 'crypto';
+import { SandboxTransport } from './sandbox-transport.mjs';
 
 const SESSION_DIR = '.aiwg/daemon/pty';
 
@@ -289,5 +290,128 @@ export class PTYAdapter extends EventEmitter {
       const p = path.join(SESSION_DIR, `${sessionId}.json`);
       if (fs.existsSync(p)) fs.unlinkSync(p);
     } catch { /* ignore */ }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Sandbox transport factory (#657)
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Create a PTYAdapter backed by a remote agentic-sandbox instance.
+   * Connects via the management server's HTTP API instead of spawning locally.
+   *
+   * Auto-selects this mode when AIWG_SANDBOX_ENDPOINT is set:
+   *   AIWG_SANDBOX_ENDPOINT=http://localhost:8122 aiwg daemon pty start
+   *
+   * @param {object} opts
+   * @param {string} opts.httpEndpoint - Sandbox management HTTP endpoint
+   * @param {string} opts.agentId - Target agent ID on the sandbox
+   * @param {string} opts.platform - AIWG provider key
+   * @param {string[]} [opts.args] - Extra arguments
+   * @param {number} [opts.cols] - Terminal width (default: 120)
+   * @param {number} [opts.rows] - Terminal height (default: 30)
+   * @param {string} [opts.cwd] - Working directory on remote agent
+   * @returns {PTYAdapter} Adapter instance using sandbox transport
+   */
+  static fromSandbox({
+    httpEndpoint,
+    agentId,
+    platform,
+    args = [],
+    cols = 120,
+    rows = 30,
+    cwd = '/home/agent',
+  }) {
+    const adapter = new PTYAdapter({ platform, args, cols, rows, cwd });
+    const bin = PLATFORM_BINS[platform] || platform;
+
+    // Replace local start() with sandbox transport
+    const transport = new SandboxTransport({
+      httpEndpoint,
+      agentId,
+      command: bin,
+      args,
+      cols,
+      rows,
+      cwd,
+    });
+
+    // Wire transport events through the adapter
+    transport.on('data', (chunk) => adapter.emit('data', chunk));
+    transport.on('exit', (info) => {
+      adapter._stopped = true;
+      PTYAdapter._removeSession(adapter.sessionId);
+      adapter.emit('exit', info);
+    });
+    transport.on('error', (err) => adapter.emit('error', err));
+
+    // Override lifecycle methods to use transport
+    adapter._transport = transport;
+    adapter.start = async function () {
+      PTYAdapter._ensureSessionDir();
+      adapter._startedAt = new Date().toISOString();
+      const cmdId = await transport.start();
+      adapter.commandId = cmdId;
+      adapter._writeSessionSandbox(httpEndpoint, agentId);
+      return adapter.sessionId;
+    };
+    adapter.write = (data) => transport.write(data);
+    adapter.resize = (c, r) => {
+      adapter.cols = c;
+      adapter.rows = r;
+      transport.resize(c, r);
+    };
+    adapter.stop = () => transport.stop();
+    adapter.isActive = () => transport.isActive();
+
+    return adapter;
+  }
+
+  /**
+   * Write a sandbox-backed session record (includes endpoint + agentId).
+   * @param {string} httpEndpoint
+   * @param {string} agentId
+   */
+  _writeSessionSandbox(httpEndpoint, agentId) {
+    const record = {
+      sessionId:     this.sessionId,
+      platform:      this.platform,
+      bin:           this.bin,
+      pid:           null,
+      cols:          this.cols,
+      rows:          this.rows,
+      cwd:           this.cwd,
+      started_at:    this._startedAt,
+      transport:     'sandbox',
+      httpEndpoint,
+      agentId,
+      commandId:     this.commandId || null,
+    };
+    PTYAdapter._ensureSessionDir();
+    const tmp = path.join(SESSION_DIR, `${this.sessionId}.json.tmp`);
+    const dst = path.join(SESSION_DIR, `${this.sessionId}.json`);
+    fs.writeFileSync(tmp, JSON.stringify(record, null, 2));
+    fs.renameSync(tmp, dst);
+  }
+
+  /**
+   * Resolve the transport mode based on environment and config.
+   *
+   * @param {object} opts - Same as PTYAdapter constructor
+   * @returns {PTYAdapter} Local or sandbox-backed adapter
+   */
+  static auto(opts) {
+    const endpoint = process.env.AIWG_SANDBOX_ENDPOINT;
+    const agentId = process.env.AIWG_SANDBOX_AGENT_ID || 'agent-01';
+
+    if (endpoint) {
+      return PTYAdapter.fromSandbox({
+        httpEndpoint: endpoint,
+        agentId,
+        ...opts,
+      });
+    }
+
+    return new PTYAdapter(opts);
   }
 }

@@ -169,15 +169,30 @@ export const registry = new PtySessionRegistry();
 /**
  * Spawn a PTY process for the given session.
  *
- * Phase 1 (local exec): uses node-pty directly.
- * Phase 2 (#657): delegate to agentic-sandbox PTY adapter.
+ * Delegates to agentic-sandbox if AIWG_SANDBOX_ENDPOINT is set or a sandbox
+ * is registered; otherwise falls back to local node-pty.
+ *
+ * @issue #657 — sandbox transport for PTY adapter
  */
 export async function spawnPty(
   session: PtySession,
   command: string,
   args: string[],
-  opts: { cols?: number; rows?: number; cwd?: string } = {},
+  opts: { cols?: number; rows?: number; cwd?: string; sandboxEndpoint?: string; agentId?: string } = {},
 ): Promise<void> {
+  const sandboxEndpoint = opts.sandboxEndpoint || process.env.AIWG_SANDBOX_ENDPOINT;
+
+  if (sandboxEndpoint) {
+    // Phase 2: delegate to agentic-sandbox via HTTP REST → gRPC bridge
+    await spawnSandboxPty(session, command, args, {
+      ...opts,
+      sandboxEndpoint,
+      agentId: opts.agentId || process.env.AIWG_SANDBOX_AGENT_ID || 'agent-01',
+    });
+    return;
+  }
+
+  // Phase 1: local exec via node-pty
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let ptyMod: any;
   try {
@@ -202,6 +217,125 @@ export async function spawnPty(
   });
 
   pty.onExit(({ exitCode }: { exitCode: number }) => {
+    session.exited = true;
+    registry.broadcast(session.id, { type: 'exit', code: exitCode });
+  });
+}
+
+/**
+ * Spawn a PTY session on a remote agentic-sandbox instance.
+ * Submits a task and polls for log output via REST.
+ *
+ * @issue #657
+ */
+async function spawnSandboxPty(
+  session: PtySession,
+  command: string,
+  args: string[],
+  opts: { cols?: number; rows?: number; cwd?: string; sandboxEndpoint: string; agentId: string },
+): Promise<void> {
+  const endpoint = opts.sandboxEndpoint.replace(/\/$/, '');
+  const cmdLine = [command, ...args].join(' ');
+
+  // Submit task manifest
+  const manifest = {
+    manifest_yaml: [
+      'version: "1"',
+      'kind: Task',
+      'metadata:',
+      `  name: "pty-${session.id}"`,
+      '  labels:',
+      '    aiwg_transport: pty',
+      `    aiwg_session: "${session.id}"`,
+      'claude:',
+      `  prompt: "${cmdLine}"`,
+      '  headless: true',
+      '  skip_permissions: true',
+      'vm:',
+      '  profile: agentic-dev',
+    ].join('\n'),
+  };
+
+  const resp = await fetch(`${endpoint}/api/v1/tasks`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(manifest),
+  });
+
+  if (!resp.ok) {
+    const body = await resp.text().catch(() => '');
+    throw new Error(`Sandbox task submission failed: ${resp.status} ${body}`);
+  }
+
+  const result = await resp.json() as { task_id: string };
+  const taskId = result.task_id;
+
+  // Create a PtyLike wrapper that routes I/O through the sandbox REST API
+  let logOffset = 0;
+  let stopped = false;
+
+  const sandboxPty: PtyLike = {
+    write(data: string) {
+      if (stopped) return;
+      fetch(`${endpoint}/api/v1/tasks/${taskId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stdin: data }),
+      }).catch(() => { /* best-effort */ });
+    },
+    resize(_cols: number, _rows: number) {
+      // Resize handled by browser WS direct connection to sandbox :8121
+    },
+    kill(_signal?: string) {
+      if (stopped) return;
+      stopped = true;
+      fetch(`${endpoint}/api/v1/tasks/${taskId}`, { method: 'DELETE' })
+        .catch(() => { /* best-effort */ });
+    },
+    onData(callback: (data: string) => void) {
+      // Poll for log output
+      const timer = setInterval(async () => {
+        if (stopped) { clearInterval(timer); return; }
+        try {
+          const logResp = await fetch(`${endpoint}/api/v1/tasks/${taskId}/logs?offset=${logOffset}`);
+          if (!logResp.ok) {
+            if (logResp.status === 404) { stopped = true; clearInterval(timer); }
+            return;
+          }
+          const text = await logResp.text();
+          if (text.length > 0) {
+            logOffset += text.length;
+            callback(text);
+          }
+        } catch { /* retry next poll */ }
+      }, 500);
+    },
+    onExit(callback: (event: { exitCode: number }) => void) {
+      // Poll for task completion
+      const timer = setInterval(async () => {
+        if (stopped) { clearInterval(timer); return; }
+        try {
+          const statusResp = await fetch(`${endpoint}/api/v1/tasks/${taskId}`);
+          if (!statusResp.ok) return;
+          const task = await statusResp.json() as { state: string };
+          if (['completed', 'failed', 'cancelled'].includes(task.state)) {
+            stopped = true;
+            clearInterval(timer);
+            callback({ exitCode: task.state === 'completed' ? 0 : 1 });
+          }
+        } catch { /* retry */ }
+      }, 2000);
+    },
+  };
+
+  session.pty = sandboxPty;
+
+  sandboxPty.onData((data: string) => {
+    registry.appendOutput(session.id, data);
+    registry.broadcast(session.id, { type: 'data', payload: data });
+  });
+
+  sandboxPty.onExit(({ exitCode }: { exitCode: number }) => {
     session.exited = true;
     registry.broadcast(session.id, { type: 'exit', code: exitCode });
   });

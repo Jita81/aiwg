@@ -10,10 +10,12 @@ import { SessionSelector } from '../features/terminal/SessionSelector.js';
 import { MissionControl } from '../features/missions/MissionControl.js';
 import { TelemetryDashboard } from '../features/telemetry/TelemetryDashboard.js';
 import { MemoryPanel } from '../features/memory/MemoryPanel.js';
+import { HitlDrawer } from '../features/hitl/HitlDrawer.js';
+import { SandboxPanel } from '../features/sandbox/SandboxPanel.js';
 import { Onboarding, isFirstVisit } from '../features/onboarding/Onboarding.js';
 import styles from './App.module.css';
 
-type Tab = 'terminal' | 'missions' | 'telemetry' | 'memory';
+type Tab = 'terminal' | 'missions' | 'telemetry' | 'memory' | 'sandbox';
 
 export function App() {
   const [tab, setTab] = useState<Tab>('missions');
@@ -31,7 +33,7 @@ export function App() {
           <span aria-hidden="true">⚙</span> AIWG Dashboard
         </h1>
         <nav className={styles.nav} aria-label="Dashboard tabs">
-          {(['terminal', 'missions', 'telemetry', 'memory'] as const).map((t) => (
+          {(['terminal', 'missions', 'sandbox', 'telemetry', 'memory'] as const).map((t) => (
             <button
               key={t}
               type="button"
@@ -64,8 +66,12 @@ export function App() {
         )}
         {tab === 'missions' && <MissionControl />}
         {tab === 'telemetry' && <TelemetryDashboard sessionId={sessionId} />}
+        {tab === 'sandbox' && <SandboxPanel />}
         {tab === 'memory' && <MemoryPanel />}
       </main>
+
+      {/* HITL drawer — persists across tab navigation (#732) */}
+      <HitlDrawer />
     </div>
   );
 }

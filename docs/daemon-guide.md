@@ -47,13 +47,63 @@ aiwg daemon pty list
 aiwg daemon pty stop <session-id>
 ```
 
-The PTY adapter requires `node-pty` (native module):
+The PTY adapter requires `node-pty` (native module) for local mode:
 
 ```bash
 npm install node-pty   # requires node-gyp + C++ build tools
 ```
 
 Input from the chat channel is forwarded as keystrokes/stdin to the TUI. Output (screen state, ANSI sequences) flows back out. Both human-in-the-loop (typing in chat) and agentic driving (LLM or script sends input programmatically) are supported. Sessions persist across detaches — reconnect with `aiwg daemon pty list` to find the session ID.
+
+### Execution Modes
+
+The PTY adapter supports three execution modes, selected automatically based on configuration:
+
+| Mode | Transport | Config | When to Use |
+|------|-----------|--------|-------------|
+| **Local** | `node-pty` on host | Default (no config) | Dev machine, `node-pty` available |
+| **Container** | HTTP → sandbox → Docker | `AIWG_SANDBOX_ENDPOINT` | Isolated sandbox, fast spin-up |
+| **VM** | HTTP → sandbox → QEMU | `AIWG_SANDBOX_ENDPOINT` | Full isolation, untrusted workloads |
+
+#### Local mode (default)
+
+Spawns the TUI process directly on the host via `node-pty`. Requires native compilation.
+
+#### Sandbox mode (container/VM)
+
+Delegates to an [agentic-sandbox](https://git.integrolabs.net/roctinam/agentic-sandbox) management server. The sandbox handles provisioning and PTY allocation inside containers or VMs.
+
+```bash
+# Set the sandbox endpoint to enable remote execution
+export AIWG_SANDBOX_ENDPOINT=http://sandbox.local:8122
+export AIWG_SANDBOX_AGENT_ID=agent-01   # optional, defaults to agent-01
+
+# PTY commands work identically — transport is transparent
+aiwg daemon pty start opencode
+aiwg daemon pty list
+aiwg daemon pty stop <session-id>
+```
+
+Or use the programmatic API:
+
+```javascript
+import { PTYAdapter } from './tools/daemon/pty-adapter.mjs';
+
+// Auto-select: uses sandbox if AIWG_SANDBOX_ENDPOINT is set, else local
+const adapter = PTYAdapter.auto({ platform: 'opencode', cols: 120, rows: 30 });
+
+// Or explicitly use sandbox transport
+const adapter = PTYAdapter.fromSandbox({
+  httpEndpoint: 'http://sandbox.local:8122',
+  agentId: 'agent-01',
+  platform: 'opencode',
+});
+
+await adapter.start();
+adapter.on('data', (chunk) => process.stdout.write(chunk));
+```
+
+The sandbox transport uses the management server's REST API (`:8122`) to submit tasks and poll for output. The browser terminal viewer connects directly to the sandbox WebSocket (`:8121`) for real-time PTY streaming with full ANSI color support.
 
 ---
 
