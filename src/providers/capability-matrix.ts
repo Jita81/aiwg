@@ -53,6 +53,7 @@ export interface ArtifactPaths {
   agents: string;
   commands: string;
   skills: string;
+  skills_cross_agent?: string;
   rules: string;
   behaviors: string | null;
 }

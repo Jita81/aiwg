@@ -135,7 +135,7 @@ const PROVIDER_PATHS: Record<string, { agents: string; skills: string; commands:
     behaviors: '.codex/rules',   // Emulated via session wrapper
   },
   opencode: {
-    agents: '',                 // Agents are config-only in OpenCode — no directory scanned
+    agents: '.opencode/agent',  // Discovered via {agent,agents}/**/*.md glob (#773)
     skills: '.opencode/skill',
     commands: '',               // Commands derive from skills automatically — no .opencode/command/ directory
     rules: '.opencode/rule',

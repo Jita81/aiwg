@@ -236,6 +236,7 @@ providers:
       agents: .warp/agents/
       commands: .warp/commands/
       skills: .warp/skills/
+      skills_cross_agent: .agents/skills/
       rules: .warp/rules/
       behaviors: null
     native_features:
@@ -272,6 +273,7 @@ providers:
       agents: .windsurf/agents/
       commands: .windsurf/workflows/
       skills: .windsurf/skills/
+      skills_cross_agent: .agents/skills/
       rules: .windsurf/rules/
       behaviors: null
     native_features:

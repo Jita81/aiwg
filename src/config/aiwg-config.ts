@@ -12,6 +12,7 @@
 import { readFile, writeFile, mkdir, access, readdir } from 'fs/promises';
 import { createHash } from 'crypto';
 import { resolve, join, isAbsolute } from 'path';
+import { homedir } from 'os';
 
 const CONFIG_FILENAME = 'aiwg.config';
 const AIWG_DIR = '.aiwg';
@@ -213,11 +214,13 @@ const PROVIDER_DEPLOY_DIRS: Record<string, { agents: string; skills: string; com
   claude:   { agents: '.claude/agents',       skills: '.claude/skills',      commands: '.claude/commands',    rules: '.claude/rules'          },
   copilot:  { agents: '.github/agents',       skills: '.github/skills',      commands: '.github/commands',   rules: '.github/copilot-rules'   },
   cursor:   { agents: '.cursor/agents',       skills: '.cursor/skills',      commands: '.cursor/commands',    rules: '.cursor/rules'           },
-  opencode: { agents: '',                     skills: '.opencode/skill',     commands: '',                   rules: '.opencode/rule'           },
+  opencode: { agents: '.opencode/agent',      skills: '.opencode/skill',     commands: '',                   rules: '.opencode/rule'           },
   warp:     { agents: '.warp/agents',         skills: '.warp/skills',        commands: '.warp/commands',      rules: '.warp/rules'             },
   windsurf: { agents: '.windsurf/agents',     skills: '.windsurf/skills',    commands: '.windsurf/workflows', rules: '.windsurf/rules'         },
   factory:  { agents: '.factory/droids',      skills: '.factory/skills',     commands: '.factory/commands',   rules: '.factory/rules'          },
   codex:    { agents: '.codex/agents',        skills: '.codex/skills',       commands: '.codex/commands',     rules: '.codex/rules'            },
+  hermes:   { agents: '',                     skills: join(homedir(), '.hermes', 'skills'),   commands: '',                   rules: ''                        },
+  openclaw: { agents: join(homedir(), '.openclaw', 'agents'), skills: join(homedir(), '.openclaw', 'skills'), commands: join(homedir(), '.openclaw', 'commands'), rules: join(homedir(), '.openclaw', 'rules') },
 };
 
 /**

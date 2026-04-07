@@ -5,7 +5,7 @@
  * tools, and permission configurations based on agent category.
  *
  * Deployment paths:
- *   - Agents: NOT DEPLOYED — OpenCode agents are config-only (opencode.json `agent` key)
+ *   - Agents: .opencode/agent/  (discovered via {agent,agents}/**/*.md glob)
  *   - Commands: NOT DEPLOYED — Commands derive from skills automatically
  *   - Skills: .opencode/skill/  (discovered via skill glob: SKILL.md)
  *   - Rules: .opencode/rule/    (loaded via `instructions` array in opencode.json)
@@ -51,14 +51,14 @@ export const name = 'opencode';
 export const aliases = [];
 
 export const paths = {
-  agents: '',             // Not deployed — OpenCode agents are config-only
-  commands: '',           // Not deployed — commands derive from skills automatically
+  agents: '.opencode/agent/',   // Discovered via {agent,agents}/**/*.md glob (#773)
+  commands: '',                 // Not deployed — commands derive from skills automatically
   skills: '.opencode/skill/',
   rules: '.opencode/rule/'
 };
 
 export const support = {
-  agents: 'none',         // Agents defined in opencode.json config, not file-based
+  agents: 'native',       // Discovered via {agent,agents}/**/*.md glob
   commands: 'none',       // Commands derived from skills automatically
   skills: 'native',       // Discovered via {skill,skills}/**/SKILL.md
   rules: 'conventional',  // Requires instructions[] entry in opencode.json
@@ -267,13 +267,18 @@ export function transformCommand(srcPath, content, opts) {
 // ============================================================================
 
 /**
- * Deploy agents — no-op for OpenCode.
+ * Deploy agents to .opencode/agent/
  *
- * OpenCode agents are defined in opencode.json under the `agent` key or are built-ins.
- * No directory is scanned for agent files. See: packages/opencode/src/agent/agent.ts
+ * OpenCode discovers agents via {agent,agents}/**/*.md glob within each .opencode directory.
+ * Agent files use YAML frontmatter (description, mode, model, temperature, steps, permission)
+ * with Markdown body as the system prompt.
+ *
+ * See: packages/opencode/src/config/config.ts loadAgent()
  */
-export function deployAgents(_agentFiles, _targetDir, _opts) {
-  // No-op: OpenCode does not discover agents from a directory
+export function deployAgents(agentFiles, targetDir, opts) {
+  const destDir = path.join(targetDir, paths.agents);
+  ensureDir(destDir, opts.dryRun);
+  return deployFiles(agentFiles, destDir, opts, transformAgent);
 }
 
 /**
@@ -396,13 +401,14 @@ export async function deploy(opts) {
   skillDirs.push(...frameworkArtifacts.skills);
   ruleFiles.push(...frameworkArtifacts.rules);
 
-  // Deploy
+  // Deploy agents to .opencode/agent/
   if (!commandsOnly && !skillsOnly && !rulesOnly) {
-    // Agents are config-only in OpenCode — no file deployment
-    // deployAgents is a no-op; soul files are skipped since there's no agent dir
-    console.log(`\nSkipping ${agentFiles.length} agents (OpenCode agents are config-only)`);
-    deployAgents(agentFiles, target, opts); // no-op
-    // Soul files require an agent directory — skip for OpenCode
+    console.log(`\nDeploying ${agentFiles.length} agents to .opencode/agent/...`);
+    deployAgents(agentFiles, target, opts);
+    // Deploy soul companion files alongside agents
+    if (soulFiles.length > 0) {
+      deploySoulCompanions(soulFiles, path.join(target, paths.agents), opts);
+    }
   }
 
   // Filter commands that collide with skills (skills take precedence)

@@ -9,6 +9,7 @@
  *   - Agents: WARP.md (aggregated only — Warp does not discover .warp/agents/)
  *   - Commands: WARP.md (aggregated only — Warp does not discover .warp/commands/)
  *   - Skills: .warp/skills/ (discrete — natively discovered by Warp)
+ *   - Skills: .agents/skills/ (cross-agent compatibility path)
  *   - Rules: WARP.md (aggregated only — Warp does not discover .warp/rules/)
  *
  * Special features:
@@ -48,7 +49,8 @@ export const name = 'warp';
 export const aliases = [];
 
 export const paths = {
-  skills: '.warp/skills/'
+  skills: '.warp/skills/',
+  crossAgentSkills: '.agents/skills/',  // Cross-agent compatibility path (#771)
   // agents, commands, rules: delivered via aggregated WARP.md only
   // Warp does not discover .warp/agents/, .warp/commands/, or .warp/rules/
 };
@@ -158,14 +160,28 @@ export function transformCommand(srcPath, content, opts) {
 // Only skills (.warp/skills/) are natively discovered.
 
 /**
- * Deploy skills to .warp/skills/
+ * Deploy skills to .warp/skills/ (primary) and .agents/skills/ (cross-agent compatibility).
+ * The .agents/skills/ path is an interop convention for projects using multiple AI coding tools.
  */
 export function deploySkills(skillDirs, targetDir, opts) {
+  // Primary: .warp/skills/
   const destDir = path.join(targetDir, paths.skills);
   ensureDir(destDir, opts.dryRun);
 
   for (const skillDir of skillDirs) {
     deploySkillDir(skillDir, destDir, opts);
+  }
+
+  // Cross-agent compatibility: .agents/skills/
+  const crossAgentDir = path.join(targetDir, paths.crossAgentSkills);
+  ensureDir(crossAgentDir, opts.dryRun);
+  if (!opts.dryRun) {
+    console.log(`Deploying cross-agent skills to ${path.relative(process.cwd(), crossAgentDir)}...`);
+  } else {
+    console.log(`[dry-run] Would deploy cross-agent skills to .agents/skills/`);
+  }
+  for (const skillDir of skillDirs) {
+    deploySkillDir(skillDir, crossAgentDir, opts);
   }
 }
 
