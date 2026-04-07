@@ -43,22 +43,11 @@ describe('checkCollisions', () => {
     expect(results).toHaveLength(0);
   });
 
-  it('returns error for AIWG CLI command collision (aiwg-sync shadows aiwg sync)', async () => {
-    const results = await checkCollisions({
-      platform: 'claude',
-      projectPath: tmpDir,
-      skillNames: ['aiwg-sync'],
-      namespace: 'aiwg',
-      skillsBaseDir: path.join(tmpDir, '.claude/skills/aiwg'),
-    });
-    const err = results.find((r) => r.skillName === 'aiwg-sync');
-    expect(err).toBeDefined();
-    expect(err!.severity).toBe('error');
-    expect(err!.blocksDeployment).toBe(true);
-  });
-
-  it('returns error for AIWG CLI collision for other CLI commands', async () => {
-    const cliNames = ['aiwg-doctor', 'aiwg-run', 'aiwg-list', 'aiwg-update', 'aiwg-use'];
+  it('does NOT block aiwg-prefixed slugs that share names with AIWG CLI commands', async () => {
+    // Per docs/migration/skill-namespace-migration.md, `/aiwg-doctor` IS the canonical
+    // slug for the doctor skill (since bare `doctor` collides with Claude's built-in).
+    // Slash commands and shell CLI commands live on different surfaces and do not collide.
+    const cliNames = ['aiwg-sync', 'aiwg-doctor', 'aiwg-run', 'aiwg-list', 'aiwg-update', 'aiwg-use'];
     const results = await checkCollisions({
       platform: 'claude',
       projectPath: tmpDir,
@@ -66,10 +55,8 @@ describe('checkCollisions', () => {
       namespace: 'aiwg',
       skillsBaseDir: path.join(tmpDir, '.claude/skills/aiwg'),
     });
-    for (const r of results) {
-      expect(r.severity).toBe('error');
-      expect(r.blocksDeployment).toBe(true);
-    }
+    // None of these should be blocked — target paths don't exist and they're properly namespaced
+    expect(results).toHaveLength(0);
   });
 
   it('returns error for Claude Code built-in collision', async () => {

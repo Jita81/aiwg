@@ -78,30 +78,13 @@ const PLATFORM_BUILTINS: Record<string, string[]> = {
   'generic': [],
 };
 
-/**
- * AIWG CLI command names.
- *
- * Skills named `aiwg-{cliCommand}` collide with the AIWG CLI surface when
- * platforms/users parse natural language (e.g. `/aiwg-sync` vs `aiwg sync`).
- * These are treated as ERROR-level collisions to prevent ambiguity.
- *
- * Generated from src/extensions/commands/definitions.ts — keep in sync.
- */
-const AIWG_CLI_COMMANDS = new Set([
-  'help', 'version', 'doctor', 'update', 'sync', 'use', 'list', 'remove',
-  'install', 'packages', 'init', 'run', 'new', 'status',
-  'migrate-workspace', 'rollback-workspace', 'aiwg-mcp', 'catalog', 'skills',
-  'index', 'runtime-info', 'prefill-cards', 'contribute-start',
-  'validate-metadata', 'install-plugin', 'uninstall-plugin', 'plugin-status',
-  'package-plugin', 'package-all-plugins', 'add-agent', 'add-command',
-  'add-skill', 'add-behavior', 'add-template', 'scaffold-addon',
-  'scaffold-extension', 'scaffold-framework', 'ralph', 'ralph-status',
-  'ralph-abort', 'ralph-resume', 'ralph-attach', 'agent-loop-ext', 'ralph-external',
-  'ralph-memory', 'ralph-config', 'mc', 'steward', 'team',
-  'cost-report', 'cost-history', 'metrics-tokens', 'doc-sync',
-  'cleanup-audit', 'sdlc-accelerate', 'execution-mode', 'snapshot',
-  'checkpoint', 'reproducibility-validate', 'behavior', 'daemon-init',
-]);
+// Note: previously this module also blocked `aiwg-{cliCommand}` slugs (e.g.
+// `aiwg-doctor`) as "shadowing" the AIWG CLI. That check was removed because
+// it directly contradicted the namespace migration strategy: `/aiwg-doctor`
+// IS the canonical slug for the doctor skill (the bare `doctor` collides with
+// Claude's built-in). Slash commands and shell CLI commands live on different
+// surfaces and do not actually conflict at runtime.
+// See: docs/migration/skill-namespace-migration.md, .aiwg/architecture/adr-skill-namespace-strategy.md
 
 // ============================================
 // Ownership Attribution
@@ -186,24 +169,16 @@ export async function checkCollisions(options: CollisionCheckOptions): Promise<C
       ? path.join(skillsBaseDir, skillName)
       : path.join(projectPath, `.${platform}/skills`, skillName);
 
-    // Check 1: AIWG CLI collision — the bare skill name (without namespace prefix) matches a CLI command
-    const bareNameForCliCheck = skillName.startsWith(`${namespace}-`)
-      ? skillName.slice(namespace.length + 1)
-      : skillName;
-
-    if (AIWG_CLI_COMMANDS.has(bareNameForCliCheck) && skillName.startsWith(`${namespace}-`)) {
-      results.push({
-        skillName,
-        targetPath,
-        severity: 'error',
-        reason: `'${skillName}' shadows the AIWG CLI command 'aiwg ${bareNameForCliCheck}' — ambiguous invocation`,
-        blocksDeployment: true,
-      });
-      continue;
-    }
-
-    // Check 2: Platform built-in collision (bare name)
-    if (platformBuiltins.has(bareNameForCliCheck) || platformBuiltins.has(skillName)) {
+    // Check 1: Platform built-in collision (literal slug only).
+    //
+    // The namespaced canonical slug (e.g. `aiwg-doctor`) is the actual command
+    // registered with the platform — it does NOT collide with the platform's bare
+    // built-in (`doctor`). The whole point of the `aiwg-` prefix per
+    // `docs/migration/skill-namespace-migration.md` is to side-step platform built-ins.
+    //
+    // Only check the literal skillName here. Bare names like `doctor` (no prefix)
+    // are still caught and blocked.
+    if (platformBuiltins.has(skillName)) {
       results.push({
         skillName,
         targetPath,
@@ -214,7 +189,7 @@ export async function checkCollisions(options: CollisionCheckOptions): Promise<C
       continue;
     }
 
-    // Check 3: Target path existence
+    // Check 2: Target path existence
     let exists = false;
     try {
       await fs.access(targetPath);
@@ -228,7 +203,7 @@ export async function checkCollisions(options: CollisionCheckOptions): Promise<C
       continue;
     }
 
-    // Check 4: Ownership of existing skill
+    // Check 3: Ownership of existing skill
     const owned = await isAiwgOwned(targetPath);
     if (owned) {
       // Check if content is actually unchanged — skip silently if identical
