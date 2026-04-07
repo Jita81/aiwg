@@ -2,7 +2,7 @@
 
 > **AIWG Provider** — Authoritative reference for GitHub Copilot extensibility features, configuration, and integration patterns.
 
-**Last Updated**: 2026-03-27
+**Last Updated**: 2026-04-06
 **Coverage**: VS Code Copilot Chat, Agent Mode, Coding Agent, Extensions
 **Maintainer**: AIWG Team
 
@@ -386,8 +386,8 @@ Copilot supports image input:
 |--------------|-------------|-------------------|
 | Agents | `.github/agents/` | Native (but format needs `.agent.md`) |
 | Commands | `.github/agents/` (as YAML agents) | Should use `.github/prompts/` |
-| Skills | `.github/skills/` | Not natively discovered |
-| Rules | `.github/copilot-rules/` | Not natively discovered |
+| Skills | `.github/skills/` | **Also scanned**: `.claude/skills/` is discovered natively by VS Code Copilot (confirmed from `promptFileLocations.ts`) — AIWG skills in `.claude/skills/` are already visible to Copilot users without extra deployment |
+| Rules | `.github/copilot-rules/` | Not natively discovered (use `.github/instructions/*.instructions.md` for path-scoped rules) |
 | Instructions | `.github/copilot-instructions.md` | Native |
 
 ### Recommended Alignment
@@ -445,3 +445,4 @@ Copilot supports image input:
 | Date | Change |
 |------|--------|
 | 2026-03-27 | Initial creation — full capability audit |
+| 2026-04-06 | Skills: corrected "Not natively discovered" — VS Code also scans `.claude/skills/` (confirmed from source) |

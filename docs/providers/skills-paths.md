@@ -1,0 +1,178 @@
+# Provider Skill Paths — Verified Reference
+
+Ground-truth skill discovery paths for all AIWG-supported providers.
+Paths are verified from platform source code where available, or from official documentation.
+
+**Issue tracking full audit + fixes:** roctinam/aiwg#766
+
+---
+
+## Universal Cross-Platform Path
+
+`.agents/skills/` is scanned by multiple platforms as a shared convention:
+
+- Codex CLI (primary, confirmed from `codex-rs/core-skills/src/loader.rs`)
+- OpenClaw (confirmed from `src/agents/skills/workspace.ts`)
+- Warp Terminal (also scans alongside `.warp/skills/`)
+- GitHub Copilot / VS Code (also scans alongside `.github/skills/`)
+
+Deploying to `.agents/skills/` is the most portable option if you need a single directory that works across providers.
+
+---
+
+## Per-Provider Skill Paths
+
+### Claude Code
+
+| Scope | Path | Source |
+|-------|------|--------|
+| Project | `.claude/skills/` | Official docs |
+
+- Discovery: scans `.claude/skills/` for SKILL.md files
+- Plugin namespace: `plugin-name:skill-name`
+- Copilot/VS Code source confirms it also scans `.claude/skills/` directly
+
+---
+
+### OpenAI Codex
+
+| Scope | Path | Source | Status |
+|-------|------|--------|--------|
+| Project | `.agents/skills/` | `codex-rs/core-skills/src/loader.rs` | **Primary (use this)** |
+| User-global | `~/.agents/skills/` | `codex-rs/core-skills/src/loader.rs` | **Primary (use this)** |
+| User-global | `~/.codex/skills/` | Legacy | **Deprecated — do not use** |
+
+- Source repo: https://github.com/openai/codex (full Rust)
+- Current AIWG deployment target `~/.codex/skills/` is incorrect — tracked in #766
+- Deploy target should be `.agents/skills/` (project) or `~/.agents/skills/` (user-global)
+
+---
+
+### GitHub Copilot / VS Code
+
+| Scope | Path | Source | Notes |
+|-------|------|--------|-------|
+| Project | `.github/skills/` | `promptFileLocations.ts` | Copilot-specific |
+| Project | `.claude/skills/` | `promptFileLocations.ts` | Also scanned — already visible to Copilot when AIWG is deployed for Claude |
+
+- Source repo: https://github.com/microsoft/vscode (full TypeScript)
+- AIWG skills in `.claude/skills/` are already visible to Copilot users without extra deployment
+- Deploying to `.github/skills/` is still correct for Copilot-only projects
+
+---
+
+### Factory AI
+
+| Scope | Path | Source |
+|-------|------|--------|
+| Project | `.factory/skills/` | `docs/cli/configuration/skills.mdx` |
+
+- Source: docs only (no public source code)
+- Path not independently verified from source; treat as provisional
+
+---
+
+### Cursor IDE
+
+| Scope | Path | Source |
+|-------|------|--------|
+| Project | `.cursor/skills/` | Official docs |
+
+- Closed source — path from documentation only
+
+---
+
+### OpenCode
+
+| Scope | Path | Source |
+|-------|------|--------|
+| Project | `.opencode/skill/` | `packages/opencode/src/skill/index.ts` |
+
+- Source repo: https://github.com/sst/opencode (full TypeScript)
+- Note: agents (`.opencode/agent/`) and commands (`.opencode/command/`) are config-only via `opencode.jsonc` — file-based discovery only works for skills
+- Skills-only file-based discovery confirmed from source
+
+---
+
+### Warp Terminal
+
+| Scope | Path | Source | Notes |
+|-------|------|--------|-------|
+| Project | `.warp/skills/` | Official docs | Warp-specific |
+| Project | `.agents/skills/` | warpdotdev/oz-skills examples | Also scanned |
+
+- Closed source — paths from official docs and example repos
+- `.agents/skills/` cross-platform path likely scanned; needs verification
+
+---
+
+### Windsurf
+
+| Scope | Path | Source |
+|-------|------|--------|
+| Project | `.windsurf/skills/` | Official docs |
+
+- Codeium — closed source; path from documentation only
+- Status: experimental
+
+---
+
+### OpenClaw
+
+| Scope | Path | Source |
+|-------|------|--------|
+| User-global | `~/.openclaw/skills/` | `src/agents/skills/workspace.ts`, `local-loader.ts` |
+
+- Source repo: https://github.com/openclaw/openclaw (full TypeScript)
+- All artifacts deploy to home directory — no project-local skill paths
+- Inherits Claude Code SKILL.md behavior including deep subdirectory recursion
+
+---
+
+### Hermes Agent
+
+| Scope | Path | Source |
+|-------|------|--------|
+| User-global | `~/.hermes/skills/` | `agent/skill_commands.py`, `agent/skill_utils.py`, `tools/skills_tool.py` |
+
+- Source repo: https://github.com/NousResearch/hermes-agent (full Python)
+- Discovery: `rglob("SKILL.md")` — unlimited recursion confirmed
+- NOT MCP-only for skills; file-based discovery is the primary mechanism
+
+---
+
+## Capability-Matrix.yaml vs. Ground Truth
+
+| Provider | Matrix `skills:` | Ground-truth primary | Correct? |
+|----------|-----------------|----------------------|----------|
+| claude-code | `.claude/skills/` | `.claude/skills/` | Yes |
+| codex | `~/.codex/skills/` | `.agents/skills/` | **No — #766** |
+| copilot | `.github/skills/` | `.github/skills/` (also `.claude/skills/`) | Partial |
+| factory | `.factory/skills/` | `.factory/skills/` | Unverified |
+| cursor | `.cursor/skills/` | `.cursor/skills/` | Unverified |
+| opencode | `.opencode/skill/` | `.opencode/skill/` | Yes |
+| warp | `.warp/skills/` | `.warp/skills/` (also `.agents/skills/`) | Partial |
+| windsurf | `.windsurf/skills/` | `.windsurf/skills/` | Unverified |
+| openclaw | `~/.openclaw/skills/` | `~/.openclaw/skills/` | Yes |
+
+---
+
+## Source Repositories
+
+| Platform | Repo | Open Source | Key skill loader |
+|----------|------|-------------|-----------------|
+| Claude Code | https://github.com/anthropics/claude-code | Partial (no loader) | Docs: code.claude.com/docs/en/skills |
+| Codex CLI | https://github.com/openai/codex | Full Rust | `codex-rs/core-skills/src/loader.rs` |
+| GitHub Copilot / VS Code | https://github.com/microsoft/vscode | Full TypeScript | `promptFileLocations.ts` |
+| Factory AI | — (docs only) | No | `docs/cli/configuration/skills.mdx` |
+| Cursor | — (closed) | No | Docs only |
+| OpenCode | https://github.com/sst/opencode | Full TypeScript | `packages/opencode/src/skill/index.ts` |
+| Warp | — (closed) | No (examples: warpdotdev/oz-skills) | Docs only |
+| Windsurf | — (closed) | No | Docs only |
+| OpenClaw | https://github.com/openclaw/openclaw | Full TypeScript | `src/agents/skills/workspace.ts`, `local-loader.ts` |
+| Hermes Agent | https://github.com/NousResearch/hermes-agent | Full Python | `agent/skill_commands.py` |
+| agentskills spec | https://github.com/agentskills/agentskills | Full | Specification + reference library |
+
+---
+
+*Last verified: 2026-04-06. Re-verify before implementing path changes — source repos move fast.*
