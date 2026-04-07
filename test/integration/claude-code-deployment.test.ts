@@ -242,7 +242,7 @@ describe.skipIf(!GIT_INIT_AVAILABLE)('Claude Code Integration', () => {
 
   describe('MCP Configuration', () => {
     it('generates valid JSON config for Claude Code', async () => {
-      const output = runAiwg(['mcp', 'install', 'claude', '--dry-run']);
+      const output = runAiwg(['aiwg-mcp', 'install', 'claude', '--dry-run']);
 
       expect(output).toContain('[DRY RUN]');
     });

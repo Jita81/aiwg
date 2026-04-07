@@ -105,8 +105,8 @@ const PROVIDERS: Record<string, ProviderConfig> = {
   },
   opencode: {
     name: 'opencode',
-    projectPaths: ['.opencode/skill', '.opencode/rule'],  // Agents/commands not file-based in OpenCode
-    forbiddenPaths: ['.claude', '.codex', '.cursor', '.opencode/agent', '.opencode/commands'],
+    projectPaths: ['.opencode/agent', '.opencode/skill', '.opencode/rule'],
+    forbiddenPaths: ['.claude', '.codex', '.cursor', '.opencode/commands'],
     fileExtension: '.md',
     minArtifacts: 5,
   },
@@ -346,7 +346,7 @@ describe.skipIf(!GIT_INIT_AVAILABLE)('Provider File Locations', () => {
         copilot: ['.github'],
         cursor: ['.cursor'],
         opencode: ['.opencode'],
-        warp: ['.warp'],  // Discrete files + WARP.md aggregated
+        warp: ['.warp', '.agents'],  // Discrete files + WARP.md aggregated + .agents/skills/ cross-agent compat (#771)
         windsurf: ['.windsurf', '.windsurfrules', '.agents'],  // .agents/skills/ cross-agent compat (#576)
       };
 

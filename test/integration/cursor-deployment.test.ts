@@ -257,14 +257,14 @@ describe.skipIf(!GIT_INIT_AVAILABLE)('Cursor Integration', () => {
     // These tests use runAiwg which goes through router-loader → npx tsx
     // Skip if tsx is not available (e.g., in Docker CI containers)
     it.skipIf(!TSX_AVAILABLE)('generates valid JSON config for Cursor', async () => {
-      const output = runAiwg(['mcp', 'install', 'cursor', '--dry-run']);
+      const output = runAiwg(['aiwg-mcp', 'install', 'cursor', '--dry-run']);
 
       expect(output).toContain('[DRY RUN]');
       expect(output).toContain('.cursor/mcp.json');
     });
 
     it.skipIf(!TSX_AVAILABLE)('includes all AIWG MCP tools', async () => {
-      runAiwg(['mcp', 'install', 'cursor']);
+      runAiwg(['aiwg-mcp', 'install', 'cursor']);
 
       const config = await fs.readFile(
         path.join(TEST_PROJECT_DIR, '.cursor', 'mcp.json'),
@@ -287,8 +287,8 @@ describe.skipIf(!GIT_INIT_AVAILABLE)('Cursor Integration', () => {
         JSON.stringify({ mcpServers: {} }, null, 2)
       );
 
-      runAiwg(['mcp', 'install', 'cursor']);
-      runAiwg(['mcp', 'install', 'cursor']);
+      runAiwg(['aiwg-mcp', 'install', 'cursor']);
+      runAiwg(['aiwg-mcp', 'install', 'cursor']);
 
       const config = await fs.readFile(
         path.join(TEST_CURSOR_DIR, 'mcp.json'),

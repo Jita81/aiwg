@@ -81,15 +81,14 @@ describe('OpenCode Deployment', () => {
   });
 
   describe('Agent Deployment', () => {
-    it('should NOT deploy agents to .opencode/agent/ (agents are config-only in OpenCode)', () => {
-      // OpenCode agents are defined in opencode.json under the `agent` key.
-      // No directory is scanned. AIWG should not write to .opencode/agent/.
+    it('should deploy agents to .opencode/agent/ directory', () => {
+      // OpenCode discovers agents via glob within .opencode/agent/ directory.
       execSync(`node ${deployScript} --target ${testDir} --provider opencode --mode sdlc`, {
         encoding: 'utf-8'
       });
 
       const agentDir = path.join(testDir, '.opencode', 'agent');
-      expect(fs.existsSync(agentDir)).toBe(false);
+      expect(fs.existsSync(agentDir)).toBe(true);
     });
 
     it('should NOT deploy commands to .opencode/commands/ (commands derive from skills in OpenCode)', () => {
@@ -195,9 +194,9 @@ describe('OpenCode Deployment', () => {
         encoding: 'utf-8'
       });
 
-      // Agents are not deployed (config-only in OpenCode), but skills should be
+      // Agents are deployed to .opencode/agent/ and skills to .opencode/skill/
       const agentDir = path.join(testDir, '.opencode', 'agent');
-      expect(fs.existsSync(agentDir)).toBe(false);
+      expect(fs.existsSync(agentDir)).toBe(true);
 
       const skillDir = path.join(testDir, '.opencode', 'skill');
       expect(fs.existsSync(skillDir)).toBe(true);

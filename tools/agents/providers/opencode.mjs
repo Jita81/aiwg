@@ -5,7 +5,7 @@
  * tools, and permission configurations based on agent category.
  *
  * Deployment paths:
- *   - Agents: .opencode/agent/  (discovered via {agent,agents}/**/*.md glob)
+ *   - Agents: .opencode/agent/  (discovered via agent glob pattern)
  *   - Commands: NOT DEPLOYED — Commands derive from skills automatically
  *   - Skills: .opencode/skill/  (discovered via skill glob: SKILL.md)
  *   - Rules: .opencode/rule/    (loaded via `instructions` array in opencode.json)
@@ -269,7 +269,7 @@ export function transformCommand(srcPath, content, opts) {
 /**
  * Deploy agents to .opencode/agent/
  *
- * OpenCode discovers agents via {agent,agents}/**/*.md glob within each .opencode directory.
+ * OpenCode discovers agents via glob within each .opencode directory.
  * Agent files use YAML frontmatter (description, mode, model, temperature, steps, permission)
  * with Markdown body as the system prompt.
  *

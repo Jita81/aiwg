@@ -314,7 +314,7 @@ describe.skipIf(!GIT_INIT_AVAILABLE)('Codex Integration', () => {
     // These tests use runAiwg which goes through router-loader → npx tsx
     // Skip if tsx is not available (e.g., in Docker CI containers)
     it.skipIf(!TSX_AVAILABLE)('generates valid TOML config snippet for Codex', async () => {
-      const output = runAiwg(['mcp', 'install', 'codex', '--dry-run']);
+      const output = runAiwg(['aiwg-mcp', 'install', 'codex', '--dry-run']);
 
       expect(output).toContain('[DRY RUN]');
       expect(output).toContain('.codex/config.toml');
@@ -327,7 +327,7 @@ describe.skipIf(!GIT_INIT_AVAILABLE)('Codex Integration', () => {
 `# Existing config\nmodel = "${LEGACY_MODELS.gpt51}"\n`
       );
 
-      runAiwg(['mcp', 'install', 'codex']);
+      runAiwg(['aiwg-mcp', 'install', 'codex']);
 
       const config = await fs.readFile(
         path.join(TEST_CODEX_DIR, 'config.toml'),
@@ -348,8 +348,8 @@ describe.skipIf(!GIT_INIT_AVAILABLE)('Codex Integration', () => {
         '# Config\n'
       );
 
-      runAiwg(['mcp', 'install', 'codex']);
-      const output = runAiwg(['mcp', 'install', 'codex']);
+      runAiwg(['aiwg-mcp', 'install', 'codex']);
+      const output = runAiwg(['aiwg-mcp', 'install', 'codex']);
 
       expect(output).toContain('already configured');
 

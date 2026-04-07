@@ -193,11 +193,11 @@ describe('CLI Router Integration Tests', () => {
     });
 
     it('should route mcp subcommands', async () => {
-      const output = await runCli(['mcp', 'info']);
+      const output = await runCli(['aiwg-mcp', 'info']);
 
       // Should route to MCP handler
       const combined = output.stdout.join('\n') + output.stderr.join('\n');
-      expect(combined).not.toMatch(/Unknown command: mcp/i);
+      expect(combined).not.toMatch(/Unknown command: aiwg-mcp/i);
     });
 
     it('should route catalog subcommands', async () => {

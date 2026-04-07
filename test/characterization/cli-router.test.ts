@@ -312,9 +312,9 @@ describe('CLI Router Characterization Tests', () => {
 
     describe('mcp subcommands', () => {
       it('should route to mcp/cli.mjs', () => {
-        const result = runCli(['mcp', 'info']);
+        const result = runCli(['aiwg-mcp', 'info']);
         // Should show MCP info or error from MCP handler, not unknown command
-        expect(result.stdout + result.stderr).not.toMatch(/Unknown command: mcp/i);
+        expect(result.stdout + result.stderr).not.toMatch(/Unknown command: aiwg-mcp/i);
       });
     });
 
