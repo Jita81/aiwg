@@ -27,7 +27,7 @@ const PLUGIN_CONFIGS = {
     name: 'sdlc',
     displayName: 'AIWG SDLC Complete',
     version: '2024.12.4',
-    description: 'Complete SDLC framework with 58 specialized agents for software development lifecycle management.',
+    description: 'Complete SDLC framework with 180+ specialized agents for software development lifecycle management.',
     sources: {
       agents: 'agentic/code/frameworks/sdlc-complete/agents',
       commands: 'agentic/code/frameworks/sdlc-complete/commands',
@@ -35,7 +35,7 @@ const PLUGIN_CONFIGS = {
     },
     readme: `# AIWG SDLC Complete
 
-Complete Software Development Lifecycle framework with 58 specialized agents.
+Complete Software Development Lifecycle framework with 180+ specialized agents.
 
 ## Features
 

@@ -10,6 +10,7 @@
 
 import realFs from 'fs';
 import path from 'path';
+import { createHash } from 'crypto';
 import { createRequire } from 'module';
 
 // Use graceful-fs to prevent EMFILE crashes on systems with low ulimit.
@@ -109,6 +110,66 @@ export function writeFile(dest, data, dryRun) {
   } else {
     fs.writeFileSync(dest, data, 'utf8');
   }
+}
+
+// ============================================================================
+// Deployment Manifest (File Ownership Tagging)
+// ============================================================================
+
+const MANAGED_MARKER_RE = /^<!-- aiwg:managed /;
+const MANIFEST_FILENAME = '.aiwg-manifest.json';
+
+/**
+ * Prepend `<!-- aiwg:managed vVERSION SOURCE -->` header to markdown content.
+ * Skips if already present.
+ */
+export function addManagedMarker(content, version, source) {
+  if (MANAGED_MARKER_RE.test(content)) return content;
+  return `<!-- aiwg:managed v${version} ${source} -->\n${content}`;
+}
+
+/**
+ * Compute SHA-256 hash of content (hex string).
+ */
+function contentHash(content) {
+  return createHash('sha256').update(content).digest('hex');
+}
+
+/**
+ * Read existing sidecar manifest from a deployment directory.
+ * Returns `{ managed: { [filename]: { hash, source, version } } }` or null.
+ */
+export function readSidecarManifest(dir) {
+  const p = path.join(dir, MANIFEST_FILENAME);
+  try {
+    return JSON.parse(fs.readFileSync(p, 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Write sidecar manifest to a deployment directory.
+ */
+export function writeSidecarManifest(dir, manifest, dryRun) {
+  if (dryRun) return;
+  const p = path.join(dir, MANIFEST_FILENAME);
+  fs.writeFileSync(p, JSON.stringify(manifest, null, 2) + '\n', 'utf8');
+}
+
+/**
+ * Update sidecar manifest entries for a batch of deployed files.
+ * Merges into existing manifest if present.
+ */
+export function updateSidecarManifest(dir, deployedEntries, opts) {
+  const { dryRun = false, version = 'unknown', source = 'bundled' } = opts;
+  const existing = readSidecarManifest(dir) || { managed: {} };
+
+  for (const { filename, hash } of deployedEntries) {
+    existing.managed[filename] = { hash: `sha256:${hash}`, source, version };
+  }
+
+  writeSidecarManifest(dir, existing, dryRun);
 }
 
 // ============================================================================
@@ -435,8 +496,14 @@ export function filterCommandsAgainstSkills(commandFiles, skillDirs) {
  */
 export function deployFiles(files, destDir, opts, transformFn) {
   const { force = false, dryRun = false, provider = 'claude', fileExtension = '.md', injectPlatform = false } = opts;
+  const deployVersion = opts.deployVersion || 'unknown';
+  const deploySource = opts.deploySource || 'bundled';
   const seen = new Set();
   const actions = [];
+
+  // Read sidecar manifest for hash-based skip-on-match (#749)
+  const sidecar = readSidecarManifest(destDir);
+  const sidecarManaged = sidecar?.managed || {};
 
   for (const f of files) {
     let base = path.basename(f);
@@ -464,30 +531,56 @@ export function deployFiles(files, destDir, opts, transformFn) {
       transformedContent = injectPlatformInContent(transformedContent, platformName);
     }
 
-    // Check if destination exists and compare contents
-    if (fs.existsSync(dest)) {
+    // Add managed marker for .md files (#749)
+    if (base.endsWith('.md')) {
+      transformedContent = addManagedMarker(transformedContent, deployVersion, deploySource);
+    }
+
+    // Compute content hash for sidecar comparison
+    const hash = contentHash(transformedContent);
+
+    // Skip-on-match: compare hash against sidecar manifest before reading dest file (#749)
+    if (!force && sidecarManaged[base]?.hash === `sha256:${hash}`) {
+      actions.push({ type: 'skip', src: f, dest, reason: 'hash-match' });
+      seen.add(dest);
+      continue;
+    }
+
+    // Fallback: check destination file content directly
+    if (!force && fs.existsSync(dest)) {
       const destContent = fs.readFileSync(dest, 'utf8');
-      if (destContent === transformedContent && !force) {
-        actions.push({ type: 'skip', src: f, dest, reason: 'unchanged' });
+      if (destContent === transformedContent) {
+        actions.push({ type: 'skip', src: f, dest, reason: 'unchanged', hash });
         seen.add(dest);
         continue;
       }
-      actions.push({ type: 'deploy', src: f, dest, content: transformedContent, reason: force ? 'forced' : 'changed' });
+      actions.push({ type: 'deploy', src: f, dest, content: transformedContent, reason: 'changed', hash });
+    } else if (force && fs.existsSync(dest)) {
+      actions.push({ type: 'deploy', src: f, dest, content: transformedContent, reason: 'forced', hash });
     } else {
-      actions.push({ type: 'deploy', src: f, dest, content: transformedContent, reason: 'new' });
+      actions.push({ type: 'deploy', src: f, dest, content: transformedContent, reason: 'new', hash });
     }
     seen.add(dest);
   }
 
   const verbose = opts.verbose === true;
+  const deployedEntries = [];
   for (const a of actions) {
     if (a.type === 'deploy') {
       if (dryRun) console.log(`[dry-run] deploy ${a.src} -> ${a.dest} (${a.reason})`);
       else writeFile(a.dest, a.content, false);
       if (verbose) console.log(`deployed ${path.basename(a.src)} -> ${path.relative(process.cwd(), a.dest)} (${a.reason})`);
+      deployedEntries.push({ filename: path.basename(a.dest), hash: a.hash });
     } else if (a.type === 'skip') {
       if (verbose) console.log(`skip (${a.reason}): ${path.basename(a.dest)}`);
+      // Preserve existing sidecar entries for skipped files
+      if (a.hash) deployedEntries.push({ filename: path.basename(a.dest), hash: a.hash });
     }
+  }
+
+  // Update sidecar manifest with deployed file hashes (#749)
+  if (deployedEntries.length > 0) {
+    updateSidecarManifest(destDir, deployedEntries, { dryRun, version: deployVersion, source: deploySource });
   }
 
   return actions;

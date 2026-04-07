@@ -153,8 +153,8 @@ describe.skipIf(!GIT_INIT_AVAILABLE)('Claude Code Integration', () => {
         'utf-8'
       );
 
-      // Check YAML frontmatter format
-      expect(agentContent).toMatch(/^---\n/);
+      // Check YAML frontmatter format (may have aiwg:managed marker before frontmatter)
+      expect(agentContent).toMatch(/---\n/);
       expect(agentContent).toMatch(/name: .+/);
       expect(agentContent).toMatch(/description: .+/);
       expect(agentContent).toMatch(/model: (sonnet|opus|haiku)/);

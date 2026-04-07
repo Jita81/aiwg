@@ -169,6 +169,30 @@ export function updateInstalled(
 }
 
 /**
+ * Aggregate deployment counts across all installed frameworks for a given provider.
+ * Returns the totals for agents, commands, skills, and rules.
+ * If no provider is specified, uses the first configured provider.
+ */
+export function getDeploymentSummary(
+  config: AiwgConfig,
+  provider?: string
+): DeployedArtifactCounts {
+  const targetProvider = provider ?? config.providers[0] ?? 'claude';
+  const totals: DeployedArtifactCounts = { agents: 0, commands: 0, skills: 0, rules: 0 };
+
+  for (const entry of Object.values(config.installed)) {
+    const counts = entry.deployedTo[targetProvider];
+    if (!counts) continue;
+    totals.agents += counts.agents;
+    totals.commands += counts.commands;
+    totals.skills += counts.skills;
+    totals.rules += counts.rules;
+  }
+
+  return totals;
+}
+
+/**
  * Compute SHA-256 hash of a manifest.json file.
  * Returns undefined if the file cannot be read.
  */

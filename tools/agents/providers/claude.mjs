@@ -254,8 +254,20 @@ export async function postDeploy(targetDir, opts) {
  * with a single @AIWG.md directive that Claude Code loads at session start.
  * Falls back gracefully if template is missing (older installs).
  */
+/**
+ * Substitute {{TOKEN}} placeholders in hook file content with deployment counts.
+ */
+function interpolateHookTokens(content, counts) {
+  if (!counts) return content;
+  return content
+    .replace(/\{\{AGENTS_COUNT\}\}/g, String(counts.agents || 0))
+    .replace(/\{\{COMMANDS_COUNT\}\}/g, String(counts.commands || 0))
+    .replace(/\{\{SKILLS_COUNT\}\}/g, String(counts.skills || 0))
+    .replace(/\{\{RULES_COUNT\}\}/g, String(counts.rules || 0));
+}
+
 function deployHookFile(targetDir, opts) {
-  const { srcRoot, dryRun } = opts;
+  const { srcRoot, dryRun, counts } = opts;
   const templatePath = path.join(srcRoot, 'agentic', 'code', 'frameworks', 'sdlc-complete', 'templates', 'project', 'AIWG.md');
   const hookDest = path.join(targetDir, 'AIWG.md');
   const claudeDest = path.join(targetDir, 'CLAUDE.md');
@@ -267,7 +279,8 @@ function deployHookFile(targetDir, opts) {
   if (dryRun) {
     console.log('[dry-run] Would write AIWG.md from template');
   } else {
-    const content = fs.readFileSync(templatePath, 'utf8');
+    let content = fs.readFileSync(templatePath, 'utf8');
+    content = interpolateHookTokens(content, counts);
     fs.writeFileSync(hookDest, content, 'utf8');
     console.log('Created AIWG.md (hook file)');
   }
@@ -481,8 +494,8 @@ export async function deploy(opts) {
     }
   }
 
-  // Post-deployment
-  await postDeploy(target, opts);
+  // Post-deployment (pass counts for hook file token substitution)
+  await postDeploy(target, { ...opts, counts });
 
   if (verbose) {
     console.log('\n=== Claude deployment complete ===\n');

@@ -204,6 +204,12 @@ export interface Extension {
   id: string;
 
   /**
+   * Previous ID for backward compatibility.
+   * Existing deployments using this ID continue to resolve until users re-run `aiwg use`.
+   */
+  legacyId?: string;
+
+  /**
    * Extension type discriminator
    *
    * Used for type-safe narrowing and dispatch.

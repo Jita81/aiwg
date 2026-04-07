@@ -448,11 +448,11 @@ export function createRalphResumeHandler(): CommandHandler {
  * Equivalent to `ralph` with crash-recovery enabled by default.
  */
 export const ralphExternalHandler: CommandHandler = {
-  id: 'ralph-external',
-  name: 'Ralph External',
+  id: 'agent-loop-ext',
+  name: 'Agent Loop External',
   description: 'Crash-resilient external loop with state persistence and CI/CD integration',
   category: 'ralph',
-  aliases: ['--ralph-external'],
+  aliases: ['ralph-external', '--ralph-external', '--agent-loop-ext'],
 
   async execute(ctx: HandlerContext): Promise<HandlerResult> {
     const runner = createScriptRunner(ctx.frameworkRoot);

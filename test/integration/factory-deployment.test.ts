@@ -119,7 +119,7 @@ describe('Factory AI Integration', () => {
       );
 
       // Verify name is kebab-case (not "Technical Researcher")
-      expect(technicalResearcher).toMatch(/^---\n/);
+      expect(technicalResearcher).toMatch(/---\n/);
       expect(technicalResearcher).toMatch(/name: technical-researcher/);
       expect(technicalResearcher).not.toMatch(/name: Technical Researcher/);
     });
@@ -255,7 +255,7 @@ describe('Factory AI Integration', () => {
       ]);
 
       const droidsDir = path.join(TEST_FACTORY_DIR, 'droids');
-      const droids = (await fs.readdir(droidsDir)).filter((d) => !d.endsWith('.soul.md'));
+      const droids = (await fs.readdir(droidsDir)).filter((d) => d.endsWith('.md') && !d.endsWith('.soul.md'));
 
       for (const droid of droids) {
         const content = await fs.readFile(path.join(droidsDir, droid), 'utf-8');
@@ -281,7 +281,7 @@ describe('Factory AI Integration', () => {
       ]);
 
       const droidsDir = path.join(TEST_FACTORY_DIR, 'droids');
-      const droids = await fs.readdir(droidsDir);
+      const droids = (await fs.readdir(droidsDir)).filter((d) => d.endsWith('.md'));
 
       // Should have multiple droids
       expect(droids.length).toBeGreaterThan(40);
@@ -296,7 +296,7 @@ describe('Factory AI Integration', () => {
       ]);
 
       const droidsDir = path.join(TEST_FACTORY_DIR, 'droids');
-      const droids = await fs.readdir(droidsDir);
+      const droids = (await fs.readdir(droidsDir)).filter((d) => d.endsWith('.md'));
 
       // Check first droid
       const droidContent = await fs.readFile(
@@ -304,8 +304,8 @@ describe('Factory AI Integration', () => {
         'utf-8'
       );
 
-      // Check frontmatter format
-      expect(droidContent).toMatch(/^---\n/);
+      // Check frontmatter format (may have aiwg:managed marker before frontmatter)
+      expect(droidContent).toMatch(/---\n/);
       expect(droidContent).toMatch(/name: [a-z0-9-]+/);
       expect(droidContent).toMatch(/description: .+/);
       expect(droidContent).toMatch(/model: .+/);

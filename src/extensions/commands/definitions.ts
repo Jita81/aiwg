@@ -529,13 +529,13 @@ export const rollbackWorkspaceCommand: Extension = {
 // MCP Commands
 
 export const mcpCommand: Extension = {
-  id: 'mcp',
+  id: 'aiwg-mcp',
   type: 'skill',
-  name: 'MCP',
-  description: 'MCP server operations (serve, install, add, remove, update, list, inject, info)',
+  name: 'AIWG MCP',
+  description: 'AIWG MCP server operations (serve, install, add, remove, update, list, inject, info)',
   version: '1.0.0',
   capabilities: ['cli', 'mcp', 'server'],
-  keywords: ['mcp', 'server', 'protocol'],
+  keywords: ['mcp', 'server', 'protocol', 'aiwg'],
   category: 'mcp',
   platforms: {
     claude: 'full',
@@ -547,7 +547,7 @@ export const mcpCommand: Extension = {
   },
   metadata: {
     type: 'skill',
-    triggerPhrases: ['mcp', 'mcp server', 'start mcp', 'mcp serve', 'mcp install'],
+    triggerPhrases: ['aiwg mcp', 'aiwg mcp server', 'start aiwg mcp', 'aiwg mcp serve', 'aiwg mcp install'],
     commandHint: {
       template: 'orchestration',
       argumentHint: '<subcommand>',
@@ -1261,14 +1261,15 @@ export const ralphAttachCommand: Extension = {
   } satisfies SkillMetadata,
 };
 
-export const ralphExternalCommand: Extension = {
-  id: 'ralph-external',
+export const agentLoopExtCommand: Extension = {
+  id: 'agent-loop-ext',
+  legacyId: 'ralph-external',
   type: 'skill',
-  name: 'Ralph External',
+  name: 'Agent Loop External',
   description: 'Crash-resilient external loop with state persistence and CI/CD integration',
   version: '1.0.0',
   capabilities: ['cli', 'ralph', 'orchestration', 'external', 'crash-recovery'],
-  keywords: ['ralph', 'external', 'crash', 'recovery', 'persistent', 'background', 'cicd'],
+  keywords: ['ralph', 'external', 'crash', 'recovery', 'persistent', 'background', 'cicd', 'agent-loop'],
   category: 'ralph',
   platforms: {
     claude: 'full',
@@ -1280,7 +1281,11 @@ export const ralphExternalCommand: Extension = {
   },
   metadata: {
     type: 'skill',
-    triggerPhrases: ['ralph external', 'external ralph', 'crash-resilient loop', 'persistent ralph'],
+    triggerPhrases: [
+      'agent-loop-ext', 'external agent loop', 'out-of-session loop', 'persistent agent loop',
+      'ralph external', 'external ralph', 'crash-resilient loop', 'persistent ralph',
+      'long-running ralph', 'start background ralph', 'ralph with crash recovery',
+    ],
     commandHint: {
       template: 'utility',
       allowedTools: ['Bash', 'Read', 'Write'],
@@ -2138,7 +2143,7 @@ export const rlmStatusCommand: Extension = {
  * - Utility (3): prefill-cards, contribute-start, validate-metadata
  * - Plugin (5): install-plugin, uninstall-plugin, plugin-status, package-plugin, package-all-plugins
  * - Scaffolding (8): add-agent, add-command, add-skill, add-behavior, add-template, scaffold-addon, scaffold-extension, scaffold-framework
- * - Ralph (8): ralph, ralph-status, ralph-abort, ralph-resume, ralph-attach, ralph-external, ralph-memory, ralph-config
+ * - Ralph (8): ralph, ralph-status, ralph-abort, ralph-resume, ralph-attach, agent-loop-ext, ralph-memory, ralph-config
  * - Mission Control (1): mc
  * - Metrics (3): cost-report, cost-history, metrics-tokens
  * - Documentation (1): doc-sync
@@ -2215,7 +2220,7 @@ export const commandDefinitions: Extension[] = [
   ralphAbortCommand,
   ralphResumeCommand,
   ralphAttachCommand,
-  ralphExternalCommand,
+  agentLoopExtCommand,
   ralphMemoryCommand,
   ralphConfigCommand,
 

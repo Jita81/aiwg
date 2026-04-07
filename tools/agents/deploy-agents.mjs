@@ -68,6 +68,19 @@ import readline from 'readline';
 import { fileURLToPath } from 'url';
 import { loadModelConfig, migrateCommandsDirectory } from './providers/base.mjs';
 
+/**
+ * Read version from package.json at the source root.
+ * Falls back to 'unknown' if unavailable.
+ */
+function getDeployVersion(srcRoot) {
+  try {
+    const pkg = JSON.parse(fs.readFileSync(path.join(srcRoot, 'package.json'), 'utf8'));
+    return pkg.version || 'unknown';
+  } catch {
+    return 'unknown';
+  }
+}
+
 // ============================================================================
 // Provider Registry
 // ============================================================================
@@ -561,7 +574,9 @@ async function promptCommandsMigration(cfg, provider, targetDir) {
     verbose: cfg.verbose,
     asPlugin: cfg.asPlugin,
     deployBehaviors: cfg.deployBehaviors,
-    skipCommandsMigration: cfg.skipCommandsMigration
+    skipCommandsMigration: cfg.skipCommandsMigration,
+    deployVersion: getDeployVersion(srcRoot),
+    deploySource: 'bundled',
   };
 
   // Commands → Skills migration: prompt then delete the commands directory

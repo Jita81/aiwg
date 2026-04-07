@@ -462,7 +462,7 @@ describe('Ralph Command Handlers', () => {
         'ralph-abort',
         'ralph-resume',
         'ralph-attach',
-        'ralph-external',
+        'agent-loop-ext',
         'ralph-memory',
         'ralph-config',
       ]);

@@ -1718,12 +1718,12 @@ aiwg ralph-attach
 
 ---
 
-### ralph-external
+### agent-loop-ext
 
-Start external agent loop with full crash recovery.
+Start external agent loop with full crash recovery. (Legacy alias: `ralph-external`)
 
 ```bash
-aiwg ralph-external "<task-description>"
+aiwg agent-loop-ext "<task-description>"
 ```
 
 **Arguments:**
@@ -2672,7 +2672,7 @@ All commands are registered as extensions in the unified schema. This enables:
 | **Plugin** | 5 | install-plugin, uninstall-plugin, plugin-status, package-plugin, package-all-plugins |
 | **Scaffolding** | 8 | add-agent, add-command, add-skill, add-behavior, add-template, scaffold-addon, scaffold-extension, scaffold-framework |
 | **Daemon** | 2 | behavior, daemon-init |
-| **Al** | 8 | ralph, ralph-status, ralph-abort, ralph-resume, ralph-attach, ralph-external, ralph-memory, ralph-config |
+| **Al** | 8 | ralph, ralph-status, ralph-abort, ralph-resume, ralph-attach, agent-loop-ext, ralph-memory, ralph-config |
 | **Mission Control** | 1 | mc (9 subcommands) |
 | **Agent Teams** | 1 | team (3 subcommands) |
 | **Metrics** | 3 | cost-report, cost-history, metrics-tokens |

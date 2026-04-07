@@ -197,14 +197,14 @@ AIWG uses a unified extension system for all extension types:
 | **Framework** (3) | use, list, remove |
 | **Project** (1) | new |
 | **Workspace** (3) | status, migrate-workspace, rollback-workspace |
-| **MCP** (1) | mcp (serve, install, info) |
+| **MCP** (1) | aiwg-mcp (serve, install, info) |
 | **Catalog** (1) | catalog (list, info, search) |
 | **Toolsmith** (1) | runtime-info |
 | **Utility** (3) | prefill-cards, contribute-start, validate-metadata |
 | **Plugin** (5) | install-plugin, uninstall-plugin, plugin-status, package-plugin, package-all-plugins |
 | **Scaffolding** (7) | add-agent, add-command, add-skill, add-template, scaffold-addon, scaffold-extension, scaffold-framework |
 | **Orchestration** (1) | mc (start, dispatch, status, watch, abort, pause, resume, stop, list) |
-| **Ralph** (8) | ralph, ralph-status, ralph-abort, ralph-resume, ralph-attach, ralph-external, ralph-memory, ralph-config |
+| **Ralph** (8) | ralph, ralph-status, ralph-abort, ralph-resume, ralph-attach, agent-loop-ext, ralph-memory, ralph-config |
 | **Metrics** (3) | cost-report, cost-history, metrics-tokens |
 | **Documentation** (1) | doc-sync |
 | **SDLC Orchestration** (1) | sdlc-accelerate |
@@ -253,7 +253,7 @@ aiwg ralph-status            # Show loop status
 aiwg ralph-abort             # Stop loop
 aiwg ralph-resume            # Resume paused loop
 aiwg ralph-attach            # Attach to running external loop
-aiwg ralph-external "task"   # Crash-resilient external loop
+aiwg agent-loop-ext "task"   # Crash-resilient external loop (alias: ralph-external)
 aiwg ralph-memory list       # Show debug memory entries
 aiwg ralph-config show       # Show Ralph configuration
 

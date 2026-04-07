@@ -24,11 +24,11 @@ import { registerDeployedExtensions } from "../../extensions/deployment-registra
  * Handles subcommands: serve, install, info
  */
 export const mcpHandler: CommandHandler = {
-  id: "mcp",
-  name: "MCP Server",
-  description: "MCP server commands (serve, install, add, remove, update, list, inject, info)",
+  id: "aiwg-mcp",
+  name: "AIWG MCP Server",
+  description: "AIWG MCP server commands (serve, install, add, remove, update, list, inject, info)",
   category: "mcp",
-  aliases: [],
+  aliases: ["mcp"],
 
   async execute(ctx: HandlerContext): Promise<HandlerResult> {
     try {

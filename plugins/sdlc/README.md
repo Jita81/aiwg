@@ -1,6 +1,6 @@
 # AIWG SDLC Complete
 
-Complete Software Development Lifecycle framework with 58 specialized agents.
+Complete Software Development Lifecycle framework with 180+ specialized agents.
 
 ## Features
 
