@@ -1,0 +1,286 @@
+# CI Pipeline Definition: {Project Name}
+#
+# Purpose: Build, test, and publish artifacts for {project name}.
+# This pipeline runs on every push and pull request to protected branches.
+# Artifacts are published only on tagged releases.
+#
+# Pipeline stages:
+#   1. Lint     — Static analysis and code style checks
+#   2. Build    — Compile, bundle, or package the project
+#   3. Test     — Unit, integration, and security tests
+#   4. Publish  — Push artifacts to registry (tagged releases only)
+#
+# Adapt this template to your CI system (Gitea Actions, GitHub Actions,
+# GitLab CI, etc.). The stage structure and gate logic are portable.
+
+# ============================================================================
+# Gitea Actions / GitHub Actions format
+# ============================================================================
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+
+# Cancel in-progress runs for the same branch/PR
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Project-specific variables
+  NODE_VERSION: "{node-version}"          # e.g., "22"
+  REGISTRY: "{registry-url}"              # e.g., "ghcr.io", "registry.example.com"
+  IMAGE_NAME: "{image-name}"              # e.g., "${{ github.repository }}"
+  ARTIFACT_NAME: "{artifact-name}"        # e.g., "my-project"
+
+jobs:
+  # --------------------------------------------------------------------------
+  # Stage 1: Lint
+  # --------------------------------------------------------------------------
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup runtime
+        uses: actions/setup-node@v4      # Adapt: setup-python, setup-go, etc.
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "{package-manager}"      # npm, pnpm, yarn
+
+      - name: Install dependencies
+        run: "{install-command}"           # e.g., npm ci, pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: "{lint-command}"              # e.g., npm run lint, eslint ., ruff check .
+
+      - name: Type check
+        run: "{typecheck-command}"         # e.g., npx tsc --noEmit, mypy .
+
+      - name: Format check
+        run: "{format-check-command}"      # e.g., prettier --check ., black --check .
+
+  # --------------------------------------------------------------------------
+  # Stage 2: Build
+  # --------------------------------------------------------------------------
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [lint]                          # Gate: lint must pass
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup runtime
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "{package-manager}"
+
+      - name: Install dependencies
+        run: "{install-command}"
+
+      - name: Build
+        run: "{build-command}"             # e.g., npm run build, go build ./..., cargo build --release
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: "{build-output-path}"      # e.g., dist/, build/, target/release/
+          retention-days: 7
+
+  # --------------------------------------------------------------------------
+  # Stage 3: Test
+  # --------------------------------------------------------------------------
+  test-unit:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: [build]                         # Gate: build must pass
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup runtime
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "{package-manager}"
+
+      - name: Install dependencies
+        run: "{install-command}"
+
+      - name: Run unit tests
+        run: "{unit-test-command}"         # e.g., npm test, pytest, go test ./...
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: "{coverage-path}"          # e.g., coverage/, htmlcov/
+
+  test-integration:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: [build]                         # Gate: build must pass
+    # services:                            # Uncomment if tests need services
+    #   db:
+    #     image: postgres:16
+    #     env:
+    #       POSTGRES_PASSWORD: test
+    #     ports:
+    #       - 5432:5432
+    #     options: >-
+    #       --health-cmd pg_isready
+    #       --health-interval 10s
+    #       --health-timeout 5s
+    #       --health-retries 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup runtime
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "{package-manager}"
+
+      - name: Install dependencies
+        run: "{install-command}"
+
+      - name: Run integration tests
+        run: "{integration-test-command}"  # e.g., npm run test:integration
+        env:
+          # DATABASE_URL: "postgresql://postgres:test@localhost:5432/test"
+          CI: "true"
+
+  test-security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Dependency audit
+        run: "{audit-command}"             # e.g., npm audit --audit-level=high, pip-audit, cargo audit
+        continue-on-error: false           # Fail pipeline on critical vulnerabilities
+
+  # --------------------------------------------------------------------------
+  # Stage 4: Publish (tagged releases only)
+  # --------------------------------------------------------------------------
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    needs: [test-unit, test-integration, test-security]  # Gate: all tests must pass
+    if: startsWith(github.ref, 'refs/tags/v')            # Only on version tags
+    # permissions:
+    #   contents: write                    # For GitHub Releases
+    #   packages: write                    # For container registry
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: "{build-output-path}"
+
+      # -- Option A: npm publish --
+      - name: Publish to npm
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
+          npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # -- Option B: Container image --
+      # - name: Login to registry
+      #   uses: docker/login-action@v3
+      #   with:
+      #     registry: ${{ env.REGISTRY }}
+      #     username: ${{ github.actor }}
+      #     password: ${{ secrets.REGISTRY_TOKEN }}
+      #
+      # - name: Build and push image
+      #   uses: docker/build-push-action@v6
+      #   with:
+      #     context: .
+      #     push: true
+      #     tags: |
+      #       ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+      #       ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
+      # -- Option C: GitHub/Gitea Release --
+      # - name: Create release
+      #   uses: softprops/action-gh-release@v2
+      #   with:
+      #     files: "{build-output-path}/*"
+      #     generate_release_notes: true
+
+  # --------------------------------------------------------------------------
+  # Verification (post-publish)
+  # --------------------------------------------------------------------------
+  verify-publish:
+    name: Verify Published Artifact
+    runs-on: ubuntu-latest
+    needs: [publish]
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - name: Verify artifact is accessible
+        run: |
+          # npm: verify package is available
+          sleep 30  # Allow registry propagation
+          npm view {package-name}@${{ github.ref_name }} version
+          # Container: verify image is pullable
+          # docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+
+      - name: Smoke test published artifact
+        run: |
+          # Install and verify the published artifact works
+          npm install -g {package-name}@${{ github.ref_name }}
+          {smoke-test-command}             # e.g., my-cli --version
+
+# ============================================================================
+# Template Notes
+# ============================================================================
+#
+# Substitution variables:
+#   {node-version}              — Runtime version (e.g., "22", "3.12", "1.22")
+#   {registry-url}              — Artifact registry URL
+#   {image-name}                — Container image name
+#   {artifact-name}             — Build artifact identifier
+#   {package-manager}           — Package manager (npm, pnpm, yarn, pip, cargo)
+#   {install-command}           — Dependency install command
+#   {lint-command}              — Linter command
+#   {typecheck-command}         — Type checker command
+#   {format-check-command}      — Format verification command
+#   {build-command}             — Build/compile command
+#   {build-output-path}        — Path to build output directory
+#   {unit-test-command}         — Unit test runner command
+#   {coverage-path}             — Test coverage output path
+#   {integration-test-command}  — Integration test command
+#   {audit-command}             — Security audit command
+#   {package-name}              — Published package name
+#   {smoke-test-command}        — Post-publish verification command
+#
+# Stage gates:
+#   lint → build → test (unit + integration + security in parallel) → publish → verify
+#
+# Secrets required:
+#   NPM_TOKEN or REGISTRY_TOKEN — for artifact publishing
+#
+# Adapting to other CI systems:
+#   - GitLab CI: Convert jobs to stages, use `needs:` for DAG
+#   - Drone CI: Convert to pipeline steps with `depends_on:`
+#   - Jenkins: Convert to Declarative Pipeline with stage blocks
+#   - Gitea Actions: Compatible as-is (GitHub Actions compatible)
