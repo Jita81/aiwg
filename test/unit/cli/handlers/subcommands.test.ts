@@ -90,7 +90,7 @@ describe("Subcommand Handlers", () => {
     it("should have correct metadata", () => {
       expect(mcpHandler.id).toBe("aiwg-mcp");
       expect(mcpHandler.category).toBe("mcp");
-      expect(mcpHandler.aliases).toEqual(["mcp"]);
+      expect(mcpHandler.aliases).toEqual(["aiwg-mcp"]);
       expect(mcpHandler.name).toBe("AIWG MCP Server");
       expect(mcpHandler.description).toMatch(/MCP server commands/i);
     });
