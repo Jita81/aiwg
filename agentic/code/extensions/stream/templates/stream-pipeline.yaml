@@ -1,0 +1,180 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsPlaybook
+metadata:
+  name: "{pipeline-name}"
+  labels:
+    domain: stream-operations
+    type: pipeline
+spec:
+  description: "Full streaming pipeline: ingest → transcode → relay"
+
+  targets:
+    groups: ["{stream-hosts}"]
+
+  vars:
+    ingest_url: "{ingest-url}"
+    # e.g. rtmp://localhost:1935/live/stream or srt://0.0.0.0:9000
+    relay_url: "{relay-url}"
+    # Internal relay between transcode and multi-platform output
+    profile: "{profile-name}"
+    expected_bitrate_kbps: "{expected-kbps}"
+    bitrate_tolerance_pct: 15
+    health_timeout_s: 5
+    transcode_unit: "{transcode-unit}.service"
+    relay_unit: "{relay-unit}.service"
+
+  steps:
+    - id: verify-input
+      name: "Verify ingest source is reachable and delivering signal"
+      capability: stream-health-check
+      inputs:
+        source: "{{ ingest_url }}"
+        timeout: "{{ health_timeout_s }}s"
+        check_video: true
+        check_audio: true
+      on_failure: abort
+      # Do not start transcode if input is not delivering a valid signal.
+      # A missing or silent input produces silent failures downstream.
+
+    - id: validate-encoder-config
+      name: "Validate encoder configuration before starting transcode"
+      capability: stream-config-validate
+      depends_on: [verify-input]
+      inputs:
+        config_target: "{{ transcode_unit }}"
+        checks:
+          - no_literal_credentials
+          - env_file_populated
+          - hardware_accel_device_exists
+          - output_endpoint_reachable
+      on_failure: abort
+
+    - id: start-transcode
+      name: "Start transcoder with selected quality profile"
+      capability: stream-transcode
+      depends_on: [validate-encoder-config]
+      inputs:
+        input: "{{ ingest_url }}"
+        profile: "{{ profile }}"
+        output: "{{ relay_url }}"
+        unit: "{{ transcode_unit }}"
+      retry:
+        max_attempts: 3
+        backoff: "10s"
+        # On failure: check systemd journal before retry
+        # journalctl -u {{ transcode_unit }} --since '-30s' --no-pager
+      on_failure: abort
+
+    - id: verify-transcode-output
+      name: "Verify transcoded relay is delivering expected quality"
+      capability: stream-health-check
+      depends_on: [start-transcode]
+      inputs:
+        source: "{{ relay_url }}"
+        expected_bitrate: "{{ expected_bitrate_kbps }}"
+        tolerance_pct: "{{ bitrate_tolerance_pct }}"
+        check_video: true
+        check_framerate: true
+        check_audio: true
+        probe_duration_s: 10
+        # Wait 10 seconds of relay output before measuring — allows encoder to stabilize
+      on_failure: abort
+
+    - id: approve-relay-cutover
+      name: "Gate: operator approval before pushing to live platforms"
+      capability: ops-gate
+      depends_on: [verify-transcode-output]
+      inputs:
+        type: automated
+        # Set to 'manual' to require explicit operator confirmation before relay starts
+        message: "Transcode verified at {{ expected_bitrate_kbps }}kbps ± {{ bitrate_tolerance_pct }}%. Starting multi-platform relay."
+        blast_radius: medium
+        # medium = visible to all platform subscribers
+        # high = use for first-time platform additions or key rotations
+      on_failure: abort
+
+    - id: start-relay
+      name: "Start multi-platform relay to all output destinations"
+      capability: stream-relay
+      depends_on: [approve-relay-cutover]
+      inputs:
+        source: "{{ relay_url }}"
+        unit: "{{ relay_unit }}"
+        destinations:
+          - "{platform-1-rtmp-url}"
+          # Never embed stream keys in destination URLs. Use environment variable substitution:
+          # rtmp://${PLATFORM_1_INGEST}/live/${PLATFORM_1_KEY_FILE}
+          - "{platform-2-srt-url}"
+          # srt://${PLATFORM_2_HOST}:${PLATFORM_2_PORT}?passphrase=${SRT_PASSPHRASE_FILE}
+        reconnect_on_failure: true
+        reconnect_delay_s: 5
+      retry:
+        max_attempts: 3
+        backoff: "10s"
+      on_failure: escalate
+
+    - id: verify-relay-destinations
+      name: "Verify each output platform is receiving stream"
+      capability: stream-health-check
+      depends_on: [start-relay]
+      inputs:
+        check_destinations: true
+        destinations:
+          - name: "{platform-1}"
+            check_url: "{platform-1-stream-status-url}"
+            # Platform dashboard or API endpoint, not stream key URL
+          - name: "{platform-2}"
+            check_url: "{platform-2-stream-status-url}"
+        expected_bitrate: "{{ expected_bitrate_kbps }}"
+        tolerance_pct: "{{ bitrate_tolerance_pct }}"
+        probe_duration_s: 15
+      on_failure: warn
+      # Warn rather than abort — stream may be live and abort would disrupt it
+
+    - id: record-pipeline-start
+      name: "Log pipeline start for operational record"
+      capability: ops-audit-log
+      depends_on: [verify-relay-destinations]
+      inputs:
+        event: pipeline-started
+        pipeline: "{{ spec.description }}"
+        profile: "{{ profile }}"
+        destinations:
+          - "{platform-1}"
+          - "{platform-2}"
+        verified_bitrate: "{{ expected_bitrate_kbps }}"
+
+  teardown:
+    # Steps to execute when pipeline is stopped (graceful shutdown)
+    steps:
+      - id: stop-relay
+        name: "Stop relay — remove from platforms before stopping transcode"
+        capability: stream-stop
+        inputs:
+          unit: "{{ relay_unit }}"
+          drain_s: 5
+          # Allow 5s drain before hard stop to let platform buffers flush
+
+      - id: stop-transcode
+        name: "Stop transcoder after relay is confirmed stopped"
+        capability: stream-stop
+        depends_on: [stop-relay]
+        inputs:
+          unit: "{{ transcode_unit }}"
+          drain_s: 2
+
+      - id: record-pipeline-stop
+        name: "Log pipeline stop"
+        capability: ops-audit-log
+        depends_on: [stop-transcode]
+        inputs:
+          event: pipeline-stopped
+          pipeline: "{{ spec.description }}"
+
+  rollback:
+    # Manual rollback: restore previous transcode profile or relay config
+    # 1. Stop relay unit:  systemctl stop {{ relay_unit }}
+    # 2. Stop transcode:   systemctl stop {{ transcode_unit }}
+    # 3. Restore configs from backup (see stream-service profile change log)
+    # 4. Re-run playbook from start-transcode step
+    # See stream-pipeline-gates.md for rollback criteria

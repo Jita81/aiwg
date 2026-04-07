@@ -1,0 +1,25 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsTarget
+metadata:
+  name: "{record-fqdn}"
+  labels:
+    domain: network-operations
+    type: dns-record
+    zone: "{zone-name}"
+spec:
+  type: service
+  record:
+    type: "{A|AAAA|CNAME|MX|TXT|SRV}"
+    name: "{subdomain}"
+    value: "{target-ip-or-hostname}"
+    ttl: {ttl-seconds}
+    priority: {priority}  # MX/SRV only
+  provider: "{cloudflare|route53|unbound|bind}"
+  lifecycle:
+    created: "{date}"
+    last_verified: "{date}"
+    owner: "{team-or-service}"
+    purpose: "{why this record exists}"
+  verification:
+    expected_resolution: "{expected-ip-or-cname}"
+    check_command: "dig +short {record-fqdn} @{nameserver}"

@@ -1,0 +1,55 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsPlaybook
+metadata:
+  name: "{builder-name}-build"
+  labels:
+    domain: dev-operations
+    type: build
+spec:
+  description: "Docker-in-Docker builder setup with GPU variant support"
+  targets:
+    groups: ["{builder-group}"]
+  vars:
+    registry: "{registry-url}"
+    base_image: "{base-image}:{pinned-tag}"
+    gpu_enabled: false
+    resource_limits:
+      cpu: "{cpu-limit}"
+      memory: "{memory-limit}"
+      gpu: "{gpu-count}"
+  steps:
+    - id: validate-dockerfile
+      capability: dev-pipeline-validate
+      inputs:
+        path: "{dockerfile-path}"
+        checks: [secret-leak, base-pin, resource-limits]
+    - id: build-image
+      capability: docker-build
+      depends_on: [validate-dockerfile]
+      inputs:
+        context: "{build-context}"
+        dockerfile: "{dockerfile-path}"
+        tags:
+          - "{registry}/{image}:{git-sha}"
+          - "{registry}/{image}:{branch}"
+        build_args:
+          GPU_ENABLED: "{gpu_enabled}"
+      retry:
+        max_attempts: 2
+        backoff: "30s"
+    - id: scan-image
+      capability: image-scan
+      depends_on: [build-image]
+      inputs:
+        image: "{registry}/{image}:{git-sha}"
+        fail_on: critical
+    - id: push-image
+      capability: docker-push
+      depends_on: [scan-image]
+      inputs:
+        image: "{registry}/{image}:{git-sha}"
+        digest_record: "{artifact-manifest-path}"
+      gate:
+        type: automated
+        message: "Image scan passed, pushing to registry"
+        blast_radius: medium

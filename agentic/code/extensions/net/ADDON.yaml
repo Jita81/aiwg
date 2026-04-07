@@ -1,0 +1,11 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsExtension
+metadata:
+  name: net
+  labels:
+    domain: network-operations
+spec:
+  extends: ops-complete
+  description: "Network operations — VLANs, DNS, firewalls, tunnels, switch/AP management"
+  version: "1.0.0"
+  capabilities: auto-discover

@@ -1,0 +1,19 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsRole
+metadata:
+  name: minimal
+  labels:
+    scope: read-only
+spec:
+  description: "Read-only access for auditing and observation — no modifications permitted"
+  tools:
+    allow: [Read, Grep, Glob, Bash]
+    deny: [Write, Edit, MultiEdit]
+  blast_radius_ceiling: low
+  gates:
+    required_for: [low, medium, high, critical]
+  audit:
+    level: standard
+  restrictions:
+    read_only: true
+    no_mutations: true

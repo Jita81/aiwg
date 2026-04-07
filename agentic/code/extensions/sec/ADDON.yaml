@@ -1,0 +1,11 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsExtension
+metadata:
+  name: sec
+  labels:
+    domain: security-operations
+spec:
+  extends: ops-complete
+  description: "Security operations — PKI, LUKS/TPM2, YubiKey/HSM, SSH CA, access control"
+  version: "1.0.0"
+  capabilities: auto-discover

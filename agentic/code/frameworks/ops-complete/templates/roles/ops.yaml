@@ -1,0 +1,16 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsRole
+metadata:
+  name: ops
+  labels:
+    scope: fleet-management
+spec:
+  description: "Full fleet management — deploy, configure, maintain services and infrastructure"
+  tools:
+    allow: [Read, Write, Edit, MultiEdit, Bash, Grep, Glob, WebFetch]
+    deny: []
+  blast_radius_ceiling: high
+  gates:
+    required_for: [critical]
+  audit:
+    level: standard

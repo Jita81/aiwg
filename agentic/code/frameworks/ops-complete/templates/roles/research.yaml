@@ -1,0 +1,19 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsRole
+metadata:
+  name: research
+  labels:
+    scope: documentation-only
+spec:
+  description: "Web search and documentation access only — no fleet interaction, no file modifications"
+  tools:
+    allow: [Read, Grep, Glob, WebFetch, WebSearch]
+    deny: [Write, Edit, MultiEdit, Bash]
+  blast_radius_ceiling: low
+  gates:
+    required_for: [low, medium, high, critical]
+  audit:
+    level: minimal
+  restrictions:
+    read_only: true
+    no_mutations: true

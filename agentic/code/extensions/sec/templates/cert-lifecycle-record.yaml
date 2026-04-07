@@ -1,0 +1,92 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsTarget
+metadata:
+  name: "{cert-identifier}"
+  labels:
+    domain: security-operations
+    type: cert-lifecycle-record
+    environment: "{production|staging|dev}"
+    criticality: "{critical|high|medium|low}"
+spec:
+  # Subject Information
+  subject:
+    common_name: "{hostname.example.com}"
+    organization: "{Organization Name}"
+    organizational_unit: "{Ops|Engineering|Security}"
+    country: "{CC}"
+    san:
+      dns:
+        - "{hostname.example.com}"
+        - "{alias.example.com}"
+      ip:
+        - "{192.168.1.10}"
+      email: []                            # for S/MIME certs
+
+  # Certificate Identity
+  serial: "{hex-serial-number}"
+  fingerprint_sha256: "{sha256-fingerprint}"
+  issuer: "{Org Issuing CA — Purpose}"
+  issuing_ca_fingerprint: "{sha256-fingerprint-of-issuing-ca}"
+
+  # Validity
+  not_before: "{YYYY-MM-DD}"
+  not_after: "{YYYY-MM-DD}"
+  validity_days: 0                         # compute from not_before → not_after
+  days_remaining: 0                        # compute from today → not_after
+
+  # Key Material
+  key_algorithm: "{EC|RSA}"
+  key_size: "{384|4096}"                   # bits for RSA, curve size for EC
+  key_curve: "{P-384}"                     # EC only
+  signature_algorithm: "sha384WithRSAEncryption"
+
+  # Deployment
+  hosts:
+    - hostname: "{hostname.example.com}"
+      service: "{nginx|apache|postgres|custom}"
+      port: 443
+      cert_path: "{/etc/ssl/certs/hostname.pem}"
+      key_path: "{/etc/ssl/private/hostname.key}"
+      chain_path: "{/etc/ssl/certs/hostname-chain.pem}"
+      last_deployed: "{YYYY-MM-DD}"
+      deployment_method: "{ansible|manual|cert-manager|certbot}"
+
+  # Renewal
+  renewal_procedure: "{auto|manual}"
+  renewal_automation:
+    enabled: false
+    tool: "{certbot|cert-manager|acme.sh|custom}"
+    trigger_days_before_expiry: 30
+    notification_channel: "{ops-alerts|email|pagerduty}"
+  renewal_trigger_days: 30                 # flag for renewal this many days before expiry
+  last_renewed: "{YYYY-MM-DD}"
+  renewal_procedure_ref: "{path/to/ca-operations-runbook.md}"
+  renewal_history:
+    - date: "{YYYY-MM-DD}"
+      renewed_by: "{operator}"
+      previous_serial: "{old-serial}"
+      notes: "{reason for renewal or routine expiry}"
+
+  # Storage
+  storage:
+    type: "{file|hsm|k8s-secret|vault}"
+    location: "{/etc/ssl/private/ | HSM slot {N} | k8s: {namespace}/{secret-name} | vault: {path}}"
+    encrypted_at_rest: true
+    backup_location: "{path or 'none'}"
+    access_control: "{description of who/what can read this cert and key}"
+
+  # Revocation
+  revocation_status: "{valid|revoked|suspended}"
+  revoked_date: null                       # YYYY-MM-DD if revoked
+  revocation_reason: null                  # keyCompromise|caCompromise|affiliationChanged|superseded|cessationOfOperation
+  crl_distribution_point: "{http://pki.example.com/issuing-purpose.crl}"
+  ocsp_responder: "{http://ocsp.example.com/issuing-purpose}"
+
+  # Audit
+  issued_by: "{operator or automation}"
+  issued_date: "{YYYY-MM-DD}"
+  approved_by: "{operator}"
+  purpose: "{description of what this certificate is used for}"
+  compliance_frameworks:
+    - "{PCI-DSS|SOC2|ISO27001|HIPAA|none}"
+  notes: "{Any additional context about this certificate}"

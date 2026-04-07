@@ -1,0 +1,63 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsTarget
+metadata:
+  name: "{tunnel-name}"
+  labels:
+    domain: network-operations
+    type: tunnel-config
+    provider: "{cloudflare|wireguard|ipsec}"
+spec:
+  type: service
+  tunnel:
+    provider: "{cloudflare|wireguard|ipsec}"
+    tunnel_id: "{provider-assigned-tunnel-id}"
+    status: "{active|standby|deprecated}"
+
+    # Credential reference — never store literal credentials here
+    credentials:
+      ref: "{absolute-or-vault-path-to-credentials-file}"
+      # File must be mode 600, owned by the cloudflared or tunnel daemon user
+      # Example: /etc/cloudflared/{tunnel-name}.json
+
+    routes:
+      - hostname: "{external-hostname}"
+        service: "{internal-service-url}"
+        path: "{url-path-prefix-or-/*}"
+        # Example:
+        #   hostname: app.example.com
+        #   service: http://localhost:8080
+        #   path: /*
+
+    access_policies:
+      - name: "{policy-name}"
+        decision: "{allow|deny|bypass}"
+        include:
+          - "{email-domain|email|service-token|country}"
+        exclude:
+          - "{email|ip-range}"
+        # Example:
+        #   name: "internal-team"
+        #   decision: allow
+        #   include:
+        #     - "@example.com"
+        #   exclude:
+        #     - "contractor@external.com"
+
+    origin_config:
+      connect_timeout: "{duration}"    # e.g. 30s
+      tls_verify: {true|false}
+      keepalive_connections: {count}
+      keepalive_timeout: "{duration}"  # e.g. 90s
+      http2_origin: {true|false}
+
+  lifecycle:
+    created: "{date}"
+    last_verified: "{date}"
+    owner: "{team-or-service}"
+    purpose: "{why this tunnel exists}"
+    review_due: "{date}"
+
+  verification:
+    health_url: "https://{external-hostname}/healthz"
+    check_command: "curl -sf https://{external-hostname}/healthz && echo OK"
+    expected_response: "{200 OK or specific body}"

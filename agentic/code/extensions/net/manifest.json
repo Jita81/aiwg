@@ -1,0 +1,20 @@
+{
+  "id": "net",
+  "type": "addon",
+  "name": "Network Operations Extension",
+  "version": "1.0.0",
+  "description": "Network operations extension for ops-complete — VLANs, DNS, firewalls, Cloudflare tunnels, UniFi",
+  "core": false,
+  "autoInstall": false,
+  "requires": ["ops-complete"],
+  "entry": {
+    "rules": "rules/",
+    "templates": "templates/",
+    "skills": "skills/"
+  },
+  "provides": {
+    "rules": ["net-change-blast-radius", "net-state-authority", "net-tunnel-safety"],
+    "templates": ["network-state", "vlan-change-runbook", "dns-zone-record", "firewall-change-runbook", "tunnel-config", "network-audit-report"],
+    "skills": ["net-vlan-audit", "net-dns-check", "net-connectivity-test"]
+  }
+}

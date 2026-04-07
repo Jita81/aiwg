@@ -1,0 +1,127 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsTarget
+metadata:
+  name: "{encoder-name}"
+  labels:
+    domain: stream-operations
+    type: encoder
+spec:
+  type: service
+  description: "Encoder/transcoder configuration with quality profiles"
+
+  encoder:
+    software: "{ffmpeg|obs|srt-live-transmit|custom}"
+    version: "{version}"
+    config_file: "{/etc/stream/{encoder-name}/encoder.conf}"
+    systemd_unit: "{encoder-name}.service"
+    run_as: "{stream-user}"
+
+  input:
+    protocol: "{rtmp|srt|rtp|file}"
+    address: "{ingest-url-or-path}"
+    # For RTMP ingest: rtmp://localhost:1935/live/{stream-key-ref}
+    # For SRT ingest: srt://0.0.0.0:9000?mode=listener&passphrase=${SRT_PASSPHRASE}
+    format: "{auto|h264|hevc|vp9}"
+    audio_channels: "{2|6}"
+    buffer_ms: "{2000}"
+
+  profiles:
+    - name: "{profile-name}"
+      codec: "{h264|h265|av1}"
+      resolution: "{1920x1080}"
+      framerate: "{30|60}"
+      bitrate: "{bitrate-kbps}kbps"
+      audio_codec: "{aac|opus}"
+      audio_bitrate: "{128}kbps"
+      preset: "{ultrafast|fast|medium|slow}"
+      # ultrafast: lowest CPU, highest bitrate for quality
+      # medium: balanced CPU and quality
+      # slow: highest quality, significant CPU load
+      keyframe_interval: "{2}s"
+      # Most platforms require 2s (Twitch, YouTube, Facebook)
+      # SRT streams may tolerate 4s
+      pixel_format: "{yuv420p}"
+      # yuv420p required for broad platform compatibility
+      crf: "{18|23|28}"
+      # Only set when using CRF mode instead of CBR
+      maxrate: "{bitrate-kbps}kbps"
+      bufsize: "{2x-bitrate-kbps}kbps"
+
+    - name: "{profile-name-low}"
+      codec: "{h264}"
+      resolution: "{1280x720}"
+      framerate: "{30}"
+      bitrate: "{2500}kbps"
+      audio_codec: "{aac}"
+      audio_bitrate: "{128}kbps"
+      preset: "{fast}"
+      keyframe_interval: "{2}s"
+      pixel_format: "{yuv420p}"
+      maxrate: "{2500}kbps"
+      bufsize: "{5000}kbps"
+
+  platforms:
+    - name: "{platform-name}"
+      protocol: "{rtmp|srt|hls}"
+      endpoint: "${STREAM_ENDPOINT}"
+      # Store endpoint in environment file — never hardcode in this config
+      key_ref: "${STREAM_KEY_FILE}"
+      # key_ref points to a file path containing the stream key, e.g.:
+      # /etc/stream/keys/{platform-name}.key (mode 600, not git-tracked)
+      profile: "{profile-name}"
+      enabled: true
+
+    - name: "{platform-name-2}"
+      protocol: "{srt}"
+      endpoint: "${STREAM_ENDPOINT_2}"
+      key_ref: "${STREAM_KEY_FILE_2}"
+      profile: "{profile-name-low}"
+      enabled: true
+      srt_options:
+        latency_ms: "{200}"
+        passphrase_ref: "${SRT_PASSPHRASE_FILE}"
+        encryption: "{AES-128|AES-256}"
+
+  hardware_acceleration:
+    enabled: false
+    # Set to true only after verifying encoder supports the hardware
+    type: "{nvenc|vaapi|qsv}"
+    # nvenc: NVIDIA GPUs (requires nvidia-cuda-toolkit)
+    # vaapi: Intel/AMD via DRI (requires libva-drm2)
+    # qsv: Intel Quick Sync (requires libmfx)
+    device: "{/dev/dri/renderD128}"
+    # Verify device exists: ls -la /dev/dri/
+    fallback_to_software: true
+    # If hardware acceleration fails, fall back to software encoding
+
+  recording:
+    enabled: "{true|false}"
+    path: "{/srv/recordings/{encoder-name}}"
+    format: "{mkv|mp4|ts}"
+    segment_duration_s: "{3600}"
+    # Segment recordings to limit file size and ease recovery
+    retention_days: "{30}"
+    # Ensure sufficient disk space: estimated_bitrate_kbps * 0.125 * seconds * retention_days bytes
+
+  monitoring:
+    metrics_port: "{9101}"
+    stats_url: "{http://localhost:{stats-port}/stat}"
+    alert_on_dropped_frames: true
+    dropped_frame_threshold_per_min: "{10}"
+    bitrate_tolerance_pct: 15
+    alert_on_input_loss: true
+    input_loss_timeout_s: "{10}"
+
+  environment_file: "{/etc/stream/{encoder-name}/env}"
+  # Environment file contains:
+  #   STREAM_ENDPOINT=rtmp://ingest.{platform}.com/live
+  #   STREAM_KEY_FILE=/etc/stream/keys/{platform-name}.key
+  # File must be mode 600 and NOT committed to git
+
+  # Credential reference table — locations only, never values
+  credential_refs:
+    - platform: "{platform-name}"
+      type: "{stream_key|srt_passphrase|api_token}"
+      store: "{file|vault|env}"
+      path: "{/etc/stream/keys/{platform-name}.key|vault:secret/stream/{platform-name}}"
+      last_rotated: "{YYYY-MM-DD}"

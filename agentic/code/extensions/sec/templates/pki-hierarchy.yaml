@@ -1,0 +1,91 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsTarget
+metadata:
+  name: "{org}-pki-hierarchy"
+  labels:
+    domain: security-operations
+    type: pki-hierarchy
+spec:
+  description: "PKI hierarchy definition for {organization}"
+  last_reviewed: "{YYYY-MM-DD}"
+  reviewed_by: "{operator}"
+
+  root_ca:
+    name: "{Org} Root CA"
+    subject_dn: "CN={Org} Root CA, O={Organization}, C={CC}"
+    key_location:
+      type: "{hsm|airgap-file}"
+      hsm_slot: "{slot-id}"                   # if HSM
+      file_path: "{/secure/path/root-ca.key}" # if file
+      access_procedure_ref: "{path/to/ceremony-runbook.md}"
+    algorithm: "EC P-384"
+    validity_years: 20
+    not_before: "{YYYY-MM-DD}"
+    not_after: "{YYYY-MM-DD}"
+    fingerprint_sha256: "{sha256-fingerprint}"
+    crl_distribution_point: "{http://pki.example.com/root.crl}"
+    ocsp_responder: "{http://ocsp.example.com/root}"
+    cross_signed_by: []                        # list any external cross-signatures
+    renewal_procedure_ref: "{path/to/root-ca-renewal.md}"
+    issued_cert_count: 0                       # root typically issues only intermediate CAs
+    notes: "Offline root CA. Only used for intermediate CA issuance and CRL signing. Kept in HSM in locked cabinet."
+
+  intermediate_cas:
+    - name: "{Org} Intermediate CA 1"
+      subject_dn: "CN={Org} Intermediate CA 1, O={Organization}, C={CC}"
+      signed_by: "{Org} Root CA"
+      key_location:
+        type: "{hsm|file}"
+        hsm_slot: "{slot-id}"
+        file_path: "{/secure/path/intermediate-ca.key}"
+      algorithm: "EC P-384"
+      validity_years: 10
+      not_before: "{YYYY-MM-DD}"
+      not_after: "{YYYY-MM-DD}"
+      fingerprint_sha256: "{sha256-fingerprint}"
+      crl_distribution_point: "{http://pki.example.com/intermediate1.crl}"
+      ocsp_responder: "{http://ocsp.example.com/intermediate1}"
+      issued_cert_count: 0
+      path_length_constraint: 0               # can this CA sign other CAs? 0 = no
+      renewal_procedure_ref: "{path/to/intermediate-ca-renewal.md}"
+      notes: "{Purpose of this intermediate CA}"
+
+  issuing_cas:
+    - name: "{Org} Issuing CA — {Purpose}"
+      subject_dn: "CN={Org} Issuing CA {Purpose}, O={Organization}, C={CC}"
+      signed_by: "{Org} Intermediate CA 1"
+      key_location:
+        type: "{hsm|file}"
+        hsm_slot: "{slot-id}"
+        file_path: "{/secure/path/issuing-ca.key}"
+      algorithm: "EC P-384"
+      validity_years: 5
+      not_before: "{YYYY-MM-DD}"
+      not_after: "{YYYY-MM-DD}"
+      fingerprint_sha256: "{sha256-fingerprint}"
+      crl_distribution_point: "{http://pki.example.com/issuing-purpose.crl}"
+      ocsp_responder: "{http://ocsp.example.com/issuing-purpose}"
+      issued_cert_count: 0
+      cert_policies:
+        - purpose: "{tls-server|tls-client|code-signing|email|ssh-host|ssh-user}"
+          key_usage: "{digitalSignature, keyEncipherment}"
+          extended_key_usage: "{serverAuth, clientAuth}"
+          max_validity_days: 398             # 398 days = browser-accepted max for TLS
+          san_required: true
+      renewal_procedure_ref: "{path/to/issuing-ca-renewal.md}"
+      auto_renewal: false
+      notes: "{Purpose of this issuing CA and the types of certificates it issues}"
+
+  trust_distribution:
+    fleet_trust_store: "{/etc/ssl/certs/org-ca-bundle.pem}"
+    distribution_method: "{ansible|puppet|manual}"
+    hosts_with_trust_installed: []            # list hostnames or use "all-fleet"
+    browsers_trust_store: "{deployed via MDM|not deployed}"
+    last_distributed: "{YYYY-MM-DD}"
+
+  crl_schedule:
+    root_ca_crl_validity_days: 365
+    intermediate_ca_crl_validity_days: 30
+    issuing_ca_crl_validity_days: 7
+    crl_publish_automation: "{manual|cron|systemd-timer}"
+    crl_publish_procedure_ref: "{path/to/ca-operations-runbook.md}"

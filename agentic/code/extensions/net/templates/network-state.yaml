@@ -1,0 +1,88 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsInventory
+metadata:
+  name: "{network-name}"
+  labels:
+    type: network-state
+    domain: network-operations
+spec:
+  vlans:
+    - id: "{vlan-id}"
+      name: "{vlan-name}"
+      subnet: "{cidr}"
+      gateway: "{gateway-ip}"
+      dhcp:
+        range_start: "{first-assignable-ip}"
+        range_end: "{last-assignable-ip}"
+        lease_seconds: {lease-seconds}
+        server: "{dhcp-server-hostname}"
+      tagged_ports:
+        - switch: "{switch-name}"
+          port: "{port-id}"
+          mode: "{trunk|access}"
+      purpose: "{management|production|storage|iot|guest|lab}"
+
+  subnets:
+    - cidr: "{cidr}"
+      vlan: "{vlan-id}"
+      description: "{what this subnet serves}"
+
+  routes:
+    - destination: "{cidr-or-default}"
+      gateway: "{next-hop-ip}"
+      interface: "{interface-name}"
+      metric: {metric}
+      description: "{why this route exists}"
+
+  dns_zones:
+    - zone: "{domain}"
+      provider: "{cloudflare|route53|unbound|bind}"
+      type: "{primary|secondary|stub}"
+      server: "{authoritative-server-hostname}"
+      records:
+        - name: "{subdomain-or-@}"
+          type: "{A|AAAA|CNAME|MX|TXT|SRV|PTR}"
+          value: "{target-ip-or-hostname}"
+          ttl: {ttl-seconds}
+          comment: "{purpose of this record}"
+
+  firewall_rules:
+    - chain: "{INPUT|FORWARD|OUTPUT|custom-chain}"
+      action: "{accept|drop|reject|log}"
+      source: "{cidr-or-any}"
+      destination: "{cidr-or-any}"
+      port: "{port-or-range}"
+      protocol: "{tcp|udp|icmp|any}"
+      comment: "{description — who/what this allows or blocks}"
+      issue: "{change-record-id-or-issue-number}"
+
+  switches:
+    - name: "{switch-name}"
+      model: "{vendor-and-model}"
+      management_ip: "{ip}"
+      management_vlan: "{vlan-id}"
+      total_ports: {port-count}
+      uplinks:
+        - to: "{connected-device}"
+          port: "{local-port}"
+          remote_port: "{remote-port}"
+          mode: "{trunk|access}"
+
+  access_points:
+    - name: "{ap-name}"
+      model: "{vendor-and-model}"
+      management_ip: "{ip}"
+      location: "{physical-location}"
+      ssids:
+        - name: "{ssid}"
+          vlan: "{vlan-id}"
+          band: "{2.4GHz|5GHz|6GHz|all}"
+
+  tunnels:
+    - name: "{tunnel-name}"
+      type: "{cloudflare|wireguard|ipsec}"
+      status: "{active|standby|deprecated}"
+      credential_ref: "{path-to-credentials-file}"
+      routes:
+        - hostname: "{external-hostname}"
+          service: "{internal-service-url}"

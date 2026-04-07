@@ -1,0 +1,18 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsRole
+metadata:
+  name: incident
+  labels:
+    scope: incident-response
+spec:
+  description: "Elevated read access for incident triage — limited write to prevent further damage during active incidents"
+  tools:
+    allow: [Read, Grep, Glob, Bash, WebFetch, WebSearch]
+    deny: [Write, Edit, MultiEdit]
+  blast_radius_ceiling: high
+  gates:
+    required_for: [high, critical]
+  audit:
+    level: verbose
+  restrictions:
+    no_mutations: true

@@ -1,0 +1,20 @@
+{
+  "id": "sec",
+  "type": "addon",
+  "name": "Security Operations Extension",
+  "version": "1.0.0",
+  "description": "Security operations extension for ops-complete — PKI, LUKS/TPM2, YubiKey, SSH CA, access auditing",
+  "core": false,
+  "autoInstall": false,
+  "requires": ["ops-complete"],
+  "entry": {
+    "rules": "rules/",
+    "templates": "templates/",
+    "skills": "skills/"
+  },
+  "provides": {
+    "rules": ["sec-luks-dual-phase", "sec-key-material-handling", "sec-cert-expiry-gates", "sec-access-audit-frequency"],
+    "templates": ["pki-hierarchy", "cert-lifecycle-record", "luks-enrollment-runbook", "ca-operations-runbook", "ssh-ca-runbook", "yubikey-ops-runbook", "access-audit-report", "security-incident-runbook"],
+    "skills": ["sec-cert-scan", "sec-luks-verify", "sec-access-snapshot"]
+  }
+}
