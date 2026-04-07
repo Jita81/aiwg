@@ -1,0 +1,50 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsCapability
+metadata:
+  name: dns-deregister
+  labels:
+    category: dns
+  annotations:
+    blast-radius: "fleet-wide — removes DNS record; any service relying on this FQDN will fail to resolve"
+spec:
+  description: Remove a host A/AAAA record from fleet DNS and verify the record no longer resolves
+  version: "1.0.0"
+  inputs:
+    - name: hostname
+      type: string
+      required: true
+    - name: domain
+      type: string
+      required: false
+      default: fleet.local
+    - name: record_type
+      type: string
+      required: false
+      default: ANY
+    - name: dns_server
+      type: string
+      required: true
+    - name: tsig_key_path
+      type: path
+      required: true
+    - name: propagation_timeout
+      type: integer
+      required: false
+      default: 60
+  outputs:
+    - name: status
+      type: string
+    - name: fqdn
+      type: string
+    - name: records_removed
+      type: list
+    - name: propagation_verified
+      type: boolean
+  target_requirements:
+    os: [linux]
+    capabilities: [nsupdate, dig]
+  agent: dns-operator
+  idempotent: true
+  verification:
+    command: "dig +short @{{ dns_server }} {{ hostname }}.{{ domain }} A; test $? -eq 0 && echo 'NXDOMAIN_CHECK'"
+    expect: "^$"

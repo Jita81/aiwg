@@ -1,0 +1,48 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsCapability
+metadata:
+  name: backup-verify
+  labels:
+    category: backup
+spec:
+  description: Run a restore test of a backup archive into a scratch directory and confirm SHA-256 hash integrity against the manifest
+  version: "1.0.0"
+  inputs:
+    - name: backup_path
+      type: path
+      required: true
+    - name: manifest_path
+      type: path
+      required: true
+    - name: scratch_dir
+      type: path
+      required: false
+      default: /tmp/backup-verify
+    - name: encryption_key_path
+      type: path
+      required: false
+    - name: backend
+      type: string
+      required: false
+      default: restic
+  outputs:
+    - name: status
+      type: string
+    - name: files_checked
+      type: integer
+    - name: files_ok
+      type: integer
+    - name: files_failed
+      type: integer
+    - name: hash_match
+      type: boolean
+    - name: restore_duration_seconds
+      type: integer
+  target_requirements:
+    os: [linux]
+    capabilities: [restic, sha256sum]
+  agent: backup-integrity-auditor
+  idempotent: true
+  verification:
+    command: "sha256sum --check {{ manifest_path }} 2>&1 | tail -1"
+    expect: "OK"

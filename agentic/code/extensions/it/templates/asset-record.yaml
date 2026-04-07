@@ -1,0 +1,36 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsTarget
+metadata:
+  name: "{asset-id}"
+  labels:
+    type: "{server|workstation|network|storage}"
+    status: "{active|retired|maintenance}"
+spec:
+  asset:
+    serial_number: "{serial}"
+    model: "{model}"
+    manufacturer: "{manufacturer}"
+    purchased: "{YYYY-MM-DD}"
+    warranty_expires: "{YYYY-MM-DD}"
+  owner: "{team or person}"
+  location:
+    site: "{site-name}"
+    building: "{building}"
+    rack: "{rack-id}"
+    rack_unit: "{u-position}"
+  lifecycle:
+    provisioned: "{YYYY-MM-DD}"
+    last_maintained: "{YYYY-MM-DD}"
+    decommission_date: null  # set when scheduled for retirement
+  sla:
+    tier: "{gold|silver|bronze}"
+    rto: "{hours}"
+    rpo: "{hours}"
+  network:
+    primary_ip: "{ip-address}"
+    management_ip: "{ip-address}"
+    hostname: "{hostname}"
+    mac_address: "{mac}"
+    vlan: "{vlan-id}"
+  tags: []
+  notes: ""

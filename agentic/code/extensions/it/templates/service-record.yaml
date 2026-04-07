@@ -1,0 +1,38 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsTarget
+metadata:
+  name: "{service-name}"
+  labels:
+    type: service
+    environment: "{production|staging|dev}"
+spec:
+  deployment:
+    host: "{hostname}"
+    method: "{docker-compose|systemd|kubernetes}"
+    compose_file: "{path-to-compose-file}"
+    config_path: "{path-to-config}"
+    data_path: "{path-to-persistent-data}"
+  health:
+    endpoint: "{url}"
+    port: "{port}"
+    protocol: "{http|tcp}"
+    interval: "{seconds}"
+    timeout: "{seconds}"
+  dependencies:
+    - "{service-name}"
+  backup:
+    enabled: false
+    schedule: "{cron-expression}"
+    retention: "{days}"
+    method: "{restic|borgbackup|rsync}"
+    target: "{backup-destination-path}"
+  monitoring:
+    dashboard: "{dashboard-url}"
+    alerts:
+      - "{alert-name}"
+  owner: "{team or person}"
+  sla:
+    tier: "{gold|silver|bronze}"
+    rto: "{hours}"
+    rpo: "{hours}"
+  notes: ""

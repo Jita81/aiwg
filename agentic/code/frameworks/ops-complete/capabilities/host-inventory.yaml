@@ -1,0 +1,56 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsCapability
+metadata:
+  name: host-inventory
+  labels:
+    category: inventory
+spec:
+  description: Collect hardware specs, OS version, installed packages, running services, and network interfaces from a target host via SSH
+  version: "1.0.0"
+  inputs:
+    - name: target_host
+      type: string
+      required: true
+    - name: ssh_user
+      type: string
+      required: false
+      default: ops
+    - name: ssh_port
+      type: integer
+      required: false
+      default: 22
+    - name: output_format
+      type: string
+      required: false
+      default: yaml
+  outputs:
+    - name: hostname
+      type: string
+    - name: os
+      type: string
+    - name: os_version
+      type: string
+    - name: kernel
+      type: string
+    - name: cpu_model
+      type: string
+    - name: cpu_cores
+      type: integer
+    - name: memory_mb
+      type: integer
+    - name: disk_layout
+      type: list
+    - name: network_interfaces
+      type: list
+    - name: installed_packages
+      type: list
+    - name: running_services
+      type: list
+  target_requirements:
+    os: [linux]
+    capabilities: [ssh]
+  agent: fleet-inventory-collector
+  idempotent: true
+  verification:
+    command: "ssh -o ConnectTimeout=5 {{ ssh_user }}@{{ target_host }} -p {{ ssh_port }} 'hostname && uname -r'"
+    expect: ".+"

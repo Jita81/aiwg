@@ -1,0 +1,68 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsCapability
+metadata:
+  name: ssh-cert-issue
+  labels:
+    category: pki
+  annotations:
+    blast-radius: "single-host — issues SSH certificate granting access scoped to specified principals"
+spec:
+  description: Issue an SSH host or user certificate signed by the fleet CA, push to target, and configure sshd to trust it
+  version: "1.0.0"
+  inputs:
+    - name: cert_type
+      type: string
+      required: true
+      default: host
+    - name: target_host
+      type: string
+      required: true
+    - name: principals
+      type: list
+      required: true
+    - name: ca_key_path
+      type: path
+      required: true
+    - name: public_key_path
+      type: path
+      required: true
+    - name: validity
+      type: string
+      required: false
+      default: "+52w"
+    - name: key_id
+      type: string
+      required: true
+    - name: ssh_user
+      type: string
+      required: false
+      default: ops
+    - name: deploy_cert
+      type: boolean
+      required: false
+      default: true
+  outputs:
+    - name: status
+      type: string
+    - name: cert_serial
+      type: string
+    - name: cert_type
+      type: string
+    - name: valid_from
+      type: datetime
+    - name: valid_to
+      type: datetime
+    - name: principals
+      type: list
+    - name: fingerprint
+      type: string
+    - name: deployed_path
+      type: path
+  target_requirements:
+    os: [linux]
+    capabilities: [ssh-keygen, ssh]
+  agent: ssh-ca-operator
+  idempotent: false
+  verification:
+    command: "ssh-keygen -L -f {{ deployed_path }} 2>/dev/null | grep -E '(Type|Valid|Principals|Serial)'"
+    expect: "Type: ssh-{{ cert_type }}"

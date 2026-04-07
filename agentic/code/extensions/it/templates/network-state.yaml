@@ -1,0 +1,42 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsInventory
+metadata:
+  name: "{network-name}"
+  labels:
+    type: network-state
+spec:
+  vlans:
+    - id: "{vlan-id}"
+      name: "{name}"
+      subnet: "{cidr}"
+      gateway: "{ip}"
+      purpose: "{management|production|storage|guest}"
+  dns_zones:
+    - zone: "{domain}"
+      type: "{primary|secondary}"
+      server: "{hostname}"
+      records:
+        - name: "{record-name}"
+          type: "{A|AAAA|CNAME|MX|TXT}"
+          value: "{value}"
+  firewall_rules:
+    - name: "{rule-name}"
+      source: "{cidr}"
+      destination: "{cidr}"
+      port: "{port}"
+      protocol: "{tcp|udp}"
+      action: "{allow|deny}"
+      comment: "{description}"
+  switches:
+    - name: "{switch-name}"
+      model: "{model}"
+      management_ip: "{ip}"
+      ports: "{count}"
+      uplinks:
+        - "{connected-to}"
+  dhcp:
+    - scope: "{subnet-cidr}"
+      range_start: "{ip}"
+      range_end: "{ip}"
+      lease_time: "{seconds}"
+      server: "{hostname}"

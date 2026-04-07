@@ -1,0 +1,50 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsCapability
+metadata:
+  name: unifi-vlan-audit
+  labels:
+    category: network
+spec:
+  description: Fetch UniFi switch and AP configuration via the UniFi Controller API, diff VLAN assignments and port profiles against the declared network-state.yaml
+  version: "1.0.0"
+  inputs:
+    - name: controller_url
+      type: string
+      required: true
+    - name: controller_site
+      type: string
+      required: false
+      default: default
+    - name: credentials_path
+      type: path
+      required: true
+    - name: network_state_path
+      type: path
+      required: true
+    - name: include_aps
+      type: boolean
+      required: false
+      default: true
+  outputs:
+    - name: status
+      type: string
+    - name: devices_audited
+      type: integer
+    - name: vlans_expected
+      type: list
+    - name: vlans_found
+      type: list
+    - name: drift_items
+      type: list
+    - name: drift_count
+      type: integer
+    - name: compliant
+      type: boolean
+  target_requirements:
+    os: [linux]
+    capabilities: [curl, jq]
+  agent: network-compliance-auditor
+  idempotent: true
+  verification:
+    command: "curl -sk -b /tmp/unifi_cookie '{{ controller_url }}/api/s/{{ controller_site }}/stat/device' | jq '.data | length'"
+    expect: "[1-9][0-9]*"

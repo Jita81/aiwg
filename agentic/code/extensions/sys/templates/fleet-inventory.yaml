@@ -1,0 +1,48 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsInventory
+metadata:
+  name: "{fleet-name}"
+spec:
+  groups:
+    - name: compute
+      hosts:
+        - compute-01
+        - compute-02
+        - compute-03
+      vars:
+        role: compute-node
+        monitoring: true
+        docker_enabled: true
+        backup_schedule: "daily"
+
+    - name: storage
+      hosts:
+        - nas-01
+        - backup-01
+      vars:
+        role: storage-node
+        monitoring: true
+        zfs_scrub_schedule: "weekly"
+        snapshot_retention_days: 30
+
+    - name: gateway
+      hosts:
+        - gw-01
+        - gw-02
+      vars:
+        role: gateway
+        monitoring: true
+        firewall_managed: true
+        dns_forwarder: true
+        trust_boundary: dmz
+
+    - name: builders
+      hosts:
+        - ci-01
+        - ci-02
+      vars:
+        role: builder
+        monitoring: true
+        ephemeral_workspaces: true
+        max_concurrent_builds: 4
+        cache_mount: /mnt/cache

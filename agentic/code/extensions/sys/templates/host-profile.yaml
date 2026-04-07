@@ -1,0 +1,62 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsTarget
+metadata:
+  name: "{hostname}"
+  labels:
+    role: "{compute|storage|gateway|builder}"
+    site: "{site}"
+    trust_boundary: "{trusted|dmz|untrusted}"
+spec:
+  hardware:
+    model: "Dell PowerEdge R750"
+    cpu: "Intel Xeon Gold 6338 2.0GHz 32C/64T"
+    ram: "256GB DDR4-3200 ECC"
+    disks:
+      - device: /dev/sda
+        size: "960GB"
+        type: NVMe
+        mount: /
+        fs: ext4
+      - device: /dev/sdb
+        size: "3.84TB"
+        type: NVMe
+        mount: /data
+        fs: xfs
+    nics:
+      - interface: eno1
+        speed: "25Gbps"
+        vlan: "100"
+        ip: "10.0.1.10/24"
+      - interface: eno2
+        speed: "25Gbps"
+        vlan: "200"
+        ip: "10.0.2.10/24"
+  os:
+    distribution: "Debian 12 (Bookworm)"
+    kernel: "6.1.0-18-amd64"
+    architecture: amd64
+  roles:
+    - compute-node
+    - docker-host
+  mounts:
+    virtiofs:
+      - tag: shared-data
+        mount_point: /mnt/shared
+      - tag: build-cache
+        mount_point: /mnt/cache
+  network:
+    primary_ip: "10.0.1.10"
+    gateway: "10.0.1.1"
+    dns:
+      - "10.0.1.1"
+      - "1.1.1.1"
+  services:
+    - name: sshd
+      port: 22
+      config_path: /etc/ssh/sshd_config
+    - name: docker
+      port: 2376
+      config_path: /etc/docker/daemon.json
+    - name: node-exporter
+      port: 9100
+      config_path: /etc/default/prometheus-node-exporter

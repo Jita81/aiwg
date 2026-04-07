@@ -1,0 +1,50 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsCapability
+metadata:
+  name: service-health
+  labels:
+    category: monitoring
+spec:
+  description: Check Docker Compose stack or systemd service status, uptime, resource usage, and restart count on a target host
+  version: "1.0.0"
+  inputs:
+    - name: target_host
+      type: string
+      required: true
+    - name: service_type
+      type: string
+      required: true
+      default: docker-compose
+    - name: service_name
+      type: string
+      required: true
+    - name: compose_dir
+      type: path
+      required: false
+    - name: ssh_user
+      type: string
+      required: false
+      default: ops
+  outputs:
+    - name: status
+      type: string
+    - name: uptime_seconds
+      type: integer
+    - name: restart_count
+      type: integer
+    - name: memory_usage_mb
+      type: integer
+    - name: cpu_percent
+      type: float
+    - name: healthy
+      type: boolean
+    - name: container_states
+      type: list
+  target_requirements:
+    os: [linux]
+    capabilities: [ssh, docker]
+  agent: service-health-monitor
+  idempotent: true
+  verification:
+    command: "ssh {{ ssh_user }}@{{ target_host }} 'cd {{ compose_dir }} && docker compose ps --format json' 2>/dev/null || ssh {{ ssh_user }}@{{ target_host }} 'systemctl is-active {{ service_name }}'"
+    expect: "running|active"

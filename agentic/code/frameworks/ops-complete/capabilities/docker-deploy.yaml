@@ -1,0 +1,62 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsCapability
+metadata:
+  name: docker-deploy
+  labels:
+    category: deployment
+  annotations:
+    blast-radius: "single-stack — pulls new images and recreates containers; causes brief downtime for affected services"
+spec:
+  description: Deploy or update a Docker Compose stack on a target host — pulls images, recreates changed containers, and runs health checks
+  version: "1.0.0"
+  inputs:
+    - name: target_host
+      type: string
+      required: true
+    - name: compose_dir
+      type: path
+      required: true
+    - name: compose_file
+      type: string
+      required: false
+      default: docker-compose.yaml
+    - name: ssh_user
+      type: string
+      required: false
+      default: ops
+    - name: pull_policy
+      type: string
+      required: false
+      default: always
+    - name: health_check_timeout
+      type: integer
+      required: false
+      default: 120
+    - name: rollback_on_failure
+      type: boolean
+      required: false
+      default: true
+    - name: env_file
+      type: path
+      required: false
+  outputs:
+    - name: status
+      type: string
+    - name: containers_updated
+      type: list
+    - name: containers_unchanged
+      type: list
+    - name: images_pulled
+      type: list
+    - name: health_check_passed
+      type: boolean
+    - name: deploy_duration_seconds
+      type: integer
+  target_requirements:
+    os: [linux]
+    capabilities: [ssh, docker, docker-compose]
+  agent: container-deploy-operator
+  idempotent: false
+  verification:
+    command: "ssh {{ ssh_user }}@{{ target_host }} 'cd {{ compose_dir }} && docker compose -f {{ compose_file }} ps --format json' | jq -r '.[].State'"
+    expect: "running"

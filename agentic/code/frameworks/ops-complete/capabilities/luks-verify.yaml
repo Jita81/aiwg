@@ -1,0 +1,53 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsCapability
+metadata:
+  name: luks-verify
+  labels:
+    category: security
+spec:
+  description: Confirm that TPM2 LUKS enrollment slots on a target host match the expected state — verifies slot assignment, PCR policy binding, and recovery key presence
+  version: "1.0.0"
+  inputs:
+    - name: target_host
+      type: string
+      required: true
+    - name: device
+      type: string
+      required: false
+      default: /dev/sda3
+    - name: expected_slots
+      type: list
+      required: true
+    - name: ssh_user
+      type: string
+      required: false
+      default: ops
+    - name: require_recovery_key
+      type: boolean
+      required: false
+      default: true
+  outputs:
+    - name: status
+      type: string
+    - name: device
+      type: string
+    - name: luks_version
+      type: integer
+    - name: active_slots
+      type: list
+    - name: tpm2_bound
+      type: boolean
+    - name: recovery_key_present
+      type: boolean
+    - name: slots_match
+      type: boolean
+    - name: drift_details
+      type: list
+  target_requirements:
+    os: [linux]
+    capabilities: [ssh, cryptsetup, systemd-cryptenroll]
+  agent: disk-encryption-auditor
+  idempotent: true
+  verification:
+    command: "ssh {{ ssh_user }}@{{ target_host }} 'sudo cryptsetup luksDump {{ device }} | grep -E \"^\\s+(Keyslot|Token)\"'"
+    expect: "Keyslot"

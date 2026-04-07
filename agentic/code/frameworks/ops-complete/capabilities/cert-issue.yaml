@@ -1,0 +1,60 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsCapability
+metadata:
+  name: cert-issue
+  labels:
+    category: pki
+  annotations:
+    blast-radius: "single-host — replaces TLS cert on target; services using the old cert will need reload"
+spec:
+  description: Issue a TLS certificate from the internal CA, push key and cert to the target host, and trigger service reload
+  version: "1.0.0"
+  inputs:
+    - name: common_name
+      type: string
+      required: true
+    - name: sans
+      type: list
+      required: false
+      default: []
+    - name: target_host
+      type: string
+      required: true
+    - name: cert_path
+      type: path
+      required: false
+      default: /etc/ssl/private
+    - name: ca_url
+      type: string
+      required: true
+    - name: validity_days
+      type: integer
+      required: false
+      default: 365
+    - name: key_type
+      type: string
+      required: false
+      default: ec-p256
+    - name: reload_command
+      type: string
+      required: false
+      default: "systemctl reload nginx"
+  outputs:
+    - name: status
+      type: string
+    - name: cert_serial
+      type: string
+    - name: expiry_date
+      type: datetime
+    - name: fingerprint_sha256
+      type: string
+    - name: deployed_path
+      type: path
+  target_requirements:
+    os: [linux]
+    capabilities: [openssl, ssh, step-cli]
+  agent: pki-operator
+  idempotent: false
+  verification:
+    command: "openssl s_client -connect {{ target_host }}:443 -servername {{ common_name }} </dev/null 2>/dev/null | openssl x509 -noout -serial -fingerprint -sha256"
+    expect: "serial={{ cert_serial }}"

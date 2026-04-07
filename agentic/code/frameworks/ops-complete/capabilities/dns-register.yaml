@@ -1,0 +1,52 @@
+apiVersion: ops.aiwg.io/v1
+kind: OpsCapability
+metadata:
+  name: dns-register
+  labels:
+    category: dns
+  annotations:
+    blast-radius: "fleet-wide — adds DNS record visible to all hosts resolving against fleet DNS"
+spec:
+  description: Register a host A and/or AAAA record in fleet DNS and verify propagation
+  version: "1.0.0"
+  inputs:
+    - name: hostname
+      type: string
+      required: true
+    - name: domain
+      type: string
+      required: false
+      default: fleet.local
+    - name: ipv4_address
+      type: string
+      required: false
+    - name: ipv6_address
+      type: string
+      required: false
+    - name: ttl
+      type: integer
+      required: false
+      default: 300
+    - name: dns_server
+      type: string
+      required: true
+    - name: tsig_key_path
+      type: path
+      required: true
+  outputs:
+    - name: status
+      type: string
+    - name: fqdn
+      type: string
+    - name: records_created
+      type: list
+    - name: propagation_verified
+      type: boolean
+  target_requirements:
+    os: [linux]
+    capabilities: [nsupdate, dig]
+  agent: dns-operator
+  idempotent: false
+  verification:
+    command: "dig +short @{{ dns_server }} {{ hostname }}.{{ domain }} A && dig +short @{{ dns_server }} {{ hostname }}.{{ domain }} AAAA"
+    expect: "{{ ipv4_address }}|{{ ipv6_address }}"
