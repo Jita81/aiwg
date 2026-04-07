@@ -341,7 +341,7 @@ describe.skipIf(!GIT_INIT_AVAILABLE)('Provider File Locations', () => {
     it('each provider creates only its own directories', async () => {
       const providerDirs: Record<string, string[]> = {
         claude: ['.claude'],
-        codex: ['.codex'],
+        codex: ['.codex', '.agents'],  // .agents/skills/ cross-agent compat (#766)
         factory: ['.factory'],
         copilot: ['.github'],
         cursor: ['.cursor'],

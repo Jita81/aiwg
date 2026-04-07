@@ -59,6 +59,7 @@ providers:
       agents: .codex/agents/
       commands: "~/.codex/prompts/"
       skills: "~/.codex/skills/"
+      skills_cross_agent: .agents/skills/
       rules: .codex/rules/
       behaviors: null
     native_features:

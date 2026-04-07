@@ -228,7 +228,8 @@ export async function deploySkills(targetDir, srcRoot, opts) {
 
   console.log('Delegating skill deployment to deploy-skills-codex.mjs...');
 
-  return new Promise((resolve, reject) => {
+  // Deploy to ~/.codex/skills/ (home dir — legacy Codex path)
+  await new Promise((resolve, reject) => {
     const args = ['--source', srcRoot];
     if (opts.dryRun) args.push('--dry-run');
     if (opts.force) args.push('--force');
@@ -242,6 +243,29 @@ export async function deploySkills(targetDir, srcRoot, opts) {
     child.on('close', (code) => {
       if (code === 0) resolve();
       else reject(new Error(`deploy-skills-codex.mjs exited with code ${code}`));
+    });
+
+    child.on('error', reject);
+  });
+
+  // Also deploy to .agents/skills/ (cross-agent universal path — #766)
+  const crossAgentSkillsDir = path.join(targetDir, '.agents', 'skills');
+  console.log(`Deploying skills to ${crossAgentSkillsDir} (cross-agent path)...`);
+
+  await new Promise((resolve, reject) => {
+    const args = ['--source', srcRoot, '--target', crossAgentSkillsDir];
+    if (opts.dryRun) args.push('--dry-run');
+    if (opts.force) args.push('--force');
+    if (opts.mode) args.push('--mode', opts.mode);
+
+    const child = spawn('node', [scriptPath, ...args], {
+      stdio: 'inherit',
+      cwd: srcRoot
+    });
+
+    child.on('close', (code) => {
+      if (code === 0) resolve();
+      else reject(new Error(`deploy-skills-codex.mjs (cross-agent) exited with code ${code}`));
     });
 
     child.on('error', reject);

@@ -540,7 +540,9 @@ export function deployFiles(files, destDir, opts, transformFn) {
     const hash = contentHash(transformedContent);
 
     // Skip-on-match: compare hash against sidecar manifest before reading dest file (#749)
-    if (!force && sidecarManaged[base]?.hash === `sha256:${hash}`) {
+    // Guard: only skip if the destination file still exists on disk. cleanupOldRuleFiles
+    // may have deleted it before deployFiles runs, so the sidecar record is stale.
+    if (!force && sidecarManaged[base]?.hash === `sha256:${hash}` && fs.existsSync(dest)) {
       actions.push({ type: 'skip', src: f, dest, reason: 'hash-match' });
       seen.add(dest);
       continue;
