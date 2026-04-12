@@ -9,10 +9,13 @@
  *   owner/name@v1.2.0          → Gitea shorthand with version
  *   github:owner/name          → GitHub shorthand
  *   github:owner/name@v1.2.0   → GitHub shorthand with version
+ *   clawhub:owner/name         → ClawHub / OpenClaw registry
+ *   openclaw:owner/name        → ClawHub alias
  *   https://...                → direct Git URL
  *   git@host:owner/name.git    → SSH URL
  *
  * @implements #557
+ * @implements #804
  */
 
 import path from 'path';
@@ -51,6 +54,8 @@ export const installHandler: CommandHandler = {
           'Usage:',
           '  aiwg install owner/name                    # Gitea shorthand',
           '  aiwg install github:owner/name             # GitHub shorthand',
+          '  aiwg install clawhub:owner/name            # ClawHub / OpenClaw registry',
+          '  aiwg install openclaw:owner/name           # ClawHub alias',
           '  aiwg install owner/name@v1.2.0             # Pin to version',
           '  aiwg install https://git.example.com/a/b   # Direct URL',
           '',
@@ -78,9 +83,10 @@ export const installHandler: CommandHandler = {
     let cachePath: string;
     let key: string;
     let type: string;
+    let namespace: string;
 
     try {
-      ({ cachePath, key, type } = await installPackage(rawRef, { refresh }));
+      ({ cachePath, key, type, namespace } = await installPackage(rawRef, { refresh }));
     } catch (error) {
       return {
         exitCode: 1,
@@ -90,6 +96,9 @@ export const installHandler: CommandHandler = {
 
     ui.success(`Installed: ${key} (${type})`);
     ui.dimText(`  Cache: ${cachePath}`);
+    if (namespace !== 'aiwg') {
+      ui.dimText(`  Namespace: ${namespace}`);
+    }
 
     // Optionally deploy
     if (deploy) {
@@ -103,6 +112,7 @@ export const installHandler: CommandHandler = {
         '--deploy-rules',
         '--provider', provider,
         '--target', target,
+        '--namespace', namespace,
         '--quiet',
       ];
 

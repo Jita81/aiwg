@@ -1,0 +1,181 @@
+# DoD Catalog Schema
+# Defines the structure for all Definition of Done entries in this catalog.
+# Agents and extensions contributing new DoDs must conform to this schema.
+
+$schema: "https://aiwg.io/schemas/dod-catalog/v1"
+version: "1.0.0"
+
+dod_entry:
+  type: object
+  required:
+    - dod_id
+    - name
+    - scope
+    - category
+    - version
+    - extensible
+    - criteria
+  properties:
+
+    dod_id:
+      type: string
+      pattern: "^dod-[a-z][a-z0-9-]*$"
+      description: >
+        Unique identifier for this DoD entry. Must be kebab-case and begin
+        with "dod-". Used for cross-referencing, tooling lookup, and extension
+        contribution targeting.
+      examples:
+        - dod-story
+        - dod-security
+        - dod-deployment
+
+    name:
+      type: string
+      description: >
+        Human-readable display name. Convention: "<Scope/Domain> Definition of Done".
+      examples:
+        - "Story Definition of Done"
+        - "Security Definition of Done"
+
+    scope:
+      type: string
+      enum: [scope, domain, operational]
+      description: >
+        Top-level catalog category.
+        - scope: tied to a delivery unit (story, feature, iteration, release, milestone)
+        - domain: tied to a quality concern or engineering discipline (security, testing, etc.)
+        - operational: tied to operational readiness concerns (deployment, monitoring, etc.)
+
+    category:
+      type: string
+      description: >
+        Sub-category within scope. Free-form but should match the file's directory
+        and the intent of the DoD.
+      examples:
+        - story
+        - feature
+        - security
+        - deployment
+
+    version:
+      type: string
+      pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+      description: Semantic version of this DoD definition. Increment when criteria change.
+
+    extensible:
+      type: boolean
+      description: >
+        When true, addons and project teams may contribute additional criteria via
+        the extension point defined in the file's "Extension Points" section.
+        Should be true for all catalog entries.
+
+    criteria:
+      type: object
+      description: Structured criteria grouped by required vs recommended.
+      properties:
+        required:
+          type: array
+          description: >
+            Criteria that MUST be met for the DoD to be satisfied. Each criterion
+            must be binary (pass/fail, yes/no). No subjective language.
+          items:
+            $ref: "#/criterion"
+        recommended:
+          type: array
+          description: >
+            Criteria that SHOULD be met but may be consciously deferred with
+            documented rationale. Also binary.
+          items:
+            $ref: "#/criterion"
+
+    verification:
+      type: object
+      description: How criteria are verified — automated vs manual.
+      properties:
+        automated:
+          type: array
+          items:
+            type: string
+          description: >
+            Tooling or CI checks that verify criteria automatically.
+            Reference tool name and what it checks.
+        manual:
+          type: array
+          items:
+            type: string
+          description: >
+            Human review steps that cannot be automated. Keep these minimal.
+
+    tailoring_guide:
+      type: string
+      description: >
+        Prose section explaining when to add or remove criteria based on
+        project type, risk level, regulatory context, or team maturity.
+
+    extension_points:
+      type: array
+      description: >
+        Named extension hooks that addons or project-level overlays can target
+        to inject additional criteria without modifying this file.
+      items:
+        type: object
+        required: [id, description]
+        properties:
+          id:
+            type: string
+            pattern: "^ext-[a-z][a-z0-9-]*$"
+          description:
+            type: string
+
+criterion:
+  type: object
+  required: [id, text]
+  properties:
+    id:
+      type: string
+      pattern: "^[a-z][a-z0-9-]*$"
+      description: Short stable identifier for the criterion, used by tooling.
+    text:
+      type: string
+      description: >
+        The criterion statement. Must be imperative, binary, and tool-verifiable
+        or reviewer-confirmable. Avoid "should", "try to", "ideally".
+    automated:
+      type: boolean
+      description: Whether this criterion can be verified by automated tooling.
+    tool:
+      type: string
+      description: Specific tool or CI step that checks this criterion (when automated=true).
+
+# Scope enumeration reference
+scope_values:
+  scope:
+    description: Delivery unit — how much work is done
+    members: [story, feature, iteration, release, milestone]
+  domain:
+    description: Engineering discipline — how well it is done
+    members: [security, performance, accessibility, testing, documentation, code-review, api-design, data-migration]
+  operational:
+    description: Operational readiness — how safely it can run
+    members: [deployment, monitoring, incident-response, runbook, sla-compliance]
+
+# Contribution guide for extensions
+extension_contribution:
+  description: >
+    To contribute additional criteria to an existing DoD from an addon or
+    project overlay:
+    1. Create a file at: <addon>/dod-extensions/<dod-id>.yaml
+    2. Reference the target DoD's dod_id and extension_point id
+    3. List additional criteria using the criterion schema above
+    4. The AIWG catalog loader merges extension criteria at the declared extension point
+  example:
+    file: my-addon/dod-extensions/dod-security.yaml
+    content: |
+      extends: dod-security
+      extension_point: ext-compliance-criteria
+      criteria:
+        required:
+          - id: hipaa-phi-encrypted
+            text: "All PHI fields encrypted at rest with AES-256"
+            automated: true
+            tool: "data-classification-scanner"

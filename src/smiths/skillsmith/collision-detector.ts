@@ -6,12 +6,13 @@
  *
  * Severity levels:
  * - none    — target path does not exist, deploy silently
- * - info    — target exists and is AIWG-owned (same or different version), overwrite silently
- * - warn    — target exists and is user-owned or foreign-package-owned, prompt user
+ * - info    — target exists and is owned by the same namespace, overwrite silently
+ * - warn    — target exists and is owned by a different namespace or user, prompt user
  * - error   — name matches a known platform built-in or AIWG CLI command, block deployment
  *
  * @see adr-skill-namespace-strategy.md
  * @implements #698
+ * @implements #804
  */
 
 import { promises as fs } from 'fs';
@@ -91,19 +92,26 @@ const PLATFORM_BUILTINS: Record<string, string[]> = {
 // ============================================
 
 /**
- * Determine if an existing skill directory is owned by AIWG.
+ * Determine if an existing skill directory is owned by the given namespace.
  *
- * A skill is AIWG-owned when ANY of:
- * 1. Its SKILL.md frontmatter contains `namespace: aiwg`
- * 2. Its parent directory is named after a known namespace (e.g. `.claude/skills/aiwg/`)
- * 3. It appears in the framework registry (`.aiwg/frameworks/registry.json`)
+ * A skill is owned by `namespace` when ANY of:
+ * 1. Its SKILL.md frontmatter contains `namespace: {namespace}`
+ * 2. Its parent directory is named after the namespace (e.g. `.claude/skills/aiwg/`)
+ *
+ * This generalises the original AIWG-only check to support any package namespace,
+ * enabling correct cross-namespace collision severity for third-party packages (#804).
+ *
+ * @param skillPath - Absolute path to the skill directory
+ * @param namespace - Namespace to test ownership against (default: 'aiwg')
  */
-async function isAiwgOwned(skillPath: string): Promise<boolean> {
-  // Check 1: namespace in frontmatter
+export async function isOwnedByNamespace(skillPath: string, namespace: string = 'aiwg'): Promise<boolean> {
+  // Check 1: namespace in SKILL.md frontmatter
   const skillFile = path.join(skillPath, 'SKILL.md');
   try {
     const content = await fs.readFile(skillFile, 'utf-8');
-    if (/^namespace:\s*aiwg\s*$/m.test(content)) {
+    // Match `namespace: <value>` line where value equals the queried namespace
+    const nsMatch = content.match(/^namespace:\s*(.+?)\s*$/m);
+    if (nsMatch && nsMatch[1] === namespace) {
       return true;
     }
   } catch {
@@ -112,7 +120,7 @@ async function isAiwgOwned(skillPath: string): Promise<boolean> {
 
   // Check 2: deployed under a namespace subdirectory
   const parentDir = path.basename(path.dirname(skillPath));
-  if (parentDir === 'aiwg') {
+  if (parentDir === namespace) {
     return true;
   }
 
@@ -153,6 +161,10 @@ async function skillContentUnchanged(sourceDir: string, deployedDir: string): Pr
 
 /**
  * Check for deployment collisions before writing skills to a platform directory.
+ *
+ * Ownership comparison uses the deploying package's namespace:
+ * - Same namespace overwrites → `info` severity (silent upgrade)
+ * - Cross-namespace or user-owned overwrites → `warn` severity (user confirmation)
  *
  * @param options - Collision check parameters
  * @returns Array of collision results, one per skill name. Only non-`none` results
@@ -204,8 +216,10 @@ export async function checkCollisions(options: CollisionCheckOptions): Promise<C
     }
 
     // Check 3: Ownership of existing skill
-    const owned = await isAiwgOwned(targetPath);
-    if (owned) {
+    // Same-namespace overwrites are silent upgrades (info).
+    // Cross-namespace or unowned overwrites require user confirmation (warn).
+    const ownedBySameNamespace = await isOwnedByNamespace(targetPath, namespace);
+    if (ownedBySameNamespace) {
       // Check if content is actually unchanged — skip silently if identical
       if (sourceSkillsDir) {
         const sourceDir = path.join(sourceSkillsDir, skillName);
@@ -227,7 +241,7 @@ export async function checkCollisions(options: CollisionCheckOptions): Promise<C
         skillName,
         targetPath,
         severity: 'warn',
-        reason: `'${skillName}' already exists at ${targetPath} and is not owned by AIWG — will overwrite user skill`,
+        reason: `'${skillName}' already exists at ${targetPath} and is not owned by namespace '${namespace}' — will overwrite existing skill`,
         blocksDeployment: false,
       });
     }
@@ -241,7 +255,7 @@ export async function checkCollisions(options: CollisionCheckOptions): Promise<C
  *
  * @param results - Collision results from `checkCollisions()`
  * @param options - Formatting options
- * @param options.verbose - When false, suppress info-level messages (AIWG → AIWG updates)
+ * @param options.verbose - When false, suppress info-level messages (same-namespace updates)
  * @returns Formatted string for CLI output, or empty string if no results
  */
 export function formatCollisionReport(
@@ -267,7 +281,7 @@ export function formatCollisionReport(
 
   if (warnings.length > 0) {
     lines.push('');
-    lines.push('WARNING: The following skills will overwrite non-AIWG content:');
+    lines.push('WARNING: The following skills will overwrite content from a different namespace:');
     for (const r of warnings) {
       lines.push(`  ⚠ ${r.skillName}: ${r.reason}`);
     }
@@ -275,7 +289,7 @@ export function formatCollisionReport(
     lines.push('  Use --force to overwrite, or --skip-conflicts to skip these skills.');
   }
 
-  // Info-level (AIWG updating its own files) only shown in verbose mode
+  // Info-level (same-namespace updates) only shown in verbose mode
   if (verbose && infos.length > 0 && errors.length === 0 && warnings.length === 0) {
     for (const r of infos) {
       lines.push(`  ℹ ${r.skillName}: ${r.reason}`);

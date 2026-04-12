@@ -323,6 +323,40 @@ export const packagesCommand: Extension = {
   } satisfies SkillMetadata,
 };
 
+export const marketplaceCommand: Extension = {
+  id: 'marketplace',
+  type: 'skill',
+  name: 'Marketplace',
+  description: 'Search and manage marketplace packages (search, list)',
+  version: '1.0.0',
+  capabilities: ['cli', 'marketplace', 'search', 'discovery'],
+  keywords: ['marketplace', 'search', 'packages', 'clawhub', 'openclaw', 'discover'],
+  category: 'framework',
+  platforms: {
+    claude: 'full',
+    generic: 'full',
+  },
+  deployment: {
+    pathTemplate: '.{platform}/commands/{id}.md',
+    core: true,
+  },
+  metadata: {
+    type: 'skill',
+    triggerPhrases: [
+      'marketplace search',
+      'search marketplace',
+      'marketplace list',
+      'find packages',
+      'discover skills',
+    ],
+    commandHint: {
+      template: 'utility',
+      argumentHint: '[search|list]',
+      allowedTools: ['Read'],
+    },
+  } satisfies SkillMetadata,
+};
+
 export const initCommand: Extension = {
   id: 'init',
   type: 'skill',
@@ -2170,6 +2204,7 @@ export const commandDefinitions: Extension[] = [
   removeCommand,
   installCommand,
   packagesCommand,
+  marketplaceCommand,
 
   // Project (4)
   newCommand,

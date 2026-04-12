@@ -86,6 +86,7 @@ import { sdlcAccelerateHandler } from './sdlc-accelerate.js';
 import { teamHandler, teamHandlers } from './team.js';
 import { installHandler } from './install.js';
 import { packagesHandler } from './packages.js';
+import { marketplaceHandler } from './marketplace.js';
 import { initHandler } from './init.js';
 import { runHandler } from './run.js';
 import { stewardHandler, stewardHandlers } from './steward.js';
@@ -108,6 +109,7 @@ export {
   removeHandler,
   installHandler,
   packagesHandler,
+  marketplaceHandler,
   initHandler,
   runHandler,
 
@@ -219,6 +221,7 @@ export const allHandlers: CommandHandler[] = [
   removeHandler,
   installHandler,
   packagesHandler,
+  marketplaceHandler,
 
   // Project setup
   newProjectHandler,

@@ -7,6 +7,8 @@
  * @implements #557
  */
 
+import { readFile } from 'fs/promises';
+import { join } from 'path';
 import type {
   PackageRef,
   PackageSource,
@@ -17,6 +19,7 @@ import type {
 import { GitAdapter, detectManifestType } from './adapters/git.js';
 import { GiteaAdapter } from './adapters/gitea.js';
 import { GitHubAdapter } from './adapters/github.js';
+import { ClawHubPackageAdapter } from './adapters/clawhub.js';
 import { LocalCacheAdapter } from './adapters/local-cache.js';
 import {
   setPackageEntry,
@@ -26,9 +29,11 @@ import {
 
 /**
  * All adapters in resolution priority order
- * (Gitea/GitHub before generic Git so shorthands are matched first)
+ * (Scheme-prefixed adapters first so explicit prefixes are matched before
+ *  Gitea/GitHub shorthands and the generic Git fallback)
  */
 const ALL_ADAPTERS: PackageRegistryAdapter[] = [
+  new ClawHubPackageAdapter(),
   new GiteaAdapter(),
   new GitHubAdapter(),
   new GitAdapter(),
@@ -56,6 +61,19 @@ export function parseRef(raw: string): PackageRef {
     const [repoAndOwner, version] = body.split('@');
     const parts = (repoAndOwner ?? '').split('/');
     ref.scheme = 'github';
+    ref.owner = parts[0];
+    ref.name = parts.slice(1).join('/') || undefined;
+    ref.version = version;
+    return ref;
+  }
+
+  // Scheme-prefixed: "clawhub:owner/name[@version]" and "openclaw:owner/name[@version]"
+  if (raw.startsWith('clawhub:') || raw.startsWith('openclaw:')) {
+    const prefix = raw.startsWith('clawhub:') ? 'clawhub:' : 'openclaw:';
+    const body = raw.slice(prefix.length);
+    const [repoAndOwner, version] = body.split('@');
+    const parts = (repoAndOwner ?? '').split('/');
+    ref.scheme = 'clawhub';
     ref.owner = parts[0];
     ref.name = parts.slice(1).join('/') || undefined;
     ref.version = version;
@@ -105,6 +123,64 @@ export async function resolveRef(ref: PackageRef): Promise<{ source: PackageSour
 }
 
 /**
+ * Read the namespace for a cached package.
+ *
+ * Resolution order:
+ * 1. `namespace` field in `manifest.json` (explicit — highest priority)
+ * 2. Owner segment parsed from `registryKey` (e.g. `roko/ring-methodology` → `roko`)
+ *    Also handles scheme-prefixed keys: `clawhub:author/name` → `author`,
+ *    `github:thirdparty/repo` → `thirdparty`.
+ * 3. `"third-party"` — safe fallback when the key cannot be parsed.
+ *
+ * AIWG-owned packages (owner = `aiwg`) return `"aiwg"` which is the default
+ * namespace used by the AIWG deploy pipeline.
+ *
+ * @param cachePath   - Absolute path to the cloned/cached package directory
+ * @param registryKey - The key stored in packages.yaml, e.g. `"owner/name"` or
+ *                      `"github:owner/name"` or `"clawhub:owner/name"`
+ */
+export async function readPackageNamespace(
+  cachePath: string,
+  registryKey: string
+): Promise<string> {
+  // 1. Prefer explicit manifest.json namespace field
+  try {
+    const manifestContent = await readFile(join(cachePath, 'manifest.json'), 'utf-8');
+    const manifest = JSON.parse(manifestContent) as { namespace?: string };
+    if (typeof manifest.namespace === 'string' && manifest.namespace.trim()) {
+      return manifest.namespace.trim();
+    }
+  } catch {
+    // manifest missing or unreadable — fall through to key-based derivation
+  }
+
+  // 2. Derive from registry key owner segment
+  // Strip leading scheme prefix: "github:", "clawhub:", "openclaw:"
+  const schemeMatch = registryKey.match(/^(?:github|clawhub|openclaw):(.+)$/);
+  const keyBody = schemeMatch ? schemeMatch[1]! : registryKey;
+
+  // Handle direct URLs — cannot derive meaningful owner
+  if (
+    keyBody.startsWith('https://') ||
+    keyBody.startsWith('http://') ||
+    keyBody.startsWith('git@') ||
+    keyBody.startsWith('ssh://')
+  ) {
+    return 'third-party';
+  }
+
+  // owner/name format
+  const slashIdx = keyBody.indexOf('/');
+  if (slashIdx > 0) {
+    const owner = keyBody.slice(0, slashIdx).trim();
+    if (owner) return owner;
+  }
+
+  // 3. Fallback
+  return 'third-party';
+}
+
+/**
  * Install a package from a ref string
  *
  * 1. Parse ref
@@ -112,12 +188,12 @@ export async function resolveRef(ref: PackageRef): Promise<{ source: PackageSour
  * 3. Fetch (clone/pull) to local cache
  * 4. Register in ~/.aiwg/packages.yaml
  *
- * Returns the cache path.
+ * Returns the cache path and resolved namespace.
  */
 export async function installPackage(
   rawRef: string,
   options: FetchOptions & { configDir?: string } = {}
-): Promise<{ cachePath: string; key: string; type: string }> {
+): Promise<{ cachePath: string; key: string; type: string; namespace: string }> {
   const ref = parseRef(rawRef);
 
   const resolved = await resolveRef(ref);
@@ -127,6 +203,8 @@ export async function installPackage(
       `Supported formats:\n` +
       `  owner/name              (Gitea shorthand)\n` +
       `  github:owner/name       (GitHub shorthand)\n` +
+      `  clawhub:owner/name      (ClawHub / OpenClaw registry)\n` +
+      `  openclaw:owner/name     (ClawHub / OpenClaw registry alias)\n` +
       `  https://...             (direct Git URL)\n` +
       `  git@host:owner/name.git (SSH URL)`
     );
@@ -145,6 +223,9 @@ export async function installPackage(
 
   const version = ref.version ?? source.ref ?? 'latest';
 
+  // Resolve namespace for artifact deployment isolation (#804)
+  const namespace = await readPackageNamespace(cachePath, rawRef);
+
   // Register in packages.yaml
   await setPackageEntry(key, {
     version,
@@ -155,7 +236,7 @@ export async function installPackage(
     deployedTo: [],
   }, options.configDir);
 
-  return { cachePath, key, type };
+  return { cachePath, key, type, namespace };
 }
 
 /**
