@@ -92,6 +92,27 @@ aiwg index build
 
 Report what changed (new, updated, unchanged counts).
 
+## Archiving Answers
+
+### `--archive-answer` flag
+
+Pass `--archive-answer` to persist the query result as a structured artifact instead of (or in addition to) displaying it in chat:
+
+```
+artifact-lookup "authentication flow" --archive-answer
+artifact-lookup --type use-case --archive-answer --tags auth,security
+```
+
+When this flag is present, after presenting results the skill invokes `archive-answer` with:
+- `title` derived from the query string
+- `content` set to the formatted result summary
+- `source-query` set to the original query expression
+- `tags` forwarded if provided
+
+Without the flag, the skill still offers archival automatically when it detects a substantive result (3+ matching artifacts with meaningful relevance scores, or a dependency tree with 5+ nodes). In that case it asks: "This looks like a useful finding. Archive it? (y/n)"
+
+Archived answers land in `.aiwg/working/answers/` and are picked up by the next `aiwg index build` run.
+
 ## Output Format
 
 Always present results as structured summaries, not raw JSON dumps. Example:

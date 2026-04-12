@@ -1,0 +1,27 @@
+{
+  "name": "Knowledge Base",
+  "path": "agentic/code/frameworks/knowledge-base",
+  "files": [
+    "README.md"
+  ],
+  "directories": [
+    "agents",
+    "skills",
+    "templates",
+    "docs"
+  ],
+  "ignore": [
+    "manifest.json"
+  ],
+  "memory": {
+    "creates": [
+      { "path": ".aiwg/kb/", "description": "All knowledge base artifacts root directory" },
+      { "path": ".aiwg/kb/entities/", "description": "Entity pages: people, tools, companies, places" },
+      { "path": ".aiwg/kb/concepts/", "description": "Concept/idea pages with definitions and examples" },
+      { "path": ".aiwg/kb/sources/", "description": "Source summaries: articles, books, videos, podcasts" },
+      { "path": ".aiwg/kb/comparisons/", "description": "Side-by-side comparison tables" },
+      { "path": ".aiwg/kb/syntheses/", "description": "Cross-cutting synthesis notes" },
+      { "path": ".aiwg/kb/index.md", "description": "Auto-generated index of all KB pages" }
+    ]
+  }
+}

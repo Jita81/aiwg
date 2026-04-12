@@ -32,6 +32,10 @@ aiwg index build --verbose
 
 Report what changed: new artifacts indexed, updated, unchanged, and removed counts.
 
+### Archived Query Answers
+
+The index includes files in `.aiwg/working/answers/` automatically. These are answers persisted by the `archive-answer` skill and appear in query results and dependency graphs alongside permanent artifacts. Their `status: working` frontmatter field signals they are candidates for promotion to a permanent destination (e.g., `.aiwg/architecture/`, `.aiwg/reports/`). Use the index to find stale working answers that should be promoted or discarded.
+
 ### Fallback: Manual Digest Generation
 
 If `aiwg index build` is not available (CLI not installed), fall back to manual scanning:

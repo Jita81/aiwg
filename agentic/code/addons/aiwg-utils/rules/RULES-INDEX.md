@@ -4,7 +4,7 @@ Core meta-utility rules for agent coordination, context management, and platform
 
 ---
 
-## AIWG Utilities Rules (13 rules — active with aiwg-utils addon)
+## AIWG Utilities Rules (14 rules — active with aiwg-utils addon)
 
 ### HIGH
 
@@ -80,6 +80,11 @@ Core meta-utility rules for agent coordination, context management, and platform
 **When to apply**: Agent definition creation, multi-provider deployment, tool selection for agents, parallel agent execution
 **Full rule**: @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/agent-deployment.md
 
+#### activity-log
+**Summary**: Agents must append a single-line entry to `.aiwg/activity.log` after completing any create, update, delete, ingest, deploy, archive, promote, lint, or actioned query operation on AIWG artifacts. Format: `## [YYYY-MM-DD HH:MM] <operation> | <summary>`. Entries are appended only after successful operations; log write failures are non-blocking. Produces a unified cross-framework timeline queryable via `aiwg activity-log`.
+**When to apply**: Any agent that writes, removes, or promotes artifacts in `.aiwg/`; post-deploy steps; lint/validation passes; archive operations
+**Full rule**: @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/activity-log.md
+
 ---
 
 ## Quick Reference by Context
@@ -99,6 +104,7 @@ Core meta-utility rules for agent coordination, context management, and platform
 | **Scope management** | human-authorization, instruction-comprehension, god-session |
 | **Loop/gate conditions** | vague-discretion |
 | **Parallel dispatch design** | parallel-then-synthesize, subagent-scoping, context-budget |
+| **Activity tracking** | activity-log |
 
 ---
 
@@ -106,5 +112,5 @@ Core meta-utility rules for agent coordination, context management, and platform
 
 ---
 
-*Generated from aiwg-utils manifest.json — 14 rules*
+*Generated from aiwg-utils manifest.json — 15 rules*
 *Full rule files: @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/*

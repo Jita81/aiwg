@@ -90,7 +90,8 @@
     "aiwg-regenerate-cursorrules",
     "aiwg-regenerate-windsurfrules",
     "aiwg-regenerate-opencode",
-    "aiwg-regenerate-codex"
+    "aiwg-regenerate-codex",
+    "activity-log"
   ],
   "rules": [
     "no-time-estimates",
@@ -106,7 +107,8 @@
     "subagent-scoping",
     "diagram-generation",
     "native-ux-tools",
-    "vague-discretion"
+    "vague-discretion",
+    "activity-log"
   ],
   "templates": [
     "devkit/addon-manifest",
