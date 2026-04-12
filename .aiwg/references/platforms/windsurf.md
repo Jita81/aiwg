@@ -282,27 +282,51 @@ Primary context file: `.windsurf/rules/aiwg-orchestration.md` with `trigger: alw
 
 ---
 
-## 6. Limitations and Gaps
+## 6. Distribution
 
-### 6.1 No Plugin Marketplace
+### 6.1 No Native Plugin Marketplace
+
+Windsurf has no native plugin marketplace for AI framework packages — there is no equivalent to the VS Code Marketplace for distributing skill/agent bundles. MCP servers are the practical distribution mechanism for individual AI capabilities, but they do not cover agents, rules, or context files.
+
+**`aiwg use` is the distribution adapter for Windsurf.**
+
+```bash
+aiwg use sdlc --provider windsurf
+```
+
+This command deploys the full AIWG framework to the correct Windsurf paths:
+
+- Agents → `AGENTS.md` (aggregated, auto-discovered by Windsurf)
+- Skills → `.windsurf/skills/` (native discovery)
+- Rules → `.windsurf/rules/` (native discovery with trigger frontmatter)
+- Commands → `.windsurf/workflows/` (manual `/workflow-name` invocation)
+- Context → `.windsurf/rules/aiwg-orchestration.md` (always-on trigger)
+
+This provides equivalent capability to a marketplace install — agents, skills, rules, and context files all reach Windsurf through platform-native paths. This is by design, not a missing feature. File-based deployment is the appropriate model for a local-first coding assistant.
+
+---
+
+## 7. Limitations and Gaps
+
+### 7.1 No Plugin Marketplace
 
 No third-party AI framework marketplace exists. MCP servers are the practical distribution mechanism for AI capabilities.
 
-### 6.2 No Native Agent Files
+### 7.2 No Native Agent Files
 
 No `.windsurf/agents/` directory is documented. Agent definitions are exclusively via `AGENTS.md` files at various directory levels.
 
-### 6.3 Memories Not Externally Writable
+### 7.3 Memories Not Externally Writable
 
 No API or documented path for external tools to inject into Windsurf's memory system. Rules files are the recommended alternative.
 
-### 6.4 Workflow Invocation Manual Only
+### 7.4 Workflow Invocation Manual Only
 
 Cascade never auto-invokes workflows — they require explicit `/workflow-name` invocation by the user.
 
 ---
 
-## 7. Related Issues
+## 8. Related Issues
 
 - #505 — MCP sidecar support for Windsurf
 - #547 — Audit per-provider skills vs commands support
@@ -310,7 +334,7 @@ Cascade never auto-invokes workflows — they require explicit `/workflow-name` 
 
 ---
 
-## 8. Changelog Tracking
+## 9. Changelog Tracking
 
 | Windsurf Version | Date | Relevant Feature |
 |-----------------|------|-----------------|

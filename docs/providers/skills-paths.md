@@ -141,6 +141,30 @@ Deploying to `.agents/skills/` is the most portable option if you need a single 
 
 ---
 
+## Distribution Mechanism by Provider
+
+Not all providers have a native plugin marketplace. The table below distinguishes providers with marketplace-based distribution from those that use `aiwg use --provider <name>` as the file-deploy adapter.
+
+| Provider | Distribution Mechanism | Install Command / Marketplace |
+|----------|----------------------|-------------------------------|
+| **Claude Code** | File-deploy adapter | `aiwg use sdlc` |
+| **OpenAI Codex** | File-deploy adapter | `aiwg use sdlc --provider codex` |
+| **GitHub Copilot** | VS Code Marketplace for extensions; file-deploy adapter for agents/skills/rules | `aiwg use sdlc --provider copilot` |
+| **Factory AI** | File-deploy adapter | `aiwg use sdlc --provider factory` |
+| **Cursor** | File-deploy adapter | `aiwg use sdlc --provider cursor` |
+| **OpenCode** | File-deploy adapter | `aiwg use sdlc --provider opencode` |
+| **Warp Terminal** | File-deploy adapter | `aiwg use sdlc --provider warp` |
+| **Windsurf** | File-deploy adapter | `aiwg use sdlc --provider windsurf` |
+| **OpenClaw** | File-deploy adapter | `aiwg use sdlc --provider openclaw` |
+| **Hermes** | File-deploy adapter | `aiwg use sdlc --provider hermes` |
+
+**Marketplace vs. file-deploy distinction:**
+
+- **VS Code Marketplace** (GitHub Copilot): Distributes Copilot *extensions* — GitHub App-based integrations built with the Extensions API. It does not distribute project-local agent/skill/rule file bundles. AIWG uses `aiwg use --provider copilot` for those.
+- **File-deploy adapter** (all other providers): No native plugin marketplace exists for distributing AI framework packages. `aiwg use --provider <name>` writes framework artifacts to the platform's native discovery paths. This provides equivalent capability to a marketplace install and is by design, not a missing feature.
+
+---
+
 ## Capability-Matrix.yaml vs. Ground Truth
 
 | Provider | Matrix `skills:` | Ground-truth primary | Correct? |

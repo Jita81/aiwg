@@ -337,6 +337,35 @@ Requires `FACTORY_API_KEY` as a GitHub repository secret.
 
 ---
 
+## Plugin Packaging
+
+Use `--as-plugin` to produce a `.factory-plugin/` bundle alongside the standard `.factory/` file deployment:
+
+```bash
+aiwg use sdlc --provider factory --as-plugin
+```
+
+This generates `.factory-plugin/plugin.json` — a manifest following Factory AI's native plugin format:
+
+```json
+{
+  "name": "aiwg-sdlc",
+  "version": "2026.4.0",
+  "description": "AIWG SDLC Framework v2026.4.0 — 190 droids, 50 commands, 12 skills, 7 rules. ...",
+  "author": { "name": "AIWG Contributors", "email": "support@aiwg.io" },
+  "contents": { "droids": 190, "commands": 50, "skills": 12, "rules": 7 },
+  "hooks": {
+    "SessionStart": [{ "matcher": "*", "hooks": [{ "type": "command", "command": "aiwg sync --dry-run --quiet" }] }]
+  }
+}
+```
+
+The bundle includes identity fields (`name`, `version`, `description`, `author`, `homepage`, `repository`, `license`), artifact counts derived from the files actually deployed to `.factory/`, and a `SessionStart` hook that runs `aiwg sync --dry-run --quiet` at the start of every session.
+
+**When to use**: Plugin packaging is additive — the standard `.factory/` file deployment happens first and is what Factory loads at runtime. Use `--as-plugin` when you want to distribute or version-pin the full AIWG framework as a self-describing bundle, or when your team's Factory workspace uses a plugin registry rather than individual file deploys.
+
+---
+
 ## Troubleshooting
 
 **Natural language not working?** Run regenerate:

@@ -440,6 +440,30 @@ Copilot supports image input:
 
 ---
 
+## 13. Distribution
+
+### 13.1 No Native Marketplace for Skill/Agent Packages
+
+The VS Code Marketplace handles Copilot **extensions** (GitHub App-based integrations built with the Extensions API), but it does not distribute skill, agent, or rule packages of the kind AIWG deploys. There is no marketplace mechanism for installing a set of `.github/agents/*.agent.md` files or `.github/prompts/*.prompt.md` files into a repository.
+
+**`aiwg use` is the distribution adapter for Copilot.**
+
+```bash
+aiwg use sdlc --provider copilot
+```
+
+This command deploys the full AIWG framework to the correct Copilot paths:
+
+- Agents → `.github/agents/*.agent.md` (native discovery, YAML frontmatter + markdown body)
+- Commands → `.github/prompts/*.prompt.md` (custom slash commands, Ctrl+K invocation)
+- Rules → `.github/instructions/*.instructions.md` (path-scoped with `applyTo` globs)
+- Instructions → `.github/copilot-instructions.md` (repository-wide always-on context)
+- Skills → `.github/skills/` (also visible via `.claude/skills/` cross-scan)
+
+This provides equivalent capability to a Marketplace extension install — agents, prompts, rules, and context instructions all reach Copilot through platform-native paths. This is by design, not a missing feature. The VS Code Marketplace is the right channel for Copilot extensions; file-based deployment is the right channel for project-scoped AIWG framework artifacts.
+
+---
+
 ## Changelog
 
 | Date | Change |

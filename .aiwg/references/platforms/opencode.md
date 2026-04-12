@@ -257,6 +257,30 @@ aiwg ralph "Fix all tests" --completion "npm test passes" --provider opencode
 
 ---
 
+## 11. Distribution
+
+### 11.1 No Native Plugin Marketplace
+
+OpenCode has no native plugin marketplace for AI framework packages. There is no package registry or install command for distributing skill/agent bundles to OpenCode projects.
+
+**`aiwg use` is the distribution adapter for OpenCode.**
+
+```bash
+aiwg use sdlc --provider opencode
+```
+
+This command deploys the full AIWG framework to the correct OpenCode paths:
+
+- Agents → `.opencode/agent/` (native discovery via `{agent,agents}/**/*.md`)
+- Skills → `.opencode/skill/` (native discovery via `{skill,skills}/**/SKILL.md`)
+- Commands → `.opencode/commands/` (native discovery via `{command,commands}/**/*.md`)
+- Rules → `.opencode/rule/` (loaded via `instructions` array in `opencode.json`)
+- Context → `AGENTS.md` (auto-loaded baseline)
+
+This provides equivalent capability to a marketplace install — agents, skills, commands, rules, and context files all reach OpenCode through platform-native paths. This is by design, not a missing feature. File-based deployment aligns with OpenCode's local-first, config-driven architecture.
+
+---
+
 ## References
 
 - Repository: https://github.com/anomalyco/opencode

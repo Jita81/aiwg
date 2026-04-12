@@ -100,7 +100,28 @@ AIWG deploys to `AGENTS.md` for Hermes.
 
 ---
 
-## 6. Changelog
+## 6. Distribution
+
+### 6.1 No Native Plugin Marketplace
+
+Hermes has no native plugin marketplace for AI framework packages. There is no package registry or install command for distributing skill/agent bundles to Hermes installations.
+
+**`aiwg use` is the distribution adapter for Hermes.**
+
+```bash
+aiwg use sdlc --provider hermes
+```
+
+This command deploys the full AIWG framework to the correct Hermes paths:
+
+- Agents → `AGENTS.md` (aggregated project context, auto-loaded)
+- Skills → `~/.hermes/skills/` (native user-global discovery via `rglob("SKILL.md")`)
+
+This provides equivalent capability to a marketplace install — agent personas and skills reach Hermes through platform-native paths. Commands and rules are not supported by Hermes at this time. This is by design, not a missing feature. Hermes's Python-based architecture uses file discovery as the primary extension mechanism.
+
+---
+
+## 7. Changelog
 
 | Date | Change |
 |------|--------|

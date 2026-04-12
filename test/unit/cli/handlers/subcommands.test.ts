@@ -299,7 +299,7 @@ describe("Subcommand Handlers", () => {
       mockContext.args = ["my-plugin"];
       await packagePluginHandler.execute(mockContext);
       expect(mockRun).toHaveBeenCalledWith(
-        "tools/plugin/plugin-packager-cli.mjs",
+        "tools/plugin/package-plugins.mjs",
         ["my-plugin"],
         { cwd: mockContext.cwd },
       );
@@ -309,7 +309,7 @@ describe("Subcommand Handlers", () => {
       mockContext.args = ["plugin1", "plugin2", "--output", "dist"];
       await packagePluginHandler.execute(mockContext);
       expect(mockRun).toHaveBeenCalledWith(
-        "tools/plugin/plugin-packager-cli.mjs",
+        "tools/plugin/package-plugins.mjs",
         ["plugin1", "plugin2", "--output", "dist"],
         { cwd: mockContext.cwd },
       );
@@ -334,7 +334,7 @@ describe("Subcommand Handlers", () => {
       // No args - just --all
       await packageAllPluginsHandler.execute(mockContext);
       expect(mockRun).toHaveBeenCalledWith(
-        "tools/plugin/plugin-packager-cli.mjs",
+        "tools/plugin/package-plugins.mjs",
         ["--all"],
         { cwd: mockContext.cwd },
       );
@@ -344,7 +344,7 @@ describe("Subcommand Handlers", () => {
       mockContext.args = ["--output", "dist"];
       await packageAllPluginsHandler.execute(mockContext);
       expect(mockRun).toHaveBeenCalledWith(
-        "tools/plugin/plugin-packager-cli.mjs",
+        "tools/plugin/package-plugins.mjs",
         ["--all", "--output", "dist"],
         { cwd: mockContext.cwd },
       );

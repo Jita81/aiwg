@@ -326,7 +326,7 @@ export const pluginStatusHandler: CommandHandler = {
 /**
  * Package plugin handler
  *
- * Delegates to tools/plugin/plugin-packager-cli.mjs
+ * Delegates to tools/plugin/package-plugins.mjs
  */
 export const packagePluginHandler: CommandHandler = {
   id: "package-plugin",
@@ -339,7 +339,7 @@ export const packagePluginHandler: CommandHandler = {
     const frameworkRoot = await getFrameworkRoot();
     const runner = createScriptRunner(frameworkRoot);
 
-    return runner.run("tools/plugin/plugin-packager-cli.mjs", ctx.args, {
+    return runner.run("tools/plugin/package-plugins.mjs", ctx.args, {
       cwd: ctx.cwd,
     });
   },
@@ -348,7 +348,7 @@ export const packagePluginHandler: CommandHandler = {
 /**
  * Package all plugins handler
  *
- * Delegates to tools/plugin/plugin-packager-cli.mjs with --all flag
+ * Delegates to tools/plugin/package-plugins.mjs with --all flag
  */
 export const packageAllPluginsHandler: CommandHandler = {
   id: "package-all-plugins",
@@ -361,7 +361,7 @@ export const packageAllPluginsHandler: CommandHandler = {
     const frameworkRoot = await getFrameworkRoot();
     const runner = createScriptRunner(frameworkRoot);
 
-    return runner.run("tools/plugin/plugin-packager-cli.mjs", ["--all", ...ctx.args], {
+    return runner.run("tools/plugin/package-plugins.mjs", ["--all", ...ctx.args], {
       cwd: ctx.cwd,
     });
   },

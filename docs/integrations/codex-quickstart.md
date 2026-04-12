@@ -352,7 +352,17 @@ Marketplace file format:
 
 #### AIWG as a Codex plugin
 
-> **Future work:** AIWG skills and MCP server configuration can be packaged as a Codex plugin for one-step installation. See the tracking issue for status on `aiwg package-plugin codex` support.
+AIWG can be deployed as a Codex plugin bundle, generating a `.codex-plugin/plugin.json` manifest and a repo marketplace entry:
+
+```bash
+# Deploy and generate plugin bundle in one step
+aiwg use sdlc --provider codex --as-plugin
+
+# Or package the plugin bundle separately
+node tools/plugin/package-plugins.mjs --plugin codex-sdlc
+```
+
+The bundle is written to `plugins/sdlc/` and a marketplace entry is created at `.agents/plugins/marketplace.json` so your team can install it via the Codex `/plugins` panel without any external registry.
 
 #### Local plugin development workflow
 

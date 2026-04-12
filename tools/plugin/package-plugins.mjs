@@ -253,6 +253,37 @@ Core AIWG utilities for context regeneration and workspace management.
 `
   },
 
+  'codex-sdlc': {
+    name: 'codex-sdlc',
+    displayName: 'AIWG SDLC for Codex',
+    pluginType: 'codex',
+    description: 'Complete SDLC framework packaged as a Codex plugin with skills, agents, and marketplace entry.',
+    sources: {
+      skills: 'agentic/code/frameworks/sdlc-complete/skills'
+    },
+    readme: `# AIWG SDLC for Codex
+
+AIWG SDLC framework packaged as a Codex plugin.
+
+## Installation
+
+\`\`\`bash
+# Generate the plugin bundle
+aiwg use sdlc --provider codex --as-plugin
+
+# Or package directly
+node tools/plugin/package-plugins.mjs --plugin codex-sdlc
+\`\`\`
+
+Then install in Codex via the \`/plugins\` command or the repo marketplace.
+
+## Documentation
+
+- Full guide: https://docs.aiwg.io/sdlc
+- Discord: https://discord.gg/BuAusFMxdA
+`
+  },
+
   'hooks': {
     name: 'hooks',
     displayName: 'AIWG Hooks',
@@ -451,6 +482,38 @@ function packagePlugin(name, config, options) {
   console.log(`  ✅ ${config.displayName} packaged successfully`);
 }
 
+// Package a Codex-format plugin (generates .codex-plugin/plugin.json + marketplace.json)
+async function packageCodexPlugin(name, config, options) {
+  console.log(`\n📦 Packaging ${config.displayName} (Codex plugin format)...`);
+
+  const { generatePluginBundle } = await import(
+    path.join(ROOT_DIR, 'tools/agents/providers/codex.mjs')
+  );
+
+  generatePluginBundle(PLUGINS_DIR, {
+    dryRun: options.dryRun,
+    srcRoot: ROOT_DIR
+  });
+
+  // Copy sources into the plugin directory for self-containment
+  const pluginDir = path.join(PLUGINS_DIR, name);
+  for (const [type, srcPath] of Object.entries(config.sources || {})) {
+    const destPath = path.join(pluginDir, type);
+    console.log(`  📁 Copying ${type}...`);
+    const count = copyDir(srcPath, destPath, options.dryRun);
+    console.log(`     ${count} files`);
+  }
+
+  // Write README
+  if (config.readme && !options.dryRun) {
+    const readmePath = path.join(pluginDir, 'README.md');
+    fs.writeFileSync(readmePath, config.readme);
+    console.log('  📄 Created README.md');
+  }
+
+  console.log(`  ✅ ${config.displayName} packaged successfully`);
+}
+
 // Main function
 async function main() {
   const options = parseArgs();
@@ -471,7 +534,11 @@ async function main() {
 
   if (options.all) {
     for (const [name, config] of Object.entries(PLUGIN_CONFIGS)) {
-      packagePlugin(name, config, options);
+      if (config.pluginType === 'codex') {
+        await packageCodexPlugin(name, config, options);
+      } else {
+        packagePlugin(name, config, options);
+      }
     }
   } else if (options.plugin) {
     const config = PLUGIN_CONFIGS[options.plugin];
@@ -480,7 +547,11 @@ async function main() {
       console.log(`Available plugins: ${Object.keys(PLUGIN_CONFIGS).join(', ')}`);
       process.exit(1);
     }
-    packagePlugin(options.plugin, config, options);
+    if (config.pluginType === 'codex') {
+      await packageCodexPlugin(options.plugin, config, options);
+    } else {
+      packagePlugin(options.plugin, config, options);
+    }
   }
 
   console.log('\n✨ Done!');

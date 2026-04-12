@@ -469,35 +469,57 @@ Notebooks are "runnable documentation" — a mix of Markdown text, code blocks, 
 
 ---
 
-## 12. Limitations and Gaps
+## 12. Distribution
 
-### 12.1 No File-Based Agent Profiles
+### 12.1 No Native Plugin Marketplace
+
+Warp has no native plugin marketplace for AI framework packages. Warp Drive provides team sharing for individual objects (workflows, prompts, notebooks), but it does not support distributing complete skill/agent bundles as installable packages.
+
+**`aiwg use` is the distribution adapter for Warp.**
+
+```bash
+aiwg use sdlc --provider warp
+```
+
+This command deploys the full AIWG framework to the correct Warp paths:
+
+- Agents → `WARP.md` (aggregated, auto-discovered as project rules)
+- Skills → `.warp/skills/` (native discovery, SKILL.md format)
+- Context → `WARP.md` (always-on rules baseline)
+
+This provides equivalent capability to a marketplace install — agent personas, skills, and project context all reach Warp through platform-native paths. This is by design, not a missing feature. File-based deployment via version-controlled project files is the appropriate distribution model for Warp.
+
+---
+
+## 13. Limitations and Gaps
+
+### 13.1 No File-Based Agent Profiles
 
 Agent profiles are UI-only (Settings panel). No documented path for distributing agent profile configurations via project files.
 
-### 12.2 Skills Not Shareable via Warp Drive
+### 13.2 Skills Not Shareable via Warp Drive
 
 Skills and agent definitions are not listed as Warp Drive shareable objects. Team distribution requires version-controlling `.warp/skills/` or `.agents/skills/` in the repository.
 
-### 12.3 MCP Config Not File-Based
+### 13.3 MCP Config Not File-Based
 
 Warp does not document a user-editable `~/.warp/mcp.json`. MCP servers are configured via UI or `/add-mcp`. There is no known path for programmatically deploying MCP config like Windsurf's `~/.codeium/windsurf/mcp_config.json`.
 
-### 12.4 Context Window Unknown
+### 13.4 Context Window Unknown
 
 Warp does not publish context window sizes for any model. Actual limits depend on the selected underlying model.
 
-### 12.5 SSH/WSL Limitation
+### 13.5 SSH/WSL Limitation
 
 Codebase Context (semantic code indexing) does not work in SSH or WSL sessions.
 
-### 12.6 No Native `.warp/rules/` Directory
+### 13.6 No Native `.warp/rules/` Directory
 
 Unlike Windsurf's per-file rule system with trigger modes, Warp uses a single-file rules approach (WARP.md/AGENTS.md). No glob-triggered or manually-triggered rules. All rules are always-on.
 
 ---
 
-## 13. Related Issues
+## 14. Related Issues
 
 - #547 — Audit per-provider skills vs commands support
 - Warp skills correction needed in `platform-resolver.ts`
@@ -505,7 +527,7 @@ Unlike Windsurf's per-file rule system with trigger modes, Warp uses a single-fi
 
 ---
 
-## 14. Changelog Tracking
+## 15. Changelog Tracking
 
 | Date Researched | Relevant Feature |
 |----------------|-----------------|

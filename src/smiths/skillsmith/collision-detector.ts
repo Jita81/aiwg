@@ -171,7 +171,7 @@ async function skillContentUnchanged(sourceDir: string, deployedDir: string): Pr
  *          are returned (clean deployments are omitted).
  */
 export async function checkCollisions(options: CollisionCheckOptions): Promise<CollisionResult[]> {
-  const { platform, projectPath, skillNames, skillsBaseDir, sourceSkillsDir } = options;
+  const { platform, projectPath, skillNames, skillsBaseDir, sourceSkillsDir, namespace = 'aiwg' } = options;
 
   const platformBuiltins = new Set(PLATFORM_BUILTINS[platform] ?? []);
   const results: CollisionResult[] = [];

@@ -311,6 +311,92 @@ export function createAgentsMd(target, srcRoot, dryRun) {
 }
 
 // ============================================================================
+// Plugin Bundle Generator
+// ============================================================================
+
+/**
+ * Generate a Codex plugin bundle for AIWG SDLC.
+ *
+ * Creates:
+ *   <targetDir>/plugins/sdlc/.codex-plugin/plugin.json  — Codex plugin manifest
+ *   <targetDir>/.agents/plugins/marketplace.json        — Repo marketplace entry
+ *
+ * @param {string} targetDir - Root directory where bundle is written
+ * @param {{ dryRun?: boolean, srcRoot?: string, version?: string }} opts
+ */
+export function generatePluginBundle(targetDir, opts = {}) {
+  const { dryRun = false, srcRoot = process.cwd(), version: overrideVersion } = opts;
+
+  // Resolve version: opts.version > package.json > 'unknown'
+  let version = overrideVersion;
+  if (!version) {
+    try {
+      const pkgPath = path.join(srcRoot, 'package.json');
+      const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+      // Strip pre-release suffix so it stays CalVer-compliant
+      version = (pkg.version || 'unknown').replace(/-.*$/, '');
+    } catch {
+      version = 'unknown';
+    }
+  }
+
+  // ---- plugin.json --------------------------------------------------------
+  const pluginManifest = {
+    name: 'aiwg-sdlc',
+    version,
+    description:
+      'Complete Software Development Lifecycle framework with 180+ specialized agents for requirements, architecture, security, testing, and deployment.',
+    author: 'AIWG',
+    homepage: 'https://aiwg.io',
+    repository: 'https://github.com/jmagly/aiwg',
+    license: 'MIT',
+    skills: './skills/',
+    keywords: ['sdlc', 'aiwg', 'agents', 'architecture', 'security', 'testing', 'deployment']
+  };
+
+  const pluginJsonDir = path.join(targetDir, 'plugins', 'sdlc', '.codex-plugin');
+  const pluginJsonPath = path.join(pluginJsonDir, 'plugin.json');
+
+  if (dryRun) {
+    console.log(`[dry-run] would write ${pluginJsonPath}`);
+  } else {
+    fs.mkdirSync(pluginJsonDir, { recursive: true });
+    fs.writeFileSync(pluginJsonPath, JSON.stringify(pluginManifest, null, 2) + '\n', 'utf8');
+  }
+
+  // ---- marketplace.json ---------------------------------------------------
+  const marketplace = {
+    name: 'aiwg-local',
+    interface: {
+      displayName: 'AIWG Plugins'
+    },
+    plugins: [
+      {
+        name: 'aiwg-sdlc',
+        source: {
+          path: './plugins/sdlc',
+          source: 'local'
+        },
+        policy: {
+          installation: 'AVAILABLE'
+        },
+        category: 'Development'
+      }
+    ]
+  };
+
+  const marketplaceDir = path.join(targetDir, '.agents', 'plugins');
+  const marketplacePath = path.join(marketplaceDir, 'marketplace.json');
+
+  if (dryRun) {
+    console.log(`[dry-run] would write ${marketplacePath}`);
+  } else {
+    fs.mkdirSync(marketplaceDir, { recursive: true });
+    fs.writeFileSync(marketplacePath, JSON.stringify(marketplace, null, 2) + '\n', 'utf8');
+  }
+}
+
+// ============================================================================
 // Post-Deployment
 // ============================================================================
 
@@ -350,6 +436,7 @@ export async function deploy(opts) {
     rulesOnly,
     dryRun,
     asAgentsMd,
+    asPlugin,
     createAgentsMd: shouldCreateAgentsMd
   } = opts;
 
@@ -437,6 +524,12 @@ export async function deploy(opts) {
   // Post-deployment
   await postDeploy(target, { ...opts, createAgentsMd: shouldCreateAgentsMd });
 
+  // Plugin bundle (opt-in via --as-plugin)
+  if (asPlugin) {
+    console.log('\nGenerating Codex plugin bundle...');
+    generatePluginBundle(target, { dryRun, srcRoot });
+  }
+
   console.log('\n=== Codex deployment complete ===\n');
 }
 
@@ -461,5 +554,6 @@ export default {
   createAgentsMd,
   postDeploy,
   getFileExtension,
+  generatePluginBundle,
   deploy
 };
