@@ -38,13 +38,20 @@ When invoked, perform automated paper acquisition:
    - Calculate PDF checksum (SHA-256)
    - Set initial GRADE baseline from source type
 
-5. **Create Finding Document**
+5. **Extract Full Text** (default, unless `--no-extract-text`)
+   - Extract full text from PDF to `.aiwg/research/sources/text/REF-XXX.txt`
+   - This text is the primary input for downstream analysis — analysis agents
+     must read this file, not just metadata or abstract
+   - If extraction fails (scanned PDF, encrypted): log warning, set
+     `full_text_available: false` in frontmatter
+
+6. **Create Finding Document**
    - Generate `.aiwg/research/findings/REF-XXX-[slug].md` from template
    - Populate frontmatter with extracted metadata
    - Add placeholder sections for key findings
    - Update fixity manifest
 
-6. **Post-Acquisition**
+7. **Post-Acquisition**
    - Log acquisition in `.aiwg/research/acquisition-log.yaml`
    - Update corpus index
    - Suggest next steps (quality assessment, documentation)
@@ -54,7 +61,7 @@ When invoked, perform automated paper acquisition:
 - `[identifier]` - DOI, arXiv ID, or URL (required)
 - `--output [path]` - Custom output location (default: auto-generate)
 - `--ref-id [REF-XXX]` - Specific REF-XXX identifier (default: auto-assign)
-- `--extract-text` - Extract full text to `.txt` file for analysis
+- `--extract-text` - Extract full text to `.txt` file for analysis (default: enabled; use `--no-extract-text` to skip)
 - `--no-metadata` - Skip metadata enrichment
 - `--force` - Re-download even if paper exists
 

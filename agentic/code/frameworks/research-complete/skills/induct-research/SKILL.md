@@ -84,31 +84,62 @@ Found 9 sources to induct:
 
 ---
 
-### Phase 2: Per-Source Analysis
+### Phase 2: Source Acquisition (acquire before analyze)
 
-For each source, run a focused analysis agent:
+**CRITICAL**: Never write analysis docs from metadata or abstracts alone. The pipeline is:
+**acquire full content → read full content → write analysis doc.**
+
+This was learned from a session where 88 of 120 papers were inducted as shallow stubs
+written from arXiv abstract pages — not the actual papers. See #817.
+
+For each source, ensure full content is available before analysis:
+
+**For PDFs / full papers**:
+1. **Acquire the PDF** — call `/research-acquire <url> --extract-text` to download the PDF
+   to `sources/pdfs/full/` and extract full text to `sources/text/`
+2. **Verify acquisition** — confirm the PDF exists at the expected path and is non-empty
+3. **If PDF unavailable** (paywall, dead link): mark as `acquisition-failed` in frontmatter,
+   file a stub with `status: pending-acquisition`, and skip to next source.
+   Do NOT write a full analysis doc from the abstract alone.
+
+**For URIs (web sources)**:
+1. **Fetch the full page** (WebFetch) — save to `sources/web/<slug>.html`
+2. **Classify**: paper, blog post, official docs, repo README, specification, news
+3. **If paper**: call `/research-acquire` to get the actual PDF — do not analyze from
+   the landing page HTML
+4. **If non-paper web source**: the fetched HTML/text is the full content — proceed to analysis
 
 **For Markdown stubs** (from issue-planner queue files):
 - Read the stub content and relevance summary
-- Assess induction priority from context
-- Assign topic tags from content keywords
-
-**For PDFs / full papers**:
-- Extract title, authors, year, abstract
-- Identify key claims and methodologies
-- Assess relevance to existing corpus (check `.aiwg/research/` for related REF-XXX files)
-- Assign GRADE quality level (A–D) based on source type and peer-review status
-
-**For URIs**:
-- Fetch content (WebFetch)
-- Classify: paper, blog post, official docs, repo README, specification, news
-- Extract key points and assess credibility
-- Determine if full acquisition is needed (call `/research-acquire` if paper)
+- If the stub references a paper URL: acquire the PDF first (same as above)
+- If the stub is a research brief with no external source: proceed as-is
 
 **For issue references**:
 - Read full issue body and comments
 - Extract referenced URLs, files, or topics
-- Treat as a research brief stub
+- If URLs point to papers: acquire PDFs before analysis
+- If no external sources: treat as a research brief stub
+
+### Phase 2.5: Per-Source Analysis (on full content)
+
+Only after full content is acquired, run analysis:
+
+**For PDFs / full papers** (with full text available):
+- Read the **full extracted text**, not just the abstract
+- Extract title, authors, year, abstract, methodology, key findings, limitations
+- Identify key claims with specific evidence (quotes, figures, tables)
+- Assess relevance to existing corpus (check `.aiwg/research/` for related REF-XXX files)
+- Assign GRADE quality level (A–D) based on source type and peer-review status
+- Target: analysis docs should be 150-300 lines with substantive content from the paper
+
+**For web sources** (with full content saved):
+- Read the full saved page content
+- Extract key points, methodology if applicable, credibility indicators
+- Assess relevance and quality
+
+**Quality gate**: If the resulting analysis doc is under 80 lines, flag it as a potential
+stub. Either the source content wasn't fully read or the analysis was superficial.
+Consider re-running with explicit instructions to read the full text.
 
 ---
 
@@ -303,10 +334,16 @@ induct-research <target>
     │   ├── File/directory: glob + read
     │   ├── URI: WebFetch + classify
     │   └── Issue ref: mcp__gitea__issue_read or gh CLI
-    ├── Phase 2: Per-source analysis (parallel agents)
-    │   ├── PDF/paper agent → extract + GRADE
-    │   ├── URI agent → classify + credibility
-    │   └── Stub agent → parse relevance summary
+    ├── Phase 2: Source acquisition (acquire before analyze)
+    │   ├── PDF/paper → /research-acquire --extract-text
+    │   ├── URI → WebFetch full page → /research-acquire if paper
+    │   ├── Stub with URL → acquire referenced source
+    │   └── Skip analysis if acquisition fails (mark pending-acquisition)
+    ├── Phase 2.5: Per-source analysis (on full content only)
+    │   ├── PDF agent → read full text, extract claims + GRADE
+    │   ├── Web agent → read full saved page, assess credibility
+    │   ├── Stub agent → parse relevance summary
+    │   └── Quality gate: flag docs under 80 lines as potential stubs
     ├── Phase 3: Induction task filing
     │   ├── File path → write .md task files
     │   ├── Gitea URI/MCP → mcp__gitea__issue_write
