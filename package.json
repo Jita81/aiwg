@@ -225,8 +225,6 @@
     "zod": "^3.25.0"
   },
   "optionalDependencies": {
-    "@xenova/transformers": "^2.17.0",
-    "hnswlib-node": "^3.0.0",
     "node-pty": "^1.0.0"
   },
   "devDependencies": {
@@ -235,6 +233,7 @@
     "@types/semver": "^7.7.1",
     "@vitest/coverage-v8": "^2.1.0",
     "@vitest/ui": "^2.1.0",
+    "@xenova/transformers": "^2.17.2",
     "@xterm/headless": "^6.0.0",
     "better-sqlite3": "^12.8.0",
     "cli-table3": "^0.6.5",
@@ -243,6 +242,7 @@
     "graphology-shortest-path": "^2.1.0",
     "graphology-traversal": "^0.3.0",
     "graphology-types": "^0.24.0",
+    "hnswlib-node": "^3.0.0",
     "simple-statistics": "^7.8.8",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
