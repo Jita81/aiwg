@@ -286,57 +286,66 @@ export class RuntimeDiscovery {
   // Private methods
 
   /**
-   * Discover all tools
+   * Discover tools using allowlist-only approach.
+   *
+   * SAFETY: Only probes tools from the knownTools database plus a curated
+   * discovery list. Never enumerates or blindly executes arbitrary PATH
+   * executables — doing so can crash privileged system tools (BPF, saned),
+   * trigger rogue network connections (input-leapc), or overwhelm
+   * apport/systemd with crash reports.
+   *
+   * @see https://git.integrolabs.net/roctinam/aiwg/issues/820
    * @private
    */
   async #discoverTools() {
-    const pathDirs = this.#getPathDirectories();
-    const candidates = new Map();
-
-    // Scan each directory
-    for (const dir of pathDirs) {
-      if (!existsSync(dir)) continue;
-
-      try {
-        const files = execSync(`ls "${dir}"`, { encoding: 'utf-8' })
-          .trim()
-          .split('\n')
-          .filter(f => f);
-
-        for (const file of files) {
-          const fullPath = join(dir, file);
-
-          // Check if executable
-          try {
-            await access(fullPath, constants.X_OK);
-
-            // Skip if already found in higher priority directory
-            if (!candidates.has(file)) {
-              candidates.set(file, fullPath);
-            }
-          } catch {
-            // Not executable, skip
-          }
-        }
-      } catch (error) {
-        // Directory scan failed, skip
-      }
-    }
+    // Curated list: knownTools database + common dev tools safe to probe
+    const safeToProbe = new Set([
+      // From knownTools database
+      ...Object.keys(this.knownTools),
+      // Aliases from knownTools
+      ...Object.values(this.knownTools).flatMap(t => t.aliases || []),
+      // Additional safe dev tools not yet in knownTools
+      'npm', 'npx', 'pnpm', 'yarn', 'bun', 'deno',
+      'pip', 'pip3', 'pipx', 'uv',
+      'ruby', 'gem', 'go', 'cargo', 'rustc', 'rustup',
+      'java', 'javac', 'mvn', 'gradle',
+      'make', 'cmake', 'gcc', 'g++', 'clang',
+      'bash', 'zsh', 'fish', 'sh',
+      'grep', 'sed', 'awk', 'find', 'xargs',
+      'tar', 'gzip', 'unzip', 'zip',
+      'ssh', 'scp', 'rsync',
+      'wget', 'httpie',
+      'vim', 'nvim', 'nano', 'code',
+      'tmux', 'screen',
+      'ag', 'fd', 'fzf', 'bat', 'exa', 'eza', 'delta',
+      'terraform', 'kubectl', 'helm', 'podman',
+      'sqlite3', 'psql', 'mysql', 'mongosh', 'redis-cli',
+      'gh', 'git-lfs', 'hub', 'lab',
+      'aws', 'az', 'gcloud',
+      'ffmpeg', 'ffprobe', 'convert', 'magick',
+      'pandoc', 'latex', 'pdflatex',
+      'yq', 'fx', 'miller',
+      'htop', 'ncdu', 'dust', 'procs', 'tokei',
+    ]);
 
     const available = [];
     const unavailable = [];
 
-    // Check each candidate
-    for (const [name, path] of candidates.entries()) {
+    for (const name of safeToProbe) {
+      const toolPath = await this.#findToolPath(name);
+      if (!toolPath) {
+        // Not installed — skip silently (not an error)
+        continue;
+      }
+
       try {
-        const version = await this.#detectToolVersion(name, path);
-        const tool = await this.#categorizeTool(name, path, version);
+        const version = await this.#detectToolVersion(name, toolPath);
+        const tool = await this.#categorizeTool(name, toolPath, version);
 
         if (tool) {
           available.push(tool);
         }
       } catch (error) {
-        // Tool check failed, mark unavailable
         unavailable.push({
           id: name,
           reason: 'broken',
@@ -346,26 +355,6 @@ export class RuntimeDiscovery {
     }
 
     return { available, unavailable };
-  }
-
-  /**
-   * Get PATH directories
-   * @private
-   */
-  #getPathDirectories() {
-    const pathEnv = process.env.PATH || '';
-    const dirs = pathEnv.split(platform() === 'win32' ? ';' : ':');
-
-    // Add common additional paths
-    const additional = [
-      '/usr/local/bin',
-      '/usr/bin',
-      '/bin',
-      join(homedir(), '.local/bin'),
-      join(homedir(), 'bin')
-    ];
-
-    return [...new Set([...dirs, ...additional])].filter(d => d);
   }
 
   /**
@@ -385,14 +374,27 @@ export class RuntimeDiscovery {
   }
 
   /**
-   * Detect tool version
+   * Detect tool version using safe command variants only.
+   *
+   * SAFETY: Only uses flag-style arguments (--version, -v, -V).
+   * Never uses bare positional `version` — many tools interpret
+   * positional args as filenames, hostnames, or operational parameters,
+   * causing crashes, rogue connections, or kernel tracepoint attachment.
+   *
+   * Uses a 3-second timeout with SIGKILL to prevent tools that spawn
+   * persistent background work from outliving the probe.
+   *
+   * @see https://git.integrolabs.net/roctinam/aiwg/issues/820
    * @private
    */
   async #detectToolVersion(toolName, toolPath) {
+    // Only flag-style version args — safe for well-behaved tools.
+    // Bare `version` (positional) is intentionally excluded: it caused
+    // BPF tools to attach tracepoints, input-leapc to connect to
+    // hostname "version", and cs2cs to open a file named "version".
     const versionCommands = [
       `${toolPath} --version`,
       `${toolPath} -v`,
-      `${toolPath} version`,
       `${toolPath} -V`
     ];
 
@@ -400,7 +402,8 @@ export class RuntimeDiscovery {
       try {
         const output = execSync(cmd, {
           encoding: 'utf-8',
-          timeout: 5000,
+          timeout: 3000,
+          killSignal: 'SIGKILL',
           stdio: ['ignore', 'pipe', 'pipe']
         }).trim();
 
