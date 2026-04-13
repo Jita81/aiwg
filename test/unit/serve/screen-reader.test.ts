@@ -8,7 +8,22 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { ScreenReader } from '../../../src/serve/screen-reader.js';
+import { createRequire } from 'module';
+
+// @xterm/headless is an optional dependency — skip all tests when unavailable
+let available = false;
+try {
+  const _require = createRequire(import.meta.url);
+  _require('@xterm/headless');
+  available = true;
+} catch {
+  // @xterm/headless not installed — tests will skip
+}
+
+// Dynamic import to avoid hard crash when the optional dep is missing
+const { ScreenReader } = available
+  ? await import('../../../src/serve/screen-reader.js')
+  : { ScreenReader: null as any };
 
 // ============================================================
 // Helpers
@@ -23,8 +38,8 @@ function tick(): Promise<void> {
 // ScreenReader
 // ============================================================
 
-describe('ScreenReader', () => {
-  let reader: ScreenReader;
+describe.skipIf(!available)('ScreenReader', () => {
+  let reader: InstanceType<typeof ScreenReader>;
 
   beforeEach(() => {
     reader = new ScreenReader({ rows: 24, cols: 80 });
