@@ -7,30 +7,17 @@
  * All dependencies (PtySession, PtyLike, LLMAssessor) are mocked — no real
  * xterm terminal or PTY process is required.
  *
- * Requires @xterm/headless (optional dependency). Tests skip when unavailable.
+ * Requires @xterm/headless (devDependency).
  *
  * @issue #756
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createRequire } from 'module';
-
-// @xterm/headless is an optional dependency — skip all tests when unavailable
-let available = false;
-try {
-  const _require = createRequire(import.meta.url);
-  _require('@xterm/headless');
-  available = true;
-} catch {
-  // @xterm/headless not installed — tests will skip
-}
-
-// Dynamic imports to avoid hard crash when the optional dep is missing
-const adapterMod = available
-  ? await import('../../../src/serve/orchestrator-adapter.js')
-  : { createScreenReaderFromSession: null as any, createSessionAdapter: null as any, attachOrchestrator: null as any };
-const { createScreenReaderFromSession, createSessionAdapter, attachOrchestrator } = adapterMod;
-
+import {
+  createScreenReaderFromSession,
+  createSessionAdapter,
+  attachOrchestrator,
+} from '../../../src/serve/orchestrator-adapter.js';
 import type { PtySession, PtyLike } from '../../../src/serve/pty-bridge.js';
 import type { OrchestratorContext, LLMAssessor } from '../../../src/serve/orchestrator-pty.js';
 
@@ -102,7 +89,7 @@ function makeContext(overrides: Partial<OrchestratorContext> = {}): Orchestrator
 // createScreenReaderFromSession
 // ============================================================
 
-describe.skipIf(!available)('createScreenReaderFromSession', () => {
+describe('createScreenReaderFromSession', () => {
   it('returns a ScreenReader instance', () => {
     const session = makeMockSession('', null);
     const reader = createScreenReaderFromSession(session);
@@ -170,7 +157,7 @@ describe.skipIf(!available)('createScreenReaderFromSession', () => {
 // createSessionAdapter
 // ============================================================
 
-describe.skipIf(!available)('createSessionAdapter', () => {
+describe('createSessionAdapter', () => {
   it('returns an object with write() and signal() methods', () => {
     const pty = makeMockPty();
     const session = makeMockSession('', pty);
@@ -223,7 +210,7 @@ describe.skipIf(!available)('createSessionAdapter', () => {
 // attachOrchestrator
 // ============================================================
 
-describe.skipIf(!available)('attachOrchestrator', () => {
+describe('attachOrchestrator', () => {
   it('returns orchestrator, screenReader, and detach function', () => {
     const pty = makeMockPty();
     const session = makeMockSession('', pty);
@@ -341,7 +328,7 @@ describe.skipIf(!available)('attachOrchestrator', () => {
 // Null PTY handling (cross-cutting)
 // ============================================================
 
-describe.skipIf(!available)('null PTY handling', () => {
+describe('null PTY handling', () => {
   it('createSessionAdapter.write() throws when pty is null', async () => {
     const session = makeMockSession('', null);
     const adapter = createSessionAdapter(session);

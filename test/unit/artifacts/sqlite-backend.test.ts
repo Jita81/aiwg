@@ -8,25 +8,13 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import type { GraphBackend } from '../../../src/artifacts/graph-backend.js';
 import type { DependencyGraph } from '../../../src/artifacts/types.js';
+import { SqliteGraphBackend } from '../../../src/artifacts/backends/sqlite-backend.js';
 
-let SqliteGraphBackend: (new (dbPath?: string) => GraphBackend & { close(): void }) | null = null;
-let available = false;
-
-try {
-  const mod = await import('../../../src/artifacts/backends/sqlite-backend.js');
-  SqliteGraphBackend = mod.SqliteGraphBackend as unknown as typeof SqliteGraphBackend;
-  // Verify better-sqlite3 is loadable
-  require('better-sqlite3');
-  available = true;
-} catch {
-  // better-sqlite3 not installed — tests will skip
-}
-
-describe.skipIf(!available)('SqliteGraphBackend', () => {
+describe('SqliteGraphBackend', () => {
   let g: GraphBackend & { close(): void };
 
   beforeEach(() => {
-    g = new SqliteGraphBackend!(':memory:');
+    g = new SqliteGraphBackend(':memory:');
   });
 
   afterEach(() => {

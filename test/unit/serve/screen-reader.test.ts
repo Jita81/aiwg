@@ -4,26 +4,13 @@
  * Tests for the PTY screen-reader that parses raw PTY byte streams
  * into structured, LLM-readable screen state.
  *
+ * Requires @xterm/headless (devDependency).
+ *
  * @issue #754
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { createRequire } from 'module';
-
-// @xterm/headless is an optional dependency — skip all tests when unavailable
-let available = false;
-try {
-  const _require = createRequire(import.meta.url);
-  _require('@xterm/headless');
-  available = true;
-} catch {
-  // @xterm/headless not installed — tests will skip
-}
-
-// Dynamic import to avoid hard crash when the optional dep is missing
-const { ScreenReader } = available
-  ? await import('../../../src/serve/screen-reader.js')
-  : { ScreenReader: null as any };
+import { ScreenReader } from '../../../src/serve/screen-reader.js';
 
 // ============================================================
 // Helpers
@@ -38,8 +25,8 @@ function tick(): Promise<void> {
 // ScreenReader
 // ============================================================
 
-describe.skipIf(!available)('ScreenReader', () => {
-  let reader: InstanceType<typeof ScreenReader>;
+describe('ScreenReader', () => {
+  let reader: ScreenReader;
 
   beforeEach(() => {
     reader = new ScreenReader({ rows: 24, cols: 80 });

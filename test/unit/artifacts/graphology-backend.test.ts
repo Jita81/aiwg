@@ -8,25 +8,13 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import type { GraphBackend } from '../../../src/artifacts/graph-backend.js';
 import type { DependencyGraph } from '../../../src/artifacts/types.js';
+import { GraphologyBackend } from '../../../src/artifacts/backends/graphology-backend.js';
 
-let GraphologyBackend: { create(): Promise<GraphBackend> } | null = null;
-let available = false;
-
-try {
-  const mod = await import('../../../src/artifacts/backends/graphology-backend.js');
-  GraphologyBackend = mod.GraphologyBackend;
-  // Verify graphology itself is importable
-  await import('graphology');
-  available = true;
-} catch {
-  // graphology not installed — tests will skip
-}
-
-describe.skipIf(!available)('GraphologyBackend', () => {
+describe('GraphologyBackend', () => {
   let g: GraphBackend;
 
   beforeEach(async () => {
-    g = await GraphologyBackend!.create();
+    g = await GraphologyBackend.create();
   });
 
   describe('addNode / hasNode', () => {
