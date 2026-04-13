@@ -18,6 +18,7 @@ import type { MetadataEntry, ArtifactIndex, TagIndex, DependencyGraph, GraphType
 import { INDEX_VERSION, INDEX_DIR, PHASE_DIRECTORIES, GRAPH_CONFIGS, loadUserGraphConfigs } from './types.js';
 import { parseCitationSidecar, citationResultToEdges, buildRefToPathMap } from './citation-parser.js';
 import { writeIndexFile, resolveIndexDir, loadGraphIndexFile } from './index-reader.js';
+import { loadManifest, writeManifest, statMatches, makeEntry, type ChecksumManifest, type ManifestStats } from './checksum-manifest.js';
 
 export interface BuildOptions {
   force?: boolean;
@@ -314,6 +315,20 @@ export async function buildIndex(
   const existingIndex = force ? null : loadGraphIndexFile<ArtifactIndex>(effectiveOutputCwd, 'metadata.json', graph);
   const existingEntries = existingIndex?.entries ?? {};
 
+  // Load checksum manifest for fast stat-based change detection (#794).
+  // When --force is set we skip the manifest entirely and rebuild everything.
+  const manifest: ChecksumManifest = force
+    ? { version: 1, generated: '', entries: {} }
+    : loadManifest(indexOutputDir);
+  const nextManifestEntries: Record<string, import('./checksum-manifest.js').ManifestEntry> = {};
+  const manifestStats: ManifestStats = {
+    checked: 0,
+    statSkipped: 0,
+    checksumSkipped: 0,
+    reindexed: 0,
+    pruned: 0,
+  };
+
   // Collect files from all scan directories
   const files: string[] = [];
   for (const dir of existingDirs) {
@@ -335,8 +350,14 @@ export async function buildIndex(
     let entry: MetadataEntry;
 
     if (useFilenameMetadata) {
-      // Filename-metadata strategy: derive metadata from filename, skip content read
+      // Filename-metadata strategy: derive metadata from filename, skip content read.
+      // The checksum manifest doesn't help here (no content read to skip) but we still
+      // preserve any existing manifest entry so cross-graph builds don't drop it.
       const checksum = createHash('sha256').update(path.basename(fullPath)).digest('hex').slice(0, 16);
+      const existingManifestEntry = manifest.entries[relativePath];
+      if (existingManifestEntry) {
+        nextManifestEntries[relativePath] = existingManifestEntry;
+      }
 
       // Skip unchanged files in incremental mode
       if (!force && existingEntries[relativePath]?.checksum === checksum) {
@@ -349,18 +370,41 @@ export async function buildIndex(
       entry = buildFilenameMetadataEntry(relativePath, fullPath, graphConfig?.filenamePattern);
     } else {
       // Default strategy: read content, parse frontmatter
-      const content = fs.readFileSync(fullPath, 'utf-8');
-      const checksum = computeChecksum(content);
+      manifestStats.checked++;
 
-      // Skip unchanged files in incremental mode
-      if (!force && existingEntries[relativePath]?.checksum === checksum) {
+      // Phase 1: stat-based quick filter — skip content read if mtime+size match manifest.
+      // This is the fast path: unchanged files don't touch the filesystem beyond fs.statSync.
+      const stat = fs.statSync(fullPath);
+      const manifestEntry = manifest.entries[relativePath];
+
+      if (!force && statMatches(stat, manifestEntry) && existingEntries[relativePath]?.checksum === manifestEntry?.checksum) {
+        // Stat matches manifest AND the stored index entry references the same checksum.
+        // Safe to reuse both without reading the file.
         entries[relativePath] = existingEntries[relativePath];
+        nextManifestEntries[relativePath] = manifestEntry!;
         unchangedCount++;
-        if (verbose) console.log(`  unchanged: ${relativePath}`);
+        manifestStats.statSkipped++;
+        if (verbose) console.log(`  unchanged (stat): ${relativePath}`);
         continue;
       }
 
-      const stat = fs.statSync(fullPath);
+      // Phase 2: content read + checksum verification for files that looked changed.
+      const content = fs.readFileSync(fullPath, 'utf-8');
+      const checksum = computeChecksum(content);
+
+      // Skip unchanged files in incremental mode (checksum matched despite stat drift)
+      if (!force && existingEntries[relativePath]?.checksum === checksum) {
+        entries[relativePath] = existingEntries[relativePath];
+        // Update manifest with current stat so Phase 1 succeeds next time.
+        nextManifestEntries[relativePath] = makeEntry(checksum, stat);
+        unchangedCount++;
+        manifestStats.checksumSkipped++;
+        if (verbose) console.log(`  unchanged (checksum): ${relativePath}`);
+        continue;
+      }
+
+      manifestStats.reindexed++;
+      nextManifestEntries[relativePath] = makeEntry(checksum, stat);
       const { data, body } = parseFrontmatter(content);
       const title = extractTitle(data, body);
       const phase = typeof data.phase === 'string' ? data.phase : inferPhase(relativePath);
@@ -514,6 +558,19 @@ export async function buildIndex(
   writeIndexFile(effectiveOutputCwd, 'tags.json', tagIndex, indexOutputDir);
   writeIndexFile(effectiveOutputCwd, 'dependencies.json', depGraph, indexOutputDir);
 
+  // Update and persist the checksum manifest for faster future builds (#794).
+  // The next manifest contains entries for every file we processed this build.
+  // Files that disappeared from disk are pruned; the resulting manifest is
+  // written atomically.
+  const nextManifest: ChecksumManifest = {
+    version: 1,
+    generated: new Date().toISOString(),
+    entries: nextManifestEntries,
+  };
+  manifestStats.pruned = Object.keys(manifest.entries).length - Object.keys(nextManifestEntries).length;
+  if (manifestStats.pruned < 0) manifestStats.pruned = 0;
+  writeManifest(indexOutputDir, nextManifest);
+
   // Write stats
   const totalEdges = Object.values(depGraph).reduce(
     (sum, node) => sum + node.downstream.length, 0
@@ -557,6 +614,16 @@ export async function buildIndex(
   console.log(`Artifact index built in ${buildTimeMs}ms`);
   console.log(`  Indexed ${newCount} new, updated ${updatedCount}, unchanged ${unchangedCount}`);
   console.log(`  Total: ${total} artifacts`);
+  // Report manifest-driven change detection stats (only meaningful when !force
+  // and we actually went through the content-read path for at least one file)
+  if (!force && manifestStats.checked > 0) {
+    const fastPath = manifestStats.statSkipped;
+    const slowPath = manifestStats.checked - manifestStats.statSkipped;
+    console.log(`  Change detection: ${manifestStats.checked} checked, ${fastPath} skipped via stat, ${slowPath} content-read, ${manifestStats.reindexed} re-indexed`);
+    if (manifestStats.pruned > 0) {
+      console.log(`  Pruned ${manifestStats.pruned} stale manifest entries (files no longer on disk)`);
+    }
+  }
   const displayDir = graph ? `${INDEX_DIR}/${graph}/` : `${INDEX_DIR}/`;
   console.log(`  Output: ${displayDir}`);
 }

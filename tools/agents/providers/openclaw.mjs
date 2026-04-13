@@ -385,6 +385,80 @@ export async function deploy(opts) {
 }
 
 // ============================================================================
+// Plugin Bundle Generation (OpenClaw / ClawHub)
+// ============================================================================
+
+/**
+ * Generate a `clawhub.json` manifest for the ClawHub registry.
+ *
+ * ClawHub is OpenClaw's central package registry. AIWG generates the manifest
+ * alongside file deployment; publishing to ClawHub is a separate workflow
+ * (not yet implemented — publish via ClawHub CLI manually for now).
+ *
+ * @param {string} targetDir - Where to write clawhub.json
+ * @param {{ dryRun?: boolean, srcRoot?: string, name?: string, version?: string, description?: string, tags?: string[] }} opts
+ */
+export function generatePluginBundle(targetDir, opts = {}) {
+  const {
+    dryRun = false,
+    srcRoot = process.cwd(),
+    name: pluginName = 'aiwg-plugin',
+    version: overrideVersion,
+    description = 'AIWG plugin for OpenClaw',
+    tags = ['aiwg', 'multi-agent'],
+  } = opts;
+
+  // Resolve version
+  let version = overrideVersion;
+  if (!version) {
+    try {
+      const pkgPath = path.join(srcRoot, 'package.json');
+      if (fs.existsSync(pkgPath)) {
+        const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
+        version = pkg.version || 'unknown';
+      } else {
+        version = 'unknown';
+      }
+    } catch {
+      version = 'unknown';
+    }
+  }
+
+  const manifest = {
+    name: pluginName,
+    version,
+    description,
+    author: 'AIWG Contributors',
+    license: 'MIT',
+    homepage: 'https://aiwg.io',
+    repository: 'https://github.com/jmagly/aiwg',
+    tags,
+    contents: {
+      agents: '~/.openclaw/agents/',
+      commands: '~/.openclaw/commands/',
+      skills: '~/.openclaw/skills/',
+      rules: '~/.openclaw/rules/',
+      behaviors: '~/.openclaw/behaviors/',
+    },
+  };
+
+  const manifestPath = path.join(targetDir, 'clawhub.json');
+
+  if (dryRun) {
+    console.log(`[dry-run] Would create ${manifestPath}`);
+    return { manifestPath, manifest };
+  }
+
+  if (!fs.existsSync(targetDir)) {
+    fs.mkdirSync(targetDir, { recursive: true });
+  }
+  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n', 'utf-8');
+
+  console.log(`Generated OpenClaw ClawHub manifest: ${manifestPath}`);
+  return { manifestPath, manifest };
+}
+
+// ============================================================================
 // Default Export
 // ============================================================================
 
@@ -398,5 +472,6 @@ export default {
   transformCommand,
   mapModel,
   getFileExtension,
+  generatePluginBundle,
   deploy,
 };

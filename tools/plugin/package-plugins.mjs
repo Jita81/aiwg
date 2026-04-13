@@ -346,6 +346,9 @@ function parseArgs() {
       case '-p':
         options.plugin = args[++i];
         break;
+      case '--provider':
+        options.provider = args[++i];
+        break;
       case '--clean':
       case '-c':
         options.clean = true;
@@ -363,16 +366,21 @@ Usage:
   node tools/plugin/package-plugins.mjs [options]
 
 Options:
-  --all, -a          Package all plugins
-  --plugin, -p NAME  Package specific plugin
-  --clean, -c        Clean plugins directory before packaging
-  --dry-run, -n      Show what would be copied without copying
-  --help, -h         Show this help message
+  --all, -a             Package all plugins
+  --plugin, -p NAME     Package specific plugin
+  --provider NAME       Package for a specific provider
+                        (claude, codex, cursor, factory, openclaw, all)
+                        Default: claude
+  --clean, -c           Clean plugins directory before packaging
+  --dry-run, -n         Show what would be done without writing
+  --help, -h            Show this help message
 
 Examples:
   node tools/plugin/package-plugins.mjs --all
-  node tools/plugin/package-plugins.mjs --plugin aiwg-sdlc
-  node tools/plugin/package-plugins.mjs --all --clean
+  node tools/plugin/package-plugins.mjs --plugin sdlc
+  node tools/plugin/package-plugins.mjs --all --provider codex
+  node tools/plugin/package-plugins.mjs --plugin sdlc --provider cursor
+  node tools/plugin/package-plugins.mjs --all --provider all --clean
 `);
         process.exit(0);
     }
@@ -514,6 +522,85 @@ async function packageCodexPlugin(name, config, options) {
   console.log(`  ✅ ${config.displayName} packaged successfully`);
 }
 
+// Package a plugin for a generic provider that exposes generatePluginBundle().
+// Used for cursor, factory, openclaw. The provider's generator writes the
+// manifest (e.g. .cursor-plugin/plugin.json, .factory-plugin/plugin.json,
+// clawhub.json) and this function copies the framework sources alongside.
+async function packageProviderPlugin(name, config, options, provider) {
+  console.log(`\n📦 Packaging ${config.displayName} (${provider} plugin format)...`);
+
+  const providerModule = await import(
+    path.join(ROOT_DIR, `tools/agents/providers/${provider}.mjs`)
+  );
+
+  if (typeof providerModule.generatePluginBundle !== 'function') {
+    throw new Error(`Provider '${provider}' does not export generatePluginBundle()`);
+  }
+
+  const pluginDir = path.join(PLUGINS_DIR, name);
+
+  providerModule.generatePluginBundle(pluginDir, {
+    dryRun: options.dryRun,
+    srcRoot: ROOT_DIR,
+    name: `aiwg-${name}`,
+    description: config.description,
+  });
+
+  // Copy sources into the plugin directory
+  for (const [type, srcPath] of Object.entries(config.sources || {})) {
+    const destPath = path.join(pluginDir, type);
+    console.log(`  📁 Copying ${type}...`);
+    const count = copyDir(srcPath, destPath, options.dryRun);
+    console.log(`     ${count} files`);
+  }
+
+  // Write README
+  if (config.readme && !options.dryRun) {
+    const readmePath = path.join(pluginDir, 'README.md');
+    fs.writeFileSync(readmePath, config.readme);
+    console.log('  📄 Created README.md');
+  }
+
+  console.log(`  ✅ ${config.displayName} packaged successfully (${provider})`);
+}
+
+// Write a root Codex marketplace.json that aggregates all plugins with
+// Codex pluginType. This is the project-level manifest Codex looks for
+// when it opens the project.
+function writeCodexMarketplaceManifest(options) {
+  const codexPlugins = Object.entries(PLUGIN_CONFIGS)
+    .filter(([, config]) => config.pluginType === 'codex' || config.supportsCodex !== false)
+    .map(([pluginName, config]) => ({
+      name: pluginName,
+      source: { source: 'local', path: `./plugins/${pluginName}` },
+      policy: {
+        installation: 'AVAILABLE',
+        authentication: 'ON_INSTALL',
+      },
+      category: config.category || 'Productivity',
+      description: config.description,
+    }));
+
+  const manifest = {
+    name: 'aiwg',
+    interface: { displayName: 'AIWG Framework' },
+    plugins: codexPlugins,
+  };
+
+  const manifestDir = path.join(ROOT_DIR, '.agents', 'plugins');
+  const manifestPath = path.join(manifestDir, 'marketplace.json');
+
+  if (options.dryRun) {
+    console.log(`\n[dry-run] Would write Codex marketplace: ${manifestPath}`);
+    console.log(`  ${codexPlugins.length} plugins`);
+    return;
+  }
+
+  fs.mkdirSync(manifestDir, { recursive: true });
+  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n', 'utf-8');
+  console.log(`\n✓ Wrote Codex project marketplace: ${manifestPath} (${codexPlugins.length} plugins)`);
+}
+
 // Main function
 async function main() {
   const options = parseArgs();
@@ -532,32 +619,68 @@ async function main() {
     console.log('   Mode: DRY RUN (no files will be changed)');
   }
 
-  if (options.all) {
-    for (const [name, config] of Object.entries(PLUGIN_CONFIGS)) {
-      if (config.pluginType === 'codex') {
+  // Resolve provider selection
+  const PROVIDER_PLUGIN_FORMATS = ['claude', 'codex', 'cursor', 'factory', 'openclaw'];
+  const requestedProvider = options.provider || 'claude';
+  let providersToRun;
+
+  if (requestedProvider === 'all') {
+    providersToRun = PROVIDER_PLUGIN_FORMATS;
+  } else if (PROVIDER_PLUGIN_FORMATS.includes(requestedProvider)) {
+    providersToRun = [requestedProvider];
+  } else {
+    console.error(`Unknown provider: ${requestedProvider}`);
+    console.log(`Available providers: ${PROVIDER_PLUGIN_FORMATS.join(', ')}, all`);
+    process.exit(1);
+  }
+
+  console.log(`   Providers: ${providersToRun.join(', ')}`);
+
+  // Determine which plugins to package
+  const pluginsToPackage = options.plugin
+    ? [[options.plugin, PLUGIN_CONFIGS[options.plugin]]].filter(([, c]) => c)
+    : Object.entries(PLUGIN_CONFIGS);
+
+  if (options.plugin && !PLUGIN_CONFIGS[options.plugin]) {
+    console.error(`Unknown plugin: ${options.plugin}`);
+    console.log(`Available plugins: ${Object.keys(PLUGIN_CONFIGS).join(', ')}`);
+    process.exit(1);
+  }
+
+  // Package for each (provider, plugin) combination
+  for (const provider of providersToRun) {
+    for (const [name, config] of pluginsToPackage) {
+      // Respect the legacy pluginType flag when selecting defaults:
+      // if pluginType is set and provider is 'claude' (default), skip this
+      // plugin for claude and route it to its declared pluginType instead.
+      const effectiveProvider =
+        provider === 'claude' && config.pluginType ? config.pluginType : provider;
+
+      if (effectiveProvider === 'claude') {
+        packagePlugin(name, config, options);
+      } else if (effectiveProvider === 'codex') {
         await packageCodexPlugin(name, config, options);
       } else {
-        packagePlugin(name, config, options);
+        // cursor, factory, openclaw — generic provider plugin bundle
+        await packageProviderPlugin(name, config, options, effectiveProvider);
       }
     }
-  } else if (options.plugin) {
-    const config = PLUGIN_CONFIGS[options.plugin];
-    if (!config) {
-      console.error(`Unknown plugin: ${options.plugin}`);
-      console.log(`Available plugins: ${Object.keys(PLUGIN_CONFIGS).join(', ')}`);
-      process.exit(1);
-    }
-    if (config.pluginType === 'codex') {
-      await packageCodexPlugin(options.plugin, config, options);
-    } else {
-      packagePlugin(options.plugin, config, options);
+
+    // After packaging for Codex, also write the root marketplace.json
+    if (provider === 'codex' || (provider === 'claude' && pluginsToPackage.some(([, c]) => c.pluginType === 'codex'))) {
+      writeCodexMarketplaceManifest(options);
     }
   }
 
   console.log('\n✨ Done!');
   console.log('\nTo test locally:');
-  console.log('  /plugin marketplace add ./plugins');
+  console.log('  /plugin marketplace add ./plugins         # Claude Code');
   console.log('  /plugin install sdlc@aiwg');
+  console.log('\nFor other providers:');
+  console.log('  aiwg use sdlc --provider codex            # Codex (reads .agents/plugins/marketplace.json)');
+  console.log('  aiwg use sdlc --provider cursor           # Cursor (manual install from .cursor-plugin/)');
+  console.log('  aiwg use sdlc --provider factory          # Factory (git-URL install from .factory-plugin/)');
+  console.log('  aiwg use sdlc --provider openclaw         # OpenClaw (ClawHub publish pending)');
 }
 
 main().catch(console.error);

@@ -408,6 +408,84 @@ export async function deploy(opts) {
 // Default Export
 // ============================================================================
 
+// ============================================================================
+// Plugin Bundle Generation (Cursor)
+// ============================================================================
+
+/**
+ * Generate a `.cursor-plugin/plugin.json` manifest for distributing AIWG as a
+ * Cursor plugin. Cursor's cursor.com/marketplace is centralized and partner-
+ * oriented; this manifest enables manual/local installation and future
+ * submission if the marketplace opens third-party submissions.
+ *
+ * Layout produced:
+ *   <targetDir>/.cursor-plugin/plugin.json  — the plugin manifest
+ *
+ * @param {string} targetDir - Plugin bundle root (typically plugins/<name>/)
+ * @param {{ dryRun?: boolean, srcRoot?: string, name?: string, version?: string, description?: string, contents?: object }} opts
+ */
+export function generatePluginBundle(targetDir, opts = {}) {
+  const {
+    dryRun = false,
+    srcRoot = process.cwd(),
+    name: pluginName = 'aiwg-plugin',
+    version: overrideVersion,
+    description = 'AIWG plugin for Cursor',
+    contents = {
+      agents: 'agents/',
+      commands: 'commands/',
+      skills: 'skills/',
+      rules: 'rules/',
+    },
+  } = opts;
+
+  // Resolve version: opts.version > package.json > 'unknown'
+  let version = overrideVersion;
+  if (!version) {
+    try {
+      const pkgPath = path.join(srcRoot, 'package.json');
+      if (fs.existsSync(pkgPath)) {
+        const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
+        version = pkg.version || 'unknown';
+      } else {
+        version = 'unknown';
+      }
+    } catch {
+      version = 'unknown';
+    }
+  }
+
+  const pluginDir = path.join(targetDir, '.cursor-plugin');
+  const manifest = {
+    name: pluginName,
+    version,
+    displayName: pluginName.replace(/^aiwg-/, 'AIWG ').replace(/-/g, ' '),
+    description,
+    publisher: 'aiwg',
+    homepage: 'https://aiwg.io',
+    repository: 'https://github.com/jmagly/aiwg',
+    license: 'MIT',
+    contents,
+  };
+
+  if (dryRun) {
+    console.log(`[dry-run] Would create ${pluginDir}/plugin.json`);
+    return { pluginDir, manifest };
+  }
+
+  if (!fs.existsSync(pluginDir)) {
+    fs.mkdirSync(pluginDir, { recursive: true });
+  }
+  fs.writeFileSync(
+    path.join(pluginDir, 'plugin.json'),
+    JSON.stringify(manifest, null, 2) + '\n',
+    'utf-8'
+  );
+
+  console.log(`Generated Cursor plugin manifest: ${pluginDir}/plugin.json`);
+  return { pluginDir, manifest };
+}
+
 export default {
   name,
   aliases,
@@ -424,5 +502,6 @@ export default {
   createAgentsMd,
   postDeploy,
   getFileExtension,
+  generatePluginBundle,
   deploy
 };

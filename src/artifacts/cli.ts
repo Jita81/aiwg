@@ -65,6 +65,10 @@ export async function main(args: string[]): Promise<void> {
       await handleSetQuery(subcommandArgs);
       break;
 
+    case 'watch':
+      await handleWatch(subcommandArgs);
+      break;
+
     case undefined:
       console.error('Error: Index subcommand required');
       console.log('');
@@ -75,6 +79,7 @@ export async function main(args: string[]): Promise<void> {
       console.log('  stats      Show index statistics');
       console.log('  neighbors  Get neighbors of a node in a graph');
       console.log('  set        Set operations (intersection, union, difference) on neighbor sets');
+      console.log('  watch      Start a filesystem watcher for automatic incremental index updates');
       console.log('');
       console.log('Options:');
       console.log('  --graph <name>  Target a specific graph (framework, project, codebase, or user-defined)');
@@ -96,8 +101,97 @@ export async function main(args: string[]): Promise<void> {
 
     default:
       console.error(`Error: Unknown index subcommand '${subcommand}'`);
-      console.log('Available: build, query, deps, stats, neighbors, set');
+      console.log('Available: build, query, deps, stats, neighbors, set, watch');
       process.exit(1);
+  }
+}
+
+/**
+ * Handle 'index watch' command — filesystem watcher daemon for auto-index updates.
+ *
+ * Modes:
+ *   aiwg index watch            — start watcher (foreground)
+ *   aiwg index watch --stop     — stop a running watcher
+ *   aiwg index watch --status   — check watcher status
+ *
+ * @implements #795
+ */
+async function handleWatch(args: string[]): Promise<void> {
+  if (args.includes('--help') || args.includes('-h')) {
+    console.log('Usage: aiwg index watch [options]');
+    console.log('');
+    console.log('Start a filesystem watcher that triggers incremental index rebuilds');
+    console.log('when .aiwg/ files change. Uses the checksum manifest (#794) for fast');
+    console.log('change detection.');
+    console.log('');
+    console.log('Options:');
+    console.log('  --stop            Stop a running watcher for this project');
+    console.log('  --status          Show whether a watcher is running');
+    console.log('  --debounce <ms>   Debounce window for batched updates (default: 500)');
+    console.log('  --graph <name>    Graph to rebuild (default: project)');
+    console.log('  --verbose         Log every detected change');
+    console.log('');
+    console.log('Examples:');
+    console.log('  aiwg index watch');
+    console.log('  aiwg index watch --verbose --debounce 1000');
+    console.log('  aiwg index watch --stop');
+    console.log('  aiwg index watch --status');
+    return;
+  }
+
+  const cwd = process.cwd();
+  const { startWatcher, stopWatcher, getRunningPid } = await import('./watcher.js');
+
+  // --status: check if a watcher is running
+  if (args.includes('--status')) {
+    const pid = getRunningPid(cwd);
+    if (pid) {
+      console.log(`Watcher running: PID ${pid}`);
+    } else {
+      console.log('No watcher running for this project');
+    }
+    return;
+  }
+
+  // --stop: terminate a running watcher
+  if (args.includes('--stop')) {
+    const stopped = stopWatcher(cwd);
+    if (stopped) {
+      console.log('Watcher stopped');
+    } else {
+      console.log('No watcher running for this project');
+    }
+    return;
+  }
+
+  // --debounce <ms>
+  let debounceMs = 500;
+  const debounceIdx = args.indexOf('--debounce');
+  if (debounceIdx !== -1 && debounceIdx + 1 < args.length) {
+    const parsed = parseInt(args[debounceIdx + 1], 10);
+    if (Number.isFinite(parsed) && parsed > 0) {
+      debounceMs = parsed;
+    }
+  }
+
+  // --graph <name>
+  const graph = parseGraphFlag(args);
+
+  const verbose = args.includes('--verbose');
+
+  try {
+    startWatcher({
+      cwd,
+      debounceMs,
+      verbose,
+      graph,
+    });
+    // startWatcher registers SIGINT/SIGTERM handlers; block the main thread
+    // until one of them fires. setInterval keeps Node alive indefinitely.
+    setInterval(() => { /* keep-alive */ }, 1 << 30);
+  } catch (err) {
+    console.error(`Error: ${err instanceof Error ? err.message : String(err)}`);
+    process.exit(1);
   }
 }
 
