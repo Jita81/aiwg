@@ -11,6 +11,18 @@ commandHint:
 
 Display comprehensive health check and statistics for the research corpus.
 
+## Scope Boundary
+
+`corpus-health` / `research-status` is **structural** — it checks whether the corpus is well-formed:
+- Are files present where expected? (orphans, missing artifacts)
+- Is frontmatter complete and valid? (schema violations)
+- Are references intact? (broken links, missing provenance)
+- Is the data well-organized? (checksums, naming, metadata)
+
+For **intellectual** gap analysis — what topics lack coverage, what claims lack evidence, what contradictions are unresolved — use `research-gap` instead.
+
+For **declarative rule checking** (automated, CI-ready), use `research-lint` which runs the `research` lint ruleset.
+
 ## Instructions
 
 When invoked, analyze corpus health:

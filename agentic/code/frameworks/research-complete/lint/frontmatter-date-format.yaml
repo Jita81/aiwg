@@ -1,0 +1,13 @@
+id: research/frontmatter-date-format
+name: Date format compliance
+description: Dates in frontmatter should follow ISO 8601 (YYYY-MM-DD)
+severity: warn
+applies-to:
+  glob: findings/REF-*.md
+checks:
+  - type: frontmatter-format
+    field: documented_date
+    pattern: "^\\d{4}-\\d{2}-\\d{2}$"
+  - type: frontmatter-format
+    field: access_date
+    pattern: "^\\d{4}-\\d{2}-\\d{2}$"

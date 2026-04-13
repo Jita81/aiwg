@@ -11,6 +11,18 @@ commandHint:
 
 Analyze research corpus coverage gaps and suggest literature to fill them.
 
+## Scope Boundary
+
+`research-gap` is **intellectual** — it analyzes what the corpus is missing in terms of knowledge:
+- What topics lack adequate coverage?
+- What claims lack supporting evidence?
+- What contradictions are unresolved?
+- What time periods, source types, or methodologies are underrepresented?
+
+For **structural** health checks — orphan files, broken references, missing frontmatter, schema violations — use `corpus-health` / `research-status` instead.
+
+For **declarative rule checking** (automated, CI-ready), use `research-lint` which runs the `research` lint ruleset.
+
 ## Instructions
 
 When invoked, perform systematic gap analysis:

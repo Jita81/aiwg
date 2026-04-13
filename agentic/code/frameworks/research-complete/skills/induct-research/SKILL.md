@@ -164,6 +164,47 @@ For each analyzed source, file one induction task using the standard template.
 
 ---
 
+### Phase 3.5: Cross-Reference Fan-Out
+
+After creating each new literature note, update the broader corpus with bidirectional cross-references. This is what makes a corpus **compound** rather than just accumulate.
+
+For each newly inducted source:
+
+1. **Search existing findings** for topically related REF-XXX notes:
+   - Match by shared tags
+   - Match by overlapping key claims or methodologies
+   - Match by citation overlap (both cite the same sources)
+
+2. **Add "Related Sources" cross-references**:
+   - In the **new note**: add a `## Related Sources` section listing existing REF-XXX notes and how they relate (confirms, contradicts, extends, prerequisite)
+   - In **existing notes**: append the new REF-XXX to their `## Related Sources` section with relationship type
+
+3. **Flag contradictions or confirmations**:
+   - If the new source contradicts an existing finding, add a `contradiction` marker to both notes
+   - If it confirms an existing finding, add a `confirms` marker
+
+4. **Update synthesis documents** in `.aiwg/research/synthesis/`:
+   - If a relevant synthesis document exists, append a note that new evidence is available
+
+**Example cross-reference entry:**
+
+```markdown
+## Related Sources
+
+- **REF-034** — Confirms: both identify prompt injection as the primary attack vector for LLM agents
+- **REF-042** — Extends: this source adds quantitative benchmarks missing from REF-042's qualitative analysis
+- **REF-067** — Contradicts: claims agent sandboxing overhead is <5%, while REF-067 measured 15-20%
+```
+
+**Batch optimization**: When inducting multiple sources in a batch, defer cross-referencing until all new notes are created, then run a single fan-out pass across all new + existing notes. This avoids redundant searches.
+
+**Skip conditions**: Skip cross-referencing when:
+- `--dry-run` is set
+- Source is filed as a stub (not yet fully documented)
+- Fewer than 3 existing REF-XXX notes in the corpus (too early for meaningful cross-refs)
+
+---
+
 ### Phase 4: Summary Report
 
 ```
@@ -271,6 +312,11 @@ induct-research <target>
     │   ├── Gitea URI/MCP → mcp__gitea__issue_write
     │   ├── GitHub URI → gh issue create
     │   └── Codehound MCP → register in search index
+    ├── Phase 3.5: Cross-reference fan-out
+    │   ├── Search existing findings by tags + claims
+    │   ├── Add bidirectional Related Sources sections
+    │   ├── Flag contradictions / confirmations
+    │   └── Update synthesis documents
     └── Phase 4: Summary report
 ```
 

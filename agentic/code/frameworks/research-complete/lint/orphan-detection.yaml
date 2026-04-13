@@ -1,0 +1,9 @@
+id: research/orphan-detection
+name: Orphan note detection
+description: REF notes with zero inbound references from other notes or synthesis documents
+severity: info
+applies-to:
+  glob: findings/REF-*.md
+checks:
+  - type: cross-ref-bidirectional
+    referencePattern: "REF-\\d{3}"

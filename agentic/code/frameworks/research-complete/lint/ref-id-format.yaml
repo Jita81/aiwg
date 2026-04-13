@@ -1,0 +1,9 @@
+id: research/ref-id-format
+name: REF identifier format
+description: REF identifiers follow REF-NNN naming convention (3-digit zero-padded)
+severity: warn
+applies-to:
+  glob: findings/REF-*.md
+checks:
+  - type: id-format
+    pattern: "^REF-\\d{3}$"

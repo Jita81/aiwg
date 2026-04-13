@@ -10,7 +10,8 @@
   "entry": {
     "agents": "agents",
     "skills": "skills",
-    "templates": "templates"
+    "templates": "templates",
+    "lint": "lint"
   },
   "workspace": {
     "subdirs": [

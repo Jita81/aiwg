@@ -1,0 +1,5 @@
+id: research
+name: Research Corpus Lint Rules
+description: Validate research corpus structure, references, quality metadata, and cross-referential integrity
+framework: research-complete
+version: 1.0.0

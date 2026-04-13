@@ -1,0 +1,15 @@
+id: research/ref-frontmatter
+name: REF frontmatter completeness
+description: All REF-XXX notes must have required frontmatter fields
+severity: error
+applies-to:
+  glob: findings/REF-*.md
+checks:
+  - type: frontmatter-required
+    fields: [title, authors, year, publication_type, tags, status]
+  - type: frontmatter-format
+    field: status
+    pattern: "^(pending|acquired|documented|quality-assessed|integrated)$"
+  - type: frontmatter-format
+    field: publication_type
+    pattern: "^(academic-paper|blog-post|documentation|book-chapter|preprint|technical-report)$"

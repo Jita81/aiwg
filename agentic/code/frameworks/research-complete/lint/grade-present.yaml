@@ -1,0 +1,12 @@
+id: research/grade-present
+name: GRADE assessment present
+description: Every research source should have a GRADE quality assessment in frontmatter
+severity: warn
+applies-to:
+  glob: findings/REF-*.md
+checks:
+  - type: frontmatter-required
+    fields: [grade_rating]
+  - type: frontmatter-format
+    field: grade_rating
+    pattern: "^(High|Moderate|Low|Very Low|high|moderate|low|very-low)$"

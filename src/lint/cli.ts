@@ -1,0 +1,154 @@
+/**
+ * Lint CLI Entry Point
+ *
+ * Parses CLI arguments and dispatches to the lint runner.
+ *
+ * Usage:
+ *   aiwg lint .aiwg/research/
+ *   aiwg lint .aiwg/research/ --ruleset research
+ *   aiwg lint --list-rulesets
+ *   aiwg lint --list-rules research
+ *   aiwg lint .aiwg/ --format json --ci --fail-on warn
+ *
+ * @issue #810
+ */
+
+import path from 'path';
+import { discoverRulesets } from './loader.js';
+import { autoDetectRulesets, runLint } from './runner.js';
+import { formatResult, formatRulesetList, formatRuleList } from './reporters.js';
+import type { LintOptions, LintOutputFormat, LintSeverity } from './types.js';
+
+/**
+ * Parse CLI arguments into LintOptions
+ */
+function parseArgs(args: string[]): LintOptions {
+  const options: LintOptions = {
+    target: '',
+    recursive: true,
+    format: 'full',
+    ci: false,
+    failOn: 'error',
+    dryRun: false,
+    listRulesets: false,
+  };
+
+  let i = 0;
+  while (i < args.length) {
+    const arg = args[i];
+
+    if (arg === '--list-rulesets') {
+      options.listRulesets = true;
+    } else if (arg === '--list-rules' && i + 1 < args.length) {
+      options.listRules = args[++i];
+    } else if (arg === '--ruleset' && i + 1 < args.length) {
+      options.rulesets = args[++i].split(',').map(s => s.trim());
+    } else if (arg === '--format' && i + 1 < args.length) {
+      options.format = args[++i] as LintOutputFormat;
+    } else if (arg === '--ci') {
+      options.ci = true;
+    } else if (arg === '--fail-on' && i + 1 < args.length) {
+      options.failOn = args[++i] as LintSeverity;
+    } else if (arg === '--dry-run') {
+      options.dryRun = true;
+    } else if (arg === '--recursive' || arg === '-r') {
+      options.recursive = true;
+    } else if (arg === '--no-recursive') {
+      options.recursive = false;
+    } else if (!arg.startsWith('-') && !options.target) {
+      options.target = arg;
+    }
+
+    i++;
+  }
+
+  return options;
+}
+
+/**
+ * Main lint CLI entry point
+ */
+export async function main(args: string[]): Promise<void> {
+  const options = parseArgs(args);
+  const cwd = process.cwd();
+
+  // Determine framework root — try common locations
+  const frameworkRoot = cwd; // In development, cwd IS the framework root
+
+  // Discover available rulesets
+  const allRulesets = await discoverRulesets(cwd, frameworkRoot);
+
+  // Handle --list-rulesets
+  if (options.listRulesets) {
+    console.log(formatRulesetList(allRulesets));
+    return;
+  }
+
+  // Handle --list-rules
+  if (options.listRules) {
+    const ruleset = allRulesets.find(
+      r => r.id === options.listRules || r.framework === options.listRules
+    );
+    if (!ruleset) {
+      console.error(`Ruleset '${options.listRules}' not found. Run 'aiwg lint --list-rulesets' to see available sets.`);
+      process.exitCode = 1;
+      return;
+    }
+    console.log(formatRuleList(ruleset));
+    return;
+  }
+
+  // Require a target for actual linting
+  if (!options.target) {
+    console.error('Usage: aiwg lint <target> [--ruleset <name>] [--format full|summary|json] [--ci] [--fail-on error|warn|info]');
+    console.error('       aiwg lint --list-rulesets');
+    console.error('       aiwg lint --list-rules <ruleset>');
+    process.exitCode = 1;
+    return;
+  }
+
+  // Resolve target path
+  const targetDir = path.resolve(cwd, options.target);
+
+  // Select rulesets
+  let selectedRulesets = allRulesets;
+  if (options.rulesets && options.rulesets.length > 0) {
+    selectedRulesets = allRulesets.filter(
+      r => options.rulesets!.includes(r.id) || options.rulesets!.includes(r.framework)
+    );
+    if (selectedRulesets.length === 0) {
+      console.error(`No matching rulesets for: ${options.rulesets.join(', ')}`);
+      console.error('Available: ' + allRulesets.map(r => r.id).join(', '));
+      process.exitCode = 1;
+      return;
+    }
+  } else {
+    selectedRulesets = autoDetectRulesets(options.target, allRulesets);
+  }
+
+  // Dry run
+  if (options.dryRun) {
+    console.log(`Dry run: would lint '${options.target}' with rulesets: ${selectedRulesets.map(r => r.id).join(', ')}`);
+    for (const rs of selectedRulesets) {
+      console.log(`  ${rs.id}: ${rs.rules.length} rules`);
+      for (const rule of rs.rules) {
+        console.log(`    - ${rule.id} [${rule.severity}]: ${rule.description}`);
+      }
+    }
+    return;
+  }
+
+  // Run lint
+  const result = await runLint(targetDir, selectedRulesets, {
+    recursive: options.recursive,
+    failOn: options.failOn,
+  });
+
+  // Output results
+  console.log(formatResult(result, options.format || 'full'));
+
+  // Set exit code in CI mode
+  if (options.ci && !result.summary.passed) {
+    process.exitCode = 1;
+  }
+}

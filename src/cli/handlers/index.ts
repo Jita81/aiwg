@@ -91,6 +91,7 @@ import { initHandler } from './init.js';
 import { runHandler } from './run.js';
 import { stewardHandler, stewardHandlers } from './steward.js';
 import { serveHandler } from './serve.js';
+import { lintHandler } from './lint.js';
 
 import type { CommandHandler } from './types.js';
 
@@ -187,6 +188,9 @@ export {
 
   // Serve
   serveHandler,
+
+  // Lint
+  lintHandler,
 };
 
 // Re-export handler arrays
@@ -286,6 +290,9 @@ export const allHandlers: CommandHandler[] = [
 
   // Web dashboard
   serveHandler,
+
+  // Lint
+  lintHandler,
 ];
 
 /**

@@ -1660,6 +1660,43 @@ export const docConsolidateCommand: Extension = {
   } satisfies SkillMetadata,
 };
 
+// Lint Commands
+
+export const lintCommand: Extension = {
+  id: 'lint',
+  type: 'skill',
+  name: 'Lint',
+  description: 'Lint AIWG artifacts against declarative rule sets',
+  version: '1.0.0',
+  capabilities: ['cli', 'lint', 'validation', 'quality'],
+  keywords: ['lint', 'validate', 'check', 'rules', 'quality', 'integrity'],
+  category: 'utility',
+  platforms: {
+    claude: 'full',
+    generic: 'full',
+  },
+  deployment: {
+    pathTemplate: '.{platform}/commands/{id}.md',
+    core: false,
+  },
+  metadata: {
+    type: 'skill',
+    triggerPhrases: ['lint', 'lint corpus', 'check research', 'validate artifacts', 'run lint'],
+    commandHint: {
+      template: 'utility',
+      argumentHint: '<target> [--ruleset <name>] [--format full|summary|json] [--ci] [--fail-on error|warn|info] [--list-rulesets] [--list-rules <name>] [--dry-run]',
+      allowedTools: ['Bash', 'Read', 'Glob', 'Grep'],
+      executionSteps: [
+        'Discover available rulesets from installed frameworks',
+        'Auto-detect or select rulesets for target path',
+        'Collect files matching rule glob patterns',
+        'Run checks (frontmatter, references, patterns, cross-refs)',
+        'Report diagnostics with severity and fix suggestions',
+      ],
+    },
+  } satisfies SkillMetadata,
+};
+
 // Code Analysis Commands
 
 export const cleanupAuditCommand: Extension = {
@@ -2276,6 +2313,9 @@ export const commandDefinitions: Extension[] = [
   // Documentation (2)
   docSyncCommand,
   docConsolidateCommand,
+
+  // Lint (1)
+  lintCommand,
 
   // Code Analysis (1)
   cleanupAuditCommand,
