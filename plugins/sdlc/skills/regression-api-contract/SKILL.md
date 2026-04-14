@@ -1,17 +1,21 @@
+---
+namespace: aiwg
+platforms: [all]
+
+---
+
 # regression-api-contract
 
 Detect breaking changes in API contracts across REST, GraphQL, and gRPC interfaces.
 
 ## Triggers
 
-- "API breaking change"
-- "contract regression"
-- "schema compatibility"
-- "API compatibility check"
-- "breaking API change"
-- "API contract drift"
-- "backward compatibility"
-- "API version check"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "breaking change" → API contract regression
+- "schema compatibility" → contract validation
+- "Pact" / "Swagger diff" → contract testing tool names
 
 ## Purpose
 
@@ -923,9 +927,9 @@ consumer_contracts:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/testing/regression.yaml
-- @agentic/code/frameworks/sdlc-complete/agents/api-designer.md
-- @agentic/code/frameworks/sdlc-complete/skills/regression-baseline/SKILL.md
-- @agentic/code/frameworks/sdlc-complete/skills/regression-bisect/SKILL.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/testing/regression.yaml
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/api-designer.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/regression-baseline/SKILL.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/regression-bisect/SKILL.md
 - @.aiwg/research/findings/REF-013-metagpt.md
-- @.claude/rules/executable-feedback.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md

@@ -1,16 +1,20 @@
+---
+namespace: aiwg
+platforms: [all]
+
+---
+
 # regression-cicd-hooks
 
 Integrate regression testing into CI/CD pipelines with automated baseline comparison, merge blocking, and multi-platform support.
 
 ## Triggers
 
-- "add regression checks to CI"
-- "setup regression pipeline"
-- "configure regression gates"
-- "block merge on regression"
-- "add pre-commit regression check"
-- "integrate baseline tests with GitHub Actions"
-- "setup regression for GitLab"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "CI hooks" / "pipeline gates" → regression check in CI/CD
+- "fail fast on regression" → CI regression gate
 
 ## Purpose
 
@@ -802,9 +806,9 @@ aiwg baseline update functional-baseline \
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/skills/regression-baseline/SKILL.md
-- @agentic/code/frameworks/sdlc-complete/skills/regression-metrics/SKILL.md
-- @agentic/code/frameworks/sdlc-complete/skills/regression-report/SKILL.md
-- @agentic/code/frameworks/sdlc-complete/agents/devops-engineer.md
-- @agentic/code/frameworks/sdlc-complete/agents/test-architect.md
-- @agentic/code/frameworks/sdlc-complete/agents/reliability-engineer.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/regression-baseline/SKILL.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/regression-metrics/SKILL.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/regression-report/SKILL.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/devops-engineer.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/test-architect.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/reliability-engineer.md

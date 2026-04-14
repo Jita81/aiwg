@@ -1,17 +1,21 @@
+---
+namespace: aiwg
+platforms: [all]
+
+---
+
 # Auto-Provenance
 
 Automatically generates W3C PROV-compliant provenance records when agents create or modify artifacts.
 
 ## Triggers
 
-- "create provenance"
-- "track artifact"
-- "record provenance"
-- "who created this"
-- "what derived from"
-- "provenance chain"
-- "trace artifact"
-- "audit trail"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "W3C PROV" → provenance standard reference
+- "lineage" → data/artifact lineage tracking
+- "provenance for [artifact]" → specific artifact provenance
 
 ## Purpose
 
@@ -59,7 +63,7 @@ When a tracked artifact is created or modified:
    - Create Relationships (wasGeneratedBy, wasAssociatedWith, wasDerivedFrom)
 
 4. **Validate and save**
-   - Validate against `@agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml`
+   - Validate against `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml`
    - Save to `.aiwg/research/provenance/records/<artifact-name>.prov.yaml`
    - Update provenance index
 
@@ -154,9 +158,9 @@ skill:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/agents/provenance-manager.md - Provenance Manager agent
-- @agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml - PROV record schema
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/provenance-manager.md - Provenance Manager agent
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml - PROV record schema
 - @.aiwg/research/provenance/docs/provenance-guide.md - Provenance guide
-- @.claude/rules/provenance-tracking.md - Provenance tracking rules
-- @.claude/rules/mention-wiring.md - @-mention wiring patterns
-- @.claude/rules/qualified-references.md - Qualified reference rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/provenance-tracking.md - Provenance tracking rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/mention-wiring.md - @-mention wiring patterns
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/qualified-references.md - Qualified reference rules

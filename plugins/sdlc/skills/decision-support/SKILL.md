@@ -1,15 +1,21 @@
+---
+namespace: aiwg
+platforms: [all]
+
+---
+
 # decision-support
 
 Facilitate data-driven technical decisions using embedded decision matrices and trade-off analysis.
 
 ## Triggers
 
-- "help me decide"
-- "compare options"
-- "trade-off analysis"
-- "decision matrix"
-- "which approach should we use"
-- "evaluate alternatives"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "ADR" in decision context → Architecture Decision Record
+- "ToT" / "tree of thought" → structured reasoning mode
+- "pros and cons" → trade-off analysis
 
 ## Purpose
 

@@ -1,15 +1,20 @@
+---
+namespace: aiwg
+platforms: [all]
+
+---
+
 # regression-bisect
 
 Automatically identify the commit that introduced a regression using git bisect.
 
 ## Triggers
 
-- "find regression commit"
-- "bisect the regression"
-- "when did this break"
-- "which commit broke [feature]"
-- "git bisect [test/issue]"
-- "identify breaking commit"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "git bisect" → binary search for regression commit
+- "when did this break" → regression commit discovery
 
 ## Purpose
 
@@ -485,6 +490,6 @@ If bisect takes too long:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/test/regression-schema.yaml
-- @agentic/code/frameworks/sdlc-complete/commands/regression-test.md
-- @.claude/agents/debugger.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/test/regression-schema.yaml
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/regression-test.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/debugger.md

@@ -1,16 +1,21 @@
+---
+namespace: aiwg
+platforms: [all]
+
+---
+
 # architecture-evolution
 
 Manage architecture changes with impact analysis, ADR generation, and migration planning.
 
 ## Triggers
 
-- "evolve architecture"
-- "architecture change"
-- "add new component"
-- "deprecate [component]"
-- "migration plan"
-- "breaking change"
-- "architecture impact"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "ADR" → Architecture Decision Record creation
+- "C4 model" → architecture diagram update
+- "architecture drift" → deviation from baseline
 
 ## Purpose
 

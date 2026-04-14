@@ -1,17 +1,20 @@
+---
+namespace: aiwg
+platforms: [all]
+
+---
+
 # tot-exploration
 
 Automatically trigger Tree of Thoughts exploration when agents face architectural decisions with multiple valid approaches.
 
 ## Triggers
 
-- "evaluate architecture options"
-- "compare approaches"
-- "which pattern should we use"
-- "explore alternatives"
-- "architecture decision"
-- "ADR for"
-- "trade-off between"
-- "should we use X or Y"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "ToT" → Tree of Thought exploration
+- "evaluate N options" → multi-option architectural analysis
 
 ## Purpose
 
@@ -27,9 +30,8 @@ When triggered, this skill:
    - Verify this is an architectural/technical decision (not stylistic)
 
 2. **Loads ToT protocol**:
-   - Load @agentic/code/frameworks/sdlc-complete/schemas/flows/tree-of-thought.yaml schema
-   - Load @.aiwg/flows/docs/tot-architecture-guide.md guidance
-   - Load @agentic/code/frameworks/sdlc-complete/agents/enhancements/architecture-designer-tot-protocol.md protocol
+   - Load @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/tree-of-thought.yaml schema
+   - Load @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/enhancements/architecture-designer-tot-protocol.md protocol
 
 3. **Generates alternatives**:
    - Produce k=3 meaningfully distinct alternatives (default)
@@ -47,7 +49,7 @@ When triggered, this skill:
    - Tie (gap < 0.2): Present both options, request human decision
 
 6. **Generates ADR if approved**:
-   - Use @agentic/code/frameworks/sdlc-complete/templates/architecture/adr-with-tot.md template
+   - Use @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/architecture/adr-with-tot.md template
    - Save to `.aiwg/architecture/`
    - Include backtracking triggers
 
@@ -101,9 +103,8 @@ agents:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/tree-of-thought.yaml - ToT workflow schema
-- @.aiwg/flows/docs/tot-architecture-guide.md - Architecture guide
-- @agentic/code/frameworks/sdlc-complete/agents/enhancements/architecture-designer-tot-protocol.md - Agent protocol
-- @agentic/code/frameworks/sdlc-complete/templates/architecture/adr-with-tot.md - ADR template
-- @agentic/code/frameworks/sdlc-complete/skills/decision-support/SKILL.md - Decision support skill
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/tree-of-thought.yaml - ToT workflow schema
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/enhancements/architecture-designer-tot-protocol.md - Agent protocol
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/architecture/adr-with-tot.md - ADR template
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/decision-support/SKILL.md - Decision support skill
 - @.aiwg/research/findings/REF-020-tree-of-thoughts.md - Research foundation

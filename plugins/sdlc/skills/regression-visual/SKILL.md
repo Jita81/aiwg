@@ -1,17 +1,21 @@
+---
+namespace: aiwg
+platforms: [all]
+
+---
+
 # regression-visual
 
 Detect visual and UI regressions through screenshot comparison and pixel-diff analysis.
 
 ## Triggers
 
-- "visual regression"
-- "UI diff"
-- "screenshot comparison"
-- "visual testing"
-- "check for UI changes"
-- "visual baseline"
-- "pixel diff"
-- "layout regression"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "visual diff" → screenshot/UI comparison
+- "UI diff" → visual regression shorthand
+- "Playwright screenshots" / "Storybook snapshots" → tool-specific visual regression
 
 ## Purpose
 
@@ -793,8 +797,8 @@ ci_integration:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/testing/regression.yaml
-- @agentic/code/frameworks/sdlc-complete/skills/regression-baseline/SKILL.md
-- @agentic/code/frameworks/sdlc-complete/skills/regression-report/SKILL.md
-- @agentic/code/frameworks/sdlc-complete/agents/test-engineer.md
-- @.claude/rules/executable-feedback.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/testing/regression.yaml
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/regression-baseline/SKILL.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/regression-report/SKILL.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/test-engineer.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md

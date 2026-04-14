@@ -1,16 +1,21 @@
+---
+namespace: aiwg
+platforms: [all]
+
+---
+
 # sdlc-reports
 
 Generate comprehensive SDLC reports including iteration status, metrics dashboards, and executive summaries.
 
 ## Triggers
 
-- "iteration report"
-- "sprint summary"
-- "project report"
-- "sdlc metrics"
-- "status report"
-- "executive summary"
-- "phase report"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "RAG" → Red/Amber/Green status dashboard
+- "KPIs" for project context → SDLC metrics
+- "burn rate" → iteration velocity metrics
 
 ## Purpose
 

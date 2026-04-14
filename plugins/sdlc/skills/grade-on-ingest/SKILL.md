@@ -1,16 +1,21 @@
+---
+namespace: aiwg
+platforms: [all]
+
+---
+
 # GRADE-on-Ingest
 
 Automatically triggers GRADE quality assessment when new research sources or findings are added to the corpus.
 
 ## Triggers
 
-- "add research source"
-- "new finding"
-- "ingest paper"
-- "add reference"
-- "import study"
-- "register source"
-- "cite new paper"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "GRADE" → evidence quality rating framework
+- "quality of evidence" → GRADE assessment
+- "evidence level" → source quality grading
 
 ## Purpose
 
@@ -141,9 +146,9 @@ skill:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/agents/quality-assessor.md - Assessment agent
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/quality-assessor.md - Assessment agent
 - @.aiwg/research/docs/grade-assessment-guide.md - GRADE methodology
-- @agentic/code/frameworks/sdlc-complete/schemas/research/quality-dimensions.yaml - Quality schema
-- @.claude/rules/research-metadata.md - Metadata requirements
-- @.claude/rules/citation-policy.md - Citation policy
-- @agentic/code/frameworks/sdlc-complete/skills/citation-guard/SKILL.md - Citation guard
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/quality-dimensions.yaml - Quality schema
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/research-metadata.md - Metadata requirements
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/citation-policy.md - Citation policy
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/citation-guard/SKILL.md - Citation guard

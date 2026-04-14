@@ -1,17 +1,21 @@
+---
+namespace: aiwg
+platforms: [all]
+
+---
+
 # citation-guard
 
 Automatically verify citations when agents generate content that makes factual claims or references research.
 
 ## Triggers
 
-- "cite"
-- "reference"
-- "according to"
-- "research shows"
-- "studies demonstrate"
-- Agent writes to `.aiwg/research/`
-- Agent writes to `docs/`
-- Agent generates content with REF-XXX references
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "fabricated citations" / "hallucinated references" → citation authenticity check
+- "DOI check" → citation DOI validation
+- "verify sources" in research context → citation verification
 
 ## Purpose
 
@@ -72,7 +76,7 @@ This skill uses:
 
 ## References
 
-- @.claude/rules/citation-policy.md - Citation policy rules
-- @agentic/code/frameworks/sdlc-complete/agents/citation-verifier.md - Citation Verifier agent
-- @agentic/code/frameworks/sdlc-complete/schemas/research/hallucination-detection.yaml - Detection patterns
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/citation-policy.md - Citation policy rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/citation-verifier.md - Citation Verifier agent
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/research/hallucination-detection.yaml - Detection patterns
 - @.aiwg/research/docs/grade-assessment-guide.md - GRADE methodology

@@ -1,15 +1,20 @@
+---
+namespace: aiwg
+platforms: [all]
+
+---
+
 # regression-baseline
 
 Create and maintain regression test baselines for comparison and drift detection.
 
 ## Triggers
 
-- "create regression baseline"
-- "update baseline"
-- "baseline the tests"
-- "capture current state"
-- "set new baseline"
-- "baseline snapshot"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "snapshot tests" → baseline creation shorthand
+- "capture current behavior" → baseline establishment
 
 ## Purpose
 
@@ -546,6 +551,6 @@ approval_config:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/test/baseline-schema.yaml
-- @agentic/code/frameworks/sdlc-complete/commands/baseline-create.md
-- @agentic/code/frameworks/sdlc-complete/agents/test-engineer.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/test/baseline-schema.yaml
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/baseline-create.md
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/test-engineer.md

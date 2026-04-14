@@ -1,16 +1,21 @@
+---
+namespace: aiwg
+platforms: [all]
+
+---
+
 # incident-triage
 
 Rapid incident classification, severity assessment, and response coordination.
 
 ## Triggers
 
-- "production incident"
-- "system is down"
-- "critical issue"
-- "triage incident"
-- "incident severity"
-- "outage"
-- "P0" / "P1" / "SEV1"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "P0" / "P1" / "SEV1" / "SEV2" → severity-based incident triage
+- "we got paged" → production incident response
+- "war room" → incident coordination setup
 
 ## Purpose
 

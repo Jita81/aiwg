@@ -1,15 +1,20 @@
+---
+namespace: aiwg
+platforms: [all]
+
+---
+
 # regression-auto-baseline
 
 Automatically manage regression test baseline lifecycle with triggers for releases, deployments, and quality gates.
 
 ## Triggers
 
-- "auto-update baselines"
-- "automatic baseline management"
-- "baseline on release"
-- "update baseline after merge"
-- "schedule baseline updates"
-- "baseline lifecycle"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "auto-update baselines" → automatic baseline management
+- "baseline on release" → release-triggered baseline update
 
 ## Purpose
 
@@ -960,10 +965,10 @@ All future test runs will be compared against this baseline.
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/skills/regression-baseline/SKILL.md - Manual baseline creation
-- @agentic/code/frameworks/sdlc-complete/skills/regression-bisect/SKILL.md - Find breaking commits
-- @agentic/code/frameworks/sdlc-complete/skills/regression-metrics/SKILL.md - Baseline drift tracking
-- @agentic/code/frameworks/sdlc-complete/schemas/testing/regression.yaml - Regression schema
-- @agentic/code/frameworks/sdlc-complete/commands/regression-check.md - Regression testing command
-- @agentic/code/frameworks/sdlc-complete/agents/test-engineer.md - Test Engineer agent
-- @.claude/rules/executable-feedback.md - Executable feedback rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/regression-baseline/SKILL.md - Manual baseline creation
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/regression-bisect/SKILL.md - Find breaking commits
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/regression-metrics/SKILL.md - Baseline drift tracking
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/testing/regression.yaml - Regression schema
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/regression-check.md - Regression testing command
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/test-engineer.md - Test Engineer agent
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md - Executable feedback rules

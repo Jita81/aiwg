@@ -1,16 +1,20 @@
+---
+namespace: aiwg
+platforms: [all]
+
+---
+
 # issue-auto-sync
 
 Automatically detect and update linked issues after commits or artifact changes.
 
 ## Triggers
 
-- "sync issues"
-- "update linked issues"
-- "check issue references in commits"
-- "auto-update issues"
-- "post-commit issue sync"
-- After git commit (if configured)
-- After artifact creation/update
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "link commits to issues" → commit-to-issue tracing
+- "auto-close issues" → issue auto-closure on commit
 
 ## Purpose
 
@@ -639,7 +643,6 @@ between git commits and issue trackers.
 
 ## References
 
-- Commands: @agentic/code/frameworks/sdlc-complete/commands/issue-sync.md, @agentic/code/frameworks/sdlc-complete/commands/issue-close.md
-- Templates: @agentic/code/frameworks/sdlc-complete/templates/issue-comments/
-- Configuration: @.aiwg/config.yaml
+- Commands: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/issue-sync.md, @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/issue-close.md
+- Templates: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/issue-comments/
 - MCP tools: Gitea issue management

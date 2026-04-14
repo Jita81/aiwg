@@ -1,17 +1,21 @@
+---
+namespace: aiwg
+platforms: [all]
+
+---
+
 # regression-performance
 
 Detect performance regressions by comparing benchmarks across versions, analyzing latency/throughput degradation, and providing statistical significance testing.
 
 ## Triggers
 
-- "performance regression"
-- "check latency"
-- "benchmark comparison"
-- "detect slowdown"
-- "throughput degradation"
-- "memory leak"
-- "performance analysis"
-- "compare performance"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "latency regression" → performance benchmark comparison
+- "p99" / "p95" → percentile-based performance metrics
+- "benchmark diff" → performance baseline comparison
 
 ## Purpose
 
@@ -916,8 +920,8 @@ jobs:
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/agents/regression-analyst.md - Regression analysis agent
-- @agentic/code/frameworks/sdlc-complete/agents/performance-engineer.md - Performance optimization agent
-- @agentic/code/frameworks/sdlc-complete/schemas/testing/regression.yaml - Regression schema
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/regression-analyst.md - Regression analysis agent
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/performance-engineer.md - Performance optimization agent
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/testing/regression.yaml - Regression schema
 - @.aiwg/research/findings/REF-013-metagpt.md - Debug memory pattern for performance history
-- @.claude/rules/executable-feedback.md - Execution validation requirements
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md - Execution validation requirements

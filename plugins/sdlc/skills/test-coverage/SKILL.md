@@ -1,15 +1,21 @@
+---
+namespace: aiwg
+platforms: [all]
+
+---
+
 # test-coverage
 
 Analyze test coverage, identify gaps, and recommend test improvements.
 
 ## Triggers
 
-- "analyze test coverage"
-- "what's not tested"
-- "coverage report"
-- "find untested code"
-- "test gaps"
-- "coverage analysis"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "lcov" / "istanbul" / "c8" → coverage tool-specific queries
+- "coverage holes" in testing context → gap analysis
+- "what's not tested" → coverage gap discovery
 
 ## Purpose
 

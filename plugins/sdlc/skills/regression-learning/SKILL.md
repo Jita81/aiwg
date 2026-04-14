@@ -1,20 +1,24 @@
+---
+namespace: aiwg
+platforms: [all]
+
+---
+
 # regression-learning
 
 Cross-task learning skill for improving regression detection over time through pattern recognition, test prioritization, and historical analysis.
 
 ## Triggers
 
-- "learn from regressions"
-- "improve regression detection"
-- "analyze regression patterns"
-- "prioritize regression tests"
-- "what tests should I run"
-- "predict regression risk"
-- "similar past failures"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "learn from regressions" → adaptive pattern recognition
+- "improve detection accuracy" → regression ML tuning
 
 ## Purpose
 
-This skill integrates with Ralph's cross-task learning system to continuously improve regression detection by:
+This skill integrates with Al's cross-task learning system to continuously improve regression detection by:
 - Learning from past regression patterns (REG-XXXX records)
 - Identifying high-risk code patterns and hot spots
 - Prioritizing tests by regression likelihood
@@ -305,12 +309,12 @@ regression_prediction:
       - test/regression/REG-0067-refund-handling.test.ts
 ```
 
-## Integration with Ralph
+## Integration with Al
 
 ### Debug Memory Integration
 
 ```yaml
-# Ralph uses this skill to improve across iterations
+# Al uses this skill to improve across iterations
 
 ralph_integration:
   on_test_failure:
@@ -652,11 +656,11 @@ Track learning effectiveness:
 
 ## References
 
-- @agentic/code/addons/ralph/schemas/debug-memory.yaml - Debug memory structure
-- @agentic/code/frameworks/sdlc-complete/schemas/testing/regression.yaml - Regression schema
-- @.claude/rules/executable-feedback.md - Feedback loop patterns
+- @$AIWG_ROOT/agentic/code/addons/ralph/schemas/debug-memory.yaml - Debug memory structure
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/testing/regression.yaml - Regression schema
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md - Feedback loop patterns
 - @.aiwg/research/findings/REF-013-metagpt.md - MetaGPT executable feedback
 - @.aiwg/research/findings/REF-015-self-refine.md - Self-Refine learning patterns
-- @agentic/code/frameworks/sdlc-complete/skills/regression-baseline/SKILL.md - Baseline management
-- @agentic/code/frameworks/sdlc-complete/skills/regression-bisect/SKILL.md - Root cause analysis
-- @agentic/code/frameworks/sdlc-complete/skills/regression-metrics/SKILL.md - Metrics tracking
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/regression-baseline/SKILL.md - Baseline management
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/regression-bisect/SKILL.md - Root cause analysis
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/skills/regression-metrics/SKILL.md - Metrics tracking

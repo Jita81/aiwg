@@ -1,15 +1,24 @@
+---
+namespace: aiwg
+platforms: [all]
+
+---
+
 # gate-evaluation
 
 Validate phase gate criteria with multi-agent review and generate pass/fail reports.
 
 ## Triggers
 
-- "check gate for [phase]"
-- "can we transition to [phase]"
-- "validate [LOM/ABM/IOC/PRM]"
-- "are we ready for [phase]"
-- "gate check"
-- "phase readiness"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "LOM" / "LO check" → Inception exit gate (Lifecycle Objective Milestone)
+- "LA" / "ABM" → Elaboration exit gate (Architecture Baseline Milestone)
+- "IOC" → Construction exit gate (Initial Operational Capability)
+- "PRM" → Transition exit gate (Product Release Milestone)
+- "can we ship" → gate readiness shorthand
+- "exit criteria for [phase]" → phase-specific gate check
 
 ## Purpose
 
