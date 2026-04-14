@@ -164,6 +164,88 @@ Describe how the system is deployed across all target environments.
 - **Secrets Management**: State where secrets live (Vault, AWS Secrets Manager, K8s Secrets, env file) and how they are injected at runtime. Do not include actual secret values.
 - **Scaling Model**: For each container, state the scaling axis (horizontal, vertical, or fixed), trigger (CPU%, queue depth, cron), and expected steady-state and peak replica counts.
 
+### 9a. Process Architecture (12-Factor Methodology)
+
+Document the runtime process model. Each subsection maps to a 12-factor principle and must be addressed or explicitly marked "N/A" with an ADR justifying the deviation.
+
+**Why this section exists**: Architecture-level process decisions determine whether the system can scale horizontally, deploy without downtime, and recover from crashes. Leaving these implicit leads to late-stage surprises.
+
+Reference: `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/stateless-processes.md`, `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/disposable-processes.md`, `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/logs-as-event-streams.md`.
+
+#### 9a.1 Process Types (Factor VIII — Concurrency)
+
+List each process archetype the system runs. Process archetypes are distinct scaling units, not distinct deployments.
+
+| Process Type | Purpose | Scaling Axis | Concurrency Limit | Entry Point |
+|--------------|---------|--------------|------------------|-------------|
+| `web` | HTTP/gRPC request handling | horizontal | N requests per replica | `src/web/server.ts` |
+| `worker` | Background jobs from queue | horizontal | N concurrent jobs per replica | `src/worker/consumer.ts` |
+| `scheduler` | Time-triggered jobs (cron) | fixed (leader-elected) | 1 instance | `src/scheduler/index.ts` |
+| `admin` | One-off admin tasks | on-demand | 1 per invocation | `src/admin/cli.ts` |
+
+For each process type: state the resource profile (CPU/memory), expected replica count at steady state, peak replica count, and the signal that triggers scaling (CPU %, queue depth, request rate).
+
+#### 9a.2 Process State Model (Factor VI — Stateless Processes)
+
+For each process type listed in 9a.1, declare the state model:
+
+| Process Type | State Kind | Storage Location | Durability |
+|--------------|-----------|-----------------|-----------|
+| `web` | Session | Redis (`sessions:*`) | durable, TTL 24h |
+| `web` | User uploads | S3 (`uploads/{user}/`) | durable, lifecycle policy |
+| `worker` | Job progress | Postgres (`jobs` table) | durable |
+| `scheduler` | Leader election | Redis (`leader:scheduler`) | TTL 30s, re-election on expiry |
+| `admin` | Task log | stdout → log aggregator | persisted by environment |
+
+Any process holding state in process memory, on local disk outside `/tmp`, or in a volume mount not declared here requires an ADR per `rules/stateless-processes.md`.
+
+#### 9a.3 Disposability (Factor IX)
+
+Declare startup and shutdown characteristics:
+
+| Process Type | Startup Target | Shutdown Grace | SIGTERM Handler | Crash Recovery |
+|--------------|---------------|----------------|----------------|----------------|
+| `web` | < 5s to ready | 30s to drain | Yes: stop accepting, finish in-flight, exit | Load balancer replaces |
+| `worker` | < 5s | 60s (max job duration) | Yes: return in-flight job to queue | Queue redelivery |
+| `scheduler` | < 2s | 5s | Yes: release leader lock | Election timeout (30s) |
+
+Startup time must be measured in CI and tracked as a non-functional requirement — state the measurement approach.
+
+#### 9a.4 Port Binding (Factor VII — Self-Contained Services)
+
+Does each web-facing process bind its own port and export via HTTP/gRPC without relying on an external web server (Apache, IIS, Java EE app server)?
+
+- [ ] Yes — all services self-contained, the environment (k8s, systemd, load balancer) routes to the bound port
+- [ ] No — [specify which services depend on external hosting and link to ADR]
+
+For each service that binds a port: state the port number (or env var that controls it), the protocol (HTTP/1.1, HTTP/2, gRPC), and whether it terminates TLS or expects a sidecar/load balancer to terminate.
+
+#### 9a.5 Backing Services — Resource Locator Table (Factor IV)
+
+Every attached resource is accessed via a locator (URL or connection string) loaded from configuration. Swapping a backing service must not require code changes.
+
+| Resource | Env Variable | Format | Used by | Swap Criteria |
+|----------|-------------|--------|---------|---------------|
+| Primary DB | `DATABASE_URL` | `postgres://...` | web, worker | Failover DNS + secrets rotation |
+| Cache | `REDIS_URL` | `redis://...` | web | Replace endpoint, restart pods |
+| Queue | `QUEUE_URL` | `amqp://...` or `https://sqs.*` | worker | Provider-managed swap |
+| Object Store | `OBJECT_STORE_ENDPOINT` | URL | web, worker | Provider endpoint swap |
+| Email | `EMAIL_PROVIDER_API` | URL | worker | Env var change + key rotation |
+
+Do not hardcode backing service addresses. Do not embed credentials in the locator (see `rules/token-security.md`).
+
+#### 9a.6 Logging Architecture (Factor XI)
+
+All processes write logs to stdout (normal) and stderr (warnings/errors) as an unbuffered event stream. Environment (container runtime, systemd, log shipper) handles routing, aggregation, and persistence.
+
+- **Format**: structured JSON lines, required fields: `ts`, `level`, `svc`, `msg`, `trace_id`, `span_id`, `user_id` (when applicable)
+- **Level**: controlled by `LOG_LEVEL` env var (`debug`/`info`/`warn`/`error`), default `info` in production
+- **Aggregation destination**: [Loki/Datadog/CloudWatch/ELK] — state where logs land
+- **No file-based logging**: applications do not open log files, configure rotation, or depend on syslog
+- **Correlation**: every request/job emits a `trace_id` on entry; propagated via `traceparent` header (W3C) across service boundaries
+
+Deviations (security audit logs with mandatory local persistence, regulated environments) require an ADR.
+
 ### 10. Cross-Cutting Concerns
 
 Document system-wide concerns that cut across multiple components. Each subsection must be addressed or explicitly marked "N/A" with a one-sentence rationale.

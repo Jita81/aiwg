@@ -62,6 +62,42 @@ Define the characteristics, configuration, and operational requirements for a sp
 - [ ] Medium (scaled-down but representative)
 - [ ] Minimal (cost-optimized for non-critical use)
 
+### 1a. Tech Stack Parity Matrix (12-Factor X — Dev/Prod Parity)
+
+The goal of this matrix is to minimize drift between environments. Any substitution (e.g., SQLite in dev → Postgres in prod) is a parity violation and requires an ADR documenting the tradeoff.
+
+**Principle**: Same backing service technology in every environment. Scale differs; technology does not.
+
+| Component | Dev | Staging | Production | Parity Status |
+|-----------|-----|---------|-----------|---------------|
+| Primary database | Postgres 16 (Docker) | Postgres 16 (RDS) | Postgres 16 (RDS, multi-AZ) | ✅ Same technology, different scale |
+| Cache | Redis 7 (Docker) | Redis 7 (ElastiCache) | Redis 7 (ElastiCache cluster) | ✅ Same technology |
+| Queue | RabbitMQ 3.12 (Docker) | Amazon MQ | Amazon MQ | ⚠ Docker vs managed — justified: easier local dev |
+| Object store | MinIO (Docker) | S3 | S3 | ⚠ MinIO vs S3 — ADR-NNN references S3 API parity |
+| Email | MailHog (Docker) | SES (sandbox) | SES | ✅ Same protocol, test accounts in non-prod |
+
+**Parity violations (substitutions) must be recorded here**:
+
+| Component | Dev Uses | Prod Uses | Justification | ADR |
+|-----------|---------|-----------|---------------|-----|
+| — | — | — | — | — |
+
+**Gate**: A tech stack substitution that is not justified by an ADR is a phase gate failure per `rules/config-in-environment.md`.
+
+### 1b. Environment Variable Catalog (12-Factor III — Config)
+
+Every environment variable the application reads must be documented here, grouped by category. The `.env.example` at the project root is the source of truth for variable names; this section states the expected value range per environment.
+
+| Variable | Dev | Staging | Production | Purpose | Required |
+|----------|-----|---------|-----------|---------|----------|
+| `APP_ENV` | `development` | `staging` | `production` | Environment identity | yes |
+| `LOG_LEVEL` | `debug` | `info` | `info` | Logging verbosity | yes |
+| `DATABASE_URL` | `postgres://dev:dev@localhost/app` | (from secret) | (from secret) | Primary DB connection | yes |
+| `REDIS_URL` | `redis://localhost:6379` | (from secret) | (from secret) | Cache + sessions | yes |
+| `FEATURE_NEW_UI` | `true` | `false` | `false` | Feature flag | no |
+
+Secrets (credentials, tokens) are referenced here but not valued — the actual values live in the secret manager and are documented in Section 4 (Configuration Management). See `rules/token-security.md`.
+
 ### 2. Environment Characteristics
 
 #### 2.1 Environment Identity
