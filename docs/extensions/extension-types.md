@@ -515,7 +515,82 @@ memory?: {
     path: string;        // e.g., ".aiwg/AIWG.md"
     description: string; // e.g., "Project context entry point"
   }>;
+  topology?: MemoryTopology; // Semantic memory contract (see below)
 }
+```
+
+### memory.topology field (optional)
+
+When present, declares a semantic memory topology that kernel skills (`memory-ingest`, `memory-lint`, `memory-query-capture`) can operate on. The kernel reads this contract to parameterize topology-agnostic behavior.
+
+See [ADR-021](../../.aiwg/architecture/decisions/ADR-021-semantic-memory-kernel.md) for architectural decisions.
+
+```typescript
+interface MemoryTopology {
+  namespace: string;                    // Root path under .aiwg/ (e.g., ".aiwg/research")
+  rawSources: string;                   // Where original sources are stored
+  derivedPages: Record<string, string>; // Page category → directory path
+  index: string;                        // Master index file path
+  log: string;                          // JSON Lines event log path (.log.jsonl)
+  crossRefStyle: CrossRefStyle;         // How pages link to each other
+  pageTemplate?: string;                // Template for new derived pages
+  ingestRequires?: string[];            // Capabilities required during ingest
+  lintRules?: string[];                 // Lint rule IDs to apply
+}
+
+type CrossRefStyle = 'at-mention' | 'wikilink' | 'markdown-link' | 'yaml-ref';
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `namespace` | Yes | Root `.aiwg/` path for this consumer's memory |
+| `rawSources` | Yes | Directory for original/unprocessed sources |
+| `derivedPages` | Yes | Map of semantic roles to storage directories |
+| `index` | Yes | Path to the master index file |
+| `log` | Yes | Path to the append-only `.log.jsonl` event log |
+| `crossRefStyle` | Yes | Cross-reference syntax (`at-mention`, `wikilink`, `markdown-link`, `yaml-ref`) |
+| `pageTemplate` | No | Template used when creating derived pages |
+| `ingestRequires` | No | Capabilities checked during ingest (e.g., `"provenance"`, `"grade-quality"`) |
+| `lintRules` | No | Existing rule/skill IDs composed with kernel structural checks |
+
+**Example** (research-complete):
+
+```json
+{
+  "memory": {
+    "creates": [ ... ],
+    "topology": {
+      "namespace": ".aiwg/research",
+      "rawSources": ".aiwg/research/sources",
+      "derivedPages": {
+        "summary": ".aiwg/research/findings",
+        "entity": ".aiwg/research/knowledge/entities",
+        "concept": ".aiwg/research/knowledge/concepts",
+        "synthesis": ".aiwg/research/synthesis"
+      },
+      "index": ".aiwg/research/index.md",
+      "log": ".aiwg/research/.log.jsonl",
+      "crossRefStyle": "at-mention",
+      "pageTemplate": "templates/research-page.md",
+      "ingestRequires": ["provenance", "grade-quality"],
+      "lintRules": ["citation-guard", "link-check", "mention-lint"]
+    }
+  }
+}
+```
+
+**Cross-reference styles**:
+
+| Style | Syntax | Used by |
+|-------|--------|---------|
+| `at-mention` | `@path/to/page.md` | AIWG frameworks (sdlc, research, forensics) |
+| `wikilink` | `[[Page Name]]` | Obsidian / llm-wiki addon |
+| `markdown-link` | `[text](path)` | Standard markdown, GitHub rendering |
+| `yaml-ref` | `refs: [path]` in frontmatter | Machine-first schemas, Dataview queries |
+
+AIWG internal tooling (`mention-wire`, `mention-lint`) uses `at-mention` exclusively regardless of consumer declaration.
+
+```
 ```
 
 ### Example

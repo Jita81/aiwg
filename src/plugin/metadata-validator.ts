@@ -220,6 +220,10 @@ export class MetadataValidator {
       // Metadata completeness warnings
       const metadataWarnings = this.checkMetadataCompleteness(manifest);
       result.warnings.push(...metadataWarnings);
+
+      // Memory topology validation (if declared)
+      const topologyWarnings = this.validateMemoryTopology(manifest);
+      result.warnings.push(...topologyWarnings);
     }
 
     // Determine if valid (no errors, or warnings only if not strict)
@@ -724,6 +728,89 @@ export class MetadataValidator {
         field: 'metadata',
         message: 'Metadata object is empty, consider removing or populating it'
       });
+    }
+
+    return warnings;
+  }
+
+  /**
+   * Validate memory.topology contract if declared
+   *
+   * Checks that declared paths follow .aiwg/ convention and required fields
+   * are present when topology is declared.
+   *
+   * @see ADR-021 — Semantic memory kernel architecture
+   */
+  validateMemoryTopology(manifest: PluginManifest): ValidationWarning[] {
+    const warnings: ValidationWarning[] = [];
+    const memory = (manifest as unknown as Record<string, unknown>).memory as Record<string, unknown> | undefined;
+    if (!memory) return warnings;
+
+    const topology = memory.topology as Record<string, unknown> | undefined;
+    if (!topology) return warnings;
+
+    const VALID_CROSS_REF_STYLES = ['at-mention', 'wikilink', 'markdown-link', 'yaml-ref'];
+
+    // Required topology fields
+    const requiredFields = ['namespace', 'rawSources', 'derivedPages', 'index', 'log', 'crossRefStyle'];
+    for (const field of requiredFields) {
+      if (!(field in topology)) {
+        warnings.push({
+          field: `memory.topology.${field}`,
+          message: `Missing required topology field: ${field}`,
+        });
+      }
+    }
+
+    // Namespace must start with .aiwg/
+    if (typeof topology.namespace === 'string' && !topology.namespace.startsWith('.aiwg/')) {
+      warnings.push({
+        field: 'memory.topology.namespace',
+        message: `Topology namespace should start with ".aiwg/" (got "${topology.namespace}")`,
+      });
+    }
+
+    // crossRefStyle must be a valid enum value
+    if (typeof topology.crossRefStyle === 'string' && !VALID_CROSS_REF_STYLES.includes(topology.crossRefStyle)) {
+      warnings.push({
+        field: 'memory.topology.crossRefStyle',
+        message: `Invalid crossRefStyle "${topology.crossRefStyle}". Valid: ${VALID_CROSS_REF_STYLES.join(', ')}`,
+      });
+    }
+
+    // derivedPages must be a non-empty object
+    if (topology.derivedPages) {
+      if (typeof topology.derivedPages !== 'object' || Array.isArray(topology.derivedPages)) {
+        warnings.push({
+          field: 'memory.topology.derivedPages',
+          message: 'derivedPages must be an object mapping category names to directory paths',
+        });
+      } else if (Object.keys(topology.derivedPages as object).length === 0) {
+        warnings.push({
+          field: 'memory.topology.derivedPages',
+          message: 'derivedPages is empty — at least one page category should be declared',
+        });
+      }
+    }
+
+    // lintRules should be an array of strings if present
+    if ('lintRules' in topology && topology.lintRules !== undefined) {
+      if (!Array.isArray(topology.lintRules)) {
+        warnings.push({
+          field: 'memory.topology.lintRules',
+          message: 'lintRules must be an array of rule ID strings',
+        });
+      }
+    }
+
+    // ingestRequires should be an array of strings if present
+    if ('ingestRequires' in topology && topology.ingestRequires !== undefined) {
+      if (!Array.isArray(topology.ingestRequires)) {
+        warnings.push({
+          field: 'memory.topology.ingestRequires',
+          message: 'ingestRequires must be an array of capability strings',
+        });
+      }
     }
 
     return warnings;

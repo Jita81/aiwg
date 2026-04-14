@@ -13,6 +13,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import os from 'os';
+import readline from 'readline';
 import { CommandHandler, HandlerContext, HandlerResult } from './types.js';
 import { createScriptRunner } from './script-runner.js';
 import { getFrameworkRoot, getVersionInfo } from '../../channel/manager.mjs';
@@ -704,6 +705,82 @@ export class UseHandler implements CommandHandler {
         }
       } catch (error) {
         ui.warn(`Failed to register CLI commands: ${error instanceof Error ? error.message : String(error)}`);
+      }
+
+      // Profile picker for addons with memory topology and multiple templates
+      try {
+        const profileManifestPath = path.join(addonSource, 'manifest.json');
+        const profileManifestContent = await fs.readFile(profileManifestPath, 'utf-8');
+        const profileManifest = JSON.parse(profileManifestContent);
+
+        const topology = profileManifest.memory?.topology;
+        const templates = profileManifest.templates;
+
+        if (topology && templates && templates.length > 1) {
+          const profileIdx = remainingArgs.findIndex(a => a === '--profile');
+          let selectedProfile: string | undefined;
+
+          if (profileIdx >= 0 && remainingArgs[profileIdx + 1]) {
+            // Explicit --profile flag
+            selectedProfile = remainingArgs[profileIdx + 1];
+            const templateFile = templates.find((t: string) =>
+              t.replace('.md', '') === selectedProfile || t === selectedProfile
+            );
+            if (!templateFile) {
+              ui.warn(`Unknown profile "${selectedProfile}". Available: ${templates.map((t: string) => t.replace('.md', '')).join(', ')}`);
+              selectedProfile = undefined;
+            }
+          } else if (process.stdin.isTTY) {
+            // Interactive profile selection
+            ui.blank();
+            ui.header('  Select a topology profile:');
+            const templateNames = templates.map((t: string) => t.replace('.md', ''));
+            templateNames.forEach((name: string, i: number) => {
+              const isDefault = name === 'generic' ? ' (default)' : '';
+              console.log(`    ${i + 1}. ${name}${isDefault}`);
+            });
+            console.log('');
+
+            const rl = readline.createInterface({
+              input: process.stdin,
+              output: process.stdout,
+            });
+            const answer = await new Promise<string>((resolve) => {
+              rl.question('  Enter number or name [generic]: ', (ans) => {
+                rl.close();
+                resolve(ans.trim());
+              });
+            });
+
+            if (answer) {
+              const num = parseInt(answer, 10);
+              if (!isNaN(num) && num >= 1 && num <= templateNames.length) {
+                selectedProfile = templateNames[num - 1];
+              } else if (templateNames.includes(answer)) {
+                selectedProfile = answer;
+              }
+            }
+          }
+
+          // Write profile config to project namespace
+          if (selectedProfile) {
+            const namespace = topology.namespace || `.aiwg/${framework}`;
+            const configDir = path.join(target, namespace);
+            await fs.mkdir(configDir, { recursive: true });
+            const profileConfig = {
+              profile: selectedProfile,
+              pageTemplate: `templates/${selectedProfile}.md`,
+              selectedAt: new Date().toISOString(),
+            };
+            await fs.writeFile(
+              path.join(configDir, 'config.json'),
+              JSON.stringify(profileConfig, null, 2) + '\n'
+            );
+            ui.success(`Profile "${selectedProfile}" selected → ${namespace}/config.json`);
+          }
+        }
+      } catch {
+        // Profile selection is optional — don't fail deployment
       }
 
       ui.blank();
