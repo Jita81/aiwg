@@ -8,6 +8,20 @@ platforms: [all]
 
 Assesses workspace alignment and suggests cleanup or realignment actions at key transition points.
 
+## Kernel Delegation
+
+> As of ADR-021, `workspace-health` delegates structural checks to the semantic memory kernel.
+
+**Delegation pattern**:
+1. `workspace-health` retains its consumer-neutral health-check UX
+2. Runs `memory-lint` for every installed framework in `.aiwg/frameworks/registry.json`
+3. Aggregates results across all consumers into a unified report
+4. `aiwg doctor` continues to call this skill unchanged
+
+**Backward compatibility**: No UX changes. Output format unchanged.
+
+@agentic/code/addons/semantic-memory/skills/memory-lint/SKILL.md
+
 ## Triggers
 
 Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):

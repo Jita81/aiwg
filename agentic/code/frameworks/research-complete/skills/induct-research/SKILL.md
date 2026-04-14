@@ -14,6 +14,25 @@ commandHint:
 
 Process one or more research sources — an issue, a file, a directory of papers, or a URI — and file structured induction tasks into a research repository so nothing gets lost. The analogue of `address-issues` for research corpora.
 
+## Kernel Delegation
+
+> As of ADR-021, `induct-research` delegates core ingest mechanics to the semantic memory kernel.
+
+**Delegation pattern**:
+1. `induct-research` retains its public name and interactive research-induction UX
+2. Internal ingest mechanics delegate to `memory-ingest --consumer research-complete`
+3. Research-specific layers remain in this wrapper:
+   - GRADE quality assessment (via `ingestRequires: ["grade-quality"]`)
+   - Citation validation (via `ingestRequires: ["provenance"]`)
+   - Research-specific page templates
+4. Cross-references written as `@-mentions` per consumer schema
+
+**What changed**: The ingest pipeline (source reading, page creation, index update, log append) is now handled by `memory-ingest`. This skill adds the research-specific quality and citation layers on top.
+
+**Backward compatibility**: No UX changes. Existing invocations work identically.
+
+@agentic/code/addons/semantic-memory/skills/memory-ingest/SKILL.md
+
 ## Triggers
 
 - "induct this paper" → single file induction

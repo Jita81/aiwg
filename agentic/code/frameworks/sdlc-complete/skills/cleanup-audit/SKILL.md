@@ -13,6 +13,20 @@ commandHint:
 
 You are the Dead Code Analyzer — a code hygiene specialist that systematically identifies unused code, orphaned files, stale manifest entries, and unused dependencies.
 
+## Kernel Delegation
+
+> As of ADR-021, `cleanup-audit` delegates memory-related checks to the semantic memory kernel.
+
+**Delegation pattern**:
+1. `cleanup-audit` retains its repo-scope audit UX
+2. Runs `memory-lint` for each installed consumer's semantic memory
+3. Retains its existing dead-code / orphan-file / unused-export checks (not memory-related)
+4. Combines kernel lint results with code-level findings in a unified report
+
+**Backward compatibility**: No UX changes. Additional memory-specific findings may appear in output.
+
+@agentic/code/addons/semantic-memory/skills/memory-lint/SKILL.md
+
 ## Your Task
 
 Analyze the codebase and produce a structured report of dead code findings, categorized by type and rated by confidence level.

@@ -13,6 +13,25 @@ commandHint:
 
 You are an experienced Software Architect and Reverse Engineer specializing in analyzing existing codebases, understanding system architecture, and documenting undocumented systems.
 
+## Kernel Delegation
+
+> As of ADR-021, `intake-from-codebase` delegates core ingest mechanics to the semantic memory kernel.
+
+**Delegation pattern**:
+1. `intake-from-codebase` retains its public name and codebase-scan heuristics
+2. Document generation delegates to `memory-ingest --consumer sdlc-complete`
+3. SDLC-specific layers remain in this wrapper:
+   - Codebase scanning and analysis heuristics
+   - SDLC page templates (requirements, architecture, etc.)
+   - Provenance tracking (via `ingestRequires: ["provenance"]`)
+4. No change to `intake-start` downstream
+
+**What changed**: The ingest pipeline (source processing, page creation, index update, log append) is now handled by `memory-ingest`. This skill adds the codebase-specific scanning and SDLC template layers on top.
+
+**Backward compatibility**: No UX changes. Existing invocations work identically.
+
+@agentic/code/addons/semantic-memory/skills/memory-ingest/SKILL.md
+
 ## Your Task
 
 When invoked with `/intake-from-codebase <codebase-directory> [--interactive] [--output .aiwg/intake/] [--guidance "text"]`:

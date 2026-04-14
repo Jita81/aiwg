@@ -10,6 +10,22 @@ commandHint:
 
 Assess the health and completeness of the research corpus at `.aiwg/research/`.
 
+## Kernel Delegation
+
+> As of ADR-021, `corpus-health` delegates structural lint to the semantic memory kernel.
+
+**Delegation pattern**:
+1. `corpus-health` retains its research-specific health-check UX
+2. Delegates to `memory-lint --consumer research-complete --severity warning`
+3. Research-specific layers remain in this wrapper:
+   - GRADE coverage check
+   - Citation completeness validation
+   - Research corpus-specific metrics
+
+**Backward compatibility**: No UX changes.
+
+@agentic/code/addons/semantic-memory/skills/memory-lint/SKILL.md
+
 ## Instructions
 
 When invoked, analyze the research corpus and report on its health:
