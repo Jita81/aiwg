@@ -1,6 +1,6 @@
 # ADR-021: Semantic Memory Kernel Architecture
 
-**Status**: Proposed
+**Status**: Accepted (2026-04-14)
 **Date**: 2026-04-14
 **Deciders**: Architecture Designer (proposing), Project Owner (review pending)
 **Context**: Epic #823 — Semantic memory kernel + LLM Wiki addon
@@ -207,9 +207,9 @@ Phased delivery per #823:
 4. **#830** — consumer migrations, one PR per migration (research → SDLC → lint-unification → forensics/media schemas). Each independently shippable and reversible.
 5. **#831** — `llm-wiki` addon: scaffold + templates + Obsidian integration docs. Ships once kernel is stable.
 
-### Schema-iteration window
+### Schema stability
 
-The first three months after kernel landing are explicitly an iteration window. Breaking schema changes during this window bump the kernel minor version and require a one-week deprecation announcement. After that, schema changes follow standard semver discipline.
+Each consumer declares its own schema stability policy via the `memory:` contract. Breaking schema changes in the kernel bump the kernel minor version and require a one-week deprecation announcement. Consumers can iterate their own schema declarations independently of the kernel version.
 
 ---
 
@@ -229,15 +229,15 @@ The first three months after kernel landing are explicitly an iteration window. 
 
 ---
 
-## Open Questions for Human Reviewer
+## Resolved Open Questions (2026-04-14)
 
-These deserve explicit acceptance before implementation:
+Resolved during review with Project Owner:
 
-1. **Naming**: Is `semantic-memory` the right addon name, or do you prefer `memory-kernel`, `kb-kernel`, `aiwg-memory`?
-2. **`crossRefStyle` enum**: Issue #825 proposes `at-mention | wikilink | markdown-link | yaml-ref`. Do we need all four, or just `at-mention` (current AIWG default) and `wikilink` (Obsidian-friendly for `llm-wiki`)?
-3. **Schema-iteration window length**: 3 months proposed above. Adjust?
-4. **Forensics topology**: Should #825 ship the forensics schema declaration in v1, or defer until forensics consumer migration (#830) actually exercises it? Leaning defer to avoid speculative design.
-5. **CLI surface**: Should kernel skills also get CLI commands (`aiwg memory ingest`, `aiwg memory lint`)? Issue #826 mentions this as optional. Recommend yes for parity with `aiwg index`.
+1. **Naming**: `semantic-memory` — accepted as-is.
+2. **`crossRefStyle` enum**: All four values supported (`at-mention | wikilink | markdown-link | yaml-ref`). AIWG internal tooling (`mention-wire`, `mention-lint`, `mention-validate`) continues to use `at-mention` exclusively. Consumers declare their preferred style; the kernel writes cross-refs per the consumer's declared style.
+3. **Schema-iteration window**: Not a fixed global window. Instead, configurable per memory instance via the schema contract. Each consumer can declare its own iteration/stability policy.
+4. **Forensics topology in #825**: Ship it. All four consumer schema declarations (sdlc-complete, research-complete, forensics-complete, media-curator) land in #825. No deferrals — exercising all consumers early catches schema gaps before the kernel skills are built.
+5. **CLI surface**: Yes. Add `aiwg memory ingest`, `aiwg memory lint`, `aiwg memory query-capture` commands for parity with `aiwg index`. Ships with respective skill issues (#826, #827, #828).
 
 ---
 
@@ -268,4 +268,4 @@ These deserve explicit acceptance before implementation:
 
 **Last Updated**: 2026-04-14
 **Author**: Claude (Architecture Designer / Orchestrator)
-**Reviewers**: Project Owner (pending)
+**Reviewers**: Project Owner (accepted 2026-04-14)
