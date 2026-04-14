@@ -28,6 +28,9 @@
   "agents": [],
   "commands": [],
   "skills": [
+    "memory-ingest",
+    "memory-lint",
+    "memory-query-capture",
     "memory-log-append",
     "memory-log-render"
   ],
