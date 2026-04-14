@@ -1,0 +1,9 @@
+id: sdlc/env-var-catalog
+name: Deployment environment has Environment Variable Catalog
+description: Environment template must catalog all env vars the application reads per environment (Factor III)
+severity: warn
+applies-to:
+  glob: "**/deployment-environment*.md"
+checks:
+  - type: pattern-match
+    pattern: "Environment Variable Catalog|env vars|\\.env\\.example"

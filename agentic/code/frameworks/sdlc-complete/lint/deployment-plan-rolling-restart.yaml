@@ -1,0 +1,9 @@
+id: sdlc/deployment-plan-rolling-restart
+name: Deployment plan has Rolling Restart Strategy
+description: Deployment plan must specify grace periods and rolling restart behavior (Factor IX)
+severity: warn
+applies-to:
+  glob: "**/deployment-plan*.md"
+checks:
+  - type: pattern-match
+    pattern: "Rolling Restart|Disposability|SIGTERM"

@@ -1,0 +1,9 @@
+id: sdlc/sad-logging-architecture
+name: SAD documents Logging Architecture
+description: SAD must document log format, destination, and correlation strategy (Factor XI)
+severity: warn
+applies-to:
+  glob: "**/software-architecture-doc*.md"
+checks:
+  - type: pattern-match
+    pattern: "Logging Architecture|stdout|event stream"

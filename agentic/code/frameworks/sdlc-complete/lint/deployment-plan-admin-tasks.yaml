@@ -1,0 +1,9 @@
+id: sdlc/deployment-plan-admin-tasks
+name: Deployment plan has Admin Tasks section
+description: Releases requiring admin tasks (migrations, backfills) must document them (Factor XII)
+severity: warn
+applies-to:
+  glob: "**/deployment-plan*.md"
+checks:
+  - type: pattern-match
+    pattern: "Admin Tasks|ADM-\\d+"

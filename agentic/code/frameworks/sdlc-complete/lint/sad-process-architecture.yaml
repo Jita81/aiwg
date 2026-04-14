@@ -1,0 +1,9 @@
+id: sdlc/sad-process-architecture
+name: SAD includes Process Architecture section
+description: Software Architecture Document must include the 12-factor Process Architecture section (Factors VI, VII, VIII, IX, XI)
+severity: warn
+applies-to:
+  glob: "**/software-architecture-doc*.md"
+checks:
+  - type: pattern-match
+    pattern: "Process Architecture|Process Types|Process State Model"

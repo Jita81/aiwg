@@ -1,0 +1,9 @@
+id: sdlc/admin-processes-documented
+name: Admin processes catalog exists
+description: Projects with admin tasks (migrations, backfills, key rotations) must have an admin-processes catalog (Factor XII)
+severity: info
+applies-to:
+  glob: "**/admin-processes*.md"
+checks:
+  - type: pattern-match
+    pattern: "Admin Task Catalog|ADM-\\d+"

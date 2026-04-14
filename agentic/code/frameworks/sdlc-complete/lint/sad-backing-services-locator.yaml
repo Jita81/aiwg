@@ -1,0 +1,9 @@
+id: sdlc/sad-backing-services-locator
+name: SAD includes Backing Services Locator Table
+description: SAD must document every backing service via an env-var-indexed locator table (Factor IV)
+severity: warn
+applies-to:
+  glob: "**/software-architecture-doc*.md"
+checks:
+  - type: pattern-match
+    pattern: "Backing Services|Resource Locator"

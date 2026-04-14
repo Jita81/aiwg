@@ -1,0 +1,5 @@
+id: sdlc
+name: SDLC 12-Factor Lint Rules
+description: Validate SDLC artifacts and codebases against 12-factor methodology principles — config in env, dependency manifests, no file logging, port binding, admin task documentation.
+framework: sdlc-complete
+version: 1.0.0

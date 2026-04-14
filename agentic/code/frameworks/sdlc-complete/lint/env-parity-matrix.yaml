@@ -1,0 +1,9 @@
+id: sdlc/env-parity-matrix
+name: Deployment environment has Tech Stack Parity Matrix
+description: Environment template must show matching tech stacks across dev/staging/prod (Factor X)
+severity: warn
+applies-to:
+  glob: "**/deployment-environment*.md"
+checks:
+  - type: pattern-match
+    pattern: "Tech Stack Parity|Parity Matrix|Parity Status"

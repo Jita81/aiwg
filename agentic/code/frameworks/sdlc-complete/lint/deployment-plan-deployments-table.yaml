@@ -1,0 +1,9 @@
+id: sdlc/deployment-plan-deployments-table
+name: Deployment plan has Deployments Table
+description: Every deployment plan must enumerate the environments targeted by the codebase (Factor I)
+severity: warn
+applies-to:
+  glob: "**/deployment-plan*.md"
+checks:
+  - type: pattern-match
+    pattern: "Deployments Table|Deployments[\\s]*$|One Codebase"

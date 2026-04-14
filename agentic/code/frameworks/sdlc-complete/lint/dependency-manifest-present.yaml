@@ -1,0 +1,9 @@
+id: sdlc/dependency-manifest-present
+name: Dependency manifest present at project root
+description: Projects must declare dependencies explicitly via a known manifest file (Factor II)
+severity: error
+applies-to:
+  glob: "**/package.json"
+checks:
+  - type: file-exists
+    field: name
