@@ -133,12 +133,18 @@ describe('isIndexStale', () => {
     expect(isIndexStale(TEST_DIR, 60_000)).toBe(false);
   });
 
-  it('returns true when max age is zero (always stale)', () => {
+  it('returns true when file is older than max age', () => {
     const indexDir = join(TEST_DIR, '.aiwg', '.index');
     mkdirSync(indexDir, { recursive: true });
-    writeFileSync(join(indexDir, 'metadata.json'), '{}', 'utf-8');
+    const metaPath = join(indexDir, 'metadata.json');
+    writeFileSync(metaPath, '{}', 'utf-8');
 
-    // Age is > 0 ms since we just wrote it
-    expect(isIndexStale(TEST_DIR, 0)).toBe(true);
+    // Set mtime to 1 hour ago
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+    const fs = require('fs');
+    fs.utimesSync(metaPath, oneHourAgo, oneHourAgo);
+
+    // 1 minute threshold — file is 60x older
+    expect(isIndexStale(TEST_DIR, 60_000)).toBe(true);
   });
 });

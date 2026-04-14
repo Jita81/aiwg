@@ -201,6 +201,36 @@ Research rules manage the research corpus. Deployed when research features are a
 
 ---
 
+## 12-Factor App Rules (4 rules — architecture guidance)
+
+These rules encode 12-factor methodology principles (https://12factor.net/) as default architectural guidance. Added per issue #821 gap analysis.
+
+### HIGH
+
+#### stateless-processes
+**Summary**: Application processes must be stateless — externalize session state, uploaded files, caches, and work state to backing services. File writes restricted to `/tmp` and declared volume mounts. Enables horizontal scaling and disposability. (Factor VI)
+**When to apply**: Architecture review, service design, SAD Process State Model section, scaling decisions
+**Full rule**: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/stateless-processes.md
+
+#### disposable-processes
+**Summary**: Fast startup (<10s) and graceful shutdown (SIGTERM handler, in-flight work completion within grace window). Enables rolling deployments, autoscaling, and crash recovery without data loss. (Factor IX)
+**When to apply**: Service design, deployment planning, operational readiness review, container/k8s deployments
+**Full rule**: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/disposable-processes.md
+
+#### logs-as-event-streams
+**Summary**: Write logs to stdout/stderr as unbuffered streams — no local log files, no in-app rotation. Structured JSON format preferred. Environment handles aggregation, routing, and persistence. (Factor XI)
+**When to apply**: Logging architecture, observability design, container log aggregation, deployment review
+**Full rule**: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/logs-as-event-streams.md
+
+### MEDIUM
+
+#### config-in-environment
+**Summary**: Configuration values that differ between environments (URLs, feature flags, resource limits) must come from environment variables. No hardcoded env-specific values in source. `.env.example` at project root documents every env var. Complements `token-security.md` for the non-secret config subset. (Factor III)
+**When to apply**: Configuration design, environment setup, deployment review, source code review
+**Full rule**: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/config-in-environment.md
+
+---
+
 ## Component Rule Indexes
 
 Rules contributed by installed addons. Load the component index for full rule summaries.
@@ -217,7 +247,9 @@ Rules contributed by installed addons. Load the component index for full rule su
 
 | Task Type | Relevant Rules |
 |-----------|---------------|
-| **Writing code** | no-attribution, executable-feedback, anti-laziness, agent-friendly-code, agent-generation-guardrails |
+| **Writing code** | no-attribution, executable-feedback, anti-laziness, agent-friendly-code, agent-generation-guardrails, config-in-environment, logs-as-event-streams |
+| **Service/process design** | stateless-processes, disposable-processes, config-in-environment, logs-as-event-streams |
+| **Deployment/operations** | disposable-processes, logs-as-event-streams, config-in-environment |
 | **Running tests** | executable-feedback, anti-laziness, reproducibility, reproducibility-validation |
 | **Creating artifacts** | mention-wiring, provenance-tracking, qualified-references, progressive-disclosure, artifact-discovery |
 | **Phase transitions** | hitl-gates, sdlc-orchestration, human-gate-display |
@@ -233,5 +265,5 @@ Rules contributed by installed addons. Load the component index for full rule su
 
 ---
 
-*Generated from manifest.json v2.0.0 — 33 rules across 3 tiers*
+*Generated from manifest.json v2.0.0 — 37 rules across 4 tiers*
 *Full rule files: @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/*
