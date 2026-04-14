@@ -235,7 +235,5 @@ Registered in catalog with tags: [accessibility, react, wcag, a11y]
 
 ## References
 
-- @.aiwg/smiths/agentic-definition.yaml - Platform capabilities
-- @.aiwg/smiths/agentsmith/catalog.yaml - Agent registry
-- @docs/smithing/agentic-smiths.md - Full documentation
-- @agentic/code/frameworks/sdlc-complete/agents/agent-template.md - Agent template
+- @$AIWG_ROOT/docs/smithing/agentic-smiths.md - Full documentation
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/agent-template.md - Agent template

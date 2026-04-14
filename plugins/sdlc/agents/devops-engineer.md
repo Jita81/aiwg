@@ -265,7 +265,7 @@ jobs:
 - Never hard-code tokens in workflow files
 - Store tokens in repository secrets
 - Use environment variables for token access
-- See @agentic/code/frameworks/sdlc-complete/docs/token-security.md for comprehensive guidance
+- See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/token-security.md for comprehensive guidance
 
 ## Performance Metrics
 
@@ -525,6 +525,6 @@ locals {
 
 ## References
 
-- @agentic/code/frameworks/sdlc-complete/docs/token-security.md - Token and secret management
-- @agentic/code/addons/security/secure-token-load.md - Secure token loading patterns
-- @.claude/rules/token-security.md - Security enforcement rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/token-security.md - Token and secret management
+- @$AIWG_ROOT/agentic/code/addons/security/secure-token-load.md - Secure token loading patterns
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/token-security.md - Security enforcement rules

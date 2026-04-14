@@ -145,9 +145,8 @@ Use explicit thought types when:
 
 This protocol improves detection accuracy and reduces false positives.
 
-See @.claude/rules/thought-protocol.md for complete thought type definitions.
-See @.claude/rules/tao-loop.md for Thought→Action→Observation integration.
-See @.aiwg/research/findings/REF-018-react.md for research foundation.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md for complete thought type definitions.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md for Thought→Action→Observation integration.
 
 ## Few-Shot Examples
 
@@ -719,7 +718,7 @@ This shows sophisticated reward hacking - the agent:
 
 ## Integration with Agent Loop
 
-When operating within agent iteration loops:
+When operating within Al iteration loops:
 
 1. **Pre-iteration check**: Load baseline metrics (test count, coverage %)
 2. **During iteration**: Monitor for incremental avoidance patterns
@@ -727,15 +726,15 @@ When operating within agent iteration loops:
 4. **On detection**: Trigger PAUSE→DIAGNOSE→ADAPT→RETRY protocol
 5. **On escalation**: Hand off to human with full context
 
-See @agentic/code/addons/ralph/schemas/iteration-analytics.yaml for iteration tracking.
+See @$AIWG_ROOT/agentic/code/addons/ralph/schemas/iteration-analytics.yaml for iteration tracking.
 
 ## References
 
 - @.aiwg/research/findings/agentic-laziness-research.md - Comprehensive research compilation
 - @.aiwg/patterns/laziness-patterns.yaml - Complete pattern catalog
-- @src/hooks/laziness-detection.ts - Hook implementation
-- @.claude/rules/executable-feedback.md - Test execution requirements
-- @.claude/rules/actionable-feedback.md - Feedback quality standards
+- @$AIWG_ROOT/src/hooks/laziness-detection.ts - Hook implementation
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/executable-feedback.md - Test execution requirements
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/actionable-feedback.md - Feedback quality standards
 - @.aiwg/intake/agent-persistence-solution-profile.md - Solution design
 - REF-071: METR reward hacking research
 - REF-072: Anthropic emergent misalignment
@@ -744,13 +743,13 @@ See @agentic/code/addons/ralph/schemas/iteration-analytics.yaml for iteration tr
 
 ## Provenance Tracking
 
-After detecting avoidance patterns or generating reports, create provenance records per @.claude/rules/provenance-tracking.md:
+After detecting avoidance patterns or generating reports, create provenance records per @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/provenance-tracking.md:
 
-1. **Create provenance record** - Use @agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml format
+1. **Create provenance record** - Use @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/provenance/prov-record.yaml format
 2. **Record Entity** - Detection report path as URN (`urn:aiwg:artifact:<path>`) with content hash
 3. **Record Activity** - Type (`detection` for pattern identification, `blocking` for write prevention) with timestamps
 4. **Record Agent** - This agent (`urn:aiwg:agent:laziness-detector`) with tool version
 5. **Document derivations** - Link detection reports to source diffs and pattern catalog as `wasDerivedFrom`
 6. **Save record** - Write to `.aiwg/research/provenance/records/<artifact-name>.prov.yaml`
 
-See @agentic/code/frameworks/sdlc-complete/agents/provenance-manager.md for the Provenance Manager agent.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/agents/provenance-manager.md for the Provenance Manager agent.

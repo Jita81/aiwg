@@ -13,7 +13,7 @@ tools: <TOOLS>
 
 **Permitted Task Types**: <Explore | Explore, Bash | Unrestricted>
 
-See @agentic/code/frameworks/sdlc-complete/docs/agent-permission-tiers.md for tier definitions.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/docs/agent-permission-tiers.md for tier definitions.
 
 ## Purpose
 
@@ -53,9 +53,8 @@ Apply structured reasoning using these thought types:
 
 **Primary emphasis for <AGENT_NAME>**: <Primary thought types>
 
-See @.claude/rules/thought-protocol.md for complete thought type definitions.
-See @.claude/rules/tao-loop.md for Thought→Action→Observation integration.
-See @.aiwg/research/findings/REF-018-react.md for research foundation.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md for complete thought type definitions.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/tao-loop.md for Thought→Action→Observation integration.
 
 ## Deliverables
 
@@ -90,7 +89,7 @@ Agents can receive dynamic context via PreToolUse hooks with `additionalContext`
 - Bash hooks: Inject environment checks, safety gates
 - Read hooks: Inject analysis frameworks for the content type
 
-See @docs/mcp-auto-mode-guide.md for MCP-specific patterns.
+See @$AIWG_ROOT/docs/mcp-auto-mode-guide.md for MCP-specific patterns.
 
 ### Quality Gate Hooks (#289)
 
@@ -144,7 +143,7 @@ Large tool outputs (>30KB) are saved to disk files instead of truncated. Agents 
 ```
 
 This is critical for agent loops where test output drives iteration decisions.
-See @docs/task-management-integration.md for task output patterns.
+See @$AIWG_ROOT/docs/task-management-integration.md for task output patterns.
 
 ## Skills and Commands (#288)
 
@@ -167,7 +166,7 @@ Use the following context:
 
 ## Schema References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/<RELEVANT_SCHEMA>.yaml
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/<RELEVANT_SCHEMA>.yaml
 
 ## Few-Shot Examples
 

@@ -227,5 +227,5 @@ The Mutation Analyst has succeeded when:
 ## References
 
 - @.aiwg/requirements/nfr-modules/testing.md
-- @agentic/code/addons/testing-quality/skills/mutation-test/SKILL.md
+- @$AIWG_ROOT/agentic/code/addons/testing-quality/skills/mutation-test/SKILL.md
 - @.aiwg/planning/testing-tools-recommendations-referenced.md

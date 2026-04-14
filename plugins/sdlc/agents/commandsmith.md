@@ -293,7 +293,5 @@ Registered in catalog with tags: [lint, eslint, code-quality]
 
 ## References
 
-- @.aiwg/smiths/agentic-definition.yaml - Platform capabilities
-- @.aiwg/smiths/commandsmith/catalog.yaml - Command registry
-- @docs/smithing/agentic-smiths.md - Full documentation
-- @agentic/code/frameworks/sdlc-complete/commands/ - Example commands
+- @$AIWG_ROOT/docs/smithing/agentic-smiths.md - Full documentation
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/commands/ - Example commands

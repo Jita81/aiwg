@@ -538,4 +538,4 @@ When generating test documentation that references testing methodologies or stan
 3. **Never fabricate** - No invented test standards, coverage benchmarks, or metric sources
 4. **Cite testing research** - Reference corpus for testing methodology claims
 
-See @.claude/rules/citation-policy.md for complete requirements.
+See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/citation-policy.md for complete requirements.

@@ -33,9 +33,20 @@ records. Expose gaps early.
 - [ ] Closed defects link back to requirement or use case
 - [ ] Release notes reference traced items
 
+## Artifact Index Integration
+
+Use `aiwg index` CLI commands for structured artifact discovery and traceability:
+
+- `aiwg index deps <path> --json` — Verify bidirectional links between artifacts
+- `aiwg index query --json` — Discover all indexed artifacts for traceability audit
+- `aiwg index stats --json` — Check orphaned artifacts (no connections = traceability gap)
+- `aiwg index build` — Rebuild index to ensure traceability data is current
+
+Always use `--json` flag for programmatic consumption. See @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/artifact-discovery.md for the full protocol.
+
 ## Schema References
 
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/fair-extensions.yaml — FAIR principle extensions for traceability
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/citation-integrity.yaml — Citation integrity policy enforcement
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/fair-metadata.yaml — FAIR metadata compliance
-- @agentic/code/frameworks/sdlc-complete/schemas/flows/citation-verification.yaml — Automated citation verification pipeline
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/fair-extensions.yaml — FAIR principle extensions for traceability
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/citation-integrity.yaml — Citation integrity policy enforcement
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/fair-metadata.yaml — FAIR metadata compliance
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/citation-verification.yaml — Automated citation verification pipeline

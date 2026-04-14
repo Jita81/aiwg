@@ -53,13 +53,13 @@ This role's practices are grounded in:
 - LoopDecisionRequest → Provides termination recommendation
 
 **Sends**:
-- ProgressReport → To Ralph orchestrator
+- ProgressReport → To Al orchestrator
 - RegressionAlert → To orchestrator and human
 - BestIterationSelection → On loop completion
 
 ## Thought Protocol
 
-For each assessment, express your thinking using thought types from `@.claude/rules/thought-protocol.md`:
+For each assessment, express your thinking using thought types from `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md`:
 
 **Goal Thought** 🎯
 - Format: "Goal: I need to assess iteration N progress and detect any regressions"
@@ -698,7 +698,7 @@ termination_logic:
 
 ## Integration with Agent Loop
 
-### Ralph Hook Points
+### Al Hook Points
 
 ```yaml
 ralph_integration:
@@ -726,14 +726,14 @@ ralph_integration:
 ### Conversation Pattern
 
 ```
-Ralph Orchestrator → Progress Tracker: "Iteration 1 complete"
-Progress Tracker → Ralph Orchestrator: "Forward progress detected, continue"
+Al Orchestrator → Progress Tracker: "Iteration 1 complete"
+Progress Tracker → Al Orchestrator: "Forward progress detected, continue"
 
-Ralph Orchestrator → Progress Tracker: "Iteration 3 complete"
-Progress Tracker → Ralph Orchestrator: "ALERT: Coverage regression, recommend rollback"
+Al Orchestrator → Progress Tracker: "Iteration 3 complete"
+Progress Tracker → Al Orchestrator: "ALERT: Coverage regression, recommend rollback"
 
-Ralph Orchestrator → Progress Tracker: "Loop complete, select best output"
-Progress Tracker → Ralph Orchestrator: "Selected iteration 2 (quality: 0.88 vs final 0.81)"
+Al Orchestrator → Progress Tracker: "Loop complete, select best output"
+Progress Tracker → Al Orchestrator: "Selected iteration 2 (quality: 0.88 vs final 0.81)"
 ```
 
 ## Storage Structure
@@ -800,11 +800,11 @@ Before completing any progress tracking task:
 ## References
 
 - @.aiwg/requirements/use-cases/UC-AP-006-progress-tracking.md - Primary use case
-- @.claude/rules/best-output-selection.md - Non-monotonic selection rules
-- @.claude/rules/thought-protocol.md - Six thought types
-- @.claude/rules/conversable-agent-interface.md - Agent interface requirements
-- @.claude/rules/few-shot-examples.md - Example quality standards
-- @agentic/code/addons/ralph/schemas/iteration-analytics.yaml - Metrics schema
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/best-output-selection.md - Non-monotonic selection rules
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/thought-protocol.md - Six thought types
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/conversable-agent-interface.md - Agent interface requirements
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/few-shot-examples.md - Example quality standards
+- @$AIWG_ROOT/agentic/code/addons/ralph/schemas/iteration-analytics.yaml - Metrics schema
 - @.aiwg/research/findings/REF-076-production-challenges.md - Infinite loop detection
 - @.aiwg/research/findings/REF-058-r-lam.md - Reproducibility and checkpoints
 
