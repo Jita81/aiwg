@@ -62,6 +62,7 @@ You recognize these as requests for this orchestration flow.
 - `test-coverage` - Test coverage thresholds
 - `documentation` - Documentation completeness
 - `traceability` - Requirements → code → tests
+- `12-factor` - 12-factor app methodology compliance (opt-in, cloud-native targets)
 
 **Special Gates**:
 - `all` - Run all applicable gates
@@ -589,6 +590,88 @@ elif gate == "traceability":
         Save to: .aiwg/gates/traceability-gate-report.md
         """
     )
+
+elif gate == "12-factor":
+    # 12-Factor App methodology compliance gate (opt-in, cloud-native targets)
+    # Combines declarative lint (fast, deterministic) with architecture-designer
+    # review (semantic quality of SAD process architecture).
+    # Reference: .aiwg/reports/12-factor-gap-analysis.md, issue #821
+
+    # Layer 1: Declarative lint — structural checks (seconds)
+    Task(
+        subagent_type="project-manager",
+        description="Run SDLC 12-factor lint ruleset",
+        prompt="""
+        Run the SDLC 12-factor lint ruleset against the project artifacts:
+
+        Command: aiwg lint .aiwg/ --ruleset sdlc --format json --ci --fail-on warn
+
+        The ruleset checks 10 structural conditions covering all 12 factors:
+        - dependency-manifest-present (II)
+        - sad-process-architecture (VI, VIII)
+        - sad-backing-services-locator (IV)
+        - sad-logging-architecture (XI)
+        - deployment-plan-deployments-table (I)
+        - deployment-plan-rolling-restart (IX)
+        - deployment-plan-admin-tasks (XII)
+        - env-parity-matrix (X)
+        - env-var-catalog (III)
+        - admin-processes-documented (XII)
+
+        Parse JSON output. Group diagnostics by factor.
+        Pass criteria: 0 errors; warnings documented with rationale if not addressed.
+        Save to: .aiwg/gates/12-factor-lint-report.md
+        """
+    )
+
+    # Layer 2: Architecture review — semantic quality of Process Architecture
+    Task(
+        subagent_type="architecture-designer",
+        description="Validate Process Architecture section of SAD",
+        prompt="""
+        Deep review of the Software Architecture Document Section 9a (Process Architecture).
+        See .aiwg/architecture/software-architecture-doc.md.
+
+        Assess semantic quality (lint covers only presence, not correctness):
+
+        9a.1 Process Types — every process archetype listed with scaling axis, concurrency limits
+        9a.2 Process State Model — every state kind externalized to backing service, no in-process state
+        9a.3 Disposability — startup < 10s target stated, SIGTERM handlers confirmed, crash recovery described
+        9a.4 Port Binding — self-contained services, no dependency on external web server (or ADR)
+        9a.5 Backing Services — every resource via env var, swap criteria realistic
+        9a.6 Logging Architecture — stdout/JSON, no file handlers, correlation IDs propagated
+
+        For each: PASS | GAP | RISK | N/A-with-ADR
+
+        Flag any section that lists state, disk writes, or log files that violate the corresponding rule:
+        - rules/stateless-processes.md
+        - rules/disposable-processes.md
+        - rules/logs-as-event-streams.md
+        - rules/config-in-environment.md
+
+        Save to: .aiwg/gates/12-factor-architecture-review.md
+        """
+    )
+
+    # Layer 3: Deployment readiness — does the deployment plan reflect the process model?
+    Task(
+        subagent_type="deployment-manager",
+        description="Validate deployment plan 12-factor compliance",
+        prompt="""
+        Review deployment artifacts for 12-factor deployment readiness.
+        See .aiwg/deployment/deployment-plan.md and deployment-environment.md.
+
+        Check:
+        - Deployments Table: every target environment enumerated? (Factor I)
+        - Rolling Restart Strategy: grace periods realistic? match SAD disposability SLA? (Factor IX)
+        - Admin Tasks: all migrations/backfills reference admin-processes catalog? (Factor XII)
+        - Tech Stack Parity Matrix: dev/staging/prod use same tech? parity violations ADR'd? (Factor X)
+        - Environment Variable Catalog: matches .env.example at project root? (Factor III)
+
+        Pass criteria: all 5 sections present and consistent with SAD Section 9a.
+        Save to: .aiwg/gates/12-factor-deployment-review.md
+        """
+    )
 ```
 
 ### Step 4: Synthesize Results
@@ -746,7 +829,7 @@ Starting validation...
 
 Supported gates:
 - Phase gates: inception, elaboration, construction, transition
-- Workflow gates: security, reliability, test-coverage, documentation, traceability
+- Workflow gates: security, reliability, test-coverage, documentation, traceability, 12-factor
 - Special: all, pre-deploy, orr
 
 Please specify a valid gate.

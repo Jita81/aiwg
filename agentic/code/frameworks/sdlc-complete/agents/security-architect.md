@@ -41,6 +41,42 @@ implementation controls, and enforce release gates.
 - [ ] Zero open critical findings; highs triaged with owner/date
 - [ ] SBOM updated; dependency risk addressed or accepted
 - [ ] Secrets policy verified; no hardcoded secrets
+- [ ] Config-in-environment audit: no hardcoded env-specific values in source (Factor III)
+
+## 12-Factor Configuration Security (Issue #821)
+
+Extend the secrets review to a general config-in-environment audit. The `token-security` rule covers credentials specifically; this extends it to all environment-varying configuration.
+
+### What to audit
+
+1. **Hardcoded URLs/hostnames/ports**: scan for literal URLs in source — flag anything that differs between environments
+2. **Feature flags with env-specific values**: `if APP_ENV == "production"` scattered in source is a smell — centralize in a config object
+3. **Secret-adjacent data**: API endpoints that identify a specific tenant/customer, tracking IDs that leak environment identity
+4. **`.env.example` completeness**: every `process.env.FOO` / `os.getenv("FOO")` in source must appear in `.env.example`
+5. **Config validation**: app should fail-fast on missing required env vars (security posture: better to refuse to start than run with defaults)
+
+### Secret-specific checks (unchanged)
+
+- No hardcoded secrets, CLI arg tokens, or logged token values (`rules/token-security.md`)
+- Secrets loaded from secret manager or mounted files, never directly from env
+- Scoped lifetime via heredoc pattern where applicable
+- File permissions 600 for any secret files
+
+### Audit tooling
+
+Run the SDLC 12-factor lint ruleset before sign-off:
+```
+aiwg lint .aiwg/ --ruleset sdlc --ci --fail-on warn
+```
+
+Rules that catch config leakage:
+- `sdlc/env-var-catalog` — deployment environment has a complete catalog
+- `sdlc/env-parity-matrix` — no hidden tech substitutions between environments
+
+References:
+- `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/token-security.md` — secrets subset
+- `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/config-in-environment.md` — general config rule
+- `@$AIWG_ROOT/.aiwg/reports/12-factor-gap-analysis.md` — context
 
 ## Artifact Index Integration
 
