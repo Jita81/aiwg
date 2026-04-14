@@ -54,6 +54,23 @@
       { "path": ".aiwg/forensics/iocs/",       "description": "Indicators of compromise" },
       { "path": ".aiwg/forensics/reports/",    "description": "Forensic reports" },
       { "path": ".aiwg/forensics/sigma/",      "description": "Sigma detection rules" }
-    ]
+    ],
+    "topology": {
+      "namespace": ".aiwg/forensics",
+      "rawSources": ".aiwg/forensics/evidence",
+      "derivedPages": {
+        "profile": ".aiwg/forensics/profiles",
+        "finding": ".aiwg/forensics/findings",
+        "timeline": ".aiwg/forensics/timelines",
+        "ioc": ".aiwg/forensics/iocs",
+        "synthesis": ".aiwg/forensics/reports"
+      },
+      "index": ".aiwg/forensics/index.md",
+      "log": ".aiwg/forensics/.log.jsonl",
+      "crossRefStyle": "at-mention",
+      "pageTemplate": "templates/forensics-finding.md",
+      "ingestRequires": ["provenance"],
+      "lintRules": ["link-check", "mention-lint"]
+    }
   }
 }

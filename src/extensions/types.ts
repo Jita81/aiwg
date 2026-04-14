@@ -135,6 +135,115 @@ export interface MemoryFootprint {
    * @example [{ "path": ".aiwg/AIWG.md", "description": "Project context entry point" }]
    */
   normalizedFiles?: MemoryPath[];
+
+  /**
+   * Semantic memory topology declaration
+   *
+   * When present, this component declares a structured semantic memory that
+   * kernel skills (memory-ingest, memory-lint, memory-query-capture) can
+   * operate on. The kernel reads this contract to parameterize behavior.
+   *
+   * @see ADR-021 — Semantic memory kernel architecture
+   */
+  topology?: MemoryTopology;
+}
+
+/**
+ * Cross-reference style used when linking between pages in semantic memory.
+ *
+ * Kernel skills write cross-references per the consumer's declared style.
+ * AIWG internal tooling (mention-wire, mention-lint) uses at-mention exclusively.
+ */
+export type CrossRefStyle = 'at-mention' | 'wikilink' | 'markdown-link' | 'yaml-ref';
+
+/**
+ * Semantic memory topology contract
+ *
+ * Declares how a consumer's semantic memory is organized — where raw sources
+ * live, where derived pages go, how pages cross-reference each other, and
+ * what validation the kernel should apply during ingest and lint.
+ *
+ * Read by kernel skills in `agentic/code/addons/semantic-memory/` to
+ * parameterize topology-agnostic operations.
+ *
+ * @see ADR-021 decisions D2 (interface) and D3 (schema location)
+ * @see https://git.integrolabs.net/roctinam/aiwg/issues/825
+ */
+export interface MemoryTopology {
+  /**
+   * Root namespace for this consumer's memory under .aiwg/
+   *
+   * @example ".aiwg/research"
+   * @example ".aiwg/wiki"
+   */
+  namespace: string;
+
+  /**
+   * Directory where raw/original sources are stored before processing
+   *
+   * @example ".aiwg/research/sources"
+   */
+  rawSources: string;
+
+  /**
+   * Map of derived page categories to their storage directories
+   *
+   * Keys are semantic roles (summary, entity, concept, synthesis, etc.).
+   * Values are directory paths under the namespace.
+   *
+   * @example { "summary": ".aiwg/research/summaries", "entity": ".aiwg/research/knowledge/entities" }
+   */
+  derivedPages: Record<string, string>;
+
+  /**
+   * Path to the master index file for this memory
+   *
+   * @example ".aiwg/research/index.md"
+   */
+  index: string;
+
+  /**
+   * Path to the append-only JSON Lines event log
+   *
+   * @example ".aiwg/research/.log.jsonl"
+   */
+  log: string;
+
+  /**
+   * How cross-references between pages are written
+   *
+   * @default "at-mention"
+   */
+  crossRefStyle: CrossRefStyle;
+
+  /**
+   * Path to the page template used when creating new derived pages
+   *
+   * Relative to the consumer's addon/framework root.
+   *
+   * @example "templates/research-page.md"
+   */
+  pageTemplate?: string;
+
+  /**
+   * Capabilities required during ingest
+   *
+   * Kernel checks these and delegates to the named capability providers.
+   * Common values: "provenance", "grade-quality", "citation-guard"
+   *
+   * @example ["provenance", "grade-quality"]
+   */
+  ingestRequires?: string[];
+
+  /**
+   * Lint rule IDs to apply during memory-lint
+   *
+   * References existing skill or rule IDs (e.g., "citation-guard", "link-check").
+   * The kernel composes these with its own structural checks.
+   *
+   * @example ["citation-guard", "link-check", "mention-lint"]
+   */
+  lintRules?: string[];
 }
 
 /**

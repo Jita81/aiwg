@@ -32,6 +32,22 @@
       { "path": ".aiwg/research/synthesis/",   "description": "Synthesis and gap analysis" },
       { "path": ".aiwg/research/provenance/",  "description": "W3C PROV provenance records" },
       { "path": ".aiwg/research/knowledge/",   "description": "Knowledge base and lit notes" }
-    ]
+    ],
+    "topology": {
+      "namespace": ".aiwg/research",
+      "rawSources": ".aiwg/research/sources",
+      "derivedPages": {
+        "summary": ".aiwg/research/findings",
+        "entity": ".aiwg/research/knowledge/entities",
+        "concept": ".aiwg/research/knowledge/concepts",
+        "synthesis": ".aiwg/research/synthesis"
+      },
+      "index": ".aiwg/research/index.md",
+      "log": ".aiwg/research/.log.jsonl",
+      "crossRefStyle": "at-mention",
+      "pageTemplate": "templates/research-page.md",
+      "ingestRequires": ["provenance", "grade-quality"],
+      "lintRules": ["citation-guard", "link-check", "mention-lint"]
+    }
   }
 }

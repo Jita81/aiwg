@@ -128,7 +128,27 @@
         "path": ".aiwg/AIWG.md",
         "description": "Project context entry point — current phase, architecture summary, installed frameworks"
       }
-    ]
+    ],
+    "topology": {
+      "namespace": ".aiwg",
+      "rawSources": ".aiwg/intake",
+      "derivedPages": {
+        "requirement": ".aiwg/requirements",
+        "architecture": ".aiwg/architecture",
+        "plan": ".aiwg/planning",
+        "risk": ".aiwg/risks",
+        "test": ".aiwg/testing",
+        "security": ".aiwg/security",
+        "deployment": ".aiwg/deployment",
+        "synthesis": ".aiwg/reports"
+      },
+      "index": ".aiwg/index.md",
+      "log": ".aiwg/.log.jsonl",
+      "crossRefStyle": "at-mention",
+      "pageTemplate": "templates/governance/adr-template.md",
+      "ingestRequires": ["provenance"],
+      "lintRules": ["link-check", "mention-lint", "traceability-check"]
+    }
   },
   "ci": {
     "github": ["workflows/aiwg-sdlc.yml"],

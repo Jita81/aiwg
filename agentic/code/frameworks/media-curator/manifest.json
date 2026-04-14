@@ -27,6 +27,21 @@
       { "path": ".aiwg/media/reports/", "description": "Completeness and gap reports" },
       { "path": ".aiwg/media/sessions/", "description": "Resumable curation session state" },
       { "path": ".aiwg/media-curator/profiles/", "description": "Artist profiles saved as YAML" }
-    ]
+    ],
+    "topology": {
+      "namespace": ".aiwg/media",
+      "rawSources": ".aiwg/media/sources",
+      "derivedPages": {
+        "artist": ".aiwg/media/analysis",
+        "discography": ".aiwg/media/discography",
+        "session": ".aiwg/media/sessions",
+        "synthesis": ".aiwg/media/reports"
+      },
+      "index": ".aiwg/media/index.md",
+      "log": ".aiwg/media/.log.jsonl",
+      "crossRefStyle": "at-mention",
+      "pageTemplate": "templates/artist-profile.md",
+      "lintRules": ["link-check", "mention-lint"]
+    }
   }
 }
