@@ -1,0 +1,79 @@
+[build-system]
+requires = ["hatchling>=1.18"]
+build-backend = "hatchling.build"
+
+[project]
+name = "aiwg-training"
+version = "1.0.0"
+description = "Runtime implementation of the AIWG training-complete framework — corpus-to-dataset pipeline"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "AIWG Contributors" },
+]
+keywords = ["aiwg", "training", "dataset", "dpo", "alpaca", "sharegpt", "decontamination", "fine-tuning"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+    "pyyaml>=6.0",
+    "jsonlines>=4.0",
+    "pydantic>=2.5",
+    "click>=8.1",
+    "rich>=13.7",
+]
+
+[project.optional-dependencies]
+parquet = ["pyarrow>=15.0"]
+semantic = ["sentence-transformers>=2.2", "numpy>=1.24"]
+fuzzy = ["rapidfuzz>=3.5"]
+agentic = ["anthropic>=0.39"]
+hf = ["datasets>=2.17"]
+all = [
+    "pyarrow>=15.0",
+    "sentence-transformers>=2.2",
+    "numpy>=1.24",
+    "rapidfuzz>=3.5",
+    "anthropic>=0.39",
+    "datasets>=2.17",
+]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "ruff>=0.5",
+    "mypy>=1.10",
+]
+
+[project.scripts]
+aiwg-training = "aiwg_training.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/jmagly/aiwg"
+Repository = "https://github.com/jmagly/aiwg"
+Issues = "https://github.com/jmagly/aiwg/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["aiwg_training"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "B", "A", "C4", "UP"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
