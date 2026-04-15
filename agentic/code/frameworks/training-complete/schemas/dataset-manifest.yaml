@@ -1,0 +1,216 @@
+# Training Dataset Manifest Schema
+# Version: 1.0.0
+# Purpose: Version-level metadata for a training dataset — captures everything
+#          needed for reproducibility (seed, sources, license, decontamination,
+#          provenance, storage reference)
+# Reference: ADR-022 D6 (YAML primary + JSON auto-export), #833
+# Standards: ML Reproducibility Checklist (REF-475), Datasheets (REF-451),
+#            Model Cards (REF-452), Data Statements (REF-453)
+
+# ==============================================================================
+# REQUIRED FIELDS
+# ==============================================================================
+
+required_fields:
+  version:
+    type: string
+    format: "CalVer (YYYY.M.PATCH) or SemVer"
+    description: "Dataset version identifier"
+    example: "2026.4.0"
+
+  name:
+    type: string
+    description: "Human-readable dataset name"
+    example: "code-review-gold-v1"
+
+  description:
+    type: string
+    description: "What this dataset is for, in one paragraph"
+
+  seed:
+    type: integer
+    description: "Random seed for reproducibility — governs split, shuffle, synthetic sampling"
+
+  split_counts:
+    type: object
+    fields:
+      train: { type: integer }
+      validation: { type: integer }
+      test: { type: integer }
+    description: "Example counts per split"
+
+  sources:
+    type: array
+    description: "Source inventory with license tracking"
+    items:
+      fields:
+        ref_id: "REF ID (from research-papers) or source file path"
+        license: "SPDX identifier"
+        example_count: "How many examples derived from this source"
+        quality_grade: "GRADE assessment of the source itself"
+
+  license:
+    type: string
+    description: "Effective license for the dataset — computed as most restrictive from sources"
+    example: "CC-BY-SA-4.0"
+
+  provenance_record_id:
+    type: string
+    description: "UUID of top-level W3C PROV record for this dataset version"
+
+  storage_ref:
+    type: object
+    description: "Pointer to immutable storage — one of fortemi_archive_id or aiwg_index_snapshot_id"
+    oneOf:
+      - fortemi_archive_id: "Fortemi archive snapshot UUID"
+      - aiwg_index_snapshot_id: "aiwg index snapshot identifier"
+
+  fixity_manifest:
+    type: string
+    description: "Path to SHA-256 fixity manifest for this version"
+    example: "datasets/v2026.4.0-CHECKSUMS.sha256"
+
+  created_at:
+    type: string
+    format: iso8601
+
+# ==============================================================================
+# OPTIONAL FIELDS — REPRODUCIBILITY METADATA
+# ==============================================================================
+
+optional_fields:
+  synthetic_ratio:
+    type: object
+    description: "Per-split human:synthetic ratio (ADR-022 D10)"
+    fields:
+      train: "ratio expressed as synthetic percentage (0.0–1.0)"
+      validation: "typically 0.0 — validation should be human"
+      test: "typically 0.0 — test MUST be human to preserve benchmark validity"
+
+  decontamination_report_id:
+    type: string
+    description: "UUID / path of decontamination-check report for this version"
+
+  reproduction_recipe:
+    type: object
+    description: "Deterministic rebuild instructions"
+    fields:
+      generator_configs: "References to synthetic-generator-config.yaml used"
+      preference_config: "Config used by preference-generator"
+      filter_thresholds: "Quality filter thresholds applied"
+      decontamination_thresholds: "Overlap thresholds per eval target"
+      aiwg_version: "Version of AIWG that built this dataset"
+      training_complete_version: "Version of training-complete framework"
+
+  format_exports:
+    type: array
+    description: "Which export formats were generated for this version"
+    items: "e.g., alpaca, sharegpt, chatml, jsonl, parquet"
+
+  target_model:
+    type: string
+    optional: true
+    description: "Target model this dataset was curated for (if applicable)"
+    example: "claude-sonnet-4-6-finetune"
+
+  intended_use:
+    type: string
+    description: "What this dataset is intended to train — populated in datasheet/model card"
+
+  out_of_scope:
+    type: array
+    description: "What this dataset should NOT be used for"
+
+  ethical_considerations:
+    type: string
+    description: "Known bias, demographic skew, consent issues"
+
+# ==============================================================================
+# VALIDATION RULES
+# ==============================================================================
+
+validation_rules:
+  - rule: "version is valid CalVer or SemVer"
+  - rule: "sum(split_counts.*) matches actual example count in storage"
+  - rule: "sources[].license values are all valid SPDX"
+  - rule: "effective license is computable from sources[].license (most restrictive wins)"
+  - rule: "provenance_record_id exists in .aiwg/training/provenance/"
+  - rule: "storage_ref has exactly one of fortemi_archive_id or aiwg_index_snapshot_id"
+  - rule: "fixity_manifest file exists and SHA-256 matches"
+  - rule: "decontamination_report_id exists and is fresher than any example in storage"
+  - rule: "synthetic_ratio.test <= 0.0 (test set must be human) unless explicitly overridden"
+
+# ==============================================================================
+# JSON EXPORT
+# ==============================================================================
+# YAML is the source of truth. The dataset-version skill auto-exports a
+# sibling .json file at the same path. Single source of truth is YAML.
+
+json_export:
+  path_pattern: "datasets/<version>.json"
+  regenerated_from: "datasets/<version>.yaml"
+  note: "Do not hand-edit the .json file — regenerated on every `dataset-version` run"
+
+# ==============================================================================
+# EXAMPLE
+# ==============================================================================
+
+example:
+  version: "2026.4.0"
+  name: "code-review-gold-v1"
+  description: "Code review examples curated from open-source projects with expert annotations"
+  seed: 42
+  split_counts:
+    train: 8000
+    validation: 1000
+    test: 1000
+  sources:
+    - ref_id: "github:torvalds/linux"
+      license: "GPL-2.0-only"
+      example_count: 3500
+      quality_grade: "HIGH"
+    - ref_id: "github:rust-lang/rust"
+      license: "Apache-2.0 OR MIT"
+      example_count: 4500
+      quality_grade: "HIGH"
+    - ref_id: "REF-238 CodeBERT"
+      license: "MIT"
+      example_count: 2000
+      quality_grade: "HIGH"
+  license: "GPL-2.0-only"  # most restrictive wins
+  provenance_record_id: "prov-dataset-2026.4.0-abc123"
+  storage_ref:
+    fortemi_archive_id: "archive-2026-04-15-code-review-v1"
+  fixity_manifest: "datasets/v2026.4.0-CHECKSUMS.sha256"
+  created_at: "2026-04-15T01:30:00Z"
+  synthetic_ratio:
+    train: 0.2
+    validation: 0.0
+    test: 0.0
+  decontamination_report_id: "decon-2026-04-15-abc"
+  reproduction_recipe:
+    generator_configs: ["synthetic-generator-config-v1.yaml"]
+    preference_config: null
+    filter_thresholds:
+      min_quality_grade: "MODERATE"
+    decontamination_thresholds:
+      humaneval: 0.0
+      mmlu: 0.0
+    aiwg_version: "2026.4.0"
+    training_complete_version: "1.0.0"
+  format_exports: ["alpaca", "jsonl", "parquet"]
+  intended_use: "Fine-tune code review models for educational feedback"
+  out_of_scope:
+    - "Security vulnerability detection"
+    - "Automatic code rewriting without human review"
+  ethical_considerations: "Sources skew toward English-language codebases; non-English comment review may underperform"
+
+# ==============================================================================
+# SCHEMA METADATA
+# ==============================================================================
+
+schema:
+  version: "1.0.0"
+  last_updated: "2026-04-14"
+  adr: "ADR-022"
+  issue: "#833"

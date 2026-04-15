@@ -1,0 +1,86 @@
+{
+  "id": "training-complete",
+  "type": "framework",
+  "name": "Training Complete",
+  "version": "1.0.0",
+  "description": "Corpus-to-dataset pipeline for AI training data curation. Ingests sources, synthesizes examples, generates preference pairs, applies decontamination, and exports to industry-standard formats (Alpaca, ShareGPT, ChatML, JSONL, Parquet) with full provenance and reproducibility.",
+  "modeAliases": [
+    "training"
+  ],
+  "entry": {
+    "agents": "agents",
+    "skills": "skills",
+    "templates": "templates",
+    "schemas": "schemas",
+    "rules": "rules",
+    "docs": "docs",
+    "lint": "lint"
+  },
+  "workspace": {
+    "subdirs": [
+      "raw",
+      "examples",
+      "preferences",
+      "evaluations",
+      "exports",
+      "provenance",
+      "datasets",
+      "reports"
+    ]
+  },
+  "standards": [
+    "W3C PROV-O",
+    "SPDX License Identifiers",
+    "Datasheets for Datasets (Gebru et al. 2021)",
+    "Model Cards (Mitchell et al. 2019)",
+    "Data Statements for NLP (Bender & Friedman 2018)",
+    "ML Reproducibility Checklist (Pineau et al. 2020)",
+    "OAIS Fixity Information"
+  ],
+  "memory": {
+    "creates": [
+      { "path": ".aiwg/training/",             "description": "Training framework root" },
+      { "path": ".aiwg/training/raw/",          "description": "Raw sources before ingestion (filesystem tier)" },
+      { "path": ".aiwg/training/examples/",     "description": "Canonical example records (for aiwg index fallback)" },
+      { "path": ".aiwg/training/preferences/",  "description": "Preference pair records for DPO/KTO export" },
+      { "path": ".aiwg/training/evaluations/",  "description": "Per-example eval results" },
+      { "path": ".aiwg/training/exports/",      "description": "Format-converted outputs (Alpaca, ShareGPT, ChatML, JSONL, Parquet)" },
+      { "path": ".aiwg/training/provenance/",   "description": "W3C PROV records for examples, pipeline stages, and dataset versions" },
+      { "path": ".aiwg/training/datasets/",     "description": "Dataset manifests (YAML + JSON) with reproducibility metadata" },
+      { "path": ".aiwg/training/reports/",      "description": "Decontamination, quality, and coverage reports" }
+    ],
+    "topology": {
+      "namespace": ".aiwg/training",
+      "rawSources": ".aiwg/training/raw",
+      "derivedPages": {
+        "rawExamples": ".aiwg/training/examples/raw",
+        "synthesizedExamples": ".aiwg/training/examples/synthesized",
+        "preferences": ".aiwg/training/preferences",
+        "evaluations": ".aiwg/training/evaluations",
+        "formatConverted": ".aiwg/training/exports"
+      },
+      "index": ".aiwg/training/index.md",
+      "log": ".aiwg/training/.log.jsonl",
+      "crossRefStyle": "at-mention",
+      "pageTemplate": "templates/example-record-template.md",
+      "ingestRequires": ["provenance"],
+      "lintRules": [
+        "citation-guard",
+        "license-check",
+        "decontamination-gate",
+        "link-check",
+        "mention-lint"
+      ]
+    }
+  },
+  "dependencies": {
+    "required": [
+      "semantic-memory"
+    ],
+    "optional": [
+      "research-complete",
+      "media-curator",
+      "rlm"
+    ]
+  }
+}
