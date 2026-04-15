@@ -1,6 +1,6 @@
 # ADR-022: AI Training Framework — Corpus-to-Dataset Pipeline
 
-**Status**: Proposed
+**Status**: Accepted (2026-04-14)
 **Date**: 2026-04-14
 **Deciders**: Architecture Designer (proposing), Project Owner (review pending)
 **Context**: Issue #822 — AI training and enhancement framework
@@ -71,23 +71,24 @@ Ten interlocking decisions. Numbered D1–D10 for downstream reference.
 
 ### D3: Storage model — Fortemi vs AIWG index vs filesystem
 
-**Decision**: **Three-tier dual storage** (from Phase 4):
+**Decision**: **Three-tier storage with `aiwg index` as the graph fallback**:
 
 | Tier | Purpose | Lifetime |
 |------|---------|----------|
 | **Filesystem** (`.aiwg/training/raw/`) | Raw sources before ingestion | Immutable reference |
-| **Fortemi** (via MCP) | Durable, relationship-rich, cross-session | Persistent |
-| **AIWG index** | Session-scoped fast lookup | Session |
+| **Fortemi** (via MCP) | Durable, relationship-rich, cross-session (preferred) | Persistent |
+| **`aiwg index`** | Graph fallback when Fortemi unavailable; always used for session cache | Session or persistent |
 
 **Rules**:
 - Raw sources land in filesystem first (`raw/` directory)
-- Ingestion via `memory-ingest` writes to Fortemi (each example = one Fortemi note)
-- Training loop queries via AIWG index (cache of Fortemi subset)
+- When Fortemi is available: ingestion writes examples as Fortemi notes (preferred path)
+- When Fortemi is NOT available: ingestion writes to `aiwg index` as the graph fallback (may need tweaks to index — track in dependent issues)
+- Training loop queries via `aiwg index` regardless (acts as session cache on top of Fortemi, or as primary store in fallback mode)
 - Dataset exports write back to filesystem in target format
 
-**Rationale**: Phase 4 confirmed Fortemi excels at durable relationship-rich storage and multi-hop retrieval for preference pair synthesis. AIWG index is already the in-session primitive. Filesystem is natural for raw inputs and published outputs.
+**Rationale**: Phase 4 confirmed Fortemi excels at durable relationship-rich storage and multi-hop retrieval for preference pair synthesis. `aiwg index` is already the in-session graph primitive with multiple backend options — it serves both as the session cache (always) and as the graph fallback (when Fortemi is absent). This means **both paths ship from day 1**, not v1-Fortemi-only.
 
-**Consequence**: Framework declares two namespace roots — `.aiwg/training/` for AIWG-side artifacts, Fortemi for examples. Export skill writes to `.aiwg/training/exports/<format>/`.
+**Consequence**: Framework declares two namespace roots — `.aiwg/training/` for AIWG-side artifacts, Fortemi (or `aiwg index`) for examples. Export skill writes to `.aiwg/training/exports/<format>/`. Implementation tickets must identify any `aiwg index` tweaks needed for preference edges + SKOS-like hierarchies.
 
 ### D4: Example granularity in Fortemi
 
@@ -137,13 +138,16 @@ Encoding:
 
 **Decision**: **Option 3 — both**. Fortemi collections partition splits; `.aiwg/training/datasets/<version>.yaml` manifests capture dataset-level metadata (split seeds, label distributions, reproduction recipe, license inheritance, decontamination audit).
 
+**Manifest formats supported**: YAML (primary, human-readable, git-friendly) + JSON (machine-first, programmatic consumption). YAML is written by hand or generated; JSON is auto-exported from YAML for tooling. Both must stay in sync (single source of truth is the YAML file).
+
 **Rationale**:
 - Fortemi collections handle example-level organization
 - YAML manifests are human-readable, git-committable, and diff-friendly (critical for reproducibility)
+- JSON export supports programmatic consumers (training orchestrators, CI, external tooling)
 - Dataset manifests can reference Fortemi archive snapshot IDs for point-in-time restore
 - Matches ML Reproducibility Checklist (REF-475) requirements
 
-**Consequence**: New schema `dataset-manifest.yaml` with required fields: version, seed, split_counts, sources, decontamination_report_id, license, provenance_record_id, fortemi_archive_id.
+**Consequence**: New schema `dataset-manifest.yaml` with required fields: version, seed, split_counts, sources, decontamination_report_id, license, provenance_record_id, fortemi_archive_id (or aiwg_index_snapshot_id in fallback mode). `dataset-version` skill auto-exports `dataset-manifest.json` alongside the YAML.
 
 ### D7: Canonical internal format + adapters
 
@@ -193,17 +197,22 @@ Adapters ship for: Alpaca (instruction/input/output), ShareGPT (conversations), 
 **Decision**: **Option 1 — first-class pipeline stage**, plus Option 2 **as belt-and-braces** (lint rule catches missed runs).
 
 Stage operation:
-- Compares dataset candidate against declared eval sets (`decontamination-targets.yaml`: MMLU, GSM8K, HumanEval, HELM, MT-Bench, etc.)
+- Compares dataset candidate against eval sets from two sources:
+  - **Defaults** shipped with framework: MMLU, GSM8K, HumanEval, HELM, MT-Bench, AlpacaEval (extensible via config)
+  - **User-declared** targets in `decontamination-targets.yaml` (union with defaults)
 - Three detection modes: exact n-gram overlap, fuzzy (edit distance), semantic (embedding similarity)
 - Produces `decontamination-report.md` with findings per eval set
 - **Gate**: publication fails if any eval set has contamination > declared threshold
+
+**Evaluation delegation**: This framework detects *contamination* (training-eval overlap). Actual **evaluation execution** (running benchmarks against trained models) is out of scope — delegated to the separate `matric-eval` project. If decontamination or eval integration needs changes to `matric-eval`, file issues there.
 
 **Rationale**:
 - REF-442 (Benchmark Contamination position paper) establishes this as non-optional
 - Post-hoc audit is too late — contaminated datasets get used
 - Lint rule alone is too weak — users might not run lint
+- Delegating eval execution to `matric-eval` keeps this framework focused on data, not model evaluation
 
-**Consequence**: `decontamination-check` skill; `decontamination-targets.yaml` schema; `decontamination-report.md` template; `decontamination-gate` lint rule.
+**Consequence**: `decontamination-check` skill; `decontamination-targets.yaml` schema (with default set shipped + user-override section); `decontamination-report.md` template; `decontamination-gate` lint rule. `matric-eval` integration documented as an optional downstream step, not implemented here.
 
 ### D9: Provenance model
 
@@ -315,15 +324,15 @@ Phased delivery after this ADR is accepted:
 
 ---
 
-## Open Questions for Human Reviewer
+## Resolved Open Questions (2026-04-14)
 
-Five questions warrant explicit acceptance before implementation tickets are filed:
+All five resolved with Project Owner:
 
-1. **Framework name**: `training-complete` vs `dataset-forge` vs something else? (D1 recommendation: training-complete for consistency)
-2. **Fortemi-only vs fallback**: ship filesystem-only constrained mode from day 1, or Fortemi-required for v1 with fallback in v2? (Current recommendation: require Fortemi for v1, design fallback later if demand exists)
-3. **Synthetic recursion depth**: max 1 generation of synthetic-on-synthetic, or allow 2 with larger warning? (D10 recommendation: 1 max per Model Collapse findings)
-4. **Dataset manifest format**: YAML as proposed, or JSON for machine-first? (D6 recommendation: YAML for human/git ergonomics)
-5. **Decontamination target list**: ship with a default set (MMLU, GSM8K, HumanEval, HELM, MT-Bench) or require user declaration? (Recommendation: ship defaults, users can override; default list is a living config)
+1. **Framework name**: `training-complete` — accepted.
+2. **Fortemi vs fallback**: Both paths ship from day 1. Fortemi is the preferred path; `aiwg index` is the graph fallback (already supports multiple backend options). May need tweaks to `aiwg index` for preference edges and SKOS-like hierarchies — identify in dependent issues during Foundation phase.
+3. **Synthetic recursion depth**: Max 1 generation of synthetic-on-synthetic per Model Collapse findings (REF-446). Further recursion requires explicit `--allow-recursive-synthetic` flag with warning.
+4. **Manifest format**: YAML is primary (human-readable, git-friendly); JSON auto-exported alongside for programmatic consumers. Single source of truth is the YAML file.
+5. **Decontamination targets**: Defaults shipped (MMLU, GSM8K, HumanEval, HELM, MT-Bench, AlpacaEval) + user-declared targets in union. **Evaluation execution** (running benchmarks against trained models) is out of scope — delegated to `matric-eval` project. File issues in `matric-eval` if changes needed for eval integration.
 
 ---
 
@@ -369,4 +378,4 @@ Five questions warrant explicit acceptance before implementation tickets are fil
 
 **Last Updated**: 2026-04-14
 **Author**: Claude (Architecture Designer / Orchestrator)
-**Reviewers**: Project Owner (pending)
+**Reviewers**: Project Owner (accepted 2026-04-14)
