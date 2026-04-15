@@ -10,6 +10,13 @@ from aiwg_training.publication.dataset_docs import (
     DatasetDocsGenerator,
     GenerationResult,
 )
+from aiwg_training.publication.flow_dataset_build import (
+    FlowDatasetBuild,
+    PipelineBlockedError,
+    PipelineConfig,
+    PipelineResult,
+    StageResult,
+)
 from aiwg_training.publication.reproduce import (
     DatasetReproducer,
     FixityComparison,
@@ -27,9 +34,14 @@ __all__ = [
     "DatasetReproducer",
     "DatasetVersioner",
     "FixityComparison",
+    "FlowDatasetBuild",
     "GenerationResult",
+    "PipelineBlockedError",
+    "PipelineConfig",
+    "PipelineResult",
     "PublicationGateError",
     "PublishResult",
     "ReproductionResult",
+    "StageResult",
     "StorageBackend",
 ]
