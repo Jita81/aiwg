@@ -122,6 +122,34 @@ async function runDoctor() {
     check('MCP Server', 'warn', 'Not found');
   }
 
+  // 8b. Check CLI runtime integrity — catches older published packages that
+  // shipped without helper scripts the current CLI depends on (e.g. 2026.3.3
+  // was published before tools/cli/deploy.mjs existed, causing `aiwg sync` to
+  // fail with MODULE_NOT_FOUND).
+  const requiredCliScripts = [
+    'deploy.mjs',
+    'update.mjs',
+    'version.mjs',
+    'runtime-info.mjs',
+    'config-gitignore.mjs',
+  ];
+  const missingCli = [];
+  for (const script of requiredCliScripts) {
+    const scriptPath = path.join(AIWG_ROOT, 'tools/cli', script);
+    if (!(await fileExists(scriptPath))) {
+      missingCli.push(script);
+    }
+  }
+  if (missingCli.length === 0) {
+    check('CLI Runtime Integrity', 'ok', `${requiredCliScripts.length} helper scripts present`);
+  } else {
+    check(
+      'CLI Runtime Integrity',
+      'error',
+      `Missing tools/cli scripts: ${missingCli.join(', ')}. Your installed AIWG is missing files the CLI depends on. Upgrade: npm install -g aiwg@latest`,
+    );
+  }
+
   // 9. Check installed addons
   const addonChecks = [
     { id: 'daemon', label: 'Daemon Addon', manifest: 'agentic/code/addons/daemon/manifest.json',
