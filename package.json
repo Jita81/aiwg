@@ -1,6 +1,6 @@
 {
   "name": "aiwg",
-  "version": "2026.4.0-rc.16",
+  "version": "2026.4.0-rc.17",
   "description": "Multi-agent AI framework for Claude Code, Copilot, Cursor, Warp, OpenClaw, and 5 more platforms. Agents, commands, skills, rules, and behaviors across SDLC, forensics, research, marketing, and media curation. Agent loop, autonomous daemon, reactive behaviors, and YAML metalanguage for declarative multi-agent workflows.",
   "type": "module",
   "bin": {
