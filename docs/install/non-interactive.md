@@ -114,4 +114,4 @@ RUN npm install -g aiwg \
 ## Related
 
 - [CLI Reference](../cli-reference.md) — Full command documentation
-- [agentic-sandbox loadouts](https://git.integrolabs.net/roctinam/agentic-sandbox) — VM provisioning that calls `aiwg use`
+- [agentic-sandbox loadouts](https://github.com/jmagly/agentic-sandbox) — VM provisioning that calls `aiwg use`

@@ -75,7 +75,7 @@ Spawns the TUI process directly on the host via `node-pty`. Requires native comp
 
 #### Sandbox mode (container/VM)
 
-Delegates to an [agentic-sandbox](https://git.integrolabs.net/roctinam/agentic-sandbox) management server. The sandbox handles provisioning and PTY allocation inside containers or VMs.
+Delegates to an [agentic-sandbox](https://github.com/jmagly/agentic-sandbox) management server. The sandbox handles provisioning and PTY allocation inside containers or VMs.
 
 ```bash
 # Set the sandbox endpoint to enable remote execution

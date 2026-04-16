@@ -1309,7 +1309,7 @@ Research foundation: Recursive Language Models (Zhang, Kraska, Khattab — MIT C
 
 ## Research Foundations
 
-AIWG's architecture is grounded in peer-reviewed research across cognitive science, multi-agent systems, software engineering, and AI safety. Full corpus: [research-papers](https://git.integrolabs.net/roctinam/research-papers) (168 papers). Entries ordered highest to lowest GRADE evidence quality within each category.
+AIWG's architecture is grounded in peer-reviewed research across cognitive science, multi-agent systems, software engineering, and AI safety. Full corpus: [research-papers](https://github.com/jmagly/research-papers) (168 papers). Entries ordered highest to lowest GRADE evidence quality within each category.
 
 ### Cognitive Foundations
 

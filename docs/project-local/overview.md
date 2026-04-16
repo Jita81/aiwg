@@ -5,7 +5,7 @@ description: How to use .aiwg/.project/ to carry project-specific agents, skills
 
 # Project-Local Customization (`.aiwg/.project/`)
 
-> **Status**: Planned — tracked in [#750](https://git.integrolabs.net/roctinam/aiwg/issues/750). The directory structure and reference implementation are available now; `aiwg use` integration ships in a future release.
+> **Status**: Planned — tracked in [#750](https://github.com/jmagly/aiwg/issues/750). The directory structure and reference implementation are available now; `aiwg use` integration ships in a future release.
 
 The `.aiwg/.project/` container lets you ship project-specific agents, skills, and scripts alongside your code — so they deploy automatically when anyone runs `aiwg use`.
 
@@ -93,4 +93,4 @@ AIWG's own assets land under `aiwg/` (per the [Skill Namespace ADR](../extension
 - [Manifest Reference](manifest-reference.md)
 - [File Placement Guide](../development/file-placement-guide.md) — Where all assets belong
 - [Graph Backends](../extensions/graph-backends.md) — Companion feature for project-local graph config
-- Issue [#750](https://git.integrolabs.net/roctinam/aiwg/issues/750) — Implementation tracking
+- Issue [#750](https://github.com/jmagly/aiwg/issues/750) — Implementation tracking
