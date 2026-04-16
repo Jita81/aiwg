@@ -234,6 +234,16 @@ export const doctorHandler: CommandHandler = {
     // Run core doctor diagnostics
     const result = await runner.run('tools/cli/doctor.mjs', ctx.args, { cwd: ctx.cwd });
 
+    // Surface feedback escape hatch when doctor finds issues
+    if (result.exitCode !== 0) {
+      console.log(`
+── Recovery options ──
+  aiwg session --no-repair    — launch anyway (skip auto-repair)
+  aiwg sync                   — sync to latest and redeploy
+  aiwg feedback --type bug    — report this issue to GitHub
+`);
+    }
+
     // Append collision scan: check deployed skills dir for bad-state collisions
     // (platform built-ins and AIWG CLI command shadows)
     try {

@@ -16,6 +16,8 @@ import { createScriptRunner } from "./script-runner.js";
 import { getFrameworkRoot } from "../../channel/manager.mjs";
 import { getRegistry } from "../../extensions/registry.js";
 import { registerDeployedExtensions } from "../../extensions/deployment-registration.js";
+import { sessionHandler } from "./session.js";
+import { feedbackHandler } from "./feedback.js";
 
 /**
  * MCP server command handler
@@ -620,4 +622,6 @@ export const subcommandHandlers: CommandHandler[] = [
   rlmPrepHandler,
   rlmSearchHandler,
   rlmStatusCliHandler,
+  sessionHandler,
+  feedbackHandler,
 ];
