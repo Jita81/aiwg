@@ -63,6 +63,22 @@
       "keywords": ["writing", "quality", "ai-detection", "authenticity", "editing"]
     },
     {
+      "name": "training",
+      "source": {
+        "type": "github",
+        "repo": "jmagly/aiwg-training",
+        "branch": "main"
+      },
+      "description": "Corpus-to-dataset pipeline for AI training data curation. Ingests sources, synthesizes examples, generates DPO/KTO preference pairs, applies decontamination, and exports to Alpaca/ShareGPT/ChatML/JSONL/Parquet with provenance. Optional Python runtime (aiwg-training CLI) for scale.",
+      "version": "1.0.0",
+      "author": {
+        "name": "AIWG Contributors"
+      },
+      "license": "MIT",
+      "category": "development",
+      "keywords": ["training-data", "fine-tuning", "dpo", "kto", "alpaca", "sharegpt", "decontamination", "synthetic-data", "datasheet"]
+    },
+    {
       "name": "utils",
       "source": "./plugins/utils",
       "description": "Core AIWG utilities for context regeneration, workspace management, development kit, and traceability.",
