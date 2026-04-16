@@ -28,7 +28,7 @@ export const mcpHandler: CommandHandler = {
   name: "AIWG MCP Server",
   description: "AIWG MCP server commands (serve, install, add, remove, update, list, inject, info)",
   category: "mcp",
-  aliases: ["aiwg-mcp"],
+  aliases: ["mcp", "aiwg-mcp"],
 
   async execute(ctx: HandlerContext): Promise<HandlerResult> {
     try {
