@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Generate a SOUL.md identity file from source material, interactive prompts, or an existing voice profile
 ---
 
 # soul-create

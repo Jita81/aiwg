@@ -15,7 +15,12 @@ export interface SkillOptions {
   /** Skill name (kebab-case) */
   name: string;
 
-  /** What the skill does */
+  /**
+   * What the skill does. REQUIRED and must be non-empty.
+   * Codex rejects SKILL.md files without a description; Claude Code uses this
+   * field for natural-language invocation. The generator throws if this is
+   * missing or blank.
+   */
   description: string;
 
   /** Target platform */
@@ -84,16 +89,20 @@ export interface SkillReference {
 }
 
 /**
- * Skill frontmatter metadata
+ * Skill frontmatter metadata.
+ *
+ * `name`, `description`, and `version` are REQUIRED in every emitted SKILL.md.
+ * `description` in particular must be non-empty — Codex rejects skills without
+ * it. `tools` is the only optional field.
  */
 export interface SkillFrontmatter {
-  /** Skill name (kebab-case) */
+  /** Skill name (kebab-case) — REQUIRED */
   name: string;
 
-  /** Brief description */
+  /** Brief description — REQUIRED, non-empty. Codex enforces this. */
   description: string;
 
-  /** Skill version (semver) */
+  /** Skill version (semver) — REQUIRED */
   version: string;
 
   /** Tools this skill uses (optional) */

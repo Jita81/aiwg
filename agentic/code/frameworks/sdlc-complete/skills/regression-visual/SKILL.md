@@ -1,6 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
+description: Detect visual and UI regressions through screenshot comparison and pixel-diff analysis across browsers and viewports
 
 ---
 

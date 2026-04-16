@@ -1,6 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
+description: Validate AIWG configuration files and project setup for correctness and completeness
 
 ---
 

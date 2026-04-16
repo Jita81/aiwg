@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Show cost trends across multiple workflow sessions, surfacing expensive operations, spending patterns, and outliers
 ---
 
 # cost-history

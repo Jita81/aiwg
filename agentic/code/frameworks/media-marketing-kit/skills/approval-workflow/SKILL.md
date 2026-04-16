@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Route marketing assets through multi-stakeholder approval chains with status tracking and escalation
 ---
 
 # approval-workflow

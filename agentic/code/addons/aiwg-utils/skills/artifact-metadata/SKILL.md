@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Manage artifact metadata, versioning, ownership, and review history across the SDLC lifecycle
 ---
 
 # artifact-metadata

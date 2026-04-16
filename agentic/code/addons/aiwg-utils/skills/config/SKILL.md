@@ -1,6 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
+description: Manage the user-level AIWG configuration file for persistent preferences across all projects
 
 ---
 

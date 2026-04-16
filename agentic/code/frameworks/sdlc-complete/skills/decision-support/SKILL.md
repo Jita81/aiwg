@@ -1,6 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
+description: Facilitate data-driven technical decisions using weighted decision matrices, trade-off analysis, and ADR generation
 
 ---
 

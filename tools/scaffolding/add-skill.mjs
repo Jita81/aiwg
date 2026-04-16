@@ -26,7 +26,15 @@ const { positional, flags } = parseArgs(process.argv);
 
 const name = positional[0];
 const target = flags.to || flags.t;
-const skillDescription = flags.description || flags.d || `${formatName(name || 'skill').title} skill`;
+// REQUIRED: description is mandatory in SKILL.md frontmatter (Codex rejects skills without it).
+// If caller passes empty string explicitly (e.g. `--description ""`), fall through to the default.
+const rawDescription =
+  typeof flags.description === 'string' && flags.description.trim() !== ''
+    ? flags.description.trim()
+    : typeof flags.d === 'string' && flags.d.trim() !== ''
+      ? flags.d.trim()
+      : '';
+const skillDescription = rawDescription || `${formatName(name || 'skill').title} skill`;
 const triggers = flags.triggers || '';
 const dryRun = flags['dry-run'] || flags.n;
 const help = flags.help || flags.h;
@@ -204,6 +212,14 @@ async function main() {
 
   printHeader(`Adding Skill: ${title}`);
   printInfo(`Target: ${resolved.type} (${target})`);
+
+  // Guard: description is REQUIRED in SKILL.md frontmatter.
+  // Codex (and other platforms) reject skills missing the description field.
+  if (!skillDescription || !skillDescription.trim()) {
+    printError('Description is required for SKILL.md (Codex and other platforms reject skills without it).');
+    printInfo('Pass --description "What this skill does" or accept the generated default.');
+    process.exit(1);
+  }
 
   // Generate content
   const skillMdContent = generateSkillMd(name, {

@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Scaffold a new behavior definition with BEHAVIOR.md and optional scripts inside an existing addon or framework
 ---
 
 # Add Behavior

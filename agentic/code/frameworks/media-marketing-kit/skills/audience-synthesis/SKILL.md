@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Synthesize audience data from multiple sources into unified personas, segments, and targeting strategies
 ---
 
 # audience-synthesis

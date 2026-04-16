@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Orchestrate marketing data collection, transformation, aggregation, and reporting workflows across platforms
 ---
 
 # data-pipeline

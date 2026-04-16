@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Ensure the session's AIWG installation is current and correctly deployed to the active provider
 ---
 
 # AIWG Sync

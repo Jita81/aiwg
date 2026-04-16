@@ -1,6 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
+description: Trigger Tree of Thoughts exploration when agents face architectural decisions with multiple valid approaches
 
 ---
 

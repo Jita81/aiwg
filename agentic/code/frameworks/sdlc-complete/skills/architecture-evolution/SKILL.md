@@ -1,6 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
+description: Manage architecture changes with impact analysis, ADR generation, migration planning, and breaking change tracking
 
 ---
 

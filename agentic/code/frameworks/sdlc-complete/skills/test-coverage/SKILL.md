@@ -1,6 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
+description: Analyze test coverage reports, identify gaps by priority, and recommend test improvements with trend tracking
 
 ---
 

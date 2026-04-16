@@ -1,6 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
+description: Trigger GRADE quality assessment automatically when new research sources or findings enter the corpus
 
 ---
 

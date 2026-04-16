@@ -14,10 +14,16 @@ skills/
 
 ### SKILL.md Structure
 
+**REQUIRED frontmatter fields:** `name` and `description` (non-empty).
+Codex rejects any SKILL.md without a non-empty `description:` field, and
+Claude Code uses it as the primary natural-language invocation signal.
+Tooling (scaffolder, SkillSmith generator, platform deployers) enforces
+this at runtime.
+
 ```markdown
 ---
 name: my-skill
-description: Brief description (shown in skill catalog)
+description: Brief description (REQUIRED, non-empty — shown in skill catalog and used for NL matching)
 triggers:
   - pattern: "regex or keyword"
     weight: 0.8

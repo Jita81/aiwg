@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Query and manage the unified .aiwg/activity.log chronological record of AIWG-managed workflow operations
 ---
 
 # Activity Log

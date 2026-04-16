@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: List the frameworks and addons currently installed in the workspace registry
 ---
 
 # AIWG List

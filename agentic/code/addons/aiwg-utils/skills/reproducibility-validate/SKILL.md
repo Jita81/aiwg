@@ -1,6 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
+description: Run a workflow multiple times and compare outputs to produce a similarity score and pass/fail verdict
 
 ---
 

@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Browse the AIWG model catalog — list available AI models, fetch model details, and search by capability or name
 ---
 
 # Model Catalog

@@ -88,12 +88,17 @@ node ~/.local/share/ai-writing-guide/tools/scaffolding/add-skill.mjs \
 
 ### 5. Customize SKILL.md
 
-The generated SKILL.md needs customization:
+The generated SKILL.md needs customization.
+
+**REQUIRED frontmatter fields:**
+- `name:` — skill slug (kebab-case)
+- `description:` — **Mandatory.** Used by Claude Code for NL matching and required by Codex (Codex rejects any SKILL.md without a non-empty description). Never leave this blank.
+- `version:` — semver string (e.g., `1.0.0`)
 
 ```yaml
 ---
 name: <skill-name>
-description: <what this skill does>
+description: <what this skill does — REQUIRED, non-empty>
 version: 1.0.0
 ---
 

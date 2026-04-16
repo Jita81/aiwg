@@ -1,6 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
+description: Improve regression detection over time through cross-task pattern recognition, test prioritization, and historical analysis
 
 ---
 

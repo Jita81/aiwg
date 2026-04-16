@@ -1,6 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
+description: Continuously identify, assess, track, and retire risks throughout the SDLC with register and RAG reporting
 
 ---
 

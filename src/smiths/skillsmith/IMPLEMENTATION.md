@@ -50,10 +50,15 @@ SkillSmith is a tool for generating skills with platform-aware deployment. It cr
 ## Skill Format
 
 ### Frontmatter
+
+**`name`, `description`, and `version` are REQUIRED.** `description` must be
+non-empty — Codex rejects SKILL.md files without it, and the SkillSmith
+generator throws at runtime if it is missing or blank.
+
 ```yaml
 ---
 name: skill-name
-description: Brief description
+description: Brief description   # REQUIRED, non-empty
 version: 1.0.0
 tools: Read, Write, Glob
 ---
@@ -89,10 +94,10 @@ Usage examples
 ### generateSkill(options: SkillOptions): Promise<GeneratedSkill>
 
 **Parameters:**
-- `name`: Skill name (kebab-case)
-- `description`: What the skill does
-- `platform`: Target platform
-- `projectPath`: Deployment directory
+- `name` (required): Skill name (kebab-case)
+- `description` (required, non-empty): What the skill does. Throws if missing or blank.
+- `platform` (required): Target platform
+- `projectPath` (required): Deployment directory
 - `triggerPhrases?`: Natural language triggers
 - `tools?`: Tools this skill uses
 - `createReferences?`: Create reference docs

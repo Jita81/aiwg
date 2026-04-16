@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Load, validate, and populate templates consistently across frameworks
 ---
 
 # template-engine

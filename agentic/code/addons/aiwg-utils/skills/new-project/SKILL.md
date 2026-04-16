@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Scaffold a new AIWG-managed project with .aiwg/ directory structure, starter CLAUDE.md, and framework registry
 ---
 
 # New Project

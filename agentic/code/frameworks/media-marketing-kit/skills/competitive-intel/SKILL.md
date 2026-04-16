@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Gather and analyze competitive intelligence across channels to surface positioning shifts and market opportunities
 ---
 
 # competitive-intel

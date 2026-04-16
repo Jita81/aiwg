@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Create, list, or recover mid-workflow checkpoints so interrupted work resumes from a known-good position
 ---
 
 # Checkpoint

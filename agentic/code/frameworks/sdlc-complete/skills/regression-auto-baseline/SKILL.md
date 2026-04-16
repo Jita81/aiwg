@@ -1,6 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
+description: Automatically manage regression test baseline lifecycle triggered by releases, deployments, and quality gates
 
 ---
 

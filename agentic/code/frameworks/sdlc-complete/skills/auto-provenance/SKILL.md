@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Generate W3C PROV-compliant provenance records automatically when agents create or modify artifacts
 ---
 
 # Auto-Provenance

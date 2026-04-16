@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Scaffold a new agent definition file inside an existing addon or framework
 ---
 
 # Add Agent

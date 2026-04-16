@@ -1,6 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
+description: Generate SDLC reports including iteration status, metrics dashboards, and executive summaries across phases
 
 ---
 

@@ -242,6 +242,76 @@ export const SkillReferenceSchema = z.object({
 });
 
 /**
+ * SKILL.md frontmatter schema
+ *
+ * Validates the YAML frontmatter block at the top of a SKILL.md file.
+ * This is distinct from {@link SkillMetadataSchema}, which validates the
+ * `metadata` field of an Extension manifest.
+ *
+ * `description` is REQUIRED and must be non-empty. Codex rejects SKILL.md
+ * files that lack a description; Claude Code uses this field for
+ * natural-language invocation. Do NOT relax this rule — a blank description
+ * is what caused the 107-file regression we are guarding against.
+ */
+export const SkillFrontmatterSchema = z.object({
+  name: z.string().min(1, 'Skill name is required'),
+  description: z
+    .string({
+      required_error:
+        'Description is required (Codex rejects SKILL.md without it)',
+    })
+    .min(1, 'Description is required and must be non-empty'),
+  version: z.string().regex(
+    /^\d+\.\d+\.\d+/,
+    'Version must be semver or CalVer format (e.g., 1.0.0)'
+  ).optional(),
+  namespace: z.string().optional(),
+  platforms: z.union([z.array(z.string()), z.string()]).optional(),
+  tools: z.union([z.array(z.string()), z.string()]).optional(),
+  'allowed-tools': z.union([z.array(z.string()), z.string()]).optional(),
+  allowedTools: z.union([z.array(z.string()), z.string()]).optional(),
+  effort: z.union([z.literal(1), z.literal(2), z.literal(3)]).optional(),
+  'user-invocable': z.boolean().optional(),
+  userInvocable: z.boolean().optional(),
+  'disable-model-invocation': z.boolean().optional(),
+  disableModelInvocation: z.boolean().optional(),
+  context: z.enum(['fork', 'inherit']).optional(),
+  author: z.string().optional(),
+  license: z.string().optional(),
+  metadata: z.record(z.unknown()).optional(),
+}).passthrough();
+
+/**
+ * Inferred SKILL.md frontmatter type
+ */
+export type ValidatedSkillFrontmatter = z.infer<typeof SkillFrontmatterSchema>;
+
+/**
+ * Validate SKILL.md frontmatter.
+ *
+ * Use this when parsing the YAML frontmatter block of a SKILL.md file to
+ * catch missing or empty `description` fields before deployment.
+ *
+ * @example
+ * ```typescript
+ * const result = validateSkillFrontmatter(parsedYaml);
+ * if (!result.success) {
+ *   throw new Error('Invalid SKILL.md frontmatter: ' +
+ *     formatValidationErrors(result.errors).join(', '));
+ * }
+ * ```
+ */
+export function validateSkillFrontmatter(
+  data: unknown
+): { success: true; data: ValidatedSkillFrontmatter } |
+   { success: false; errors: z.ZodError } {
+  const result = SkillFrontmatterSchema.safeParse(data);
+  return result.success
+    ? { success: true, data: result.data }
+    : { success: false, errors: result.error };
+}
+
+/**
  * Skill-specific metadata
  */
 export const SkillMetadataSchema = z.object({

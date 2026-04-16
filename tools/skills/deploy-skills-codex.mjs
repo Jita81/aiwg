@@ -205,6 +205,22 @@ function transformToCodexSkill(skillDir) {
   const name = (metadata.name || path.basename(skillDir)).slice(0, MAX_NAME_LENGTH);
   let description = metadata.description || '';
 
+  // Codex REQUIRES a non-empty description — it rejects SKILL.md files that
+  // lack one. Fail loudly rather than silently writing `description: ""`
+  // (the exact regression this guard defends against).
+  if (!description || !String(description).trim()) {
+    console.error(
+      `ERROR: Skill '${name}' has empty/missing description in source ${skillPath}`
+    );
+    console.error(
+      `       Codex rejects SKILL.md files without a description field.`
+    );
+    console.error(
+      `       Fix the source file: add a non-empty 'description:' to the frontmatter.`
+    );
+    return null;
+  }
+
   // Truncate description to 500 chars, ending at word boundary
   if (description.length > MAX_DESCRIPTION_LENGTH) {
     description = description.slice(0, MAX_DESCRIPTION_LENGTH - 3);
@@ -215,10 +231,19 @@ function transformToCodexSkill(skillDir) {
     description += '...';
   }
 
+  // Final guard: never emit `description: ""` under any circumstance.
+  const quotedDescription = yamlDoubleQuoted(description);
+  if (!quotedDescription || !quotedDescription.trim()) {
+    console.error(
+      `ERROR: Skill '${name}' description collapsed to empty after normalization (source: ${skillPath})`
+    );
+    return null;
+  }
+
   // Build Codex skill format — include platforms: [codex] so deployed skills are self-describing
   const codexContent = `---
 name: "${yamlDoubleQuoted(name)}"
-description: "${yamlDoubleQuoted(description)}"
+description: "${quotedDescription}"
 platforms: [codex]
 ---
 
@@ -331,7 +356,9 @@ function getSkillDirectories(srcRoot, mode) {
     for (const skillDir of skills) {
       const skill = transformToCodexSkill(skillDir);
       if (!skill) {
-        console.log(`  skip (parse error): ${path.basename(skillDir)}`);
+        // transformToCodexSkill already logged the specific reason (parse
+        // error, missing description, platform mismatch, etc.).
+        console.log(`  skip: ${path.basename(skillDir)} (see error above)`);
         totalSkipped++;
         continue;
       }

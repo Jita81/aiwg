@@ -2,7 +2,7 @@
 namespace: aiwg
 name: auto-test-execution
 platforms: [all]
-
+description: Automatically execute tests when code-generating agents modify source files, enforcing the execute-before-return pattern
 ---
 
 # auto-test-execution

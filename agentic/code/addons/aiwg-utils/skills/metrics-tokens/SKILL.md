@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Analyze token usage efficiency against the MetaGPT baseline and surface per-step optimization opportunities
 ---
 
 # metrics-tokens

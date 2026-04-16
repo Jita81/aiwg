@@ -1,6 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
+description: Search and navigate SDLC artifacts by topic, type, phase, or tag using the aiwg index CLI
 
 ---
 

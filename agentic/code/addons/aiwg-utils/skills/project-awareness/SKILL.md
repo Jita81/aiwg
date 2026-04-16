@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Detect project type, AIWG framework state, team configuration, and active work to summarize status and recommend next actions
 ---
 
 # project-awareness

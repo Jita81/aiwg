@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Run multi-stage quality assurance on marketing assets with channel-specific validation and approval-ready reports
 ---
 
 # qa-protocol

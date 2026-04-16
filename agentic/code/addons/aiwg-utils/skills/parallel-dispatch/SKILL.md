@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Launch multiple agents concurrently, collect their results, and handle timeouts for fan-out orchestration patterns
 ---
 
 # parallel-dispatch

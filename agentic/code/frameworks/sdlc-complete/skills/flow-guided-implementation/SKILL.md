@@ -1,6 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
+description: Orchestrate autonomous issue-to-code implementation using existing tools and agents with bounded iteration
 ---
 
 # /flow-guided-implementation

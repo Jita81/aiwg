@@ -1,6 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
+description: Track and analyze regression statistics, trends, hotspots, and health indicators across test suites
 
 ---
 

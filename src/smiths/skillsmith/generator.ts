@@ -30,6 +30,20 @@ export async function generateSkill(
     throw new Error(`Invalid skill name: ${nameValidation.error}`);
   }
 
+  // Description is REQUIRED. Codex rejects SKILL.md files without a non-empty
+  // description field; Claude Code uses it for natural-language invocation.
+  // Never allow generation of a SKILL.md with a missing or blank description.
+  if (
+    typeof options.description !== 'string' ||
+    options.description.trim() === ''
+  ) {
+    throw new Error(
+      `Skill description is required and must be non-empty. ` +
+        `Codex (and other platforms) reject SKILL.md files without a description. ` +
+        `Skill: '${options.name}'`
+    );
+  }
+
   // Check if platform supports skills natively
   const supportsSkills = PlatformSkillResolver.supportsSkills(options.platform);
   if (!supportsSkills) {
@@ -147,11 +161,28 @@ function generateSkillContent(options: SkillOptions): string {
 
 /**
  * Generate frontmatter YAML
+ *
+ * `description` is REQUIRED — Codex rejects SKILL.md files without a non-empty
+ * description, and Claude Code relies on it for natural-language invocation.
+ * This function throws rather than emitting a frontmatter block with a missing
+ * or blank description (which would otherwise produce `description: ""` —
+ * a silent failure that breaks deployments).
  */
 function generateFrontmatter(options: SkillOptions): string {
+  if (
+    typeof options.description !== 'string' ||
+    options.description.trim() === ''
+  ) {
+    throw new Error(
+      `generateFrontmatter: 'description' is required and must be non-empty ` +
+        `(skill: '${options.name ?? '<unnamed>'}'). Codex and other platforms ` +
+        `reject SKILL.md files without a description.`
+    );
+  }
+
   const fm: SkillFrontmatter = {
     name: options.name,
-    description: options.description,
+    description: options.description.trim(),
     version: options.version || '1.0.0',
   };
 

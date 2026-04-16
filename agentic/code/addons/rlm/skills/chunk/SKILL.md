@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Split a file into overlapping chunks suitable for parallel fanout processing and emit a manifest describing each chunk
 ---
 
 # Chunk

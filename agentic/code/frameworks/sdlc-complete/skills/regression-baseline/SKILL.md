@@ -1,6 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
+description: Create and maintain regression test baselines for comparison and drift detection across versioned snapshots
 
 ---
 

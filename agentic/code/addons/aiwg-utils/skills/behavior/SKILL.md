@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Manage AIWG behavior bundles that bind reactive directives and toolset configurations to specific agent types
 ---
 
 # Behavior

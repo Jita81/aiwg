@@ -1,6 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
+description: Validate a SOUL.md file against community best practices and quality criteria
 
 ---
 

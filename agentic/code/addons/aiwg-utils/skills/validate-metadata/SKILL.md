@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Validate AIWG extension definitions against the metadata schema and report errors with field names, line numbers, and remediation hints
 ---
 
 # Validate Metadata

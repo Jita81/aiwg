@@ -386,10 +386,15 @@ A strong description enables Claude to match user intent without explicit trigge
 
 ### SKILL.md Frontmatter Reference
 
-| Field | Source | Purpose |
-|-------|--------|---------|
-| `name:` | Official | Skill name; also controls the generated command's slash-command path |
-| `description:` | Official | **Primary NL signal.** Claude reads this at session start and autonomously invokes the skill when user intent matches. A weak description degrades discoverability. |
+`name:` and `description:` are **REQUIRED** in every SKILL.md. Codex rejects
+any skill whose frontmatter is missing a non-empty `description:` field, and
+Claude Code cannot auto-invoke skills without it. Tooling (scaffolder,
+generator, deployers) enforces this at runtime — never skip it.
+
+| Field | Source | Required | Purpose |
+|-------|--------|----------|---------|
+| `name:` | Official | **Yes** | Skill name; also controls the generated command's slash-command path |
+| `description:` | Official | **Yes (non-empty)** | **Primary NL signal.** Claude reads this at session start and autonomously invokes the skill when user intent matches. Codex rejects skills without it. A weak or empty description degrades discoverability and breaks deployments. |
 | `effort:` | Official | Model effort override: `1` (low), `2` (medium), `3` (high) |
 | `user-invocable:` | Official | `false` = background-only; not shown in `/` autocomplete |
 | `disable-model-invocation:` | Official | `true` = explicit user-only; disables autonomous model invocation |

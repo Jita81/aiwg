@@ -100,10 +100,17 @@ skill-name/
 
 ## SKILL.md Format
 
+**Required fields:** `name`, `description` (non-empty), `version`.
+
+The `description` field is enforced at generation time — `generateSkill()`
+throws if it is missing or blank. This guard exists because Codex rejects
+any SKILL.md that lacks a non-empty description, and Claude Code relies on
+the description for natural-language invocation.
+
 ```markdown
 ---
 name: skill-name
-description: What this skill does
+description: What this skill does   # REQUIRED, non-empty
 version: 1.0.0
 tools: Read, Write
 ---
@@ -176,10 +183,10 @@ Skill names must:
 Generate a skill from options.
 
 **Parameters:**
-- `name` (string): Skill name (kebab-case)
-- `description` (string): What the skill does
-- `platform` (Platform): Target platform
-- `projectPath` (string): Where to deploy
+- `name` (string, required): Skill name (kebab-case)
+- `description` (string, required, non-empty): What the skill does. Throws if missing or blank — Codex rejects SKILL.md without it.
+- `platform` (Platform, required): Target platform
+- `projectPath` (string, required): Where to deploy
 - `guidance?` (string): User guidance for generation
 - `interactive?` (boolean): Enable interactive mode
 - `triggerPhrases?` (string[]): Natural language triggers

@@ -1,6 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
+description: Execute a named script defined in .aiwg/aiwg.config or list all available scripts
 
 ---
 

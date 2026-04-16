@@ -2,7 +2,7 @@
 namespace: aiwg
 name: reflection-injection
 platforms: [all]
-
+description: Inject relevant past reflections into agent context at iteration start so agents learn from prior mistakes without repeating them
 ---
 
 # reflection-injection

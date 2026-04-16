@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Manage bounded iteration loops for autonomous implementation — track retries, synthesize failure feedback, and escalate when limits hit
 ---
 
 # iteration-control

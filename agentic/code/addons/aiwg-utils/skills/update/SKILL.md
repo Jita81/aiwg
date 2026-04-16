@@ -1,6 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
+description: Update AIWG to the latest stable version and re-deploy all installed frameworks from the registry
 
 ---
 

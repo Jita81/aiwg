@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Build, query, inspect dependencies, and report statistics for the searchable index of SDLC artifacts in .aiwg/
 ---
 
 # Artifact Index

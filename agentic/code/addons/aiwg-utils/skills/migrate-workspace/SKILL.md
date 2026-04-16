@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Migrate the .aiwg/ directory from single-framework layout to the multi-framework layout with an automatic backup
 ---
 
 # Migrate Workspace

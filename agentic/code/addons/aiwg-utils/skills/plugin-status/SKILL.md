@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: List installed Claude Code plugins with version, install date, and enabled status
 ---
 
 # Plugin Status

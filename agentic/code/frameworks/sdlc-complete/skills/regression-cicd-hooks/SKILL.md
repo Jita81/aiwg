@@ -1,6 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
+description: Integrate regression testing into CI/CD pipelines with baseline comparison and merge blocking on failure
 
 ---
 

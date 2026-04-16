@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Scaffold a new document template inside an existing addon or framework
 ---
 
 # Add Template

@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Merge multiple SOUL.md files into a composite persona for team-level agents or multi-perspective characters
 ---
 
 # soul-blend

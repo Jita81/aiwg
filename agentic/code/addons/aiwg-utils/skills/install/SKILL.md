@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Install AIWG-compatible packages from remote Git repositories into the current workspace
 ---
 
 # AIWG Install

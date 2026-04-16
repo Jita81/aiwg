@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Aggregate multi-reviewer feedback into consolidated, prioritized, and actionable recommendations
 ---
 
 # review-synthesis

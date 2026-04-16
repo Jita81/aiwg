@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Display workspace status dashboard showing installed frameworks, deployments, artifact counts, and health indicators
 ---
 
 # Status

@@ -243,6 +243,22 @@ interface CommandOption {
 
 Natural language workflows triggered by phrases or conditions.
 
+### Required SKILL.md Frontmatter
+
+Every SKILL.md file MUST include these fields in its YAML frontmatter:
+
+| Field | Required | Notes |
+|-------|----------|-------|
+| `name:` | **Yes** | Kebab-case slug; used for discovery and command generation. |
+| `description:` | **Yes (non-empty)** | Used by Claude Code for natural-language invocation. **Codex rejects any SKILL.md without a non-empty `description:` field.** Never leave blank. |
+| `version:` | Recommended | Semver (`1.0.0`) or CalVer (`2026.1.5`). |
+| `namespace:` | Recommended | `aiwg` for AIWG-owned skills; drives collision avoidance. |
+| `platforms:` | Optional | Target platform list (e.g. `[all]`, `[claude, codex]`). |
+
+Missing or empty `description:` will cause deployment to fail on Codex and
+degrade discoverability on every platform. The `aiwg add-skill` scaffolder,
+the SkillSmith generator, and the Codex deployer all enforce this at runtime.
+
 ### SkillMetadata
 
 ```typescript

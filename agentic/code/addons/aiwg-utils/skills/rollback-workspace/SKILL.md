@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Restore the .aiwg/ directory from a migrate-workspace backup, listing available backups when none is specified
 ---
 
 # Rollback Workspace

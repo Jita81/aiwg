@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Refine brand identity through metaphor testing, competitive research, and owner-grounded verification tied to repository reality
 ---
 
 # brand-identity-refinement

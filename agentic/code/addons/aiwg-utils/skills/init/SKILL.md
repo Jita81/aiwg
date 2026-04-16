@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Initialize AIWG configuration for an existing project by creating .aiwg/aiwg.config with provider and script entries
 ---
 
 # Init

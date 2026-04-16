@@ -1,6 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
+description: Identify the commit that introduced a regression using git bisect with automated test execution and blame context
 
 ---
 

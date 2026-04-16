@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Assess workspace alignment and recommend cleanup or realignment actions at key lifecycle transition points
 ---
 
 # Workspace Health Check Skill

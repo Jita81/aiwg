@@ -2,7 +2,7 @@
 namespace: aiwg
 name: mission-control
 platforms: [all]
-
+description: Orchestrate multi-loop background operations via the Mission Control dashboard — start sessions, dispatch missions, monitor, and stop
 ---
 
 # Mission Control

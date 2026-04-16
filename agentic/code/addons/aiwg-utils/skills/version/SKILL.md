@@ -1,6 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
+description: Display the current AIWG version, release channel, and installation path
 
 ---
 

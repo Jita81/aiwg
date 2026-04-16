@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Manage remotely installed AIWG packages sourced from Git repositories via list, info, and remove subcommands
 ---
 
 # AIWG Packages

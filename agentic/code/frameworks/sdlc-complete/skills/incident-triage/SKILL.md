@@ -1,6 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
+description: Classify incidents by severity, assemble response teams, and coordinate initial response actions and comms
 
 ---
 

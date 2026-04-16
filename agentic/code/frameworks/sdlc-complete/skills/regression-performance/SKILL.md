@@ -1,6 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
+description: Detect performance regressions by comparing benchmarks across versions with latency, throughput, and statistical significance analysis
 
 ---
 

@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Route natural language requests to appropriate skills and workflows by parsing intent and matching trigger patterns
 ---
 
 # nl-router

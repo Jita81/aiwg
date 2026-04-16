@@ -1,7 +1,7 @@
 ---
 namespace: aiwg
 platforms: [all]
-
+description: Validate documentation for unsupported claims, made-up metrics, and unverifiable statements
 ---
 
 # claims-validator
