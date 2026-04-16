@@ -61,6 +61,132 @@ function parseServeArgs(args: string[]): {
   return { port, host, open, readOnly, sandbox };
 }
 
+// ============================================================
+// WebSocket routing (#851)
+//
+// @hono/node-server v1.x does not export createNodeWebSocket.
+// We wire WebSocket routes directly via the Node.js HTTP server's
+// 'upgrade' event and the `ws` npm package instead.
+// ============================================================
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function handleSandboxWs(ws: any, sandboxId: string, token: string): void {
+  if (!sandboxRegistry.authenticate(sandboxId, token)) {
+    ws.close(4001, 'Unauthorized');
+    return;
+  }
+  sandboxRegistry.setConnected(sandboxId, true);
+
+  ws.on('message', (data: Buffer | string) => {
+    if (!sandboxRegistry.authenticate(sandboxId, token)) return;
+    try {
+      const event: SandboxEvent = JSON.parse(data.toString());
+      event.sandboxId = sandboxId;
+      if (!event.timestamp) event.timestamp = new Date().toISOString();
+      sandboxRegistry.handleEvent(event);
+    } catch { /* ignore malformed events */ }
+  });
+
+  ws.on('close', () => {
+    sandboxRegistry.setConnected(sandboxId, false);
+  });
+
+  ws.on('error', (err: unknown) => {
+    console.error(`[sandbox-registry] WebSocket error for ${sandboxId}:`, err);
+  });
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function handlePtyWs(ws: any, sessionId: string, command: string, cmdArgs: string[], cwd?: string): void {
+  // createPtyWsHandler expects a Hono-context-like object for param/query extraction.
+  // We provide a minimal shim since we've already parsed the URL.
+  const mockContext = {
+    req: {
+      param: (key: string) => key === 'sessionId' ? sessionId : undefined,
+      query: () => ({ command, args: cmdArgs.join(','), ...(cwd ? { cwd } : {}) }),
+    },
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handler = createPtyWsHandler(mockContext as any);
+  handler.onOpen?.(null, ws);
+
+  ws.on('message', (data: Buffer | string) => {
+    handler.onMessage?.({ data: data.toString() });
+  });
+  ws.on('close', () => {
+    handler.onClose?.();
+  });
+  ws.on('error', (err: unknown) => {
+    handler.onError?.(err);
+  });
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function setupWebSockets(httpServer: any, readOnly: boolean): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let wsMod: any;
+  try {
+    wsMod = await (new Function('m', 'return import(m)'))('ws');
+  } catch {
+    console.warn('[serve] ws package not available — WebSocket routes disabled. Install with: npm install ws');
+    return;
+  }
+
+  // ws ships as CJS; ESM import may wrap in .default
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const WebSocketServer: any =
+    wsMod.WebSocketServer ??
+    wsMod.default?.WebSocketServer ??
+    wsMod.Server ??
+    wsMod.default?.Server;
+
+  if (!WebSocketServer) {
+    console.warn('[serve] Could not resolve WebSocketServer from ws package — WebSocket routes disabled.');
+    return;
+  }
+
+  const wss = new WebSocketServer({ noServer: true });
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  httpServer.on('upgrade', (req: any, socket: any, head: any) => {
+    const url = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
+    const pathname = url.pathname;
+
+    // /ws/sandbox/:sandboxId
+    const sandboxMatch = pathname.match(/^\/ws\/sandbox\/([^/]+)$/);
+    if (sandboxMatch) {
+      const sandboxId = sandboxMatch[1];
+      const token = url.searchParams.get('token') ?? '';
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      wss.handleUpgrade(req, socket, head, (ws: any) => {
+        handleSandboxWs(ws, sandboxId, token);
+      });
+      return;
+    }
+
+    // /ws/pty/:sessionId (disabled in read-only mode)
+    if (!readOnly) {
+      const ptyMatch = pathname.match(/^\/ws\/pty\/([^/]+)$/);
+      if (ptyMatch) {
+        const sessionId = ptyMatch[1];
+        const command = url.searchParams.get('command') ?? 'aiwg';
+        const argsParam = url.searchParams.get('args');
+        const cmdArgs = argsParam ? argsParam.split(',') : ['mc', 'watch'];
+        const cwd = url.searchParams.get('cwd') ?? undefined;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        wss.handleUpgrade(req, socket, head, (ws: any) => {
+          handlePtyWs(ws, sessionId, command, cmdArgs, cwd);
+        });
+        return;
+      }
+    }
+
+    // Unknown WS path — reject cleanly
+    socket.destroy();
+  });
+}
+
 /**
  * Start the Hono HTTP server
  *
@@ -84,15 +210,15 @@ async function startServer(opts: {
     nodeMod = await (new Function('m', 'return import(m)'))('@hono/node-server');
   } catch {
     // Auto-install optional serve dependencies on first use
-    console.log('Installing serve dependencies (hono, @hono/node-server)...');
+    console.log('Installing serve dependencies (hono, @hono/node-server, ws)...');
     const result = spawnSync(
       'npm',
-      ['install', '--save-optional', 'hono', '@hono/node-server'],
+      ['install', '--save-optional', 'hono', '@hono/node-server', 'ws'],
       { stdio: 'inherit' },
     );
     if (result.status !== 0) {
       throw new Error(
-        'Failed to install serve dependencies. Install manually:\n  npm install hono @hono/node-server',
+        'Failed to install serve dependencies. Install manually:\n  npm install hono @hono/node-server ws',
       );
     }
     // Retry imports after install
@@ -101,33 +227,19 @@ async function startServer(opts: {
       nodeMod = await (new Function('m', 'return import(m)'))('@hono/node-server');
     } catch {
       throw new Error(
-        'Serve dependencies installed but could not be loaded. Try:\n  npm install hono @hono/node-server',
+        'Serve dependencies installed but could not be loaded. Try:\n  npm install hono @hono/node-server ws',
       );
     }
   }
 
   const { Hono } = honoMod;
-  const { serve, createNodeWebSocket } = nodeMod;
+  const { serve } = nodeMod;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const app = new Hono() as any;
 
-  // WebSocket setup — shared by PTY bridge (#712) and sandbox event push (#731)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let injectWebSocket: ((server: any) => void) | null = null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let upgradeWebSocket: ((handler: any) => any) | null = null;
-  try {
-    const wsSetup = createNodeWebSocket({ app });
-    injectWebSocket = wsSetup.injectWebSocket;
-    upgradeWebSocket = wsSetup.upgradeWebSocket;
-    // PTY bridge only available when not in read-only mode
-    if (!opts.readOnly) {
-      app.get('/ws/pty/:sessionId', wsSetup.upgradeWebSocket(createPtyWsHandler));
-    }
-  } catch {
-    // @hono/node-server/ws not available — WebSocket routes skipped
-  }
+  // WebSocket routes are handled via Node.js upgrade event below (see setupWebSockets).
+  // @hono/node-server v1.x does not export createNodeWebSocket.
 
   // Health check
   app.get('/api/health', (c: any) => c.json({ status: 'ok', readOnly: opts.readOnly }));
@@ -315,43 +427,6 @@ async function startServer(opts: {
     return c.json({ ok: true });
   });
 
-  // WebSocket endpoint for sandbox event push (#731)
-  // agentic-sandbox connects here after registration to stream events
-  if (upgradeWebSocket) {
-    try {
-      app.get('/ws/sandbox/:sandboxId', upgradeWebSocket((c: any) => {
-        const sandboxId: string = c.req.param('sandboxId');
-        const token = c.req.query('token') ?? '';
-
-        return {
-          onOpen() {
-            if (!sandboxRegistry.authenticate(sandboxId, token)) {
-              return; // will be closed in onMessage or by client
-            }
-            sandboxRegistry.setConnected(sandboxId, true);
-          },
-          onMessage(evt: { data: string }) {
-            if (!sandboxRegistry.authenticate(sandboxId, token)) return;
-            try {
-              const event: SandboxEvent = JSON.parse(evt.data);
-              event.sandboxId = sandboxId;
-              if (!event.timestamp) event.timestamp = new Date().toISOString();
-              sandboxRegistry.handleEvent(event);
-            } catch { /* ignore malformed events */ }
-          },
-          onClose() {
-            sandboxRegistry.setConnected(sandboxId, false);
-          },
-          onError(err: unknown) {
-            console.error(`[sandbox-registry] WebSocket error for ${sandboxId}:`, err);
-          },
-        };
-      }));
-    } catch {
-      // WebSocket upgrade not available for sandbox push — REST-only mode
-    }
-  }
-
   // Static file serving — apps/web/dist/ (#714)
   // Served with @hono/node-server/serve-static if the dist exists
   const webDistDir = path.join(opts.frameworkRoot, 'apps', 'web', 'dist');
@@ -378,10 +453,8 @@ async function startServer(opts: {
 
   const server = serve({ fetch: app.fetch, port: opts.port, hostname: opts.host });
 
-  // Inject WebSocket upgrade support into the underlying HTTP server
-  if (injectWebSocket) {
-    injectWebSocket(server);
-  }
+  // Wire up WebSocket routes via Node.js upgrade event (#851)
+  await setupWebSockets(server, opts.readOnly);
 
   return {
     url,

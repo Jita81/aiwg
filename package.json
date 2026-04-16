@@ -227,7 +227,8 @@
   "optionalDependencies": {
     "@hono/node-server": "^1.19.14",
     "hono": "^4.12.14",
-    "node-pty": "^1.0.0"
+    "node-pty": "^1.0.0",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
