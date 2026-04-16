@@ -88,7 +88,7 @@ describe("Subcommand Handlers", () => {
 
   describe("mcpHandler", () => {
     it("should have correct metadata", () => {
-      expect(mcpHandler.id).toBe("aiwg-mcp");
+      expect(mcpHandler.id).toBe("aiwg-mcp-server");
       expect(mcpHandler.category).toBe("mcp");
       expect(mcpHandler.aliases).toEqual(["aiwg-mcp"]);
       expect(mcpHandler.name).toBe("AIWG MCP Server");
@@ -477,7 +477,7 @@ describe("Subcommand Handlers", () => {
 
       const handlerIds = subcommandHandlers.map((h) => h.id);
       const expectedIds = [
-        "aiwg-mcp",
+        "aiwg-mcp-server",
         "catalog",
         "list",
         "remove",
@@ -534,7 +534,7 @@ describe("Subcommand Handlers", () => {
 
       // Specific handlers
       const specificCategories = [
-        { id: "aiwg-mcp", category: "mcp" },
+        { id: "aiwg-mcp-server", category: "mcp" },
         { id: "catalog", category: "catalog" },
         { id: "new", category: "project" },
         { id: "index", category: "index" },

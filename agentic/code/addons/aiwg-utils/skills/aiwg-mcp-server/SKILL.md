@@ -1,6 +1,6 @@
 ---
 namespace: aiwg
-name: aiwg-mcp
+name: aiwg-mcp-server
 platforms: [all]
 description: Manage the AIWG MCP server — start it, configure clients, and maintain the registered server registry
 ---

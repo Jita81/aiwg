@@ -563,9 +563,9 @@ export const rollbackWorkspaceCommand: Extension = {
 // MCP Commands
 
 export const mcpCommand: Extension = {
-  id: 'aiwg-mcp',
+  id: 'aiwg-mcp-server',
   type: 'skill',
-  name: 'AIWG MCP',
+  name: 'AIWG MCP Server',
   description: 'AIWG MCP server operations (serve, install, add, remove, update, list, inject, info)',
   version: '1.0.0',
   capabilities: ['cli', 'mcp', 'server'],

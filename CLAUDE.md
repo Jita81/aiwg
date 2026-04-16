@@ -197,7 +197,7 @@ AIWG uses a unified extension system for all extension types:
 | **Framework** (3) | use, list, remove |
 | **Project** (1) | new |
 | **Workspace** (3) | status, migrate-workspace, rollback-workspace |
-| **MCP** (1) | aiwg-mcp (serve, install, info) |
+| **MCP** (1) | aiwg-mcp-server (serve, install, info) — alias: aiwg-mcp |
 | **Catalog** (1) | catalog (list, info, search) |
 | **Toolsmith** (1) | runtime-info |
 | **Utility** (3) | prefill-cards, contribute-start, validate-metadata |

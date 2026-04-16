@@ -24,7 +24,7 @@ import { registerDeployedExtensions } from "../../extensions/deployment-registra
  * Handles subcommands: serve, install, info
  */
 export const mcpHandler: CommandHandler = {
-  id: "aiwg-mcp",
+  id: "aiwg-mcp-server",
   name: "AIWG MCP Server",
   description: "AIWG MCP server commands (serve, install, add, remove, update, list, inject, info)",
   category: "mcp",
