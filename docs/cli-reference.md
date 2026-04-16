@@ -106,6 +106,7 @@ aiwg doctor
 - Deployed agents and commands
 - MCP server availability
 - System dependencies (git, jq, etc.)
+- `memory.topology` contracts — runs `validateMemoryTopology()` against every installed framework/addon manifest; flags missing required fields, invalid `crossRefStyle` values (must be `at-mention | wikilink | markdown-link | yaml-ref`), namespaces not under `.aiwg/`, empty `derivedPages`, and wrong array shapes for `lintRules`/`ingestRequires` (per ADR-021)
 
 **Example output:**
 ```
@@ -247,6 +248,7 @@ aiwg use <framework|addon>
 - `--dry-run` - Preview without making changes
 - `--ci-hooks-enabled` - Also deploy CI workflow files to `.github/workflows/` and/or `.gitea/workflows/` (opt-in; detects forge from `.git/config`). Review deployed files before committing.
 - `--skip-commands-migration` - Skip deleting the legacy commands directory (warns about duplicate entries in the command palette)
+- `--profile <name>` - Select a topology profile for addons that declare multiple page templates (e.g., `llm-wiki` ships `book-companion | personal | research-deep-dive | business-team | generic`). Without the flag, an interactive prompt appears on TTY. The selection is written to `.aiwg/<namespace>/config.json` so subsequent skill invocations pick the right template.
 
 **Capabilities:** cli, framework, deployment, addon
 **Platforms:** All

@@ -55,6 +55,13 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 | **`no-time-estimates` rule** | Agent-oriented estimation: scope count, agent count, parallelism map, pass estimate. No wall-clock figures. HIGH. |
 | **Graph backends guide** | Documentation for pluggable graph storage backends in `docs/development/`. |
 | **Specification-complete layer (Layer 3 + 4)** | Elaboration now produces behavioral specs (sequence diagrams, state machines, decision tables, interface contracts) and pseudo-code specs — making construction-phase code generation a translation task, not a design task. 6 new templates, deepened gate criteria, new `/flow-use-case-realization` orchestration, 6-layer traceability enforcement. |
+| **Semantic memory kernel** | New `semantic-memory` addon (`core: true, autoInstall: true`) with 5 kernel skills (`memory-ingest`, `memory-lint`, `memory-query-capture`, `memory-log-append`, `memory-log-render`) and a JSON Lines event schema. Any consumer declaring a `memory.topology` contract gets durable ingest/lint/log/query-capture for free. Replaces domain-scoped implementations across 4 frameworks. Per ADR-021. |
+| **`MemoryTopology` contract** | New `memory.topology` field in `manifest.json` with TypeScript types in `src/extensions/types.ts`. Four `crossRefStyle` values supported: `at-mention`, `wikilink`, `markdown-link`, `yaml-ref`. Declared in sdlc-complete, research-complete, forensics-complete, media-curator. Validated by `aiwg doctor`. |
+| **Kernel delegation pattern** | Five existing skills (`induct-research`, `intake-from-codebase`, `workspace-health`, `corpus-health`, `cleanup-audit`) now delegate mechanical work to `memory-ingest`/`memory-lint`. No UX change; adds provenance logging, contradiction detection, graph-native cross-references. Per ADR-021 D5. |
+| **`llm-wiki` addon** | Thin topology on top of the semantic memory kernel. 5 page templates (book-companion, personal, research-deep-dive, business-team, generic), Obsidian integration docs, `crossRefStyle: wikilink`. Pick a profile during `aiwg use llm-wiki` via interactive picker or `--profile <name>`. |
+| **`aiwg doctor` topology validation** | New `MetadataValidator.validateMemoryTopology()` method validates 6 required fields, `crossRefStyle` enum, `.aiwg/` namespace convention, `derivedPages` shape, and array types for `lintRules`/`ingestRequires`. Flags common addon-author mistakes before deploy. |
+| **Training framework → marketplace plugin** | The `training-complete` framework moved out of main aiwg into a standalone repo at [`jmagly/aiwg-training`](https://github.com/jmagly/aiwg-training). Install via `/plugin install training@aiwg` or `aiwg use training`. Optional Python runtime (`aiwg-training` CLI) for batch operations — post-install hook prompts on Python 3.10+ detection. Main aiwg shrinks by ~20K lines. |
+| **ADR-021 & ADR-022** | Two architectural decisions accepted: ADR-021 locks the semantic memory kernel architecture (6 decisions), ADR-022 locks the training framework architecture (10 decisions). Open questions resolved on both. |
 
 ### Added
 
@@ -141,6 +148,16 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 - **`no-time-estimates` rule** (HIGH, aiwg-utils) — agents must express effort in agent-oriented units: scope count (atomic deliverables), agent count and roles, parallelism map (parallel vs sequential batches), pass estimate (iterations to quality gate); wall-clock estimates (`N days/hours/weeks`, "expected duration", "this should be quick") are prohibited (#708)
 - **Graph backends guide** (`docs/development/graph-backends.md`) — documentation for pluggable graph storage backends
 - **Specification-complete layer (Layer 3 + Layer 4)** — 6 new behavioral specification templates (`state-machine-spec` DES-SM, `decision-table` DES-DT, `activity-diagram-spec` DES-ACT, `method-interface-contract` DES-MIC, `data-flow-spec` DES-DFS, `pseudocode-spec` DES-PSC) in `analysis-design/`; `flow-use-case-realization` orchestration command for multi-agent behavioral spec generation with 4-reviewer parallel review; ABM gate deepened with sections 3a (behavioral specs ≥80% coverage) and 8a (pseudo-code specs for first iteration); `check-traceability` rewritten for 6-layer enforcement (UC ↔ BS ↔ IC ↔ PC ↔ code ↔ tests) with orphan detection, `--fix` mode, and coverage metrics; `sdlc-accelerate` Phase 3 updated; 8 new `.aiwg/` artifact directories in framework manifest (#740–#746)
+- **`agentic/code/addons/semantic-memory/`** — kernel addon: `memory-ingest`, `memory-lint`, `memory-query-capture`, `memory-log-append`, `memory-log-render` skills; `memory-log-event` JSON Lines schema with 10 op types (5 kernel + 5 training-specific); `core: true, autoInstall: true` (#823, #826, #827, #828, #829)
+- **`agentic/code/addons/llm-wiki/`** — wiki addon with 5 profile templates (book-companion, personal, research-deep-dive, business-team, generic), schemas/page-schema, Obsidian integration docs, and `crossRefStyle: wikilink` topology; depends on semantic-memory kernel (#831)
+- **`MemoryTopology` + `CrossRefStyle` TypeScript types** — in `src/extensions/types.ts`; extends `MemoryFootprint` with optional `topology` field; declared in all 4 consumer framework manifests (sdlc-complete, research-complete, forensics-complete, media-curator) (#825)
+- **Profile picker for addons with multiple templates** — `aiwg use <addon>` detects `templates[]` array in plugin manifest, prompts user interactively (TTY) or reads `--profile <name>` flag, writes chosen selection to `.aiwg/<namespace>/config.json`
+- **`validateMemoryTopology()` method** — in `MetadataValidator` at `src/plugin/metadata-validator.ts`; validates 6 required topology fields, `crossRefStyle` enum membership, `.aiwg/` namespace convention, non-empty `derivedPages`, array types for `lintRules`/`ingestRequires`
+- **Kernel delegation sections** — `induct-research`, `intake-from-codebase`, `workspace-health`, `corpus-health`, `cleanup-audit` SKILL.md files gain a "Kernel Delegation" section documenting how they call `memory-ingest`/`memory-lint` under the hood while preserving their public UX (#830)
+- **ADR-021** — Semantic Memory Kernel Architecture at `.aiwg/architecture/decisions/ADR-021-semantic-memory-kernel.md`; locks 6 decisions (location, interface, schema location, consumer ID resolution, backward compatibility, log format) (#824)
+- **ADR-022** — AI Training Framework at `.aiwg/architecture/decisions/ADR-022-training-framework.md`; locks 10 decisions for the training-data pipeline; framework subsequently extracted to standalone repo (#822)
+- **`training` marketplace plugin entry** — in `.claude-plugin/marketplace.json`, external source pointing at `jmagly/aiwg-training`; installable via `/plugin install training@aiwg` or `aiwg use training`
+- **`docs/extensions/extension-types.md` MemoryTopology section** — documents the new contract with field table, `CrossRefStyle` enum table, and research-complete example
 
 ### Fixed
 
@@ -168,6 +185,11 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 - **CI test scope** — `test:ci` widened to run all non-inference tests (characterization, integration, smoke); only live inference UATs excluded; removed redundant "Full Test Visibility" CI job; `package-lock.json` synced
 - **Manifest skill arrays** — 34 aiwg-utils skills and 7 RLM skills migrated from `commands[]` to `skills[]` in `manifest.json` (#706, #707)
 - **Agent-loop addon** — renamed from `ralph/`; 5 missing skills registered; Wiggum terminology removed; `al`/`agent-loop` aliases added (#705)
+- **Gitea reference leakage in user-facing docs** — `README.md` + `docs/install/non-interactive.md` + `docs/project-local/overview.md` + `docs/daemon-guide.md` pointed at internal `git.integrolabs.net` URLs; replaced with public `github.com/jmagly/*` equivalents. Internal CI documentation (`docs/contributing/ci-cd-secrets.md`, `docs/frameworks/sdlc-complete/token-security.md`) retains Gitea references as intended — that's where the CI runs.
+
+### Removed
+
+- **`agentic/code/frameworks/training-complete/`** (91 files, ~18K lines) — extracted to standalone repo at [`jmagly/aiwg-training`](https://github.com/jmagly/aiwg-training). History preserved via `git subtree split` (8 commits). Users on the training workflow install via `/plugin install training@aiwg`. Existing `.aiwg/training/` artifacts remain forward-compatible via the `memory.topology` contract.
 
 ### Changed
 
@@ -187,6 +209,12 @@ and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with n
 - **aiwg-utils rule count** — 13 → 14 rules (added `no-time-estimates`)
 - **CI enforcement** — "CI Green Before Done" added as HIGH enforcement rule in `CLAUDE.md`
 - **`test:ci` simplified** — single `vitest run` covering unit + integration + characterization + smoke; UAT config kept separate
+- **Framework count** — 6 → 5 locally (training-complete extracted to marketplace). Still 6 total if the marketplace plugin is counted.
+- **Addon count** — 21 → 23 (+ `semantic-memory`, + `llm-wiki`)
+- **`memory.topology` added to 4 framework manifests** — sdlc-complete, research-complete, forensics-complete, media-curator each declare their topology contract (#825)
+- **`memory-log-event` schema extended** — 5 new training-specific op types (`format-convert`, `decontamination-check`, `preference-generate`, `synthetic-generate`, `dataset-version`); no breaking changes to existing kernel ops (#834)
+- **Default consumer addon behavior** — when Fortemi is absent, `aiwg index` serves as the graph fallback (ADR-021 D3)
+- **`.claude-plugin/marketplace.json` version** — bumped from stale `2024.12.4` to `2026.4.0` across marketplace metadata and all plugin entries
 
 [2026.3.2]: https://github.com/jmagly/aiwg/compare/v2026.3.2...v2026.4.0
 

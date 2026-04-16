@@ -198,6 +198,41 @@ Memory is organized by type: user preferences, project state, feedback on past w
 
 ---
 
+## Semantic Memory Kernel — Shared artifact operations
+
+```bash
+aiwg use semantic-memory   # core addon, auto-installed
+```
+
+Core addon (installed automatically on every project) that factors common semantic memory operations — ingest, lint, cross-reference maintenance, contradiction detection, event logging — out of individual frameworks and into a shared kernel. Any framework or addon that declares a `memory.topology` contract in its `manifest.json` gets these capabilities for free.
+
+Five skills ship:
+
+- **`memory-ingest`** reads a source (file, directory, URL) and writes summarized pages, cross-references, and index entries per the consumer's topology declaration
+- **`memory-lint`** runs 8 health checks — broken mentions, orphan pages, stale claims, missing cross-refs, index drift, log integrity, provenance coverage, domain-specific rules
+- **`memory-query-capture`** turns a valuable query response into a durable page so explorations compound over time
+- **`memory-log-append`** writes structured JSON Lines events to a consumer's `.log.jsonl`
+- **`memory-log-render`** generates a greppable Markdown view from the JSONL stream
+
+You don't invoke these directly most of the time — five existing skills (`induct-research`, `intake-from-codebase`, `workspace-health`, `corpus-health`, `cleanup-audit`) delegate to the kernel under the hood while keeping their public names.
+
+---
+
+## LLM Wiki — Obsidian-native knowledge base
+
+```bash
+aiwg use llm-wiki
+# interactive prompt picks one of: book-companion | personal | research-deep-dive | business-team | generic
+```
+
+A thin topology on top of the semantic memory kernel that ships five page-template profiles. Cross-references use `[[wikilink]]` style — directly consumable by Obsidian's graph view, Dataview queries, and Marp slide rendering.
+
+Use it for domains that don't fit a pre-packaged framework: book companions, personal knowledge bases, research deep-dives, team wikis. Install once, pick a profile, start ingesting sources. The kernel handles contradiction detection, cross-reference maintenance, and log rendering.
+
+Docs on Obsidian integration (Web Clipper, Graph View, Dataview patterns, hotkeys) ship with the addon.
+
+---
+
 ## Guided Implementation — Structured feature delivery
 
 For complex features that need to be broken down carefully before implementation:

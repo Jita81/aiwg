@@ -4,7 +4,7 @@
 
 **Multi-agent AI framework for Claude Code, Copilot, Cursor, Warp, and 4 more platforms**
 
-188 agents, 50 CLI commands, 128 skills, 6 frameworks, 21 addons. SDLC workflows, digital forensics, research management, marketing operations, media curation, and ops infrastructure — all deployable with one command.
+188 agents, 50 CLI commands, 128 skills, 5 core frameworks + training marketplace plugin, 23 addons. SDLC workflows, digital forensics, research management, marketing operations, media curation, ops infrastructure, and fine-tuning dataset curation — all deployable with one command.
 
 ```bash
 npm i -g aiwg        # install globally
@@ -288,8 +288,8 @@ The orchestration pattern: **Primary Author → Parallel Reviewers → Synthesiz
 - **35 enforcement rules** — anti-laziness detection, token security, citation integrity, executable feedback, failure mitigation across 6 LLM archetypes
 - **334 artifact templates** — progressive disclosure templates for requirements, architecture, testing, security, deployment, and more
 - **8 platform support** — deploy to Claude Code, Copilot, Cursor, Warp, Factory AI, OpenCode, Codex, and Windsurf
-- **6 complete frameworks** — SDLC, Digital Forensics, Marketing Operations, Research Management, Media Curation, Ops Infrastructure
-- **21 addons** — RLM recursive decomposition, voice profiles, testing quality, mutation testing, UAT automation, and more
+- **5 core frameworks + training marketplace plugin** — SDLC, Digital Forensics, Marketing Operations, Research Management, Media Curation, Ops Infrastructure, plus [`aiwg-training`](https://github.com/jmagly/aiwg-training) for fine-tuning dataset curation (corpus-to-dataset pipeline with DPO/KTO/ORPO/SimPO export)
+- **23 addons** — semantic-memory kernel, llm-wiki (Obsidian-native knowledge base), RLM recursive decomposition, voice profiles, testing quality, mutation testing, UAT automation, and more
 - **Agent Loop** — iterative task execution with automatic error recovery and crash resilience (6-8 hour sessions)
 - **RLM addon** — recursive context decomposition for processing 10M+ tokens via sub-agent delegation
 - **YAML metalanguage** — declarative schema-validated workflow definitions (JSON Schema 2020-12)
