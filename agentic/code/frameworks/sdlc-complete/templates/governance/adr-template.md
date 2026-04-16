@@ -58,6 +58,28 @@ Complete these fields immediately when proposing an architectural decision:
 - Operations Team: Maintenance and monitoring burden
 -->
 
+### Source Verification & Claim Tracking
+
+Track factual claims made in the ADR — benchmarks, cost figures, capability assertions — with sources and verification status. Prevents decisions from resting on unverified assumptions.
+
+<!-- EXAMPLE:
+| Claim | Source | Verified | Date |
+|-------|--------|----------|------|
+| PostgreSQL handles 500K users at $200-400/month | AWS RDS pricing calculator | ✅ Yes | 2026-01-10 |
+| Team has 3/4 developers with PostgreSQL experience | Team skills survey | ✅ Yes | 2026-01-08 |
+| MongoDB multi-document transactions unavailable | MongoDB 4.x docs | ✅ Yes | 2026-01-09 |
+| p99 < 100ms achievable at 500 RPS | Load test on staging (report: .aiwg/testing/db-load-v1.md) | ✅ Yes | 2026-01-14 |
+| Aurora Serverless cold start up to 30 s | AWS docs + internal spike | ✅ Yes | 2026-01-11 |
+-->
+
+| Claim | Source | Verified | Date |
+|-------|--------|----------|------|
+| [Claim 1] | [Source / citation] | ⬜ No | — |
+| [Claim 2] | [Source / citation] | ⬜ No | — |
+
+**Unverified claims** (must be resolved before L2 — Reviewed):
+- [ ] [Claim that still needs a source]
+
 ## Phase 2: Decision & Alternatives (EXPAND WHEN READY)
 
 <details>
@@ -334,6 +356,137 @@ How does this affect day-to-day operations?
 - ADR-015: Redis for session storage
 - ADR-018: S3 for file uploads
 -->
+
+### Implementation Sketch
+
+Concrete code or configuration demonstrating the decision in practice. Keeps the ADR grounded and exposes integration complexity early.
+
+<!-- EXAMPLE:
+```typescript
+// Connection pool configuration (PgBouncer + TypeORM)
+const dataSource = new DataSource({
+  type: 'postgres',
+  host: process.env.DB_HOST,
+  port: 5432,
+  database: process.env.DB_NAME,
+  username: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  ssl: { rejectUnauthorized: true },
+  poolSize: 20,
+  connectTimeoutMS: 5000,
+  entities: ['src/**/*.entity.ts'],
+  migrations: ['src/migrations/*.ts'],
+});
+
+// Example schema migration
+export class CreateUsersTable1700000000000 implements MigrationInterface {
+  async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.createTable(new Table({
+      name: 'users',
+      columns: [
+        { name: 'id', type: 'uuid', isPrimary: true, default: 'gen_random_uuid()' },
+        { name: 'email', type: 'varchar(255)', isUnique: true, isNullable: false },
+        { name: 'created_at', type: 'timestamptz', default: 'now()' },
+      ],
+    }));
+  }
+}
+```
+-->
+
+```
+[Paste representative code, config, or schema here]
+```
+
+**Key integration points**:
+- [Where this touches existing code]
+- [External APIs or protocols involved]
+
+**Known sharp edges**:
+- [Gotcha 1 — e.g. N+1 queries if ORM lazy-loads associations]
+- [Gotcha 2 — e.g. migration lock on large tables]
+
+### Concurrency and Shared State Model
+
+Describes how the decision handles concurrent access, shared mutable state, and race conditions.
+
+<!-- EXAMPLE:
+**Concurrency model**: PostgreSQL row-level locking + optimistic concurrency via `version` column.
+
+**Shared state**:
+- `users` table: read-heavy, cache-friendly — Redis L2 cache with 60 s TTL
+- `sessions` table: write-heavy, no caching — direct DB write per request
+- `transactions` table: serialized via `SELECT FOR UPDATE` within explicit transaction
+
+**Race conditions addressed**:
+- Double-spend: prevented by `SELECT FOR UPDATE` + unique constraint on `(user_id, idempotency_key)`
+- Concurrent profile updates: last-writer-wins with `updated_at` optimistic check
+
+**Not addressed** (acceptable trade-offs):
+- Read-your-writes across replicas: clients routed to primary for 5 s after write
+-->
+
+**Concurrency model**: [e.g. optimistic locking, pessimistic locking, actor model, event sourcing]
+
+**Shared mutable state**:
+- [Resource 1 — access pattern and protection mechanism]
+- [Resource 2]
+
+**Race conditions and mitigations**:
+- [Scenario 1 → mitigation]
+- [Scenario 2 → mitigation]
+
+**Explicitly out of scope**: [What concurrency scenarios this decision does not address and why]
+
+### Testing Strategy
+
+How to verify this decision is correctly implemented and remains correct over time.
+
+<!-- EXAMPLE:
+**Unit tests**: Mock DataSource, test repository methods against in-memory fixtures.
+- File: `src/users/users.repository.spec.ts`
+- Coverage target: 90% branch coverage on all query methods
+
+**Integration tests**: Real PostgreSQL via Docker Compose (`docker-compose.test.yml`).
+- Run with: `npm run test:integration`
+- Tests: CRUD lifecycle, concurrent insert idempotency, migration forward/rollback
+
+**Contract tests**: Verify ORM-generated SQL against pg_stat_statements baseline on schema change.
+
+**Performance tests**: k6 load test at 500 RPS, p99 < 100 ms.
+- Baseline captured: `tests/perf/baselines/db-v1.json`
+- Regression threshold: +20% on p95
+
+**Chaos tests**: Kill primary RDS instance, verify automatic failover within 60 s (quarterly drill).
+-->
+
+**Unit tests**: [What to mock, where test files live, coverage target]
+
+**Integration tests**: [Real dependencies required, how to run, key scenarios]
+
+**Contract/compatibility tests**: [API contracts, schema compatibility, migration smoke tests]
+
+**Performance tests**: [Load profile, thresholds, baseline location]
+
+**Regression guard**: [What signals a regression in this decision — metric, CI check, or alert]
+
+### Definition of Done
+
+Multi-level quality gates that must pass before this ADR is considered complete at each stage.
+
+| Level | Gate | Criteria |
+|-------|------|----------|
+| **L1 — Proposed** | ADR drafted | Phase 1 complete, status = Proposed, at least one alternative considered |
+| **L2 — Reviewed** | Architecture review | Phase 2 complete, all reviewers signed off, no unresolved comments |
+| **L3 — Accepted** | Decision accepted | Status = Accepted, implementation sketch present, risks documented |
+| **L4 — Implemented** | Code shipped | Implementation matches sketch, unit + integration tests pass, CI green |
+| **L5 — Verified** | Live validation | Performance/contract tests pass in staging, no regressions after 2-week soak |
+
+**Current level**: [L1 | L2 | L3 | L4 | L5]
+
+**Blocking items for next level**:
+- [ ] [Item 1]
+- [ ] [Item 2]
 
 </details>
 
