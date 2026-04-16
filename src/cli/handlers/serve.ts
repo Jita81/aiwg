@@ -10,6 +10,7 @@
  */
 
 import path from 'path';
+import { spawnSync } from 'child_process';
 import type { CommandHandler, HandlerContext, HandlerResult } from './types.js';
 import { createPtyWsHandler, registry as ptyRegistry } from '../../serve/pty-bridge.js';
 import { telemetryStore, createEvent } from '../../serve/telemetry.js';
@@ -82,9 +83,27 @@ async function startServer(opts: {
     honoMod = await (new Function('m', 'return import(m)'))('hono');
     nodeMod = await (new Function('m', 'return import(m)'))('@hono/node-server');
   } catch {
-    throw new Error(
-      'Hono is required for `aiwg serve`. Install it:\n  npm install hono @hono/node-server',
+    // Auto-install optional serve dependencies on first use
+    console.log('Installing serve dependencies (hono, @hono/node-server)...');
+    const result = spawnSync(
+      'npm',
+      ['install', '--save-optional', 'hono', '@hono/node-server'],
+      { stdio: 'inherit' },
     );
+    if (result.status !== 0) {
+      throw new Error(
+        'Failed to install serve dependencies. Install manually:\n  npm install hono @hono/node-server',
+      );
+    }
+    // Retry imports after install
+    try {
+      honoMod = await (new Function('m', 'return import(m)'))('hono');
+      nodeMod = await (new Function('m', 'return import(m)'))('@hono/node-server');
+    } catch {
+      throw new Error(
+        'Serve dependencies installed but could not be loaded. Try:\n  npm install hono @hono/node-server',
+      );
+    }
   }
 
   const { Hono } = honoMod;
