@@ -8,7 +8,9 @@
 
 ## The Elevator Pitch
 
-AIWG is a cognitive architecture for AI-augmented software development. It provides AI agents with the structured memory, reasoning patterns, recovery mechanisms, and quality gates that make the difference between "impressive demos" and "production-ready workflows."
+AIWG is a deployment tool and support utility for AI context. At its core, `aiwg use` copies markdown and YAML source files into the specific paths each AI platform looks in — `.claude/agents/`, `~/.codex/skills/`, `.cursor/rules/`, `.github/prompts/`, and six more — so one source of truth works across 10 platforms. Around that core, AIWG ships utilities for things the base platforms do not handle on their own: persistent artifact memory, background orchestration, autonomous loops, artifact indexing, cost telemetry, and health diagnostics. Most utilities are opt-in; the deployment layer works standalone as plain text.
+
+The compounding story matters more than any single file. Hundreds of small artifacts — each a readable, editable `.md` file — snap together into multi-agent workflows (SDLC, forensics, marketing, research) that would otherwise take a bespoke agent platform to build. AIWG implements patterns from cognitive science, multi-agent systems, and software engineering as file conventions and deployment rules, not as a runtime you depend on.
 
 If you have used AI coding assistants and thought "this is amazing for small tasks but falls apart on anything complex," AIWG is the missing infrastructure layer that scales AI assistance to multi-week projects.
 
@@ -40,7 +42,9 @@ Base assistants optimize for "sounds plausible" not "actually works." They lack 
 
 ## What AIWG Provides
 
-AIWG is a **cognitive architecture**—a term borrowed from cognitive science (SOAR, ACT-R) describing systems with memory, reasoning, learning, verification, planning, and controllable output generation. These components work together to enable reliable AI-augmented development.
+AIWG is, first, a **deployment tool**: it places markdown and YAML artifacts into the paths each AI platform reads. Second, it is a **support utility**: an optional set of CLI tools and services (memory indexing, background orchestration, autonomous loops, MCP servers, cost telemetry, diagnostics) that handle what base platforms do not.
+
+The combined system implements a **cognitive architecture** — a term borrowed from cognitive science (SOAR, ACT-R) describing systems with memory, reasoning, learning, verification, planning, and controllable output generation. AIWG expresses that architecture through file conventions (where artifacts live, how they cross-reference), deployment rules (which platform gets which artifacts), and optional runtime helpers — not through a monolithic runtime you install and depend on.
 
 ---
 

@@ -427,12 +427,16 @@ aiwg --use-stable      # Switch back to npm package
 
 ## What AIWG Is
 
-**AIWG** is a framework that provides AI coding assistants with structured workflows, specialized agents, and artifact management. It's not just documentation - it's an operational system that:
+**AIWG** is a deployment tool and support utility for AI context. At its core, `aiwg use` copies markdown and YAML source files (agents, skills, commands, rules, templates) into the paths each AI platform reads — `.claude/agents/`, `~/.codex/skills/`, `.cursor/rules/`, `.github/prompts/`, and six more — so one source of truth works across 10 platforms. The deployment layer works standalone as plain text.
+
+Around that core, AIWG ships optional utilities for things the base platforms do not handle on their own:
 
 1. **Deploys agents** - Specialized AI personas (Test Engineer, Security Auditor, etc.) with defined tools and expertise
 2. **Manages artifacts** - All project documents (requirements, architecture, tests) live in `.aiwg/`
 3. **Orchestrates workflows** - SDLC phases, handoffs, and quality gates
 4. **Tracks state** - Framework registry, project status, iteration history
+
+Most utilities (`ralph`, `mc`, `daemon`, `index`, `mcp`) are opt-in. Turn them off and the deployed agents, skills, and rules still work — they are still text files the platform reads natively.
 
 ### The `.aiwg/` Directory
 

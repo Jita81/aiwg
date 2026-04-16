@@ -8,7 +8,9 @@
 
 ## What AIWG Does
 
-AIWG is a cognitive architecture for AI-augmented software development that provides structured memory, multi-agent orchestration, and quality gates. Unlike simple prompt tools, AIWG gives AI systems the memory to maintain project context across sessions, the coordination mechanisms to synthesize multiple perspectives, and the recovery protocols to handle failures systematically.
+AIWG is a deployment tool and support utility for AI context. It copies markdown and YAML source files — agents, skills, commands, rules, templates — into the paths each AI platform reads (`.claude/agents/`, `~/.codex/skills/`, `.cursor/rules/`, and seven more) so one source of truth works across 10 platforms. Around that core, it ships optional utilities the base platforms do not provide: persistent `.aiwg/` artifact memory, multi-agent orchestration, workflow recovery loops, artifact indexing, and cost telemetry.
+
+Unlike simple prompt tools, AIWG gives AI systems the memory to maintain project context across sessions, the coordination mechanisms to synthesize multiple perspectives, and the recovery protocols to handle failures systematically — all expressed as file conventions and deployment rules rather than a monolithic runtime you depend on.
 
 ## Business Value
 

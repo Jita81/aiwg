@@ -30,11 +30,57 @@ aiwg use sdlc        # deploy SDLC framework
 
 ## What AIWG Is
 
-AIWG is a cognitive architecture that gives AI coding assistants structured memory, multi-agent ensemble validation, and closed-loop self-correction. It deploys specialized agents, workflow commands, enforcement rules, and artifact templates to any of 8 AI platforms with a single CLI command.
+AIWG is a deployment tool and support utility for AI context. At its core, `aiwg use` copies markdown and YAML source files into the specific paths each AI platform looks in — `.claude/agents/`, `~/.codex/skills/`, `.cursor/rules/`, `.github/prompts/`, and six more — so one source of truth works across 10 platforms.
+
+Around that core, AIWG ships utilities for things the base platforms do not handle on their own: persistent artifact memory (`.aiwg/`), background orchestration (`aiwg mc`), autonomous loops (`aiwg ralph`), artifact indexing (`aiwg index`), cost telemetry, health diagnostics, and more. Most are opt-in. The deployment layer works standalone as plain text files the platform reads natively.
+
+## Simple Building Blocks
+
+AIWG ships five primitive artifact types. All are plain text:
+
+- **Agents** — specialized personas (Security Auditor, Test Architect) with a scoped toolset
+- **Skills** — natural-language workflows the platform auto-invokes on trigger phrases
+- **Commands** — explicit slash invocations (`/flow-security-review-cycle`)
+- **Rules** — enforcement directives the platform loads into every session
+- **Behaviors** — lifecycle hooks that fire on events (pre-write, post-session)
+
+Each is a single `.md` file with YAML frontmatter. Nothing executes until an AI platform reads it.
+
+## Why It Compounds
+
+Because the primitives are text, they compose without runtime coordination:
+
+- One agent file becomes one member of a **180-agent SDLC team** that reviews architecture, tests, security, and compliance in parallel.
+- One skill becomes a **natural-language entry point** — "run security review" routes to the right multi-agent flow on every platform that supports skills.
+- One **framework** (SDLC, forensics, marketing) bundles dozens of agents + skills + rules + templates that cross-reference each other. Deploying a framework deploys a working multi-agent ecosystem.
+- The `.aiwg/` directory gives those agents a **shared memory** — artifacts from Monday's requirements session are read by Thursday's test design.
+- Flows orchestrate **Primary Author → Parallel Reviewers → Synthesizer → Archive** patterns that no single-prompt workflow can match.
+
+The leverage is not in any one file. It is that hundreds of small files — each independently readable and editable — snap together into workflows that would otherwise take a bespoke agent platform to build.
+
+This is also where the research background lives. AIWG implements patterns from cognitive science (Miller 1956, Sweller 1988), multi-agent systems (Jacobs et al. 1991, MetaGPT, AutoGen), and software engineering (Cooper's stage-gate, FAIR Principles, W3C PROV) — applied as file conventions and deployment rules, not as a runtime you depend on.
+
+## What's Optional
+
+These are CLI tools and services on top of the text-file substrate. The substrate works without them:
+
+- `aiwg ralph` — autonomous iterate-until-done loops
+- `aiwg mc` — background mission-control for parallel tasks
+- `aiwg daemon` — persistent session manager
+- `aiwg index` — searchable artifact index
+- `aiwg mcp` — MCP server for runtime tool access
+
+Turn any of these on when you want persistence, parallelism, or automation. Turn them off and your deployed agents, skills, and rules still work — they are still text files the platform reads natively.
+
+## What AIWG Is Not
+
+- **Not a prompt library.** Prompts are the artifacts, not the product. The product is placing the right prompts where the platform finds them.
+- **Not an LLM runtime.** AIWG never calls a model. The AI platform you already use does that; AIWG configures what it sees.
+- **Not a framework you import into your app.** Nothing is imported at build time. Your project gets a `.aiwg/` directory (artifacts) and a few provider-specific context dirs (deployed copies). Delete them and your app is unchanged.
+
+## Who It's For
 
 If you have used AI coding assistants and thought "this is amazing for small tasks but falls apart on anything complex," AIWG is the missing infrastructure layer that scales AI assistance to multi-week projects.
-
-Unlike prompt libraries or ad-hoc workflows, AIWG implements research-backed patterns from cognitive science (Miller 1956, Sweller 1988), multi-agent systems (Jacobs et al. 1991, MetaGPT, AutoGen), and software engineering (Cooper's stage-gate, FAIR Principles, W3C PROV). The system addresses the hard problems in AI-augmented development: recovering from failures, maintaining context across sessions, preventing hallucinated citations, and ensuring reproducible workflows.
 
 ---
 
