@@ -498,7 +498,7 @@ async function packageCodexPlugin(name, config, options) {
     path.join(ROOT_DIR, 'tools/agents/providers/codex.mjs')
   );
 
-  generatePluginBundle(PLUGINS_DIR, {
+  generatePluginBundle(ROOT_DIR, {
     dryRun: options.dryRun,
     srcRoot: ROOT_DIR
   });

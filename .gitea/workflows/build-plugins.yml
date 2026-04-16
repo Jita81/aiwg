@@ -46,12 +46,21 @@ jobs:
       - name: Validate plugin manifests
         run: |
           echo "Validating plugin manifests..."
+          # Codex plugins are registered via .agents/plugins/marketplace.json
+          # instead of per-plugin .claude-plugin/plugin.json. Accept either.
+          CODEX_MARKETPLACE=".agents/plugins/marketplace.json"
           for plugin in plugins/*/; do
+            name=$(basename "$plugin")
             if [ -f "$plugin.claude-plugin/plugin.json" ]; then
-              echo "✓ $(basename $plugin): manifest valid"
+              echo "✓ $name: claude manifest valid"
               cat "$plugin.claude-plugin/plugin.json" | head -5
+            elif [ -f "$plugin.codex-plugin/plugin.json" ]; then
+              echo "✓ $name: codex manifest valid"
+              cat "$plugin.codex-plugin/plugin.json" | head -5
+            elif [ -f "$CODEX_MARKETPLACE" ] && grep -Eq "\"name\"[[:space:]]*:[[:space:]]*\"$name\"" "$CODEX_MARKETPLACE"; then
+              echo "✓ $name: registered in codex marketplace"
             else
-              echo "✗ $(basename $plugin): missing manifest"
+              echo "✗ $name: missing manifest (no .claude-plugin/plugin.json, .codex-plugin/plugin.json, or codex marketplace entry)"
               exit 1
             fi
           done
