@@ -1,0 +1,11 @@
+{
+  "timestamp": "2026-04-17T07:51:54Z",
+  "direction": "code-to-docs",
+  "scope": "full repo",
+  "findings_total": 26,
+  "fixes_applied": 19,
+  "files_modified": [
+    "docs/cli-reference.md",
+    "CLAUDE.md"
+  ]
+}
