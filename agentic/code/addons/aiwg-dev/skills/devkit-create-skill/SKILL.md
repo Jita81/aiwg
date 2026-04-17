@@ -94,12 +94,14 @@ The generated SKILL.md needs customization.
 - `name:` — skill slug (kebab-case)
 - `description:` — **Mandatory.** Used by Claude Code for NL matching and required by Codex (Codex rejects any SKILL.md without a non-empty description). Never leave this blank.
 - `version:` — semver string (e.g., `1.0.0`)
+- `priority:` — **Mandatory.** Importance level: `critical`, `high`, `medium`, or `low`. Used by corpus gap reports and backlog tooling to surface work items. Never omit.
 
 ```yaml
 ---
 name: <skill-name>
 description: <what this skill does — REQUIRED, non-empty>
 version: 1.0.0
+priority: medium
 ---
 
 # <Skill Name>

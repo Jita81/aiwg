@@ -82,6 +82,7 @@ function generateSkillMd(name, options) {
 name: ${kebab}
 description: ${options.description}
 version: 1.0.0
+priority: medium
 ---
 
 # ${title} Skill
