@@ -16,6 +16,7 @@ import {
   SUPPORTED_PROVIDERS,
   getProviderConfigPath,
 } from './registry.mjs';
+import { McpProfileRegistry } from './profiles.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -36,6 +37,7 @@ Usage:
   aiwg mcp update <name> [opts]  Update a server definition
   aiwg mcp list                List registered MCP servers
   aiwg mcp inject [opts]       Inject servers into provider configs
+  aiwg mcp profile <sub>       Manage MCP profiles (named server subsets)
 
 Server Options (for add/update):
   --url <url>          Server URL (for http/sse types)
@@ -591,6 +593,15 @@ async function handleList() {
 
 /**
  * Handle `aiwg mcp inject [opts]`
+ *
+ * Supports:
+ *   --profile <name>   resolve server set from profile registry (#890)
+ *   --ephemeral        write standalone config file, do NOT touch provider default (#890)
+ *   --out <path>       explicit output path for ephemeral mode
+ *   --all              inject into all previously configured providers (existing behavior)
+ *   --provider <name>  target provider
+ *   --servers a,b      explicit server filter
+ *   --dry-run          print what would change
  */
 async function handleInject(args) {
   const provider = parseFlag(args, '--provider');
@@ -598,27 +609,47 @@ async function handleInject(args) {
   const serversStr = parseFlag(args, '--servers');
   const dryRun = args.includes('--dry-run');
   const projectDir = parseFlag(args, '--project') || '.';
+  const profileName = parseFlag(args, '--profile');
+  const ephemeral = args.includes('--ephemeral');
+  const outPath = parseFlag(args, '--out');
 
   if (!provider && !injectAll) {
-    console.error('Usage: aiwg mcp inject --provider <name> [--servers a,b] [--dry-run]');
+    console.error('Usage: aiwg mcp inject --provider <name> [--profile <p>] [--ephemeral] [--servers a,b] [--dry-run]');
     console.error('       aiwg mcp inject --all [--dry-run]');
     console.error(`\nSupported providers: ${SUPPORTED_PROVIDERS.join(', ')}`);
     process.exit(1);
   }
 
   const registry = new McpServerRegistry();
-  const serverFilter = serversStr ? serversStr.split(',').map(s => s.trim()) : undefined;
+
+  // Resolve server filter: --profile takes precedence over --servers
+  let serverFilter;
+  if (profileName) {
+    const profiles = new McpProfileRegistry();
+    const profile = await profiles.get(profileName);
+    if (!profile) {
+      const all = await profiles.list();
+      console.error(`Profile "${profileName}" not found.`);
+      if (all.length > 0) console.error(`Available profiles: ${all.map(p => p.name).join(', ')}`);
+      process.exit(1);
+    }
+    // Resolve to server names (expand __all__ later in injectServers)
+    serverFilter = profile.servers.includes('__all__')
+      ? undefined  // inject all
+      : profile.servers;
+    console.log(`Profile: ${profileName} (${profile.servers.length === 1 && profile.servers[0] === '__all__' ? 'all servers' : profile.servers.join(', ')})`);
+  } else if (serversStr) {
+    serverFilter = serversStr.split(',').map(s => s.trim());
+  }
 
   let providers;
   if (injectAll) {
-    // Get all previously injected providers, or all supported if none yet
     providers = await registry.getInjectedProviders();
     if (providers.length === 0) {
       console.error('No providers have been injected before. Use --provider <name> first.');
       process.exit(1);
     }
   } else {
-    // Normalize provider name
     const normalized = provider === 'claude' ? 'claude-code' : provider;
     if (!SUPPORTED_PROVIDERS.includes(normalized) && normalized !== 'openai') {
       console.error(`Unknown provider: ${provider}`);
@@ -628,13 +659,85 @@ async function handleInject(args) {
     providers = [normalized];
   }
 
-  if (dryRun) {
+  // Ephemeral mode — providers that don't support it
+  const EPHEMERAL_UNSUPPORTED = ['warp'];
+  const EPHEMERAL_SUPPORTED = ['claude-code', 'claude', 'codex', 'openai'];
+
+  if (ephemeral) {
+    for (const p of providers) {
+      if (EPHEMERAL_UNSUPPORTED.includes(p)) {
+        console.error(`Error: --ephemeral is not supported for provider "${p}".`);
+        console.error(`  Warp configures MCP servers via its UI only. No file-based ephemeral config is available.`);
+        process.exit(1);
+      }
+    }
+    console.log(dryRun ? '[DRY RUN] Ephemeral mode — would write standalone config:' : 'Ephemeral mode — writing standalone config (default provider config NOT modified):');
+  } else if (dryRun) {
     console.log('[DRY RUN] Would inject servers into:');
   }
 
   let totalInjected = 0;
 
   for (const p of providers) {
+    if (ephemeral) {
+      // Generate a standalone ephemeral config file
+      const targetPath = outPath ?? path.join(
+        process.env.TMPDIR || '/tmp',
+        `aiwg-mcp-${profileName ?? 'custom'}-${p}-${Date.now()}.json`,
+      );
+
+      const allServers = await registry.list();
+      const servers = serverFilter
+        ? allServers.filter(s => serverFilter.includes(s.name))
+        : allServers;
+
+      if (servers.length === 0) {
+        console.error(`  ${p}: no servers to write`);
+        continue;
+      }
+
+      // Build ephemeral config in provider's format
+      const mcpKey = p === 'opencode' ? 'mcp' : 'mcpServers';
+      const mcpBlock = {};
+      for (const server of servers) {
+        if (p === 'codex' || p === 'openai') {
+          // TOML providers get a note — ephemeral TOML is handled by codex-runtime adapter
+          console.log(`  ${p}: TOML ephemeral config requires the codex-runtime adapter.`);
+          console.log(`  Use "aiwg session --provider codex --profile ${profileName}" instead.`);
+          continue;
+        }
+        const cfg = {};
+        if (server.type === 'stdio') {
+          cfg.command = server.command;
+          cfg.args = server.args || [];
+          if (server.env) cfg.env = server.env;
+        } else {
+          cfg.url = server.url;
+          if (server.headers) cfg.headers = server.headers;
+        }
+        mcpBlock[server.name] = cfg;
+      }
+
+      if (Object.keys(mcpBlock).length === 0) continue;
+
+      const config = { [mcpKey]: mcpBlock };
+
+      if (!dryRun) {
+        await fs.mkdir(path.dirname(targetPath), { recursive: true });
+        await fs.writeFile(targetPath, JSON.stringify(config, null, 2) + '\n', 'utf-8');
+      }
+
+      const prefix = dryRun ? '[DRY RUN] ' : '';
+      console.log(`${prefix}${p}: ${targetPath}`);
+      console.log(`  ${prefix}Servers: ${Object.keys(mcpBlock).join(', ')}`);
+      if (!dryRun && (p === 'claude-code' || p === 'claude')) {
+        console.log(`  Launch with: claude --mcp-config ${targetPath}`);
+      }
+      totalInjected += Object.keys(mcpBlock).length;
+      continue;
+    }
+
+    // Persistent injection (existing behavior)
     const result = await injectServers(registry, p, {
       servers: serverFilter,
       projectDir,
@@ -657,8 +760,291 @@ async function handleInject(args) {
     }
   }
 
-  if (!dryRun && totalInjected > 0) {
+  if (!dryRun && totalInjected > 0 && !ephemeral) {
     console.log(`\nDone. Restart your provider(s) to pick up the changes.`);
+  }
+}
+
+// ============================================
+// Profile subcommand handlers (#889)
+// ============================================
+
+/**
+ * Print profile subcommand usage
+ */
+function printProfileUsage() {
+  console.log(`
+aiwg mcp profile — MCP server profiles (named server subsets)
+
+Usage:
+  aiwg mcp profile add <name> --servers a,b,c [--description "..."]
+  aiwg mcp profile list
+  aiwg mcp profile show <name>
+  aiwg mcp profile edit <name> [--add-server x] [--remove-server y] [--description "..."]
+  aiwg mcp profile remove <name>
+  aiwg mcp profile import <file>
+  aiwg mcp profile export <name> [--out <file>]
+  aiwg mcp profile init-presets
+
+Profiles let you define named subsets of your registered MCP servers:
+  aiwg mcp profile add dev --servers git-gitea,memory-fortemi --description "Dev work"
+  aiwg mcp profile show dev
+  aiwg mcp inject --provider claude --profile dev --ephemeral
+  aiwg session --provider claude --profile dev
+
+Preset profiles (minimal, dev, ops, research, incident, full):
+  aiwg mcp profile init-presets
+`);
+}
+
+/**
+ * Handle `aiwg mcp profile add <name> [opts]`
+ */
+async function handleProfileAdd(args) {
+  const positional = args.filter(a => !a.startsWith('--'));
+  const name = positional[0];
+  if (!name) {
+    console.error('Usage: aiwg mcp profile add <name> --servers a,b,c [--description "..."]');
+    process.exit(1);
+  }
+
+  const serversStr = parseFlag(args, '--servers');
+  const description = parseFlag(args, '--description');
+
+  if (!serversStr && name !== 'minimal') {
+    console.error('Warning: no --servers specified. Profile will start empty.');
+  }
+
+  const servers = serversStr ? serversStr.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+  const profiles = new McpProfileRegistry();
+  const registry = new McpServerRegistry();
+
+  await profiles.add({ name, description, servers }, registry);
+
+  console.log(`Profile added: ${name}`);
+  if (description) console.log(`  Description: ${description}`);
+  console.log(`  Servers (${servers.length}): ${servers.length > 0 ? servers.join(', ') : '(none)'}`);
+  console.log(`\nUse "aiwg mcp inject --provider <p> --profile ${name}" to inject this profile.`);
+}
+
+/**
+ * Handle `aiwg mcp profile list`
+ */
+async function handleProfileList() {
+  const profiles = new McpProfileRegistry();
+  const all = await profiles.list();
+
+  if (all.length === 0) {
+    console.log('No profiles defined.');
+    console.log('\nCreate one:   aiwg mcp profile add dev --servers git-gitea,memory-fortemi');
+    console.log('Or install presets: aiwg mcp profile init-presets');
+    return;
+  }
+
+  console.log(`MCP Profiles (${all.length}):\n`);
+  for (const p of all) {
+    const serverCount = p.servers.length === 1 && p.servers[0] === '__all__'
+      ? 'all'
+      : String(p.servers.length);
+    console.log(`  ${p.name.padEnd(16)}  [${serverCount} server${serverCount === '1' ? '' : 's'}]  ${p.description ?? ''}`);
+  }
+  console.log(`\nProfiles file: ${profiles.getPath()}`);
+}
+
+/**
+ * Handle `aiwg mcp profile show <name>`
+ */
+async function handleProfileShow(args) {
+  const name = args.filter(a => !a.startsWith('--'))[0];
+  if (!name) {
+    console.error('Usage: aiwg mcp profile show <name>');
+    process.exit(1);
+  }
+
+  const profiles = new McpProfileRegistry();
+  const profile = await profiles.get(name);
+
+  if (!profile) {
+    const all = await profiles.list();
+    console.error(`Profile "${name}" not found.`);
+    if (all.length > 0) {
+      console.error(`Available profiles: ${all.map(p => p.name).join(', ')}`);
+    }
+    process.exit(1);
+  }
+
+  console.log(`Profile: ${profile.name}`);
+  if (profile.description) console.log(`Description: ${profile.description}`);
+  console.log(`\nServers (${profile.servers.length}):`);
+
+  if (profile.servers.length === 0) {
+    console.log('  (none)');
+  } else if (profile.servers[0] === '__all__') {
+    console.log('  (all registered servers)');
+  } else {
+    // Resolve server configs
+    const registry = new McpServerRegistry();
+    for (const serverName of profile.servers) {
+      const server = await registry.get(serverName);
+      if (server) {
+        const detail = server.type === 'stdio'
+          ? `stdio  ${server.command}${server.args ? ' ' + server.args.join(' ') : ''}`
+          : `${server.type}  ${server.url}`;
+        console.log(`  ${serverName.padEnd(24)} ${detail}`);
+        if (server.description) console.log(`  ${''.padEnd(24)} ${server.description}`);
+      } else {
+        console.log(`  ${serverName.padEnd(24)} (not in registry — missing)`);
+      }
+    }
+  }
+
+  if (profile.providerOverrides && Object.keys(profile.providerOverrides).length > 0) {
+    console.log('\nProvider overrides:');
+    for (const [provider, overrides] of Object.entries(profile.providerOverrides)) {
+      console.log(`  ${provider}:`);
+      if (overrides.toolDeny) console.log(`    toolDeny: ${overrides.toolDeny.join(', ')}`);
+      if (overrides.toolAllow) console.log(`    toolAllow: ${overrides.toolAllow.join(', ')}`);
+    }
+  }
+
+  if (profile.createdAt) console.log(`\nCreated: ${profile.createdAt}`);
+  if (profile.updatedAt) console.log(`Updated: ${profile.updatedAt}`);
+}
+
+/**
+ * Handle `aiwg mcp profile edit <name> [opts]`
+ */
+async function handleProfileEdit(args) {
+  const positional = args.filter(a => !a.startsWith('--'));
+  const name = positional[0];
+  if (!name) {
+    console.error('Usage: aiwg mcp profile edit <name> [--add-server x] [--remove-server y] [--description "..."]');
+    process.exit(1);
+  }
+
+  const addServer = parseFlag(args, '--add-server');
+  const removeServer = parseFlag(args, '--remove-server');
+  const description = parseFlag(args, '--description');
+
+  const changes = {
+    description,
+    addServers: addServer ? addServer.split(',').map(s => s.trim()) : undefined,
+    removeServers: removeServer ? removeServer.split(',').map(s => s.trim()) : undefined,
+  };
+
+  if (!description && !addServer && !removeServer) {
+    console.error('No changes specified. Use --add-server, --remove-server, or --description.');
+    process.exit(1);
+  }
+
+  const profiles = new McpProfileRegistry();
+  const registry = new McpServerRegistry();
+  const updated = await profiles.edit(name, changes, registry);
+
+  console.log(`Profile updated: ${name}`);
+  console.log(`  Servers (${updated.servers.length}): ${updated.servers.join(', ') || '(none)'}`);
+}
+
+/**
+ * Handle `aiwg mcp profile remove <name>`
+ */
+async function handleProfileRemove(args) {
+  const name = args.filter(a => !a.startsWith('--'))[0];
+  if (!name) {
+    console.error('Usage: aiwg mcp profile remove <name>');
+    process.exit(1);
+  }
+
+  const profiles = new McpProfileRegistry();
+  await profiles.remove(name);
+  console.log(`Profile removed: ${name}`);
+}
+
+/**
+ * Handle `aiwg mcp profile import <file>`
+ */
+async function handleProfileImport(args) {
+  const filePath = args.filter(a => !a.startsWith('--'))[0];
+  if (!filePath) {
+    console.error('Usage: aiwg mcp profile import <file>');
+    process.exit(1);
+  }
+
+  const profiles = new McpProfileRegistry();
+  const result = await profiles.importFrom(filePath);
+  console.log(`Imported ${result.added} new profile(s), updated ${result.updated} existing.`);
+}
+
+/**
+ * Handle `aiwg mcp profile export <name> [--out <file>]`
+ */
+async function handleProfileExport(args) {
+  const positional = args.filter(a => !a.startsWith('--'));
+  const name = positional[0]; // optional — omit to export all
+  const outFile = parseFlag(args, '--out') || (name ? `${name}-profile.json` : 'mcp-profiles.json');
+
+  const profiles = new McpProfileRegistry();
+  await profiles.exportTo(outFile, name);
+  console.log(`Exported ${name ? `profile "${name}"` : 'all profiles'} to: ${outFile}`);
+}
+
+/**
+ * Handle `aiwg mcp profile init-presets`
+ */
+async function handleProfileInitPresets() {
+  const profiles = new McpProfileRegistry();
+  const result = await profiles.initPresets();
+
+  if (result.added === 0) {
+    console.log(`All ${result.total} preset profiles are already installed.`);
+    console.log('Use "aiwg mcp profile list" to view them.');
+  } else {
+    console.log(`Installed ${result.added} preset profile(s) (${result.total} total presets):`);
+    console.log('  minimal, dev, ops, research, incident, full');
+    console.log('\nNote: preset server names reference expected registry entries.');
+    console.log('Run "aiwg mcp list" to see which servers are registered.');
+  }
+}
+
+/**
+ * Route `aiwg mcp profile <subcommand>`
+ */
+async function handleProfile(args) {
+  const sub = args[0];
+  const subArgs = args.slice(1);
+
+  switch (sub) {
+    case 'add':
+      await handleProfileAdd(subArgs);
+      break;
+    case 'list':
+    case 'ls':
+      await handleProfileList();
+      break;
+    case 'show':
+      await handleProfileShow(subArgs);
+      break;
+    case 'edit':
+      await handleProfileEdit(subArgs);
+      break;
+    case 'remove':
+    case 'rm':
+      await handleProfileRemove(subArgs);
+      break;
+    case 'import':
+      await handleProfileImport(subArgs);
+      break;
+    case 'export':
+      await handleProfileExport(subArgs);
+      break;
+    case 'init-presets':
+      await handleProfileInitPresets();
+      break;
+    default:
+      if (sub) console.error(`Unknown profile subcommand: ${sub}\n`);
+      printProfileUsage();
+      process.exit(sub ? 1 : 0);
   }
 }
 
@@ -750,6 +1136,10 @@ export async function main(args = process.argv.slice(2)) {
 
     case 'inject':
       await handleInject(subArgs);
+      break;
+
+    case 'profile':
+      await handleProfile(subArgs);
       break;
 
     case '--help':

@@ -20,6 +20,7 @@
 
 import { spawnSync } from 'child_process';
 import { CommandHandler, HandlerContext, HandlerResult } from './types.js';
+import { ensureRuntimeHome, writeProfileConfig, launchWithProfile } from '../../mcp/adapters/codex-runtime.js';
 import { getFrameworkRoot } from '../../channel/manager.mjs';
 import { forceUpdateCheck } from '../../update/checker.mjs';
 import {
@@ -71,12 +72,18 @@ interface SessionArgs {
   provider: string | undefined;
   /** Skip auto-repair — check only */
   noRepair: boolean;
+  /** MCP profile name — launch with profile-scoped server set (#891) */
+  profile: string | undefined;
+  /** Persist profile injection to provider config (default: ephemeral) */
+  persist: boolean;
 }
 
 function parseSessionArgs(args: string[]): SessionArgs {
   let mcp = false;
   let provider: string | undefined;
   let noRepair = false;
+  let profile: string | undefined;
+  let persist = false;
 
   for (let i = 0; i < args.length; i++) {
     const a = args[i];
@@ -86,10 +93,14 @@ function parseSessionArgs(args: string[]): SessionArgs {
       provider = args[++i];
     } else if (a === '--no-repair') {
       noRepair = true;
+    } else if (a === '--profile' && args[i + 1]) {
+      profile = args[++i];
+    } else if (a === '--persist') {
+      persist = true;
     }
   }
 
-  return { mcp, provider, noRepair };
+  return { mcp, provider, noRepair, profile, persist };
 }
 
 // ── Pre-flight steps ─────────────────────────────────────────────────────────
@@ -256,13 +267,76 @@ function injectMcp(provider: string, cwd: string): boolean {
   return true;
 }
 
+/**
+ * Profile-aware inject (#891).
+ * Default is ephemeral (no persistent config mutation).
+ *
+ * For Claude: returns the ephemeral config path (for claude --mcp-config).
+ * For Codex: sets up the runtime home via the codex-runtime adapter (#892).
+ * Returns null for persistent mode or on failure.
+ */
+function injectMcpProfile(
+  provider: string,
+  profileName: string,
+  cwd: string,
+  persist: boolean,
+): string | null {
+  console.log(`\n  Resolving profile "${profileName}" for ${provider}...`);
+
+  if (persist) {
+    // Persistent: write to provider's default config
+    const result = spawnSync(
+      process.execPath,
+      [process.argv[1]!, 'mcp', 'inject', '--provider', provider, '--profile', profileName],
+      { stdio: 'inherit', cwd },
+    );
+    if (result.status !== 0) {
+      console.warn('  WARN  Profile inject failed — continuing without profile.');
+    }
+    return null; // persistent mode, no ephemeral path
+  }
+
+  // Codex: runtime-home adapter handles ephemeral config (#892)
+  // The codex launch is also handled specially in launchProvider.
+  if (provider === 'codex' || provider === 'openai') {
+    return null; // signal handled via runtime home (see launchProvider)
+  }
+
+  // Claude/others: generate a temp config file
+  const tmpPath = `${process.env.TMPDIR ?? '/tmp'}/aiwg-mcp-${profileName}-${provider}-${Date.now()}.json`;
+
+  const result = spawnSync(
+    process.execPath,
+    [
+      process.argv[1]!, 'mcp', 'inject',
+      '--provider', provider,
+      '--profile', profileName,
+      '--ephemeral',
+      '--out', tmpPath,
+    ],
+    { stdio: 'inherit', cwd },
+  );
+
+  if (result.status !== 0) {
+    console.warn('  WARN  Ephemeral profile inject failed — launching without profile MCP config.');
+    return null;
+  }
+
+  return tmpPath;
+}
+
 // ── Launch ────────────────────────────────────────────────────────────────────
 
 /**
  * Launch a spawnable provider binary, replacing the current process (exec-style).
  * For IDE-integrated providers, print guidance and exit.
  */
-function launchProvider(provider: string, mcpInjected: boolean): HandlerResult {
+function launchProvider(
+  provider: string,
+  mcpInjected: boolean,
+  mcpConfigPath?: string | null,
+  profile?: string | null,
+): HandlerResult {
   const cfg = getProviderConfig(provider);
 
   if (!isSpawnableProvider(provider)) {
@@ -270,10 +344,13 @@ function launchProvider(provider: string, mcpInjected: boolean): HandlerResult {
     const mcpNote = mcpInjected
       ? '\n  MCP servers have been injected into your provider config.\n'
       : '';
+    const ephemeralNote = mcpConfigPath
+      ? `\n  MCP config (ephemeral): ${mcpConfigPath}\n`
+      : '';
 
     console.log(`
 ── Ready to start ${cfg.name} ──
-${mcpNote}
+${mcpNote}${ephemeralNote}
 ${cfg.guidanceMessage ?? `Open ${cfg.name} in your project directory to begin.`}
 `);
     return { exitCode: 0 };
@@ -281,9 +358,23 @@ ${cfg.guidanceMessage ?? `Open ${cfg.name} in your project directory to begin.`}
 
   // Spawnable — hand off the terminal
   console.log(`\n── Launching ${cfg.name} ──\n`);
-  const result = spawnSync(cfg.binary!, [], {
+
+  // Codex + profile: use runtime-home adapter (#892)
+  if ((provider === 'codex' || provider === 'openai') && profile) {
+    console.log(`  Using runtime home for profile "${profile}"`);
+    const result = launchWithProfile(profile);
+    return { exitCode: result.status ?? 0 };
+  }
+
+  // Claude: if we have an ephemeral MCP config, pass it via --mcp-config
+  const binaryArgs: string[] = [];
+  if (mcpConfigPath && (provider === 'claude' || provider === 'claude-code')) {
+    binaryArgs.push('--mcp-config', mcpConfigPath);
+    console.log(`  Using ephemeral MCP config: ${mcpConfigPath}`);
+  }
+
+  const result = spawnSync(cfg.binary!, binaryArgs, {
     stdio: 'inherit',
-    // Inherit the current environment so the provider sees PATH, AIWG_ROOT, etc.
     env: process.env as Record<string, string>,
   });
 
@@ -301,14 +392,15 @@ export const sessionHandler: CommandHandler = {
   aliases: [],
 
   async execute(ctx: HandlerContext): Promise<HandlerResult> {
-    const { mcp, provider: explicitProvider, noRepair } = parseSessionArgs(ctx.args);
+    const { mcp, provider: explicitProvider, noRepair, profile, persist } = parseSessionArgs(ctx.args);
     const cwd = ctx.cwd || process.cwd();
 
     // ── Resolve provider ─────────────────────────────────────────
     const provider = await resolveProvider(explicitProvider, cwd);
     const providerCfg = PROVIDER_CONFIGS[provider];
 
-    console.log(`\n── aiwg session ── provider: ${providerCfg?.name ?? provider} ──\n`);
+    const profileSuffix = profile ? ` · profile: ${profile}` : '';
+    console.log(`\n── aiwg session ── provider: ${providerCfg?.name ?? provider}${profileSuffix} ──\n`);
 
     const frameworkRoot = await getFrameworkRoot();
 
@@ -347,11 +439,38 @@ export const sessionHandler: CommandHandler = {
 
     // ── Step 4: MCP inject ────────────────────────────────────────
     let mcpInjected = false;
-    if (mcp) {
+    let mcpConfigPath: string | null = null;
+
+    if (profile) {
+      // Profile-aware injection (#891) — ephemeral by default
+
+      // For codex: set up the runtime home and write profile config (#892)
+      if ((provider === 'codex' || provider === 'openai') && !persist) {
+        try {
+          console.log(`\n  Setting up Codex runtime home for profile "${profile}"...`);
+          // Import server list for this profile
+          const { McpProfileRegistry } = await import('../../mcp/profiles.js');
+          const { McpServerRegistry } = await import('../../mcp/registry.js');
+          const profiles = new McpProfileRegistry();
+          const registry = new McpServerRegistry();
+          const resolvedServers = await profiles.resolveServers(profile, registry) as import('../../mcp/registry.js').McpServerDefinition[];
+          await ensureRuntimeHome(profile);
+          await writeProfileConfig(profile, resolvedServers);
+          console.log(`  Runtime home ready. Profile servers: ${resolvedServers.map((s) => s.name).join(', ') || '(none)'}`);
+          mcpInjected = true;
+        } catch (err) {
+          console.warn(`  WARN  Codex runtime home setup failed: ${err instanceof Error ? err.message : String(err)}`);
+          console.warn('  Falling back to standard launch.');
+        }
+      } else {
+        mcpConfigPath = injectMcpProfile(provider, profile, cwd, persist);
+        mcpInjected = mcpConfigPath !== null || persist;
+      }
+    } else if (mcp) {
       mcpInjected = injectMcp(provider, cwd);
     }
 
     // ── Step 5: Launch ────────────────────────────────────────────
-    return launchProvider(provider, mcpInjected);
+    return launchProvider(provider, mcpInjected, mcpConfigPath, profile);
   },
 };
