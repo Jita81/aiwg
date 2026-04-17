@@ -8,7 +8,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import type { Terminal as XTerminal } from '@xterm/xterm';
 import type { FitAddon } from '@xterm/addon-fit';
-import type { WebLinksAddon } from '@xterm/addon-web-links';
 import { ReconnectingWs, ptyWsUrl } from '../../lib/ws.js';
 import styles from './Terminal.module.css';
 

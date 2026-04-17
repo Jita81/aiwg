@@ -18,7 +18,8 @@
     "validate-metadata": "node tools/cli/validate-metadata.mjs",
     "package-plugins": "node tools/plugin/package-plugins.mjs --all",
     "package-plugins:clean": "node tools/plugin/package-plugins.mjs --all --clean",
-    "build": "tsc",
+    "build": "tsc && npm --prefix apps/web ci && npm --prefix apps/web run build",
+    "build:web": "npm --prefix apps/web ci && npm --prefix apps/web run build",
     "test": "vitest run",
     "test:ci": "vitest run && vitest run --config vitest.uat.config.js",
     "test:coverage": "vitest --coverage",
@@ -45,6 +46,7 @@
     "templates/",
     "plugins/",
     "man/",
+    "apps/web/dist",
     "CLAUDE.md"
   ],
   "repository": {
