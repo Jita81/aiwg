@@ -41,3 +41,35 @@ plans, validate runbooks, manage acceptance activities, and ensure support teams
 - Coordinate with Support Lead for training and on-call updates.
 - Inform Project Manager and Test Architect of any deviations or incidents.
 - Verify Automation Outputs declared in each template before announcing completion.
+
+## 12-Factor Compliance Checks (Issue #821)
+
+Before declaring a deployment ready, verify the deployment plan reflects the 12-factor process model defined in the SAD Section 9a:
+
+### Disposability (Factor IX)
+- **Rolling Restart Strategy** section exists and specifies grace periods per process type
+- Grace window is shorter than the orchestrator SIGKILL timeout (< 30s typical)
+- Load balancer connection draining aligns with the grace window
+- Readiness probe distinguishes "running" from "ready to serve"
+- Startup time measured and meets the < 10s target from the SAD
+- Reference: `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/disposable-processes.md`
+
+### Env Var Propagation (Factor III)
+- Every env var in the Environment Variable Catalog is populated in the target environment
+- Secrets resolved via the secret manager, not checked-in config
+- `.env.example` matches the catalog (no orphan vars, no missing vars)
+- Reference: `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/config-in-environment.md`
+
+### Admin Tasks (Factor XII)
+- Every migration/backfill/key-rotation has a documented ADM-XXX entry
+- No ad-hoc scripts run during deployment — all admin operations trace to the catalog
+- Rollback procedures specified per admin task
+- Reference: `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/templates/deployment/admin-processes-template.md`
+
+### Tech Stack Parity (Factor X)
+- Parity Matrix shows same backing service technology across environments
+- Substitutions (e.g. SQLite dev → Postgres prod) have ADRs
+- Staging closely mirrors production at reduced scale, not reduced tech
+
+### Verification
+Run: `aiwg lint .aiwg/ --ruleset sdlc --ci --fail-on warn` before signing off release readiness.

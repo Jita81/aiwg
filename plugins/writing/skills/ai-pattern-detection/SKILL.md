@@ -1,8 +1,10 @@
 ---
+namespace: aiwg
 name: ai-pattern-detection
 description: Detects AI-generated writing patterns and suggests authentic alternatives. Auto-applies when reviewing content, editing documents, generating text, or when user mentions writing quality, AI detection, authenticity, or natural voice.
 version: 1.0.0
-platforms: [claude-code, openclaw]
+platforms: [all]
+
 ---
 
 # AI Pattern Detection Skill
@@ -100,3 +102,11 @@ This skill works with:
 - `/writing-validator` command for explicit validation
 - `writing-validator` agent for deep analysis
 - Any content generation task automatically
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/voice-framework/README.md — Voice framework for target style profiles
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/instruction-comprehension.md — Parsing content requirements accurately
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/README.md — SDLC framework context for documentation quality
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for writing-related commands
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Research patterns before making writing recommendations

@@ -1,15 +1,20 @@
+---
+namespace: aiwg
+platforms: [all]
+description: Run multi-stage quality assurance on marketing assets with channel-specific validation and approval-ready reports
+---
+
 # qa-protocol
 
 Multi-stage quality assurance protocol for marketing assets with channel-specific validation.
 
 ## Triggers
 
-- "quality check"
-- "QA this asset"
-- "validate for [channel]"
-- "ready for approval"
-- "pre-flight check"
-- "final review"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "launch checklist" / "pre-flight check" → pre-launch validation
+- "content QA" → quality assurance shorthand
 
 ## Purpose
 

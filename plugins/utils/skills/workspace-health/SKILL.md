@@ -1,22 +1,46 @@
+---
+namespace: aiwg
+platforms: [all]
+description: Assess workspace alignment and recommend cleanup or realignment actions at key lifecycle transition points
+---
+
 # Workspace Health Check Skill
 
 Assesses workspace alignment and suggests cleanup or realignment actions at key transition points.
 
-## Trigger Conditions
+## Kernel Delegation
 
-This skill should be invoked:
+> As of ADR-021, `workspace-health` delegates structural checks to the semantic memory kernel.
+
+**Delegation pattern**:
+1. `workspace-health` retains its consumer-neutral health-check UX
+2. Runs `memory-lint` for every installed framework in `.aiwg/frameworks/registry.json`
+3. Aggregates results across all consumers into a unified report
+4. `aiwg doctor` continues to call this skill unchanged
+
+**Backward compatibility**: No UX changes. Output format unchanged.
+
+@agentic/code/addons/semantic-memory/skills/memory-lint/SKILL.md
+
+## Triggers
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "do I need to realign" → workspace realignment check
+- "is my workspace aligned" → alignment status check
+- "cleanup recommendations" → workspace prune suggestions
+
+Auto-triggers:
+- After phase transition flow commands complete
+- After completing major features or intensive processes
+
+## Trigger Conditions Reference
+
+This skill is commonly invoked:
 - At the end of phase transitions (flow commands)
 - After completing major features or intensive processes
 - When documentation appears out of sync
-- Manually via "check workspace health" or similar
-
-## Natural Language Triggers
-
-- "check workspace health"
-- "is my workspace aligned"
-- "workspace status"
-- "do I need to realign"
-- "cleanup recommendations"
+- Manually via natural language phrases above
 
 ## Assessment Checklist
 
@@ -146,3 +170,10 @@ This skill should:
 - `/workspace-reset` - Full workspace reset (destructive)
 - `/project-status` - Current project state
 - `/check-traceability` - Verify requirement links
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/README.md — aiwg-utils addon overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/human-authorization.md — Report findings and await user authorization before cleanup
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Concrete thresholds for health checks (file count, age)
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/README.md — SDLC phase structure that workspace health is measured against

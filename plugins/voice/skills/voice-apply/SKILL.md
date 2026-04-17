@@ -1,8 +1,10 @@
 ---
+namespace: aiwg
 name: voice-apply
 description: Applies a voice profile to transform content. Use when user asks to write in a specific voice, match a tone, apply a style, or transform content to sound like a particular voice profile.
 version: 1.0.0
-platforms: [claude-code, openclaw]
+platforms: [all]
+
 ---
 
 # Voice Apply Skill
@@ -191,3 +193,11 @@ Authenticity Check:
 ✓ Uses specific numbers
 ✓ References constraints
 ```
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/voice-framework/README.md — Voice framework addon overview and profile documentation
+- @$AIWG_ROOT/agentic/code/addons/voice-framework/voices/templates/ — Built-in voice profile templates
+- @$AIWG_ROOT/agentic/code/addons/writing-quality/README.md — Writing quality addon for authenticity enforcement
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for voice commands
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/instruction-comprehension.md — Parsing voice and style directives accurately

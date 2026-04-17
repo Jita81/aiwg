@@ -63,6 +63,39 @@ before release.
 - Require 95%+ match rate for critical workflows (5 verification runs)
 - Document non-determinism sources when full reproducibility cannot be achieved
 
+## 12-Factor Runtime Reliability (Issue #821)
+
+When reviewing service reliability, validate the 12-factor process runtime model:
+
+### Graceful Shutdown (Factor IX — Disposability)
+- Main process entry point registers SIGTERM handler
+- Handler: stop accepting new work → finish in-flight work within grace window → flush buffers → close connections → exit cleanly
+- Queue consumers: in-flight messages returned to queue before exit (visibility timeout or explicit nack)
+- Grace window < orchestrator SIGKILL timeout
+- Verify via integration test: send SIGTERM mid-work, confirm no data loss
+- Reference: `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/disposable-processes.md`
+
+### Statelessness (Factor VI)
+- No session, cache, or business data in module-level variables or local disk
+- Sticky sessions (if used) documented as an ADR with scaling-flexibility tradeoff
+- Local disk writes only to `/tmp` or declared volume mounts
+- Verify via chaos test: kill random replica, confirm no data loss and no user impact beyond the in-flight request
+- Reference: `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/stateless-processes.md`
+
+### Log Streams (Factor XI)
+- Logs go to stdout/stderr, not files
+- Structured JSON format with required fields: `ts`, `level`, `svc`, `msg`, `trace_id`
+- `LOG_LEVEL` env var respected
+- Correlation IDs propagated across service boundaries (W3C traceparent)
+- Verify log aggregator receives events within 5s of emission
+- Reference: `@$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/logs-as-event-streams.md`
+
+### Crash Recovery
+- Any non-idempotent work checkpointed to backing service before acknowledgment
+- Idempotency keys for operations that could retry after crash
+- Database transactions wrap multi-step operations
+- Verify via integration test: SIGKILL mid-operation, confirm state is consistent on restart
+
 ## Schema References
 
 - @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/schemas/flows/reproducibility-framework.yaml — Reproducibility modes, snapshots, checkpoints

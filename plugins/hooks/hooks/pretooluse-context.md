@@ -50,7 +50,7 @@ Claude Code v2.1.9 introduced PreToolUse hooks that can return `additionalContex
         },
         "handler": {
           "type": "additionalContext",
-          "content": "When writing AIWG artifacts:\n\n1. **Frontmatter Required** (for documents):\n   - Use YAML frontmatter with metadata\n   - Include created timestamp\n   - Add created_by agent reference\n\n2. **@-Mentions Required**:\n   - Add References section\n   - Wire to source requirements\n   - Wire to implementations\n   - Use semantic qualifiers (@implements, @tests, @depends)\n\n3. **Progressive Disclosure** (for templates):\n   - Label sections: ESSENTIAL, EXPAND WHEN READY, ADVANCED\n   - Use <details> tags for collapsible sections\n   - Include inline examples\n\n4. **Provenance Tracking**:\n   - Record in .aiwg/research/provenance/records/ if significant\n\nSee @.claude/rules/mention-wiring.md and @.claude/rules/progressive-disclosure.md"
+          "content": "When writing AIWG artifacts:\n\n1. **Frontmatter Required** (for documents):\n   - Use YAML frontmatter with metadata\n   - Include created timestamp\n   - Add created_by agent reference\n\n2. **@-Mentions Required**:\n   - Add References section\n   - Wire to source requirements\n   - Wire to implementations\n   - Use semantic qualifiers (@implements, @tests, @depends)\n\n3. **Progressive Disclosure** (for templates):\n   - Label sections: ESSENTIAL, EXPAND WHEN READY, ADVANCED\n   - Use <details> tags for collapsible sections\n   - Include inline examples\n\n4. **Provenance Tracking**:\n   - Record in .aiwg/research/provenance/records/ if significant\n\nSee @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/mention-wiring.md and @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/progressive-disclosure.md"
         }
       }
     ]
@@ -94,7 +94,7 @@ User: "Create a use case for user authentication"
         },
         "handler": {
           "type": "additionalContext",
-          "content": "**Security Requirements for Bash Commands**:\n\n1. **Token Handling**:\n   - NEVER hard-code tokens in commands\n   - Use heredoc for token operations: bash <<'EOF' ... EOF\n   - Load tokens inline: $(cat ~/.config/gitea/token)\n\n2. **Git Commits**:\n   - NEVER use --no-verify or --no-gpg-sign\n   - NEVER force push to main/master\n   - Use conventional commit format\n\n3. **Safe Patterns**:\n   - Quote paths with spaces\n   - Use absolute paths when possible\n   - Check file existence before operations\n\nSee @.claude/rules/token-security.md and @CLAUDE.md Git Conventions"
+          "content": "**Security Requirements for Bash Commands**:\n\n1. **Token Handling**:\n   - NEVER hard-code tokens in commands\n   - Use heredoc for token operations: bash <<'EOF' ... EOF\n   - Load tokens inline: $(cat ~/.config/gitea/token)\n\n2. **Git Commits**:\n   - NEVER use --no-verify or --no-gpg-sign\n   - NEVER force push to main/master\n   - Use conventional commit format\n\n3. **Safe Patterns**:\n   - Quote paths with spaces\n   - Use absolute paths when possible\n   - Check file existence before operations\n\nSee @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/token-security.md and @CLAUDE.md Git Conventions"
         }
       }
     ]
@@ -140,7 +140,7 @@ User: "Push changes to Gitea"
         },
         "handler": {
           "type": "additionalContext",
-          "content": "**AIWG Voice Profile (Technical Authority)**:\n\n1. **Active Voice**: Prefer active over passive\n   - Good: 'The system validates input'\n   - Avoid: 'Input is validated by the system'\n\n2. **Maintain Sophistication**: Preserve domain vocabulary\n   - Use precise technical terms\n   - Don't oversimplify for accessibility\n\n3. **Authenticity Markers**:\n   - Include opinions when appropriate\n   - Acknowledge trade-offs\n   - Vary sentence structure\n\n4. **Specificity**: Use exact metrics and concrete examples\n\nSee @agentic/code/addons/voice-framework/voices/templates/technical-authority.md"
+          "content": "**AIWG Voice Profile (Technical Authority)**:\n\n1. **Active Voice**: Prefer active over passive\n   - Good: 'The system validates input'\n   - Avoid: 'Input is validated by the system'\n\n2. **Maintain Sophistication**: Preserve domain vocabulary\n   - Use precise technical terms\n   - Don't oversimplify for accessibility\n\n3. **Authenticity Markers**:\n   - Include opinions when appropriate\n   - Acknowledge trade-offs\n   - Vary sentence structure\n\n4. **Specificity**: Use exact metrics and concrete examples\n\nSee @$AIWG_ROOT/agentic/code/addons/voice-framework/voices/templates/technical-authority.md"
         }
       }
     ]
@@ -185,7 +185,7 @@ User: "Write README for the testing framework"
         },
         "handler": {
           "type": "additionalContext",
-          "content": "**Citation Policy Requirements**:\n\n1. **Verify Before Citing**:\n   - Only cite sources in .aiwg/research/sources/\n   - Check file exists before referencing\n   - Use exact quotes with page numbers\n\n2. **GRADE Quality Levels**:\n   - HIGH: 'demonstrates', 'shows', 'confirms'\n   - MODERATE: 'suggests', 'indicates', 'supports'\n   - LOW: 'some evidence', 'limited data'\n   - VERY LOW: 'anecdotal', 'exploratory'\n\n3. **Never Fabricate**:\n   - NEVER invent DOIs, URLs, page numbers\n   - NEVER cite sources not in corpus\n   - Acknowledge gaps explicitly\n\n4. **Frontmatter Required**:\n   - ref_id (REF-XXX)\n   - title, authors, year\n   - key_findings with metrics\n   - quality_assessment (GRADE)\n\nSee @.claude/rules/citation-policy.md and @.claude/rules/research-metadata.md"
+          "content": "**Citation Policy Requirements**:\n\n1. **Verify Before Citing**:\n   - Only cite sources in .aiwg/research/sources/\n   - Check file exists before referencing\n   - Use exact quotes with page numbers\n\n2. **GRADE Quality Levels**:\n   - HIGH: 'demonstrates', 'shows', 'confirms'\n   - MODERATE: 'suggests', 'indicates', 'supports'\n   - LOW: 'some evidence', 'limited data'\n   - VERY LOW: 'anecdotal', 'exploratory'\n\n3. **Never Fabricate**:\n   - NEVER invent DOIs, URLs, page numbers\n   - NEVER cite sources not in corpus\n   - Acknowledge gaps explicitly\n\n4. **Frontmatter Required**:\n   - ref_id (REF-XXX)\n   - title, authors, year\n   - key_findings with metrics\n   - quality_assessment (GRADE)\n\nSee @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/citation-policy.md and @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/research-metadata.md"
         }
       }
     ]
@@ -264,7 +264,7 @@ To verify hooks are active:
 ## Best Practices
 
 1. **Keep Context Concise**: Hooks inject on every tool use - keep payload small
-2. **Reference Full Rules**: Point to detailed docs (e.g., @.claude/rules/...)
+2. **Reference Full Rules**: Point to detailed docs (e.g., @$AIWG_ROOT/agentic/code/.../rules/...)
 3. **Test Matcher Logic**: Verify pathPattern and excludePattern work as expected
 4. **Version Control Settings**: Commit `.claude/settings.json` for team consistency
 5. **Document Rationale**: Explain why each hook exists (link to issues)
@@ -294,10 +294,10 @@ To verify hooks are active:
 
 - Issue #284 - PreToolUse context injection implementation
 - Claude Code v2.1.9 Release Notes - additionalContext feature
-- @.claude/rules/mention-wiring.md - @-mention patterns
-- @.claude/rules/token-security.md - Security requirements
-- @.claude/rules/citation-policy.md - Citation standards
-- @.claude/rules/progressive-disclosure.md - Artifact templates
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/mention-wiring.md - @-mention patterns
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/token-security.md - Security requirements
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/citation-policy.md - Citation standards
+- @$AIWG_ROOT/agentic/code/frameworks/sdlc-complete/rules/progressive-disclosure.md - Artifact templates
 
 ---
 

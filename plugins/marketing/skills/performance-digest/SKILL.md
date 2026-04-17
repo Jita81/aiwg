@@ -1,15 +1,20 @@
+---
+namespace: aiwg
+platforms: [all]
+description: Generate executive-ready marketing performance summaries with insights, trends, and prioritized recommendations
+---
+
 # performance-digest
 
 Generate executive-ready performance summaries with insights and recommendations.
 
 ## Triggers
 
-- "performance summary"
-- "marketing report"
-- "how are we doing"
-- "executive summary"
-- "campaign results"
-- "KPI update"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "KPIs" / "MQL" / "SQL" / "CAC" / "LTV" → marketing metrics shorthand
+- "funnel report" → marketing funnel analysis
 
 ## Purpose
 

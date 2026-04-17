@@ -1,15 +1,21 @@
+---
+namespace: aiwg
+platforms: [all]
+description: Gather and analyze competitive intelligence across channels to surface positioning shifts and market opportunities
+---
+
 # competitive-intel
 
 Gather and analyze competitive intelligence from multiple sources.
 
 ## Triggers
 
-- "competitive analysis"
-- "analyze competitors"
-- "what are competitors doing"
-- "competitive landscape"
-- "competitor update"
-- "market positioning"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "battle card" → competitive comparison document
+- "SWOT" → competitive framework analysis
+- "comp analysis" → competitive intelligence shorthand
 
 ## Purpose
 

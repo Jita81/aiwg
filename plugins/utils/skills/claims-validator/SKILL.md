@@ -1,15 +1,20 @@
+---
+namespace: aiwg
+platforms: [all]
+description: Validate documentation for unsupported claims, made-up metrics, and unverifiable statements
+---
+
 # claims-validator
 
 Validate documentation for unsupported claims, made-up metrics, and unverifiable statements.
 
 ## Triggers
 
-- "check for unsupported claims"
-- "validate claims"
-- "review for BS"
-- "check metrics"
-- "verify claims in this document"
-- "find made-up stats"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "fact-check this" → claim validation
+- "verify [claim]" → specific claim check
 
 ## Purpose
 
@@ -248,3 +253,10 @@ This skill complements:
 ## Output Location
 
 - Validation reports: `.aiwg/reports/claims-validation.md`
+
+## References
+
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/README.md — aiwg-utils addon overview
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/research-before-decision.md — Verify claims before accepting them
+- @$AIWG_ROOT/agentic/code/addons/aiwg-utils/rules/vague-discretion.md — Requirements for measurable, verifiable claims
+- @$AIWG_ROOT/docs/cli-reference.md — CLI reference for validation commands

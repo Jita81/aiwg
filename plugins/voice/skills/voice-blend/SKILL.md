@@ -1,14 +1,20 @@
+---
+namespace: aiwg
+platforms: [all]
+description: Combine multiple voice profiles with weighted mixing to create hybrid voices
+---
+
 # voice-blend
 
 Combine multiple voice profiles with weighted mixing to create hybrid voices.
 
 ## Triggers
 
-- "blend X and Y voices"
-- "mix technical with friendly"
-- "combine executive and casual"
-- "70% technical, 30% friendly"
-- "merge these voices..."
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "70/30 [voice A]/[voice B]" → ratio-based voice blending
+- "blend voices" → voice mixing
 
 ## Behavior
 

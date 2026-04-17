@@ -1,15 +1,21 @@
+---
+namespace: aiwg
+platforms: [all]
+description: Validate AIWG configuration files and project setup for correctness and completeness
+
+---
+
 # config-validator
 
 Validate AIWG configuration files and project setup for correctness and completeness.
 
 ## Triggers
 
-- "validate config"
-- "check configuration"
-- "verify setup"
-- "config issues"
-- "validate aiwg setup"
-- "check project setup"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "validate [YAML/JSON]" in configuration context → config schema check
+- "is this valid config" → configuration validation
 
 ## Purpose
 

@@ -1,14 +1,20 @@
+---
+namespace: aiwg
+platforms: [all]
+description: Validate brand compliance across visual, verbal, and legal dimensions with actionable reports
+---
+
 # brand-compliance
 
 Unified brand compliance validation across visual, verbal, and legal dimensions.
 
 ## Triggers
 
-- "brand review"
-- "check brand compliance"
-- "validate against brand guidelines"
-- "brand audit"
-- "is this on-brand"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "brand police" → brand guideline enforcement
+- "on-brand check" → brand consistency validation
 
 ## Purpose
 

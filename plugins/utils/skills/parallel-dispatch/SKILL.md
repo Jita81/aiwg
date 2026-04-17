@@ -1,14 +1,20 @@
+---
+namespace: aiwg
+platforms: [all]
+description: Launch multiple agents concurrently, collect their results, and handle timeouts for fan-out orchestration patterns
+---
+
 # parallel-dispatch
 
 Generic parallel agent orchestration utility for launching multiple agents concurrently.
 
 ## Triggers
 
-- "launch parallel [agents]"
-- "concurrent review by [agents]"
-- "multi-agent [task]"
-- "parallel analysis"
-- "dispatch agents"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "fan out" → parallel agent dispatch shorthand
+- "run all [N] in parallel" → explicit parallel execution
 
 ## Purpose
 

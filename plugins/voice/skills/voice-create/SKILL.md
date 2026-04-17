@@ -1,14 +1,20 @@
+---
+namespace: aiwg
+platforms: [all]
+description: Generate custom voice profiles from natural language descriptions by mapping tone, formality, and domain to voice dimensions
+---
+
 # voice-create
 
 Generate custom voice profiles from natural language descriptions.
 
 ## Triggers
 
-- "create a voice for..."
-- "new voice that sounds like..."
-- "generate a voice profile for..."
-- "make me a voice that is..."
-- "define a writing voice for..."
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "make me sound like [reference]" → reference-based voice creation
+- "voice fingerprint" → voice profile extraction from text
 
 ## Behavior
 

@@ -1,15 +1,21 @@
+---
+namespace: aiwg
+platforms: [all]
+description: Route marketing assets through multi-stakeholder approval chains with status tracking and escalation
+---
+
 # approval-workflow
 
 Multi-stakeholder approval routing with status tracking and escalation.
 
 ## Triggers
 
-- "submit for approval"
-- "route for approval"
-- "approval workflow"
-- "get sign-off"
-- "approval status"
-- "who needs to approve"
+
+Alternate expressions and non-obvious activations (primary phrases are matched automatically from the skill description):
+
+- "RACI for [X]" → responsibility assignment
+- "sign-off matrix" → approval routing
+- "who approves [X]" → approval workflow lookup
 
 ## Purpose
 
