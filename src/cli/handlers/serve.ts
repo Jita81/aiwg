@@ -10,6 +10,7 @@
  */
 
 import path from 'path';
+import { existsSync } from 'fs';
 import { spawnSync } from 'child_process';
 import type { CommandHandler, HandlerContext, HandlerResult } from './types.js';
 import { createPtyWsHandler, registry as ptyRegistry } from '../../serve/pty-bridge.js';
@@ -428,15 +429,37 @@ async function startServer(opts: {
   });
 
   // Static file serving — apps/web/dist/ (#714)
-  // Served with @hono/node-server/serve-static if the dist exists
+  // Only register serveStatic when the dist directory actually exists.
+  // When it doesn't, fall back to a helpful HTML placeholder so the
+  // browser gets a 503 with context rather than a bare "Not found".
   const webDistDir = path.join(opts.frameworkRoot, 'apps', 'web', 'dist');
-  try {
-    const { serveStatic } = await (new Function('m', 'return import(m)'))('@hono/node-server/serve-static');
-    app.use('/*', serveStatic({ root: webDistDir }));
-  } catch {
-    // serve-static not available yet (before #714 dist is built) — fallback below
-    app.get('/', (c: any) =>
-      c.text('AIWG Dashboard — run `pnpm build` inside apps/web/ to build the UI.', 503),
+  if (existsSync(webDistDir)) {
+    try {
+      const { serveStatic } = await (new Function('m', 'return import(m)'))('@hono/node-server/serve-static');
+      app.use('/*', serveStatic({ root: webDistDir }));
+    } catch {
+      // serve-static import failed — fall through to placeholder below
+    }
+  }
+
+  if (!existsSync(webDistDir)) {
+    app.get('/*', (c: any) =>
+      c.html(
+        `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>AIWG Dashboard</title>
+<style>body{font-family:system-ui,sans-serif;max-width:600px;margin:80px auto;padding:0 20px;color:#333}
+code{background:#f4f4f4;padding:2px 6px;border-radius:3px}
+a{color:#0070f3}</style></head><body>
+<h1>AIWG Dashboard</h1>
+<p>The dashboard UI has not been built yet.</p>
+<p>The <strong>API is fully operational</strong> — try
+<a href="/api/health">/api/health</a> or
+<a href="/api/sandboxes">/api/sandboxes</a>.</p>
+<hr>
+<p>To build the UI, run:<br><code>pnpm --filter @aiwg/web build</code></p>
+</body></html>`,
+        503,
+      ),
     );
   }
 
