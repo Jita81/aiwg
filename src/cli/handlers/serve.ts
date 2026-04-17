@@ -10,7 +10,7 @@
  */
 
 import path from 'path';
-import { existsSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { spawnSync } from 'child_process';
 import type { CommandHandler, HandlerContext, HandlerResult } from './types.js';
 import { createPtyWsHandler, registry as ptyRegistry } from '../../serve/pty-bridge.js';
@@ -244,6 +244,92 @@ async function startServer(opts: {
 
   // Health check
   app.get('/api/health', (c: any) => c.json({ status: 'ok', readOnly: opts.readOnly }));
+
+  // Connection status — server health, PTY sessions, sandboxes, subsystem status (#887)
+  const serverStartTime = Date.now();
+  app.get('/api/connections', (c: any) => {
+    const uptime = Date.now() - serverStartTime;
+
+    // PTY sessions
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sessions: string[] = [...(ptyRegistry as any)['sessions'].keys()];
+
+    // Sandboxes
+    const allSandboxes = sandboxRegistry.list().map((s) => ({
+      id: s.id,
+      name: s.name,
+      connected: s.connected,
+      agentCount: s.agentCount,
+    }));
+
+    // Ralph subsystem — read .aiwg/ralph/registry.json if present
+    let ralphStatus: 'active' | 'idle' | 'unknown' = 'unknown';
+    let activeLoops = 0;
+    try {
+      const ralphPath = path.join(process.cwd(), '.aiwg', 'ralph', 'registry.json');
+      if (existsSync(ralphPath)) {
+        const data = JSON.parse(readFileSync(ralphPath, 'utf-8')) as {
+          active_loops?: Array<{ status: string }>;
+        };
+        activeLoops = (data.active_loops ?? []).filter((l) => l.status === 'running').length;
+        ralphStatus = activeLoops > 0 ? 'active' : 'idle';
+      }
+    } catch { /* ignore */ }
+
+    // Missions subsystem — check for mc session directory
+    let missionsStatus = 'unknown';
+    let missionsCount = 0;
+    try {
+      const mcPath = path.join(process.cwd(), '.aiwg', 'mc');
+      if (existsSync(mcPath)) {
+        missionsStatus = 'idle';
+        const registryPath = path.join(mcPath, 'registry.json');
+        if (existsSync(registryPath)) {
+          const data = JSON.parse(readFileSync(registryPath, 'utf-8')) as {
+            sessions?: Array<{ status: string }>;
+          };
+          const activeSessions = (data.sessions ?? []).filter((s) => s.status === 'running');
+          missionsCount = activeSessions.length;
+          if (missionsCount > 0) missionsStatus = 'active';
+        }
+      }
+    } catch { /* ignore */ }
+
+    // Daemon subsystem — check for daemon PID file
+    let daemonStatus = 'unknown';
+    try {
+      const daemonPid = path.join(process.cwd(), '.aiwg', 'daemon', 'daemon.pid');
+      daemonStatus = existsSync(daemonPid) ? 'running' : 'stopped';
+    } catch { /* ignore */ }
+
+    // RLM subsystem — check for rlm state
+    let rlmStatus = 'unknown';
+    try {
+      const rlmPath = path.join(process.cwd(), '.aiwg', 'rlm');
+      rlmStatus = existsSync(rlmPath) ? 'idle' : 'stopped';
+    } catch { /* ignore */ }
+
+    // Semantic memory — check for memory index
+    let memoryStatus = 'unknown';
+    try {
+      const memPath = path.join(process.cwd(), '.aiwg', 'memory');
+      memoryStatus = existsSync(memPath) ? 'active' : 'stopped';
+    } catch { /* ignore */ }
+
+    return c.json({
+      server: { status: 'ok', readOnly: opts.readOnly, uptime },
+      ptySessions: sessions,
+      sandboxes: allSandboxes,
+      mcpServers: [] as Array<{ name: string; status: string }>,
+      subsystems: {
+        ralph: { status: ralphStatus, activeLoops },
+        missions: { status: missionsStatus, count: missionsCount },
+        daemon: { status: daemonStatus },
+        rlm: { status: rlmStatus },
+        memory: { status: memoryStatus },
+      },
+    });
+  });
 
   // REST stubs — filled in by #715 / #716
   app.get('/api/sessions', (c: any) => {

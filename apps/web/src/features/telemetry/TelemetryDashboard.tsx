@@ -13,6 +13,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import type { SessionMetrics } from './types.js';
+import type { ConnectionsResponse } from '../../lib/api.js';
 import styles from './TelemetryDashboard.module.css';
 
 // ─────────────────────────────────────────────
@@ -101,14 +102,34 @@ interface Props {
   sessionId?: string;
 }
 
+// ─────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────
+
+function fmtUptime(ms: number): string {
+  const s = Math.floor(ms / 1000);
+  if (s < 60) return `${s}s`;
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m}m ${s % 60}s`;
+  return `${Math.floor(m / 60)}h ${m % 60}m`;
+}
+
+function statusColor(status: string): string {
+  if (status === 'active' || status === 'running' || status === 'ok') return styles.statusGreen;
+  if (status === 'idle' || status === 'stopped') return styles.statusAmber;
+  return styles.statusGray;
+}
+
 export function TelemetryDashboard({ sessionId }: Props) {
   const [metrics, setMetrics] = useState<Partial<SessionMetrics>>({});
   const [recentEvents, setRecentEvents] = useState<TelemetryEventBrowser[]>([]);
+  const [connections, setConnections] = useState<ConnectionsResponse | null>(null);
+  const [eventFilter, setEventFilter] = useState<string>('');
 
   const refresh = useCallback(() => {
     setMetrics(localStore.computeMetrics(sessionId));
     const events = localStore.query(sessionId);
-    setRecentEvents(events.slice(-20).reverse());
+    setRecentEvents(events.slice(-50).reverse());
   }, [sessionId]);
 
   // Poll /api/telemetry and store events locally
@@ -135,15 +156,104 @@ export function TelemetryDashboard({ sessionId }: Props) {
     return () => { active = false; clearInterval(id); };
   }, [sessionId, refresh]);
 
+  // Poll /api/connections every 5 s (#887)
+  useEffect(() => {
+    let active = true;
+
+    async function pollConnections() {
+      try {
+        const res = await fetch('/api/connections');
+        if (!res.ok) return;
+        const data = await res.json() as ConnectionsResponse;
+        if (active) setConnections(data);
+      } catch {
+        // server not ready
+      }
+    }
+
+    pollConnections();
+    const id = setInterval(pollConnections, 5000);
+    return () => { active = false; clearInterval(id); };
+  }, []);
+
   const { totalInputTokens = 0, totalOutputTokens = 0, tokensByModel = {},
     iterations = 0, gatePasses = 0, gateFails = 0, passRate,
     scopeDone = 0, scopeTotal = 0, activeAgents = 0 } = metrics;
 
   const totalTokens = (totalInputTokens) + (totalOutputTokens);
 
+  const filteredEvents = eventFilter
+    ? recentEvents.filter((e) => e.type.startsWith(eventFilter))
+    : recentEvents;
+
   return (
     <div className={styles.dashboard} aria-label="Telemetry dashboard">
       <h2 className={styles.heading}>Telemetry</h2>
+
+      {/* Connection status (#887) */}
+      {connections && (
+        <section className={styles.connectionPanel} aria-label="Connection status">
+          <h3>Connection Status</h3>
+          <div className={styles.connectionGrid}>
+            <div className={styles.connectionItem}>
+              <span className={styles.connectionLabel}>Server</span>
+              <span className={`${styles.statusBadge} ${statusColor(connections.server.status)}`}>
+                {connections.server.status}
+              </span>
+              <span className={styles.connectionMeta}>up {fmtUptime(connections.server.uptime)}{connections.server.readOnly ? ' · read-only' : ''}</span>
+            </div>
+            <div className={styles.connectionItem}>
+              <span className={styles.connectionLabel}>PTY Sessions</span>
+              <span className={`${styles.statusBadge} ${connections.ptySessions.length > 0 ? styles.statusGreen : styles.statusGray}`}>
+                {connections.ptySessions.length}
+              </span>
+              <span className={styles.connectionMeta}>{connections.ptySessions.length === 0 ? 'none active' : connections.ptySessions.join(', ')}</span>
+            </div>
+            <div className={styles.connectionItem}>
+              <span className={styles.connectionLabel}>Sandboxes</span>
+              <span className={`${styles.statusBadge} ${connections.sandboxes.length > 0 ? styles.statusGreen : styles.statusGray}`}>
+                {connections.sandboxes.length}
+              </span>
+              <span className={styles.connectionMeta}>
+                {connections.sandboxes.length === 0 ? 'none registered' : connections.sandboxes.map((s) => `${s.name}${s.connected ? '' : ' (offline)'}`).join(', ')}
+              </span>
+            </div>
+            {connections.mcpServers.length > 0 && (
+              <div className={styles.connectionItem}>
+                <span className={styles.connectionLabel}>MCP Servers</span>
+                <span className={`${styles.statusBadge} ${styles.statusGreen}`}>{connections.mcpServers.length}</span>
+                <span className={styles.connectionMeta}>{connections.mcpServers.map((m) => m.name).join(', ')}</span>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* Subsystem health (#887) */}
+      {connections && (
+        <section className={styles.subsystemPanel} aria-label="Subsystem health">
+          <h3>Subsystems</h3>
+          <div className={styles.subsystemGrid}>
+            <SubsystemCard
+              name="Ralph"
+              status={connections.subsystems.ralph.status}
+              detail={connections.subsystems.ralph.activeLoops > 0
+                ? `${connections.subsystems.ralph.activeLoops} active loop${connections.subsystems.ralph.activeLoops !== 1 ? 's' : ''}`
+                : 'no active loops'}
+            />
+            <SubsystemCard
+              name="Missions"
+              status={connections.subsystems.missions.status}
+              detail={connections.subsystems.missions.count > 0
+                ? `${connections.subsystems.missions.count} running`
+                : 'none running'}
+            />
+            <SubsystemCard name="Daemon" status={connections.subsystems.daemon.status} />
+            <SubsystemCard name="RLM" status={connections.subsystems.rlm.status} />
+            <SubsystemCard name="Memory" status={connections.subsystems.memory.status} />
+          </div>
+        </section>
+      )}
 
       {/* KPI cards */}
       <section className={styles.kpiGrid} aria-label="Key performance indicators">
@@ -210,14 +320,29 @@ export function TelemetryDashboard({ sessionId }: Props) {
         </section>
       )}
 
-      {/* Recent event log */}
+      {/* Event log with filter (#887) */}
       <section className={styles.eventLog} aria-label="Recent telemetry events">
-        <h3>Recent Events</h3>
-        {recentEvents.length === 0 ? (
+        <div className={styles.eventLogHeader}>
+          <h3>Event Feed</h3>
+          <div className={styles.filterButtons} role="group" aria-label="Filter events by type">
+            {['', 'tokens', 'gate', 'agent', 'scope', 'iteration', 'mission'].map((prefix) => (
+              <button
+                key={prefix || 'all'}
+                type="button"
+                className={`${styles.filterBtn} ${eventFilter === prefix ? styles.filterBtnActive : ''}`}
+                onClick={() => setEventFilter(prefix)}
+                aria-pressed={eventFilter === prefix}
+              >
+                {prefix || 'all'}
+              </button>
+            ))}
+          </div>
+        </div>
+        {filteredEvents.length === 0 ? (
           <p className={styles.empty}>No events yet. Start a session to collect telemetry.</p>
         ) : (
           <ol className={styles.eventList} aria-label="Telemetry event list">
-            {recentEvents.map((e) => (
+            {filteredEvents.map((e) => (
               <li key={e.id} className={styles.eventRow}>
                 <time dateTime={e.timestamp} className={styles.eventTime}>
                   {new Date(e.timestamp).toLocaleTimeString()}
@@ -244,6 +369,30 @@ interface KpiCardProps {
   highlight?: 'green' | 'amber' | 'red';
   children?: React.ReactNode;
 }
+
+// ─────────────────────────────────────────────
+// Subsystem Card sub-component
+// ─────────────────────────────────────────────
+
+interface SubsystemCardProps {
+  name: string;
+  status: string;
+  detail?: string;
+}
+
+function SubsystemCard({ name, status, detail }: SubsystemCardProps) {
+  return (
+    <article className={styles.subsystemCard} aria-label={`${name}: ${status}`}>
+      <p className={styles.subsystemName}>{name}</p>
+      <span className={`${styles.statusBadge} ${statusColor(status)}`}>{status}</span>
+      {detail && <p className={styles.subsystemDetail}>{detail}</p>}
+    </article>
+  );
+}
+
+// ─────────────────────────────────────────────
+// KPI Card sub-component
+// ─────────────────────────────────────────────
 
 function KpiCard({ label, value, sub, highlight, children }: KpiCardProps) {
   const valueClass = highlight

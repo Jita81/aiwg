@@ -78,6 +78,22 @@ export interface HitlResponse {
   requests: HitlRequest[];
 }
 
+// ---- Connections types (#887) ----
+
+export interface ConnectionsResponse {
+  server: { status: 'ok'; readOnly: boolean; uptime: number };
+  ptySessions: string[];
+  sandboxes: Array<{ id: string; name: string; connected: boolean; agentCount: number }>;
+  mcpServers: Array<{ name: string; status: string }>;
+  subsystems: {
+    ralph: { status: 'active' | 'idle' | 'unknown'; activeLoops: number };
+    missions: { status: string; count: number };
+    daemon: { status: string };
+    rlm: { status: string };
+    memory: { status: string };
+  };
+}
+
 // ---- Loadout types (#733) ----
 
 export interface Loadout {
@@ -91,6 +107,9 @@ export const api = {
   sessions: () => request<SessionsResponse>('/api/sessions'),
   missions: () => request<MissionsResponse>('/api/missions'),
   telemetry: () => request<TelemetryResponse>('/api/telemetry'),
+
+  // Connections (#887)
+  connections: () => request<ConnectionsResponse>('/api/connections'),
 
   // Sandbox (#731)
   sandboxes: () => request<SandboxesResponse>('/api/sandboxes'),
