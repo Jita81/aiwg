@@ -77,3 +77,7 @@ docs/references/pdfs/*.pdf
 
 # Test temp directories (created by file watcher tests)
 test-temp-watch-*/
+
+# AIWG — ignore only high-churn runtime subdirs, NOT .aiwg/ itself
+.aiwg/ralph/
+.aiwg/ralph-external/
