@@ -2,6 +2,7 @@
 #
 # Validates plugin and agent metadata schemas.
 # Runs on changes to agentic framework files.
+# Requires Node 20+ (hnswlib-node native addon not compatible with Node 18 EOL).
 
 name: Validate Metadata
 
