@@ -331,12 +331,28 @@ function deployHookFile(targetDir, opts) {
 
   if (!fs.existsSync(templatePath)) return;
 
+  // Build effective counts: use current-run counts where > 0, otherwise read the
+  // actual deployed count from the filesystem. This prevents a partial deploy
+  // (e.g. agents-only, no --skills flag) from resetting skill/command counts to
+  // "0" in the generated AIWG.md.
+  const effectiveCounts = { ...counts };
+  function countMdFiles(dir) {
+    try { return fs.readdirSync(dir).filter(f => f.endsWith('.md')).length; } catch { return 0; }
+  }
+  function countDirs(dir) {
+    try { return fs.readdirSync(dir, { withFileTypes: true }).filter(e => e.isDirectory()).length; } catch { return 0; }
+  }
+  if (!effectiveCounts.agents) effectiveCounts.agents = countMdFiles(path.join(targetDir, '.claude', 'agents'));
+  if (!effectiveCounts.skills) effectiveCounts.skills = countDirs(path.join(targetDir, '.claude', 'skills'));
+  if (!effectiveCounts.commands) effectiveCounts.commands = countMdFiles(path.join(targetDir, '.claude', 'commands'));
+  if (!effectiveCounts.rules)   effectiveCounts.rules   = countMdFiles(path.join(targetDir, '.claude', 'rules'));
+
   // Write AIWG.md (always overwrite — it's generated content)
   if (dryRun) {
     console.log('[dry-run] Would write AIWG.md from template');
   } else {
     let content = fs.readFileSync(templatePath, 'utf8');
-    content = interpolateHookTokens(content, counts);
+    content = interpolateHookTokens(content, effectiveCounts);
     fs.writeFileSync(hookDest, content, 'utf8');
     console.log('Created AIWG.md (hook file)');
   }
