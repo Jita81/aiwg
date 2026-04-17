@@ -459,6 +459,63 @@ cd customer-portal
 /intake-wizard "Customer portal with real-time chat"
 ```
 
+### session
+
+Start an agentic session with pre-flight health checks, auto-repair, optional MCP injection, and provider launch.
+
+```bash
+aiwg session                        # default provider, full pre-flight + launch
+aiwg session mcp                    # inject configured MCPs first, then launch
+aiwg session --provider codex       # explicit provider
+aiwg session mcp --provider cursor  # MCP inject for cursor + start instructions
+aiwg session --no-repair            # skip auto-repair (still checks and reports)
+```
+
+**Options:**
+- `mcp` - Inject configured MCP servers into the provider config before launching
+- `--provider <p>` - Override provider (default: `providers[0]` from `.aiwg/aiwg.config`, then `claude`)
+- `--no-repair` - Skip auto-repair; still runs health checks and reports issues
+
+**Pre-flight sequence:**
+1. **Version check** — updates aiwg if stale (`npm install -g aiwg@latest`)
+2. **Health check** — runs `aiwg doctor`; auto-repairs fixable issues via `aiwg sync`
+3. **Deployment check** — redeploys framework files to the provider if missing or stale
+4. **MCP inject** (when `mcp` subcommand used) — runs `aiwg mcp inject --provider <p>`
+5. **Launch** — spawns binary (claude, codex, opencode) or prints start instructions (IDE providers: cursor, windsurf, copilot, etc.)
+
+**Auto-repair escalation:**
+- Strategy 1: `aiwg sync` (update + redeploy)
+- Strategy 2: `npm install -g aiwg@latest` + redeploy all frameworks
+- If unresolvable: surfaces `aiwg feedback --type bug` as escape hatch
+
+**Capabilities:** cli, project
+**Platforms:** All
+**Tools:** Bash
+
+**Examples:**
+
+```bash
+# Default: run pre-flight then launch claude
+aiwg session
+
+# With MCP servers injected first
+aiwg session mcp
+
+# Launch a specific provider
+aiwg session --provider opencode
+
+# Set up Cursor (IDE — prints instructions instead of launching)
+aiwg session --provider cursor
+
+# Combine MCP + provider
+aiwg session mcp --provider codex
+
+# Skip repair if you just want to check and launch
+aiwg session --no-repair
+```
+
+---
+
 ### serve
 
 Start local HTTP dashboard server for sandbox fleet management and HITL relay.
@@ -479,7 +536,7 @@ aiwg serve --no-open --read-only
 **Platforms:** All
 **Tools:** Read, Bash
 
-**Requires:** `hono`, `@hono/node-server` (install via `npm install hono @hono/node-server`)
+**Requires:** `hono`, `@hono/node-server`, `ws` (auto-installed on first use; or `npm install hono @hono/node-server ws`)
 
 **See also:** [Serve Guide](serve-guide.md) for full API reference, WebSocket protocols, and integration details.
 
@@ -921,6 +978,71 @@ aiwg validate-metadata
 # Validate specific extension
 aiwg validate-metadata .claude/agents/api-designer.md
 ```
+
+### feedback
+
+Submit a bug report, feature request, or feedback to the AIWG GitHub repository. System context (version, OS, Node, provider, installed frameworks) is collected and prefilled automatically.
+
+```bash
+aiwg feedback                              # interactive (if TTY)
+aiwg feedback --type bug                   # skip type selection
+aiwg feedback --type feature               # feature request
+aiwg feedback --type doc                   # documentation gap
+aiwg feedback --title "X" --body "Y"       # fully non-interactive
+aiwg feedback --no-context                 # skip attaching system context
+```
+
+**Aliases:** `report`
+
+**Options:**
+- `--type <t>` - Feedback type: `bug`, `feature`, `doc`, `other` (interactive prompt if omitted)
+- `--title <text>` - Issue title (interactive prompt if omitted)
+- `--body <text>` - Issue description (interactive prompt if omitted)
+- `--no-context` - Skip collecting and attaching system context
+
+**Submission flow:**
+1. If `gh` CLI is available → `gh issue create --repo jmagly/aiwg` with appropriate label
+2. Otherwise → opens browser with pre-filled GitHub issue URL
+3. If no browser (non-TTY) → prints formatted issue body to stdout for manual filing
+
+**System context collected automatically:**
+
+| Field | Source |
+|-------|--------|
+| aiwg version | `aiwg version` |
+| Node.js | `process.version` |
+| OS | `os.type() + os.release()` |
+| Arch | `os.arch()` |
+| Provider | `.aiwg/aiwg.config` `providers[0]` |
+| Frameworks | `.aiwg/aiwg.config` `installed` keys |
+| Shell | `$SHELL` / `$COMSPEC` |
+
+**Capabilities:** cli, utility
+**Platforms:** All
+**Tools:** Bash
+
+**Examples:**
+
+```bash
+# Interactive — prompts for type, title, description
+aiwg feedback
+
+# File a bug report non-interactively
+aiwg feedback --type bug \
+  --title "doctor crashes in empty project" \
+  --body "Running aiwg doctor in a new directory with no .aiwg causes an unhandled exception."
+
+# Request a feature
+aiwg feedback --type feature --title "add --watch flag to aiwg index build"
+
+# Report a doc gap
+aiwg feedback --type doc --title "mcp inject workflow not documented"
+
+# Skip system context (for privacy)
+aiwg feedback --type bug --title "crash" --body "details" --no-context
+```
+
+**Tip:** `aiwg doctor` surfaces `aiwg feedback --type bug` automatically when it finds issues it cannot auto-repair.
 
 ---
 

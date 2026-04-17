@@ -5,6 +5,39 @@ All notable changes to AIWG project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project uses [Calendar Versioning (CalVer)](https://calver.org/) with npm-compatible format (`YYYY.M.PATCH`).
 
+## [2026.4.1] - 2026-04-16 – "Self-Healing Sessions"
+
+| What changed | Why you care |
+|---|---|
+| **`aiwg session`** | One command launches a fully-prepared agentic session: version check, doctor, auto-repair, deployment verification, optional MCP injection, then provider launch or IDE instructions. Self-healing by default — falls back through `aiwg sync` → full reinstall → `aiwg feedback` if repair fails. |
+| **`aiwg feedback`** | File GitHub issues from the CLI without leaving the terminal. System context (version, OS, provider, frameworks) collected automatically. Routes through `gh` CLI → browser URL → stdout fallback. Surfaces automatically from `aiwg doctor` on unresolvable issues. |
+| **`aiwg serve` WebSocket fix** | Sandbox WebSocket connections were silently 404-ing because `@hono/node-server` v1.19.14 never shipped `createNodeWebSocket`. Replaced with a native Node.js `upgrade`-event router + `ws` package. `ws` now auto-installs on first `aiwg serve` run. |
+| **ADR template: 5 new sections** | Source verification & claim tracking, implementation sketch, concurrency/shared state model, testing strategy, and multi-level Definition of Done. Addresses the most common gaps in architectural decision records. |
+
+### Added
+
+- **`aiwg session`** — self-healing session launcher; 5-step pre-flight: version check → `aiwg doctor` → deployment check → optional MCP inject → provider launch; `mcp` subcommand injects configured servers first; `--provider <p>` overrides provider; `--no-repair` skips auto-repair; repair escalates sync → npm reinstall → `aiwg feedback` escape hatch; IDE providers (cursor, windsurf, copilot, etc.) receive identical pre-flight then print start instructions instead of spawning a binary (#885)
+- **`aiwg feedback`** — GitHub issue submitter; collects system context automatically (aiwg version, Node.js, OS, arch, provider, installed frameworks, shell); `--type bug|feature|doc|other`, `--title`, `--body`, `--no-context` flags; submission via `gh issue create --repo jmagly/aiwg` → browser URL pre-fill → stdout fallback; `report` alias; interactive prompts when TTY; surfaces from `aiwg doctor` on unresolvable issues (#885)
+- **Session and feedback skills** — `agentic/code/addons/aiwg-utils/skills/session/SKILL.md` and `agentic/code/addons/aiwg-utils/skills/feedback/SKILL.md`; trigger patterns, examples, and clarification prompts for natural-language invocation across all providers (#885)
+- **ADR template: Source Verification & Claim Tracking section** — table of Claim / Source / Verified / Date; unverified claims checklist blocks L2 acceptance (#863)
+- **ADR template: Implementation Sketch section** — annotated code block, key integration points, known sharp edges (Phase 3) (#854)
+- **ADR template: Concurrency and Shared State Model section** — concurrency model declaration, shared mutable state inventory, race conditions and mitigations, explicit out-of-scope (Phase 3) (#856)
+- **ADR template: Testing Strategy section** — 5 layers: unit, integration, contract, performance, regression guard (Phase 3) (#858)
+- **ADR template: Definition of Done section** — 5-level table L1 Proposed → L5 Verified; blocking-items checklist (Phase 3) (#860)
+
+### Fixed
+
+- **`aiwg serve` WebSocket 404** — `createNodeWebSocket` does not exist in `@hono/node-server` v1.19.14; the `try/catch` around the import silently swallowed the failure leaving `upgradeWebSocket = null`; all `/ws/sandbox/:id` connections returned 404; replaced with `setupWebSockets()` using native Node.js `upgrade` event + `ws` package `WebSocketServer({ noServer: true })` (#851)
+- **`ws` package not installed for `aiwg serve`** — `ws` added to `optionalDependencies` and to the auto-install list run on first `aiwg serve` launch
+
+### Changed
+
+- **`aiwg doctor` recovery output** — now surfaces `aiwg session --no-repair`, `aiwg sync`, and `aiwg feedback --type bug` as concrete recovery options when health checks fail
+- **`aiwg serve` install hint** — updated to include `ws` in the install command (`npm install hono @hono/node-server ws`)
+- **Command count** — 53 → 55 (`session`, `feedback` added)
+
+---
+
 ## [2026.4.0] - 2026-04-01 – "Autonomous Systems"
 
 > First major version milestone. Covers everything since v2026.3.2. Intermediate builds (3.3, 3.4) were internal test releases — this is the stable release users should upgrade to.
