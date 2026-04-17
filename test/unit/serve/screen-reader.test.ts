@@ -145,7 +145,7 @@ describe('ScreenReader', () => {
     for (let i = 1; i <= 30; i++) {
       reader.write(`Line ${i}\r\n`);
     }
-    await tick();
+    await reader.flush();
     const state = reader.getState();
     // After 30 lines written into a 24-row terminal, scrollback should exist
     expect(state.scrollback.length).toBeGreaterThan(0);

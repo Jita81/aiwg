@@ -183,6 +183,18 @@ export class ScreenReader {
     });
   }
 
+  /**
+   * Flush all pending writes through xterm's internal write queue.
+   * Enqueues an empty write and resolves when its callback fires, which
+   * guarantees all previously queued writes have been processed.
+   */
+  flush(): Promise<void> {
+    return new Promise((resolve) => {
+      if (this.disposed) { resolve(); return; }
+      this.terminal.write('', () => resolve());
+    });
+  }
+
   /** Get human-readable summary of visible screen */
   getSummary(): string {
     return buildSummary(this.getState().text);
