@@ -1,5 +1,7 @@
 {
   "name": "Ops Complete",
+  "id": "ops-complete",
+  "modeAliases": ["ops"],
   "path": "agentic/code/frameworks/ops-complete",
   "files": [
     "README.md"

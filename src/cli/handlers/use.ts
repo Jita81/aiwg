@@ -33,21 +33,50 @@ import {
 /**
  * Valid framework identifiers
  */
-const VALID_FRAMEWORKS = ['sdlc', 'marketing', 'media-curator', 'research', 'writing', 'general', 'all'] as const;
+const VALID_FRAMEWORKS = ['sdlc', 'marketing', 'media-curator', 'research', 'forensics', 'ops', 'knowledge-base', 'writing', 'general', 'all'] as const;
 type Framework = typeof VALID_FRAMEWORKS[number];
 
 /**
- * Framework name to deploy mode mapping
+ * Framework name to deploy mode mapping.
+ * Mode is passed as `--mode <value>` to deploy-agents.mjs, which resolves
+ * to the actual framework via discoverFrameworks() + modeAliases.
  */
 const MODE_MAP: Record<Framework, string> = {
   sdlc: 'sdlc',
   marketing: 'marketing',
   'media-curator': 'media-curator',
   research: 'research',
+  forensics: 'forensics',
+  ops: 'ops-complete',      // ops-complete manifest id is 'ops-complete' (modeAlias: ops)
+  'knowledge-base': 'knowledge-base',
   writing: 'general',
   general: 'general',
   all: 'all',
 };
+
+/**
+ * Framework name to actual directory name under agentic/code/frameworks/.
+ * Used for path construction in collision checks, CI hooks, and version tracking.
+ * Frameworks without a dedicated directory (writing, general) map to undefined —
+ * those code paths are skipped gracefully.
+ */
+const FRAMEWORK_DIR_MAP: Partial<Record<string, string>> = {
+  sdlc: 'sdlc-complete',
+  marketing: 'media-marketing-kit',
+  'media-curator': 'media-curator',
+  research: 'research-complete',
+  forensics: 'forensics-complete',
+  ops: 'ops-complete',
+  'knowledge-base': 'knowledge-base',
+  // 'writing' and 'general' have no backing framework directory
+  // 'all' falls back to sdlc for manifest/CI purposes
+  all: 'sdlc-complete',
+};
+
+/** Resolve actual framework directory name for a given user-facing name. */
+function resolveFrameworkDir(framework: string): string | undefined {
+  return FRAMEWORK_DIR_MAP[framework];
+}
 
 /**
  * Addons excluded from `aiwg use all`.
@@ -215,11 +244,12 @@ async function runPreDeployCollisionCheck(opts: {
   const { frameworkRoot, framework, target, provider, force, verbose = false } = opts;
 
   // Resolve source skills dir for this framework
-  const frameworkSlug = framework === 'all' ? 'sdlc' : framework;
+  const frameworkDirName = resolveFrameworkDir(framework);
+  if (!frameworkDirName) return true; // no backing directory — skip collision check
   const sourceSkillsDir = path.join(
     frameworkRoot,
     'agentic/code/frameworks',
-    `${frameworkSlug}-complete`,
+    frameworkDirName,
     'skills'
   );
 
@@ -478,10 +508,12 @@ async function deployCiHooks(opts: {
   const { frameworkRoot, framework, target, dryRun } = opts;
 
   // Resolve framework source dir
+  const ciFrameworkDir = resolveFrameworkDir(framework);
+  if (!ciFrameworkDir) return; // no backing directory — nothing to deploy
   const frameworkDir = path.join(
     frameworkRoot,
     'agentic/code/frameworks',
-    `${framework === 'all' ? 'sdlc' : framework}-complete`
+    ciFrameworkDir
   );
 
   // Read CI manifest from framework manifest.json
@@ -607,7 +639,7 @@ export class UseHandler implements CommandHandler {
           : '';
         return {
           exitCode: 1,
-          message: `Error: Framework or addon name required\nFrameworks: sdlc, marketing, media-curator, research, writing, all\nAddons: rlm, ring, daemon, aiwg-dev${advisory}`,
+          message: `Error: Framework or addon name required\nFrameworks: sdlc, marketing, media-curator, research, forensics, ops, knowledge-base, all\nAddons: rlm, ring, daemon, aiwg-dev${advisory}`,
         };
       }
       const installedNames = Object.keys(config.installed);
@@ -979,12 +1011,11 @@ export class UseHandler implements CommandHandler {
     if (config !== null && !dryRun) {
       try {
         const versionInfo = await getVersionInfo();
-        const frameworkManifestPath = path.join(
-          frameworkRoot,
-          'agentic/code/frameworks',
-          `${framework === 'all' ? 'sdlc' : framework}-complete`,
-          'manifest.json'
-        );
+        const versionDirName = resolveFrameworkDir(framework);
+        const frameworkManifestPath = versionDirName
+          ? path.join(frameworkRoot, 'agentic/code/frameworks', versionDirName, 'manifest.json')
+          : null;
+        if (!frameworkManifestPath) throw new Error('no manifest for general/writing mode');
         const mHash = await hashManifest(frameworkManifestPath);
         const updatedConfig = updateInstalled(config, framework, provider, {
           agents: counts.agents,

@@ -1,5 +1,7 @@
 {
   "name": "Knowledge Base",
+  "id": "knowledge-base",
+  "modeAliases": ["knowledge-base", "kb"],
   "path": "agentic/code/frameworks/knowledge-base",
   "files": [
     "README.md"
