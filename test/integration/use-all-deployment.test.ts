@@ -107,7 +107,7 @@ describe.skipIf(!GIT_AVAILABLE)('aiwg use all — deployment coverage', () => {
 
   it('deploys to .claude/skills/ without errors', () => {
     const result = runAiwg(['use', 'all', '--target', projectDir], projectDir);
-    expect(result.exitCode).toBe(0);
+    expect(result.exitCode, `aiwg use all failed (exit ${result.exitCode}):\nstdout: ${result.stdout}\nstderr: ${result.stderr}`).toBe(0);
     const skillsDir = path.join(projectDir, '.claude', 'skills');
     expect(existsSync(skillsDir)).toBe(true);
   });
