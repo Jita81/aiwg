@@ -241,6 +241,15 @@ aiwg rollback-workspace      # Rollback migration
 aiwg mcp serve               # Start MCP server
 aiwg mcp install claude      # Configure Claude Desktop
 aiwg mcp info                # Show capabilities
+aiwg mcp add <name> --url <url>  # Register a server
+aiwg mcp remove <name>       # Remove a server
+aiwg mcp list                # List registered servers
+aiwg mcp inject --provider claude --profile dev  # Inject profile servers
+aiwg mcp inject --provider claude --profile ops --ephemeral  # Ephemeral inject (temp file, default config unchanged)
+aiwg mcp profile init-presets    # Install built-in profiles (minimal/dev/ops/research/incident/full)
+aiwg mcp profile add <name> --servers <a,b>  # Create profile
+aiwg mcp profile list        # List profiles
+aiwg mcp profile show <name> # Inspect a profile
 
 # Utilities
 aiwg runtime-info            # Show runtime environment

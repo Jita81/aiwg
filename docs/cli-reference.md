@@ -475,12 +475,14 @@ aiwg session --no-repair            # skip auto-repair (still checks and reports
 - `mcp` - Inject configured MCP servers into the provider config before launching
 - `--provider <p>` - Override provider (default: `providers[0]` from `.aiwg/aiwg.config`, then `claude`)
 - `--no-repair` - Skip auto-repair; still runs health checks and reports issues
+- `--profile <name>` - Launch with a named MCP profile (ephemeral by default — does not modify your provider's default config). For Claude: passes a temp config via `--mcp-config`. For Codex: sets up a per-profile runtime home via `~/.codex/roles-runtime/<profile>/`
+- `--persist` - When combined with `--profile`, writes servers to the provider's default config instead of using an ephemeral temp file
 
 **Pre-flight sequence:**
 1. **Version check** — updates aiwg if stale (`npm install -g aiwg@latest`)
 2. **Health check** — runs `aiwg doctor`; auto-repairs fixable issues via `aiwg sync`
 3. **Deployment check** — redeploys framework files to the provider if missing or stale
-4. **MCP inject** (when `mcp` subcommand used) — runs `aiwg mcp inject --provider <p>`
+4. **MCP inject** (when `mcp` subcommand or `--profile` used) — runs `aiwg mcp inject --provider <p>`
 5. **Launch** — spawns binary (claude, codex, opencode) or prints start instructions (IDE providers: cursor, windsurf, copilot, etc.)
 
 **Auto-repair escalation:**
@@ -512,6 +514,15 @@ aiwg session mcp --provider codex
 
 # Skip repair if you just want to check and launch
 aiwg session --no-repair
+
+# Launch claude with the 'dev' MCP profile (ephemeral — default config unchanged)
+aiwg session --profile dev
+
+# Launch codex with the 'ops' profile (isolated OAuth per profile)
+aiwg session --provider codex --profile ops
+
+# Persist profile servers into provider's default config
+aiwg session --profile incident --persist
 ```
 
 ---
@@ -720,6 +731,184 @@ aiwg mcp info
 **Capabilities:** cli, mcp, server
 **Platforms:** All
 **Tools:** Read, Write, Bash
+
+#### mcp add
+
+Register an MCP server in the AIWG server registry (`~/.aiwg/mcp-servers.json`).
+
+```bash
+aiwg mcp add <name> --url <url> [--type http|stdio|sse] [--description <text>]
+aiwg mcp add <name> --type stdio --command <cmd> [--args <a,b>] [--env KEY=VAL]
+```
+
+**Arguments:**
+- `<name>` - Unique server name (referenced by profiles and inject)
+
+**Options:**
+- `--type <type>` - Server type: `http` (default), `stdio`, `sse`
+- `--url <url>` - URL for http/sse servers
+- `--command <cmd>` - Executable for stdio servers
+- `--args <a,b>` - Comma-separated args for stdio command
+- `--env KEY=VAL` - Environment variable(s) for stdio servers
+- `--headers KEY=VAL` - HTTP headers for http/sse servers
+- `--description <text>` - Human-readable description
+
+**Example:**
+
+```bash
+# HTTP server
+aiwg mcp add my-api --url http://localhost:3001 --description "Local API server"
+
+# stdio server
+aiwg mcp add git-server --type stdio --command npx --args @gitea/mcp-server
+```
+
+#### mcp remove
+
+Remove a server from the AIWG registry.
+
+```bash
+aiwg mcp remove <name>
+```
+
+Note: does not remove the server from already-injected provider configs. Re-run `aiwg mcp inject --all` to propagate removals.
+
+#### mcp update
+
+Update a registered server's properties.
+
+```bash
+aiwg mcp update <name> [--url <url>] [--type <type>] [--command <cmd>] [--description <text>]
+```
+
+Re-run `aiwg mcp inject --all` after updating to propagate changes to provider configs.
+
+#### mcp list
+
+List all registered MCP servers.
+
+```bash
+aiwg mcp list
+```
+
+Shows server name, type, URL or command, description, and which providers it has been injected into.
+
+#### mcp inject
+
+Inject registered servers into a provider's config file.
+
+```bash
+aiwg mcp inject --provider <name> [options]
+aiwg mcp inject --all [--dry-run]
+```
+
+**Options:**
+- `--provider <name>` - Target provider (`claude`, `codex`, `cursor`, `copilot`, `windsurf`, `opencode`, `warp`, `factory`, `openclaw`, `hermes`)
+- `--all` - Inject into all providers that have been configured before
+- `--profile <name>` - Resolve server set from a named MCP profile (see `mcp profile`)
+- `--ephemeral` - Write a standalone temp config without modifying the provider's default config. Supported for: `claude`, `codex`, `openai`. Not supported for: `warp`
+- `--out <path>` - Explicit output path for ephemeral config (default: auto-generated temp file)
+- `--servers <a,b>` - Comma-separated server name filter (alternative to `--profile`)
+- `--dry-run` - Preview what would be written without modifying any files
+
+**Example:**
+
+```bash
+# Inject all registered servers into Claude Code config
+aiwg mcp inject --provider claude
+
+# Inject servers from the 'dev' profile only
+aiwg mcp inject --provider claude --profile dev
+
+# Ephemeral: write to a temp file, don't touch default config
+aiwg mcp inject --provider claude --profile ops --ephemeral
+
+# Ephemeral to a specific path
+aiwg mcp inject --provider claude --profile ops --ephemeral --out /tmp/ops-mcp.json
+
+# Propagate updates to all previously configured providers
+aiwg mcp inject --all
+
+# Preview without writing
+aiwg mcp inject --provider cursor --dry-run
+```
+
+#### mcp profile
+
+Manage named MCP profiles — ordered subsets of registered servers stored in `~/.aiwg/mcp-profiles.json`.
+
+Profiles let you launch sessions or inject only the servers relevant to a specific task (e.g., `dev` for code editing, `ops` for infrastructure work).
+
+```bash
+aiwg mcp profile <subcommand>
+```
+
+**Subcommands:**
+
+| Subcommand | Description |
+|-----------|-------------|
+| `add <name>` | Create a new profile |
+| `list` | List all profiles |
+| `show <name>` | Show profile details and resolved servers |
+| `edit <name>` | Add/remove servers or update description |
+| `remove <name>` | Delete a profile |
+| `import <file>` | Import profiles from a JSON file |
+| `export [<name>] --out <file>` | Export one or all profiles |
+| `init-presets` | Install built-in preset profiles |
+
+**Preset Profiles** (installed via `aiwg mcp profile init-presets`):
+
+| Name | Servers | Description |
+|------|---------|-------------|
+| `minimal` | (none) | Minimal toolset for smoke tests |
+| `dev` | git-gitea, codeindex-codehound, memory-fortemi | Code editing + git + memory |
+| `ops` | git-gitea, cmdb-itassets, memory-fortemi | Infra + git + CMDB |
+| `research` | memory-fortemi, google-drive, google-calendar | Documentation + memory + calendar |
+| `incident` | git-gitea, cmdb-itassets, memory-fortemi, codeindex-codehound | Incident response |
+| `full` | `__all__` | All registered servers |
+
+**Profile options:**
+
+```bash
+# add
+aiwg mcp profile add <name> --servers <a,b> [--description <text>]
+
+# edit
+aiwg mcp profile edit <name> --add-server <s> --remove-server <s> [--description <text>]
+
+# export
+aiwg mcp profile export <name> --out ./my-profile.json
+aiwg mcp profile export --out ./all-profiles.json   # export all
+```
+
+**Examples:**
+
+```bash
+# Install built-in presets
+aiwg mcp profile init-presets
+
+# Create a custom profile
+aiwg mcp profile add my-work --servers git-gitea,memory-fortemi --description "Daily work"
+
+# List all profiles
+aiwg mcp profile list
+
+# Inspect a profile
+aiwg mcp profile show dev
+
+# Add a server to an existing profile
+aiwg mcp profile edit my-work --add-server codeindex-codehound
+
+# Use a profile in a session
+aiwg session --profile dev
+
+# Use a profile for ephemeral inject
+aiwg mcp inject --provider claude --profile ops --ephemeral
+```
+
+**Profile storage:** `~/.aiwg/mcp-profiles.json` (apiVersion: `aiwg.io/v1`, kind: `McpProfileRegistry`)
+
+**Codex runtime homes:** When `--provider codex` with `--profile` is used, AIWG creates a per-profile runtime home at `~/.codex/roles-runtime/<profile>/`. Each runtime home has an isolated `config.toml` with only the profile's servers, and OAuth tokens are stored separately per profile. Shared state (history, sessions) is symlinked from `~/.codex/`.
 
 ---
 
@@ -2789,7 +2978,7 @@ All commands are registered as extensions in the unified schema. This enables:
 | **Framework** | 3 | use, list, remove |
 | **Project** | 1 | new |
 | **Workspace** | 3 | status, migrate-workspace, rollback-workspace |
-| **MCP** | 1 | mcp (3 subcommands) |
+| **MCP** | 1 | mcp (serve, install, info, add, remove, update, list, inject, profile) |
 | **Catalog** | 1 | catalog (3 subcommands) |
 | **Toolsmith** | 1 | runtime-info |
 | **Utility** | 3 | prefill-cards, contribute-start, validate-metadata |
