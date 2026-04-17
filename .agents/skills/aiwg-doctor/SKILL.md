@@ -1,7 +1,7 @@
 ---
-namespace: aiwg
-platforms: [all]
-description: Run a comprehensive health check on the AIWG installation and workspace with pass/fail diagnostics and remediation steps
+name: "aiwg-doctor"
+description: "Run a comprehensive health check on the AIWG installation and workspace with pass/fail diagnostics and remediation steps"
+platforms: [codex]
 ---
 
 # AIWG Doctor

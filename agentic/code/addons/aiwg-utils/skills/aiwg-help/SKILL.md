@@ -1,4 +1,5 @@
 ---
+name: aiwg-help
 namespace: aiwg
 platforms: [all]
 description: Display all available AIWG CLI commands, their arguments, and usage examples
