@@ -467,9 +467,9 @@ export async function deploy(opts) {
     // Try assembled rules index (combines all component indexes)
     const assembled = assembleRulesIndex(srcRoot);
     if (assembled) {
-      // Write assembled index to temp file for deployment
-      const tmpDir = path.join(tmpdir(), 'aiwg-rules-assembly');
-      fs.mkdirSync(tmpDir, { recursive: true });
+      // Write assembled index to a unique temp dir to avoid races when
+      // multiple deployments run concurrently (e.g., parallel test workers)
+      const tmpDir = fs.mkdtempSync(path.join(tmpdir(), 'aiwg-rules-assembly-'));
       const assembledPath = path.join(tmpDir, 'RULES-INDEX.md');
       fs.writeFileSync(assembledPath, assembled);
 

@@ -332,8 +332,7 @@ export async function deploy(opts) {
     const assembled = assembleRulesIndex(srcRoot);
     if (assembled) {
       const { tmpdir } = await import('os');
-      const tmpDir = path.join(tmpdir(), 'aiwg-rules-assembly');
-      fs.mkdirSync(tmpDir, { recursive: true });
+      const tmpDir = fs.mkdtempSync(path.join(tmpdir(), 'aiwg-rules-assembly-'));
       const assembledPath = path.join(tmpDir, 'RULES-INDEX.md');
       fs.writeFileSync(assembledPath, assembled);
 
