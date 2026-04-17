@@ -159,6 +159,59 @@ export function transformCommand(srcPath, content, opts) {
 }
 
 // ============================================================================
+// Legacy Skill Cleanup
+// ============================================================================
+
+/**
+ * Claude built-in command names that must never be used as bare skill slugs.
+ * Mirrors the list in src/smiths/skillsmith/collision-detector.ts.
+ */
+const CLAUDE_BUILTINS = new Set([
+  'help', 'clear', 'compact', 'review', 'init', 'doctor',
+  'memory', 'settings', 'logout', 'login', 'mcp', 'migrate',
+]);
+
+/**
+ * After deploying skills, remove stale bare-named skills that collide with
+ * Claude built-ins, provided all three conditions hold:
+ *   1. The skill directory is owned by the aiwg namespace (namespace: aiwg in SKILL.md)
+ *   2. The skill name is in the CLAUDE_BUILTINS set
+ *   3. A namespaced replacement (aiwg-{name}) already exists in the same directory
+ *
+ * This implements the "+1 release" auto-cleanup milestone from the skill namespace
+ * migration guide (docs/migration/skill-namespace-migration.md).
+ */
+function cleanupLegacyBuiltinCollisions(destDir, opts) {
+  if (opts.dryRun || !fs.existsSync(destDir)) return;
+
+  let entries;
+  try { entries = fs.readdirSync(destDir, { withFileTypes: true }); } catch { return; }
+
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    const name = entry.name;
+    if (!CLAUDE_BUILTINS.has(name)) continue;
+
+    const skillPath = path.join(destDir, name);
+    const namespacedPath = path.join(destDir, `aiwg-${name}`);
+    const skillMd = path.join(skillPath, 'SKILL.md');
+
+    // Only remove when the namespaced replacement has already been deployed
+    if (!fs.existsSync(skillMd) || !fs.existsSync(namespacedPath)) continue;
+
+    let content = '';
+    try { content = fs.readFileSync(skillMd, 'utf8'); } catch { continue; }
+    // Guard: only remove if the skill is owned by the aiwg namespace
+    if (!/^namespace:\s*aiwg\s*$/m.test(content)) continue;
+
+    try {
+      fs.rmSync(skillPath, { recursive: true, force: true });
+      if (opts.verbose) console.log(`removed legacy skill: ${name} (superseded by aiwg-${name})`);
+    } catch { /* non-fatal */ }
+  }
+}
+
+// ============================================================================
 // Deployment Functions
 // ============================================================================
 
@@ -191,6 +244,9 @@ export function deploySkills(skillDirs, targetDir, opts) {
   for (const skillDir of skillDirs) {
     deploySkillDir(skillDir, destDir, opts);
   }
+
+  // Remove legacy bare-named skills superseded by their aiwg- prefixed replacements
+  cleanupLegacyBuiltinCollisions(destDir, opts);
 }
 
 /**

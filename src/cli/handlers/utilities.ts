@@ -20,7 +20,6 @@ import { forceUpdateCheck } from '../../update/checker.mjs';
 import { useHandler as useFrameworkHandler } from './use.js';
 import {
   checkCollisions,
-  formatCollisionReport,
 } from '../../smiths/skillsmith/collision-detector.js';
 
 /**
@@ -267,9 +266,16 @@ export const doctorHandler: CommandHandler = {
         });
         const errorAndWarn = collisions.filter(r => r.severity === 'error' || r.severity === 'warn');
         if (errorAndWarn.length > 0) {
-          const report = formatCollisionReport(errorAndWarn);
+          // In doctor context we report stale skills, not deployment blocks.
+          // Re-running `aiwg use` will auto-clean aiwg-owned stale skills.
           console.log('\n── Skill collision scan ──');
-          console.log(report);
+          console.log('');
+          console.log('⚠ Stale skills detected (names collide with Claude built-ins):');
+          for (const r of errorAndWarn) {
+            console.log(`  ✗ ${r.skillName}: ${r.reason}`);
+          }
+          console.log('');
+          console.log('  Fix: run `aiwg use <framework>` to redeploy and auto-clean stale skill directories.');
         }
       }
     } catch {
