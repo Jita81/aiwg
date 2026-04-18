@@ -31,9 +31,10 @@ jobs:
           # --omit=optional skips sharp (can't download binary from GitHub in CI).
           # Re-install @rollup/rollup-linux-x64-gnu separately — it's also optional
           # but is a registry package (no GitHub download) and is required by vitest.
+          # --ignore-scripts on the second pass prevents sharp from being re-triggered.
           npm ci --omit=optional
           ROLLUP_VER=$(node -e "console.log(require('./node_modules/rollup/package.json').version)")
-          npm install --no-save "@rollup/rollup-linux-x64-gnu@${ROLLUP_VER}"
+          npm install --no-save --omit=optional --ignore-scripts "@rollup/rollup-linux-x64-gnu@${ROLLUP_VER}"
 
       - name: Run type check
         run: npm run typecheck
@@ -56,7 +57,7 @@ jobs:
         run: |
           npm ci --omit=optional
           ROLLUP_VER=$(node -e "console.log(require('./node_modules/rollup/package.json').version)")
-          npm install --no-save "@rollup/rollup-linux-x64-gnu@${ROLLUP_VER}"
+          npm install --no-save --omit=optional --ignore-scripts "@rollup/rollup-linux-x64-gnu@${ROLLUP_VER}"
 
       - name: Build TypeScript
         run: npm run build
