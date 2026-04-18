@@ -14,6 +14,7 @@ import path from 'path';
  *   - codex:  OPENAI_API_KEY set, codex CLI installed
  */
 export default defineConfig({
+  root: path.resolve(__dirname, '..'),
   test: {
     include: ['test/uat/ralph-live-*.uat.ts'],
     environment: 'node',
@@ -33,7 +34,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      '@': path.resolve(__dirname, '../src'),
     },
     extensions: ['.ts', '.js', '.json'],
   },

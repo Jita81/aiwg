@@ -8,6 +8,7 @@ import path from 'path';
  * Also runnable on demand: npm run uat
  */
 export default defineConfig({
+  root: path.resolve(__dirname, '..'),
   test: {
     include: ['test/uat/ralph-external.uat.ts', 'test/uat/daemon-supervisor.test.mjs', 'test/uat/rlm-cli.uat.ts', 'test/uat/aiwg-config-flow.uat.ts'],
     exclude: ['test/uat/ralph-live-*.uat.ts'],
@@ -23,7 +24,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      '@': path.resolve(__dirname, '../src'),
     },
     extensions: ['.ts', '.js', '.json'],
   },

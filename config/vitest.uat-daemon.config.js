@@ -14,6 +14,7 @@ import path from 'path';
  *   - No existing daemon process on the test socket paths
  */
 export default defineConfig({
+  root: path.resolve(__dirname, '..'),
   test: {
     include: ['test/uat/daemon-live-*.uat.mjs'],
     environment: 'node',
@@ -33,7 +34,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      '@': path.resolve(__dirname, '../src'),
     },
     extensions: ['.ts', '.mjs', '.js', '.json'],
   },

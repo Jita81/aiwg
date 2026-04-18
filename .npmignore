@@ -24,6 +24,7 @@ dist/
 tsconfig.json
 vitest.config.*
 jest.config.*
+config/
 
 # Documentation (keep only essential)
 # docs/ is included via package.json files array
