@@ -11,7 +11,7 @@ import { execSync } from 'child_process';
 import { readFile, writeFile, access } from 'fs/promises';
 import { existsSync, constants } from 'fs';
 import { resolve, join, dirname } from 'path';
-import { platform, arch, homedir, tmpdir, cpus } from 'os';
+import { platform, arch, homedir, tmpdir, cpus, totalmem, freemem } from 'os';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -193,8 +193,8 @@ export class RuntimeDiscovery {
       }
 
       // Memory (from os module)
-      const totalMem = require('os').totalmem();
-      const freeMem = require('os').freemem();
+      const totalMem = totalmem();
+      const freeMem = freemem();
       memoryTotalGb = Math.round((totalMem / (1024 ** 3)) * 10) / 10;
       memoryAvailableGb = Math.round((freeMem / (1024 ** 3)) * 10) / 10;
     } catch (error) {
