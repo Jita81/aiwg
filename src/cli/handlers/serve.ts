@@ -206,6 +206,58 @@ async function setupWebSockets(httpServer: any, readOnly: boolean): Promise<void
       }
     }
 
+    // /ws/sandbox/:sandboxId/sessions/:sessionId/orchestrate
+    // Proxies to the sandbox management server's orchestrate WS endpoint.
+    // Browser speaks the orchestrate protocol (screen_update frames) directly;
+    // this bridge is purely a cross-origin WS relay.
+    const orchMatch = pathname.match(/^\/ws\/sandbox\/([^/]+)\/sessions\/([^/]+)\/orchestrate$/);
+    if (orchMatch) {
+      const sandboxId = orchMatch[1];
+      const sessionId = orchMatch[2];
+      const sandbox = sandboxRegistry.get(sandboxId);
+      if (!sandbox?.connected) {
+        socket.destroy();
+        return;
+      }
+      // Convert httpEndpoint to ws:// URL for the sandbox orchestrate path
+      const orchWsUrl = sandbox.httpEndpoint.replace(/^http/, 'ws') + `/ws/sessions/${sessionId}/orchestrate`;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      wss.handleUpgrade(req, socket, head, async (browserWs: any) => {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const WS: any = wsMod.WebSocket ?? wsMod.default?.WebSocket ?? wsMod.default;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const sandboxWs = new WS(orchWsUrl) as any;
+
+          sandboxWs.on('open', () => {
+            // Relay sandbox → browser
+            sandboxWs.on('message', (data: Buffer | string) => {
+              if (browserWs.readyState === 1) {
+                try { browserWs.send(typeof data === 'string' ? data : data.toString()); } catch { /* ignore */ }
+              }
+            });
+            sandboxWs.on('close', () => { try { browserWs.close(1001, 'Sandbox closed'); } catch { /* ignore */ } });
+            sandboxWs.on('error', () => { try { browserWs.close(1011, 'Sandbox WS error'); } catch { /* ignore */ } });
+
+            // Relay browser → sandbox
+            browserWs.on('message', (data: Buffer | string) => {
+              if (sandboxWs.readyState === 1) {
+                try { sandboxWs.send(typeof data === 'string' ? data : data.toString()); } catch { /* ignore */ }
+              }
+            });
+            browserWs.on('close', () => { try { sandboxWs.close(); } catch { /* ignore */ } });
+          });
+
+          sandboxWs.on('error', () => {
+            try { browserWs.close(1011, 'Could not connect to sandbox orchestrate WS'); } catch { /* ignore */ }
+          });
+        } catch {
+          try { browserWs.close(1011, 'Orchestrate proxy error'); } catch { /* ignore */ }
+        }
+      });
+      return;
+    }
+
     // Unknown WS path — reject cleanly
     socket.destroy();
   });
@@ -539,13 +591,17 @@ async function startServer(opts: {
     }
   });
 
-  app.delete('/api/sandboxes/:id/sessions/:sid', async (c: any) => {
+  // DELETE /api/sandboxes/:id/agents/:aid/sessions/:session
+  // Path key `:session` is the session_name (not session_id) — sandbox returns 204 No Content.
+  app.delete('/api/sandboxes/:id/agents/:aid/sessions/:session', async (c: any) => {
     const sandbox = sandboxRegistry.get(c.req.param('id'));
     if (!sandbox) return c.json({ error: 'Sandbox not found' }, 404);
     try {
-      const resp = await fetch(`${sandbox.httpEndpoint}/api/v1/sessions/${c.req.param('sid')}`, {
-        method: 'DELETE',
-      });
+      const resp = await fetch(
+        `${sandbox.httpEndpoint}/api/v1/agents/${c.req.param('aid')}/sessions/${c.req.param('session')}`,
+        { method: 'DELETE' },
+      );
+      if (resp.status === 204) return new Response(null, { status: 204 });
       return c.json(await resp.json(), resp.status);
     } catch (err) {
       return c.json({ error: `Sandbox unreachable: ${err instanceof Error ? err.message : String(err)}` }, 502);

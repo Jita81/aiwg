@@ -102,31 +102,31 @@ export interface ConnectionsResponse {
 // ---- Session types (#896) ----
 
 export interface Session {
-  id: string;
-  agentId: string;
-  type: 'interactive' | 'background' | 'unknown';
+  session_id: string;
+  session_name: string;
+  session_type: 'interactive' | 'headless' | 'background';
   command: string;
-  /** Human-readable name or command label */
-  name?: string;
-  status: 'running' | 'exited' | 'unknown';
-  /** ISO timestamp when the session started */
-  startedAt: string;
-  /** Exit code — only present when status === 'exited' */
-  exitCode?: number;
+  /** Elapsed seconds since session creation (monotonic clock on sandbox) */
+  created_at_secs: number;
+  /** True if the ScreenRegistry has live VT100 state — attachable via orchestrate WS */
+  has_screen: boolean;
 }
 
 export interface SessionsListResponse {
+  agent_id: string;
   sessions: Session[];
 }
 
 export interface CreateSessionRequest {
   command?: string;
-  args?: string[];
-  name?: string;
+  session_name?: string;
 }
 
 export interface CreateSessionResponse {
   session_id: string;
+  session_name: string;
+  /** Relative WS URL on the sandbox: /ws/sessions/:id/orchestrate */
+  ws_url: string;
 }
 
 // ---- Loadout types (#733) ----
@@ -169,8 +169,9 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     }),
-  killSession: (sandboxId: string, sessionId: string) =>
-    request<{ ok: boolean }>(`/api/sandboxes/${sandboxId}/sessions/${sessionId}`, { method: 'DELETE' }),
+  /** Kill a session by its session_name (the DELETE path key on the sandbox). */
+  killSession: (sandboxId: string, agentId: string, sessionName: string) =>
+    request<void>(`/api/sandboxes/${sandboxId}/agents/${agentId}/sessions/${encodeURIComponent(sessionName)}`, { method: 'DELETE' }),
 
   // HITL (#732)
   hitl: () => request<HitlResponse>('/api/hitl'),

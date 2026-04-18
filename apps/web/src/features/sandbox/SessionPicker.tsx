@@ -2,13 +2,16 @@
  * Session Picker + Inline Terminal
  *
  * Renders a collapsible session list for a specific sandbox agent.
- * Each session shows name, age, status, Attach and Kill controls.
- * "+ New Terminal" spawns a new bash session via the sandbox REST API.
- * Selecting a session opens an inline terminal pane bridged through
- * the existing /ws/pty WebSocket route.
+ * Each session shows name, command, age, has_screen status, and Attach/Kill controls.
+ * "+ New Terminal" creates a new bash session via the sandbox REST API.
+ * Attaching opens an inline terminal pane using the orchestrate WS protocol
+ * (proxied through aiwg serve at /ws/sandbox/:sandboxId/sessions/:sessionId/orchestrate).
  *
- * Will gracefully show a 502 error until agentic-sandbox#140 lands the
- * session list/create/delete REST endpoints.
+ * The orchestrate WS sends structured screen_update frames (VT100 rendered text),
+ * not raw PTY bytes. The TerminalPane replaces its display on each frame.
+ *
+ * Session list auto-refreshes every 5 s while the drawer is open with no active
+ * terminal, and is also triggered by Attach/Kill/New actions.
  *
  * @issue #896
  */
@@ -19,45 +22,47 @@ import styles from './SessionPicker.module.css';
 
 // ---- Helpers ----
 
-function relAge(iso: string): string {
-  try {
-    const diff = Date.now() - new Date(iso).getTime();
-    const s = Math.floor(diff / 1000);
-    if (s < 60) return `${s}s`;
-    const m = Math.floor(s / 60);
-    if (m < 60) return `${m}m`;
-    return `${Math.floor(m / 60)}h`;
-  } catch {
-    return '';
-  }
+function relAge(secs: number): string {
+  if (secs < 60) return `${secs}s`;
+  const m = Math.floor(secs / 60);
+  if (m < 60) return `${m}m`;
+  return `${Math.floor(m / 60)}h`;
 }
 
-// ---- Terminal Pane ----
+// ---- Orchestrate terminal pane ----
+//
+// Connects to the aiwg serve orchestrate WS proxy:
+//   /ws/sandbox/:sandboxId/sessions/:sessionId/orchestrate
+//
+// Server → client frames (tagged union on `type`):
+//   session_start  { session_id }
+//   screen_update  { session_id, timestamp, screen: { rows, cols, text, cursor_row, cursor_col, scrollback_tail }, prompt_detected }
+//   prompt_detected { session_id, prompt_text, confidence }
+//   session_end    { session_id, exit_code? }
+//   error          { message }
+//
+// Client → server frames:
+//   { type: "write",  text: string }
+//   { type: "resize", rows: number, cols: number }
+//   { type: "signal", signal: "SIGINT" | "SIGTERM" | "SIGKILL" }
 
 interface TerminalPaneProps {
-  /** Unique PTY session key routed through /ws/pty/:key */
-  sessionKey: string;
   sandboxId: string;
-  agentId: string;
-  /** agentic-sandbox management WS URL (e.g. ws://localhost:8121) */
-  wsEndpoint: string;
+  sessionId: string;
+  sessionName: string;
 }
 
-function TerminalPane({ sessionKey, sandboxId, agentId, wsEndpoint }: TerminalPaneProps) {
+function TerminalPane({ sandboxId, sessionId, sessionName }: TerminalPaneProps) {
   const outputRef = useRef<HTMLPreElement>(null);
   const wsRef = useRef<WebSocket | null>(null);
-  const [output, setOutput] = useState('');
+  const [screen, setScreen] = useState('');
+  const [scrollback, setScrollback] = useState('');
   const [connected, setConnected] = useState(false);
+  const [exited, setExited] = useState(false);
 
   useEffect(() => {
-    const params = new URLSearchParams({
-      sandbox: sandboxId,
-      agent: agentId,
-      wsEndpoint,
-      command: 'bash',
-    });
     const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${proto}//${window.location.host}/ws/pty/${sessionKey}?${params}`;
+    const wsUrl = `${proto}//${window.location.host}/ws/sandbox/${sandboxId}/sessions/${sessionId}/orchestrate`;
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
 
@@ -65,51 +70,48 @@ function TerminalPane({ sessionKey, sandboxId, agentId, wsEndpoint }: TerminalPa
 
     ws.onmessage = (evt) => {
       try {
-        const msg = JSON.parse(evt.data as string) as {
-          type: string;
-          payload?: string;
-          code?: number;
-          message?: string;
-        };
-        if (msg.type === 'data' && msg.payload) {
-          setOutput((prev) => {
-            const next = prev + msg.payload!;
-            return next.length > 100_000 ? next.slice(-100_000) : next;
-          });
-        } else if (msg.type === 'exit') {
-          setOutput((prev) => prev + `\n[Session exited: code ${msg.code ?? 0}]\n`);
-          setConnected(false);
-        } else if (msg.type === 'error') {
-          setOutput((prev) => prev + `\n[Error: ${msg.message ?? 'unknown'}]\n`);
+        const msg = JSON.parse(evt.data as string) as Record<string, unknown>;
+        switch (msg['type']) {
+          case 'screen_update': {
+            const s = msg['screen'] as { text?: string; scrollback_tail?: string } | undefined;
+            if (s?.text !== undefined) setScreen(s.text);
+            if (s?.scrollback_tail !== undefined) setScrollback(s.scrollback_tail);
+            break;
+          }
+          case 'session_end':
+            setExited(true);
+            setConnected(false);
+            setScreen((prev) => prev + `\n[Session ended${msg['exit_code'] !== undefined ? `: exit ${msg['exit_code']}` : ''}]\n`);
+            break;
+          case 'error':
+            setScreen((prev) => prev + `\n[Error: ${msg['message'] ?? 'unknown'}]\n`);
+            break;
         }
       } catch { /* ignore malformed frames */ }
     };
 
-    ws.onclose = () => {
-      setConnected(false);
-      wsRef.current = null;
-    };
+    ws.onclose = () => { setConnected(false); wsRef.current = null; };
     ws.onerror = () => setConnected(false);
 
-    return () => {
-      ws.close();
-      wsRef.current = null;
-    };
-  }, [sessionKey, sandboxId, agentId, wsEndpoint]);
+    return () => { ws.close(); wsRef.current = null; };
+  }, [sandboxId, sessionId]);
 
-  // Auto-scroll output
+  // Auto-scroll on content change
   useEffect(() => {
     if (outputRef.current) {
       outputRef.current.scrollTop = outputRef.current.scrollHeight;
     }
-  }, [output]);
+  }, [screen, scrollback]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key !== 'Enter') return;
+    if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
     const input = e.currentTarget;
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({ type: 'data', payload: input.value + '\n' }));
+    if (e.key === 'Enter') {
+      wsRef.current.send(JSON.stringify({ type: 'write', text: input.value + '\n' }));
       input.value = '';
+    } else if (e.ctrlKey && e.key === 'c') {
+      wsRef.current.send(JSON.stringify({ type: 'signal', signal: 'SIGINT' }));
+      e.preventDefault();
     }
   };
 
@@ -117,15 +119,16 @@ function TerminalPane({ sessionKey, sandboxId, agentId, wsEndpoint }: TerminalPa
     <div className={styles.terminal}>
       <div className={styles.termStatus}>
         <span className={[styles.termDot, connected ? styles.termDotOn : styles.termDotOff].join(' ')} />
-        {connected ? 'Connected' : 'Connecting...'}
+        <span>{connected ? sessionName : exited ? 'Session exited' : 'Connecting...'}</span>
       </div>
       <pre ref={outputRef} className={styles.termOutput}>
-        {output || (connected ? '' : 'Waiting for shell...')}
+        {scrollback ? scrollback + '\n' : ''}
+        {screen || (connected ? '' : 'Waiting for screen...')}
       </pre>
       <input
         type="text"
         className={styles.termInput}
-        placeholder={connected ? 'Type command, press Enter' : 'Disconnected'}
+        placeholder={connected ? 'Type and press Enter  (Ctrl+C sends SIGINT)' : 'Disconnected'}
         disabled={!connected}
         onKeyDown={handleKeyDown}
         spellCheck={false}
@@ -140,19 +143,16 @@ function TerminalPane({ sessionKey, sandboxId, agentId, wsEndpoint }: TerminalPa
 // ---- Session Picker ----
 
 interface ActiveSession {
-  /** PTY session key used for /ws/pty/:key route */
-  sessionKey: string;
-  label: string;
+  sessionId: string;
+  sessionName: string;
 }
 
 export interface SessionPickerProps {
   sandboxId: string;
   agentId: string;
-  /** agentic-sandbox management WS URL */
-  wsEndpoint: string;
 }
 
-export function SessionPicker({ sandboxId, agentId, wsEndpoint }: SessionPickerProps) {
+export function SessionPicker({ sandboxId, agentId }: SessionPickerProps) {
   const [open, setOpen] = useState(false);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(false);
@@ -166,55 +166,49 @@ export function SessionPicker({ sandboxId, agentId, wsEndpoint }: SessionPickerP
       const data = await api.agentSessions(sandboxId, agentId);
       setSessions(data.sessions);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : String(err),
-      );
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
     }
   }, [sandboxId, agentId]);
 
+  // Fetch on open; poll every 5 s while list is visible
   useEffect(() => {
-    if (open && !active) {
-      fetchSessions();
-    }
+    if (!open || active) return;
+    fetchSessions();
+    const id = setInterval(fetchSessions, 5_000);
+    return () => clearInterval(id);
   }, [open, active, fetchSessions]);
 
   const handleAttach = (session: Session) => {
-    // Namespace the PTY session key to this sandbox+session so concurrent
-    // drawers don't share the same PTY registry entry.
-    const sessionKey = `sb-${sandboxId.slice(0, 6)}-${agentId.slice(0, 6)}-${session.id}`;
-    setActive({ sessionKey, label: session.name ?? session.command });
+    setActive({ sessionId: session.session_id, sessionName: session.session_name });
   };
 
   const handleNewTerminal = async () => {
     setError(null);
     try {
       const result = await api.createSession(sandboxId, agentId, { command: 'bash' });
-      const sessionKey = `sb-${sandboxId.slice(0, 6)}-${agentId.slice(0, 6)}-${result.session_id}`;
-      setActive({ sessionKey, label: 'bash' });
-      // Refresh list in background
+      setActive({ sessionId: result.session_id, sessionName: result.session_name });
       fetchSessions().catch(() => { /* ignore */ });
     } catch (err) {
-      setError(
-        `Failed to create session: ${err instanceof Error ? err.message : String(err)}`,
-      );
+      setError(`Failed to create session: ${err instanceof Error ? err.message : String(err)}`);
     }
   };
 
-  const handleKill = async (sessionId: string) => {
+  const handleKill = async (sessionName: string) => {
     setError(null);
     try {
-      await api.killSession(sandboxId, sessionId);
-      // If this was the active terminal, close it
-      const suffix = `-${sessionId}`;
-      if (active?.sessionKey.endsWith(suffix)) setActive(null);
+      await api.killSession(sandboxId, agentId, sessionName);
+      if (active?.sessionName === sessionName) setActive(null);
       await fetchSessions();
     } catch (err) {
-      setError(
-        `Failed to kill session: ${err instanceof Error ? err.message : String(err)}`,
-      );
+      setError(`Failed to kill session: ${err instanceof Error ? err.message : String(err)}`);
     }
+  };
+
+  const handleBack = () => {
+    setActive(null);
+    fetchSessions().catch(() => { /* ignore */ });
   };
 
   return (
@@ -235,20 +229,15 @@ export function SessionPicker({ sandboxId, agentId, wsEndpoint }: SessionPickerP
             /* ---- Active terminal pane ---- */
             <div className={styles.terminalWrap}>
               <div className={styles.terminalHeader}>
-                <span className={styles.terminalLabel}>{active.label}</span>
-                <button
-                  type="button"
-                  className={styles.backBtn}
-                  onClick={() => { setActive(null); fetchSessions().catch(() => { /* ignore */ }); }}
-                >
+                <span className={styles.terminalLabel}>{active.sessionName}</span>
+                <button type="button" className={styles.backBtn} onClick={handleBack}>
                   ← Sessions
                 </button>
               </div>
               <TerminalPane
-                sessionKey={active.sessionKey}
                 sandboxId={sandboxId}
-                agentId={agentId}
-                wsEndpoint={wsEndpoint}
+                sessionId={active.sessionId}
+                sessionName={active.sessionName}
               />
             </div>
           ) : (
@@ -261,38 +250,38 @@ export function SessionPicker({ sandboxId, agentId, wsEndpoint }: SessionPickerP
                 </div>
               )}
 
-              {loading && <div className={styles.infoRow}>Loading sessions...</div>}
+              {loading && sessions.length === 0 && (
+                <div className={styles.infoRow}>Loading sessions...</div>
+              )}
 
-              {!loading && !error && sessions.length === 0 && (
+              {!loading && sessions.length === 0 && !error && (
                 <div className={styles.infoRow}>No active sessions for this agent.</div>
               )}
 
               {sessions.map((session) => (
-                <div key={session.id} className={styles.sessionRow}>
+                <div key={session.session_id} className={styles.sessionRow}>
                   <span
-                    className={[
-                      styles.dot,
-                      session.status === 'running' ? styles.dotRunning : styles.dotExited,
-                    ].join(' ')}
-                    aria-label={`Status: ${session.status}`}
+                    className={[styles.dot, session.has_screen ? styles.dotRunning : styles.dotExited].join(' ')}
+                    title={session.has_screen ? 'Attachable' : 'No screen state'}
+                    aria-label={session.has_screen ? 'Attachable' : 'No screen state'}
                   />
-                  <span className={styles.sessionLabel} title={session.command}>
-                    {session.name ?? session.command}
+                  <span className={styles.sessionLabel} title={`${session.command} (${session.session_type})`}>
+                    {session.session_name}
                   </span>
-                  <span className={styles.sessionAge}>{relAge(session.startedAt)}</span>
+                  <span className={styles.sessionAge}>{relAge(session.created_at_secs)}</span>
                   <button
                     type="button"
                     className={styles.attachBtn}
                     onClick={() => handleAttach(session)}
-                    disabled={session.status !== 'running'}
-                    title={session.status !== 'running' ? 'Session has exited' : 'Attach terminal'}
+                    disabled={!session.has_screen}
+                    title={!session.has_screen ? 'No screen state — session may have exited' : 'Attach terminal'}
                   >
                     Attach
                   </button>
                   <button
                     type="button"
                     className={styles.killBtn}
-                    onClick={() => handleKill(session.id)}
+                    onClick={() => handleKill(session.session_name)}
                     title="Kill session"
                     aria-label="Kill session"
                   >
@@ -301,11 +290,7 @@ export function SessionPicker({ sandboxId, agentId, wsEndpoint }: SessionPickerP
                 </div>
               ))}
 
-              <button
-                type="button"
-                className={styles.newTermBtn}
-                onClick={handleNewTerminal}
-              >
+              <button type="button" className={styles.newTermBtn} onClick={handleNewTerminal}>
                 + New Terminal
               </button>
             </>

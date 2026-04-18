@@ -242,7 +242,6 @@ export function SandboxPanel() {
                     key={agent.agentId}
                     agent={agent}
                     sandboxId={selectedSandbox.id}
-                    sandboxWsEndpoint={selectedSandbox.wsEndpoint}
                     onAction={handleAgentAction}
                     actionInProgress={state.actionInProgress}
                     sandboxConnected={selectedSandbox.connected}
@@ -269,15 +268,12 @@ export function SandboxPanel() {
 function AgentCard({
   agent,
   sandboxId,
-  sandboxWsEndpoint,
   onAction,
   actionInProgress,
   sandboxConnected,
 }: {
   agent: SandboxAgent;
   sandboxId: string;
-  /** agentic-sandbox management WS URL — used by SessionPicker */
-  sandboxWsEndpoint: string;
   onAction: (sandboxId: string, agentId: string, action: 'start' | 'stop' | 'destroy' | 'reprovision') => void;
   actionInProgress: string | null;
   sandboxConnected: boolean;
@@ -358,7 +354,6 @@ function AgentCard({
         <SessionPicker
           sandboxId={sandboxId}
           agentId={agent.agentId}
-          wsEndpoint={sandboxWsEndpoint}
         />
       )}
     </div>
