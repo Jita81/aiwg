@@ -1,5 +1,55 @@
 # Contributing
 
+## Prerequisites
+
+| Requirement | Version | Notes |
+|-------------|---------|-------|
+| **Node.js** | ≥ 18 (20 recommended) | CI runs on Node 20. Use [nvm](https://github.com/nvm-sh/nvm) to manage versions. |
+| **npm** | ≥ 8 | Bundled with Node 18+. |
+| **Git** | any | Standard source control. |
+| **C++ build tools** | — | Required by native modules (`better-sqlite3`, `hnswlib-node`). See below. |
+
+### Installing C++ build tools
+
+**macOS** — Install Xcode Command Line Tools:
+```bash
+xcode-select --install
+```
+
+**Ubuntu / Debian**:
+```bash
+sudo apt-get install -y build-essential python3
+```
+
+**Windows** — Install the Visual C++ Build Tools:
+```bash
+npm install --global windows-build-tools   # or install VS Build Tools manually
+```
+
+### Native module notes
+
+Three devDependencies compile native addons via node-gyp:
+
+| Package | What it does | Extra system dep |
+|---------|-------------|-----------------|
+| `better-sqlite3` | SQLite for the artifact index | none beyond build tools |
+| `hnswlib-node` | ANN search for semantic embedding | none beyond build tools |
+| `@xenova/transformers` | Text embeddings (pulls in `sharp`) | `sharp` downloads a prebuilt binary from GitHub; if that fails (restricted network), install `libvips-dev` so it can compile from source: `sudo apt-get install -y libvips-dev` |
+
+**CI installs** with `npm ci --omit=optional --ignore-scripts` on the second pass to skip the sharp binary download on self-hosted runners without GitHub release access. Local development with a normal `npm install` downloads the prebuilt binary automatically and needs no extra steps.
+
+### Quick start
+
+```bash
+git clone https://github.com/jmagly/aiwg.git
+cd aiwg
+npm install           # downloads all deps including native modules
+npm test              # run unit tests
+npm run typecheck     # TypeScript type check
+```
+
+---
+
 ## Contributor Setup
 
 Install the AIWG developer tools addon before making changes. It provides rules that prevent common mistakes and skills to validate your work before filing a PR:

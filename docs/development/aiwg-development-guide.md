@@ -15,6 +15,60 @@ Writing a guide, schema, or rule file is **necessary but not sufficient**. A com
 
 If you create a schema file but no agent references it, it does nothing. If you write a rule but no hook enforces it, it's aspirational prose. Integration is the whole point.
 
+## Prerequisites
+
+### System requirements
+
+| Requirement | Version | Notes |
+|-------------|---------|-------|
+| **Node.js** | ≥ 18 (20 recommended) | Matches CI. Use [nvm](https://github.com/nvm-sh/nvm) to manage versions. |
+| **npm** | ≥ 8 | Bundled with Node 18+. |
+| **Git** | any | Standard source control. |
+| **C++ build tools** | — | Required by native modules. See [CONTRIBUTING.md](../../CONTRIBUTING.md#prerequisites) for OS-specific install instructions. |
+
+### Installing
+
+```bash
+git clone https://github.com/jmagly/aiwg.git
+cd aiwg
+npm install
+npm test              # run unit + UAT stub tests
+npm run typecheck     # TypeScript check
+```
+
+### Native module dependencies
+
+Several devDependencies compile C++ native addons via node-gyp. These require Python 3 and a C++ compiler:
+
+| Package | Used for | Extra system dep |
+|---------|----------|-----------------|
+| `better-sqlite3` | Artifact index (SQLite) | none (build tools only) |
+| `hnswlib-node` | Semantic ANN search | none (build tools only) |
+| `@xenova/transformers` | Text embeddings; pulls in `sharp` | `sharp` downloads a prebuilt binary from GitHub; on restricted networks add `libvips-dev` so it can compile from source |
+
+**Optional runtime deps** (in `optionalDependencies`) install only when explicitly needed:
+
+| Package | Used for |
+|---------|----------|
+| `node-pty` | Terminal session management (MC/daemon) |
+| `hono` + `@hono/node-server` | Web server mode |
+| `ws` | WebSocket support |
+
+### CI vs local install differences
+
+CI uses a two-step install to avoid network calls to GitHub releases on self-hosted runners:
+
+```bash
+# Step 1 — skip optional packages (and sharp's binary download doesn't block)
+npm ci --omit=optional
+
+# Step 2 — add rollup's platform binding (needed by vitest, but skip install scripts)
+ROLLUP_VER=$(node -e "console.log(require('./node_modules/rollup/package.json').version)")
+npm install --no-save --omit=optional --ignore-scripts "@rollup/rollup-linux-x64-gnu@${ROLLUP_VER}"
+```
+
+Local `npm install` downloads sharp's prebuilt binary automatically and needs no extra steps.
+
 ## Architecture Mental Model
 
 ### Three-Tier Plugin Taxonomy
