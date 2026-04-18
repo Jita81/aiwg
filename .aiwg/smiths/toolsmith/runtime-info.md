@@ -9,8 +9,8 @@
 
 ## Resources
 
-- **Disk Free**: 902.7 GB
-- **Memory**: 0 GB available / 0 GB total
+- **Disk Free**: 843.9 GB
+- **Memory**: 32.6 GB available / 62.5 GB total
 - **CPU Cores**: 20
 
 ## Installed Tools
@@ -71,7 +71,7 @@
 - **code** (1.114.0) - /usr/bin/code
 - **tmux** (3.4) - /usr/bin/tmux
 - **screen** (4.09.01) - /usr/bin/screen
-- **psql** (0.24.04) - /usr/bin/psql
+- **psql** (18.3) - /usr/bin/psql
 - **gh** (2.45.0) - /usr/bin/gh
 - **ffmpeg** (unknown) - /usr/bin/ffmpeg
 - **ffprobe** (unknown) - /usr/bin/ffprobe
@@ -82,5 +82,5 @@
 
 - **Total Tools**: 49
 - **Unavailable**: 0
-- **Generated**: 2026-04-13T07:23:02.838Z
+- **Generated**: 2026-04-18T14:32:04.630Z
 - **Catalog**: /home/roctinam/dev/aiwg/.aiwg/smiths/toolsmith/runtime.json
