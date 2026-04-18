@@ -1,0 +1,275 @@
+/* Session Picker + Inline Terminal — #896 */
+
+/* Toggle button — sits at the bottom of the agent card action area */
+.sessionPicker {
+  margin-top: 8px;
+  border-top: 1px solid #2a2a2a;
+  padding-top: 8px;
+}
+
+.toggleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 4px 0;
+  background: transparent;
+  border: none;
+  color: #888;
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.toggleBtn:hover {
+  color: #ccc;
+}
+
+.chevron {
+  font-size: 10px;
+  margin-left: 6px;
+}
+
+/* Drawer — expands below toggle */
+.drawer {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Session rows */
+.sessionRow {
+  display: grid;
+  grid-template-columns: 8px 1fr auto auto auto;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+  font-size: 12px;
+}
+
+.dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dotRunning { background: #4caf50; }
+.dotExited  { background: #555; }
+
+.sessionLabel {
+  color: #ccc;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: monospace;
+  font-size: 11px;
+}
+
+.sessionAge {
+  color: #555;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.attachBtn {
+  padding: 2px 8px;
+  font-size: 11px;
+  border: 1px solid #2a2a2a;
+  border-radius: 3px;
+  background: transparent;
+  color: #ccc;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.attachBtn:hover:not(:disabled) {
+  background: #5a8fff;
+  color: #fff;
+  border-color: #5a8fff;
+}
+
+.attachBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.killBtn {
+  padding: 2px 5px;
+  font-size: 10px;
+  border: 1px solid #333;
+  border-radius: 3px;
+  background: transparent;
+  color: #666;
+  cursor: pointer;
+}
+
+.killBtn:hover {
+  background: #4a1a1a;
+  border-color: #883333;
+  color: #ff8888;
+}
+
+/* New terminal button */
+.newTermBtn {
+  width: 100%;
+  margin-top: 4px;
+  padding: 5px;
+  font-size: 12px;
+  border: 1px dashed #333;
+  border-radius: 4px;
+  background: transparent;
+  color: #888;
+  cursor: pointer;
+  text-align: center;
+}
+
+.newTermBtn:hover {
+  border-color: #5a8fff;
+  color: #5a8fff;
+}
+
+/* Info / error rows */
+.infoRow {
+  font-size: 11px;
+  color: #555;
+  padding: 2px 0;
+  font-style: italic;
+}
+
+.errBanner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  background: #2a1a1a;
+  border: 1px solid #663333;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #ff8888;
+  word-break: break-word;
+}
+
+.errBanner button {
+  background: none;
+  border: none;
+  color: #ff8888;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  font-size: 11px;
+}
+
+/* Terminal wrapper */
+.terminalWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.terminalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0 6px;
+  border-bottom: 1px solid #2a2a2a;
+  margin-bottom: 6px;
+}
+
+.terminalLabel {
+  font-size: 12px;
+  color: #ccc;
+  font-family: monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.backBtn {
+  padding: 2px 8px;
+  font-size: 11px;
+  border: 1px solid #2a2a2a;
+  border-radius: 3px;
+  background: transparent;
+  color: #888;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.backBtn:hover {
+  color: #ccc;
+  border-color: #444;
+}
+
+/* Terminal pane */
+.terminal {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: #0d0d0d;
+  border: 1px solid #222;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.termStatus {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 6px;
+  background: #111;
+  border-bottom: 1px solid #1a1a1a;
+  font-size: 10px;
+  color: #555;
+}
+
+.termDot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.termDotOn  { background: #4caf50; }
+.termDotOff { background: #555; }
+
+.termOutput {
+  flex: 1;
+  min-height: 160px;
+  max-height: 320px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 8px;
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #d4d4d4;
+  white-space: pre-wrap;
+  word-break: break-all;
+  background: transparent;
+}
+
+.termInput {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 5px 8px;
+  background: #111;
+  border: none;
+  border-top: 1px solid #1a1a1a;
+  color: #d4d4d4;
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  font-size: 11px;
+  outline: none;
+}
+
+.termInput:disabled {
+  color: #444;
+}
+
+.termInput::placeholder {
+  color: #444;
+}

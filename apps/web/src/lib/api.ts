@@ -40,6 +40,8 @@ export interface SandboxAgent {
 
 export interface SandboxSummary {
   id: string;
+  /** Stable UUIDv7 — persisted across sandbox restarts */
+  instanceId?: string;
   name: string;
   grpcEndpoint: string;
   wsEndpoint: string;
@@ -47,8 +49,11 @@ export interface SandboxSummary {
   capabilities: string[];
   version: string;
   registeredAt: string;
+  lastRegisteredAt: string;
   lastEventAt: string;
   connected: boolean;
+  /** ISO timestamp of last disconnect — undefined while connected */
+  disconnectedAt?: string;
   agentCount: number;
   agents: SandboxAgent[];
 }
@@ -94,6 +99,36 @@ export interface ConnectionsResponse {
   };
 }
 
+// ---- Session types (#896) ----
+
+export interface Session {
+  id: string;
+  agentId: string;
+  type: 'interactive' | 'background' | 'unknown';
+  command: string;
+  /** Human-readable name or command label */
+  name?: string;
+  status: 'running' | 'exited' | 'unknown';
+  /** ISO timestamp when the session started */
+  startedAt: string;
+  /** Exit code — only present when status === 'exited' */
+  exitCode?: number;
+}
+
+export interface SessionsListResponse {
+  sessions: Session[];
+}
+
+export interface CreateSessionRequest {
+  command?: string;
+  args?: string[];
+  name?: string;
+}
+
+export interface CreateSessionResponse {
+  session_id: string;
+}
+
 // ---- Loadout types (#733) ----
 
 export interface Loadout {
@@ -124,6 +159,18 @@ export const api = {
     }),
   agentAction: (sandboxId: string, agentId: string, action: 'start' | 'stop' | 'destroy' | 'reprovision') =>
     request<{ ok: boolean }>(`/api/sandboxes/${sandboxId}/agents/${agentId}/${action}`, { method: 'POST' }),
+
+  // Sessions (#896)
+  agentSessions: (sandboxId: string, agentId: string) =>
+    request<SessionsListResponse>(`/api/sandboxes/${sandboxId}/agents/${agentId}/sessions`),
+  createSession: (sandboxId: string, agentId: string, body: CreateSessionRequest = {}) =>
+    request<CreateSessionResponse>(`/api/sandboxes/${sandboxId}/agents/${agentId}/sessions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    }),
+  killSession: (sandboxId: string, sessionId: string) =>
+    request<{ ok: boolean }>(`/api/sandboxes/${sandboxId}/sessions/${sessionId}`, { method: 'DELETE' }),
 
   // HITL (#732)
   hitl: () => request<HitlResponse>('/api/hitl'),

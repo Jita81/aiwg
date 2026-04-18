@@ -11,6 +11,7 @@
 import { useCallback, useEffect, useReducer } from 'react';
 import { api, type SandboxSummary, type SandboxAgent } from '../../lib/api.js';
 import styles from './SandboxPanel.module.css';
+import { SessionPicker } from './SessionPicker.js';
 
 // ---- State ----
 
@@ -66,18 +67,33 @@ const STATUS_COLORS: Record<string, string> = {
   provisioning: '#2196f3',
   starting: '#2196f3',
   error: '#f44336',
-  disconnected: '#666',
+  disconnected: '#555',
 };
 
 function statusBadge(status: string) {
   return (
     <span
       className={styles.statusDot}
-      style={{ background: STATUS_COLORS[status] || '#666' }}
+      style={{ background: STATUS_COLORS[status] || '#555' }}
       title={status}
       aria-label={`Status: ${status}`}
     />
   );
+}
+
+function fmtTime(iso: string): string {
+  try {
+    return new Date(iso).toLocaleString(undefined, {
+      month: 'short', day: 'numeric',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+    });
+  } catch {
+    return iso;
+  }
+}
+
+function shortId(id?: string): string {
+  return id ? id.slice(0, 8) : '';
 }
 
 // ---- Component ----
@@ -136,13 +152,18 @@ export function SandboxPanel() {
               <li key={s.id}>
                 <button
                   type="button"
-                  className={s.id === state.selectedSandbox ? styles.sandboxItemActive : styles.sandboxItem}
+                  className={[
+                    s.id === state.selectedSandbox ? styles.sandboxItemActive : styles.sandboxItem,
+                    !s.connected ? styles.sandboxItemDisconnected : '',
+                  ].join(' ')}
                   onClick={() => dispatch({ type: 'SET_SELECTED', id: s.id })}
                 >
                   <span className={styles.sandboxName}>{s.name}</span>
                   <span className={styles.sandboxMeta}>
                     {statusBadge(s.connected ? 'ready' : 'disconnected')}
-                    {s.agentCount} agent{s.agentCount !== 1 ? 's' : ''}
+                    {s.connected
+                      ? `${s.agentCount} agent${s.agentCount !== 1 ? 's' : ''}`
+                      : 'offline'}
                   </span>
                 </button>
               </li>
@@ -164,26 +185,67 @@ export function SandboxPanel() {
               <h2 className={styles.sandboxTitle}>
                 {statusBadge(selectedSandbox.connected ? 'ready' : 'disconnected')}
                 {selectedSandbox.name}
+                {!selectedSandbox.connected && (
+                  <span className={styles.offlineBadge}>offline</span>
+                )}
               </h2>
               <div className={styles.sandboxInfo}>
                 <span>v{selectedSandbox.version}</span>
                 <span>{selectedSandbox.capabilities.join(', ')}</span>
-                <span title="HTTP endpoint">{selectedSandbox.httpEndpoint}</span>
+                {selectedSandbox.connected && (
+                  <span title="HTTP endpoint">{selectedSandbox.httpEndpoint}</span>
+                )}
+                {selectedSandbox.instanceId && (
+                  <span className={styles.instanceId} title={`Instance ID: ${selectedSandbox.instanceId}`}>
+                    #{shortId(selectedSandbox.instanceId)}
+                  </span>
+                )}
               </div>
             </div>
+
+            {/* Disconnected last-session info */}
+            {!selectedSandbox.connected && (
+              <div className={styles.disconnectedBanner}>
+                <div className={styles.disconnectedIcon}>⚠</div>
+                <div className={styles.disconnectedInfo}>
+                  <strong>Sandbox offline</strong>
+                  <p>This sandbox is no longer connected. It will reappear automatically when it reconnects.</p>
+                  <div className={styles.lastSessionGrid}>
+                    {selectedSandbox.disconnectedAt && (
+                      <><span className={styles.lastSessionLabel}>Disconnected</span>
+                      <span>{fmtTime(selectedSandbox.disconnectedAt)}</span></>
+                    )}
+                    <span className={styles.lastSessionLabel}>Last active</span>
+                    <span>{fmtTime(selectedSandbox.lastEventAt)}</span>
+                    <span className={styles.lastSessionLabel}>Last registered</span>
+                    <span>{fmtTime(selectedSandbox.lastRegisteredAt)}</span>
+                    {selectedSandbox.instanceId && (
+                      <><span className={styles.lastSessionLabel}>Instance ID</span>
+                      <span className={styles.monoSmall}>{selectedSandbox.instanceId}</span></>
+                    )}
+                    <span className={styles.lastSessionLabel}>Endpoint</span>
+                    <span className={styles.monoSmall}>{selectedSandbox.httpEndpoint}</span>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Agent grid */}
             <div className={styles.agentGrid} role="list" aria-label="Agents">
               {selectedSandbox.agents.length === 0 ? (
-                <div className={styles.emptyAgents}>No agents connected</div>
+                <div className={styles.emptyAgents}>
+                  {selectedSandbox.connected ? 'No agents connected' : 'No agent data from last session'}
+                </div>
               ) : (
                 selectedSandbox.agents.map((agent) => (
                   <AgentCard
                     key={agent.agentId}
                     agent={agent}
                     sandboxId={selectedSandbox.id}
+                    sandboxWsEndpoint={selectedSandbox.wsEndpoint}
                     onAction={handleAgentAction}
                     actionInProgress={state.actionInProgress}
+                    sandboxConnected={selectedSandbox.connected}
                   />
                 ))
               )}
@@ -207,20 +269,28 @@ export function SandboxPanel() {
 function AgentCard({
   agent,
   sandboxId,
+  sandboxWsEndpoint,
   onAction,
   actionInProgress,
+  sandboxConnected,
 }: {
   agent: SandboxAgent;
   sandboxId: string;
+  /** agentic-sandbox management WS URL — used by SessionPicker */
+  sandboxWsEndpoint: string;
   onAction: (sandboxId: string, agentId: string, action: 'start' | 'stop' | 'destroy' | 'reprovision') => void;
   actionInProgress: string | null;
+  sandboxConnected: boolean;
 }) {
   const busy = actionInProgress?.startsWith(agent.agentId);
 
   return (
-    <div className={styles.agentCard} role="listitem">
+    <div
+      className={[styles.agentCard, !sandboxConnected ? styles.agentCardOffline : ''].join(' ')}
+      role="listitem"
+    >
       <div className={styles.agentHeader}>
-        {statusBadge(agent.status)}
+        {statusBadge(sandboxConnected ? agent.status : 'disconnected')}
         <strong className={styles.agentId}>{agent.agentId}</strong>
         {agent.loadout && (
           <span className={styles.loadoutBadge}>{agent.loadout}</span>
@@ -238,7 +308,7 @@ function AgentCard({
       )}
 
       <div className={styles.agentActions}>
-        {agent.status === 'ready' && (
+        {sandboxConnected && agent.status === 'ready' && (
           <button
             type="button"
             className={styles.actionBtn}
@@ -248,7 +318,7 @@ function AgentCard({
             Stop
           </button>
         )}
-        {agent.status === 'disconnected' && (
+        {sandboxConnected && agent.status === 'disconnected' && (
           <button
             type="button"
             className={styles.actionBtn}
@@ -258,23 +328,39 @@ function AgentCard({
             Start
           </button>
         )}
-        <button
-          type="button"
-          className={styles.actionBtnSecondary}
-          onClick={() => onAction(sandboxId, agent.agentId, 'reprovision')}
-          disabled={busy}
-        >
-          Reprovision
-        </button>
-        <button
-          type="button"
-          className={styles.actionBtnDanger}
-          onClick={() => onAction(sandboxId, agent.agentId, 'destroy')}
-          disabled={busy}
-        >
-          Destroy
-        </button>
+        {sandboxConnected && (
+          <>
+            <button
+              type="button"
+              className={styles.actionBtnSecondary}
+              onClick={() => onAction(sandboxId, agent.agentId, 'reprovision')}
+              disabled={busy}
+            >
+              Reprovision
+            </button>
+            <button
+              type="button"
+              className={styles.actionBtnDanger}
+              onClick={() => onAction(sandboxId, agent.agentId, 'destroy')}
+              disabled={busy}
+            >
+              Destroy
+            </button>
+          </>
+        )}
+        {!sandboxConnected && (
+          <span className={styles.offlineNote}>Actions unavailable while offline</span>
+        )}
       </div>
+
+      {/* Session picker — only when sandbox is connected and agent is active */}
+      {sandboxConnected && (agent.status === 'ready' || agent.status === 'busy') && (
+        <SessionPicker
+          sandboxId={sandboxId}
+          agentId={agent.agentId}
+          wsEndpoint={sandboxWsEndpoint}
+        />
+      )}
     </div>
   );
 }

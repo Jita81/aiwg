@@ -98,13 +98,19 @@ function handleSandboxWs(ws: any, sandboxId: string, token: string): void {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function handlePtyWs(ws: any, sessionId: string, command: string, cmdArgs: string[], cwd?: string): void {
+function handlePtyWs(ws: any, sessionId: string, command: string, cmdArgs: string[], cwd?: string, wsEndpoint?: string, agentId?: string): void {
   // createPtyWsHandler expects a Hono-context-like object for param/query extraction.
   // We provide a minimal shim since we've already parsed the URL.
   const mockContext = {
     req: {
       param: (key: string) => key === 'sessionId' ? sessionId : undefined,
-      query: () => ({ command, args: cmdArgs.join(','), ...(cwd ? { cwd } : {}) }),
+      query: () => ({
+        command,
+        args: cmdArgs.join(','),
+        ...(cwd ? { cwd } : {}),
+        ...(wsEndpoint ? { wsEndpoint } : {}),
+        ...(agentId ? { agentId } : {}),
+      }),
     },
   };
 
@@ -167,6 +173,11 @@ async function setupWebSockets(httpServer: any, readOnly: boolean): Promise<void
     }
 
     // /ws/pty/:sessionId (disabled in read-only mode)
+    // Optional query params:
+    //   ?sandbox=<sandboxId>  — target a specific registered sandbox
+    //   ?agent=<agentId>      — target a specific agent within that sandbox
+    //   ?wsEndpoint=<url>     — explicit management WS URL (overrides sandbox lookup)
+    // Without these params the PTY bridge auto-detects the first connected sandbox.
     if (!readOnly) {
       const ptyMatch = pathname.match(/^\/ws\/pty\/([^/]+)$/);
       if (ptyMatch) {
@@ -175,9 +186,21 @@ async function setupWebSockets(httpServer: any, readOnly: boolean): Promise<void
         const argsParam = url.searchParams.get('args');
         const cmdArgs = argsParam ? argsParam.split(',') : ['mc', 'watch'];
         const cwd = url.searchParams.get('cwd') ?? undefined;
+        const agentId = url.searchParams.get('agent') ?? undefined;
+
+        // Resolve wsEndpoint: explicit param takes precedence over sandbox registry lookup
+        let wsEndpoint = url.searchParams.get('wsEndpoint') ?? undefined;
+        if (!wsEndpoint) {
+          const sandboxId = url.searchParams.get('sandbox') ?? undefined;
+          if (sandboxId) {
+            const sb = sandboxRegistry.get(sandboxId);
+            if (sb?.wsEndpoint) wsEndpoint = sb.wsEndpoint;
+          }
+        }
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         wss.handleUpgrade(req, socket, head, (ws: any) => {
-          handlePtyWs(ws, sessionId, command, cmdArgs, cwd);
+          handlePtyWs(ws, sessionId, command, cmdArgs, cwd, wsEndpoint, agentId);
         });
         return;
       }
@@ -476,6 +499,51 @@ async function startServer(opts: {
     if (!sandbox) return c.json({ error: 'Sandbox not found' }, 404);
     try {
       const resp = await fetch(`${sandbox.httpEndpoint}/api/v1/agents/${c.req.param('aid')}`, {
+        method: 'DELETE',
+      });
+      return c.json(await resp.json(), resp.status);
+    } catch (err) {
+      return c.json({ error: `Sandbox unreachable: ${err instanceof Error ? err.message : String(err)}` }, 502);
+    }
+  });
+
+  // Session management proxy endpoints (#896)
+  // Forwards to sandbox management HTTP API: GET/POST /api/v1/agents/:aid/sessions
+  // and DELETE /api/v1/sessions/:sid
+  // Will 502 gracefully until agentic-sandbox#140 lands these endpoints.
+
+  app.get('/api/sandboxes/:id/agents/:aid/sessions', async (c: any) => {
+    const sandbox = sandboxRegistry.get(c.req.param('id'));
+    if (!sandbox) return c.json({ error: 'Sandbox not found' }, 404);
+    try {
+      const resp = await fetch(`${sandbox.httpEndpoint}/api/v1/agents/${c.req.param('aid')}/sessions`);
+      return c.json(await resp.json(), resp.status);
+    } catch (err) {
+      return c.json({ error: `Sandbox unreachable: ${err instanceof Error ? err.message : String(err)}` }, 502);
+    }
+  });
+
+  app.post('/api/sandboxes/:id/agents/:aid/sessions', async (c: any) => {
+    const sandbox = sandboxRegistry.get(c.req.param('id'));
+    if (!sandbox) return c.json({ error: 'Sandbox not found' }, 404);
+    try {
+      const body = await c.req.json().catch(() => ({}));
+      const resp = await fetch(`${sandbox.httpEndpoint}/api/v1/agents/${c.req.param('aid')}/sessions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      return c.json(await resp.json(), resp.status);
+    } catch (err) {
+      return c.json({ error: `Sandbox unreachable: ${err instanceof Error ? err.message : String(err)}` }, 502);
+    }
+  });
+
+  app.delete('/api/sandboxes/:id/sessions/:sid', async (c: any) => {
+    const sandbox = sandboxRegistry.get(c.req.param('id'));
+    if (!sandbox) return c.json({ error: 'Sandbox not found' }, 404);
+    try {
+      const resp = await fetch(`${sandbox.httpEndpoint}/api/v1/sessions/${c.req.param('sid')}`, {
         method: 'DELETE',
       });
       return c.json(await resp.json(), resp.status);
