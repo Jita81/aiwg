@@ -1583,6 +1583,12 @@ Full research background, citations, and methodology: [docs/research/](docs/rese
 - **[Prerequisites](docs/getting-started/prerequisites.md)** — Node.js, AI platforms, OS support
 - **[CLI Reference](docs/cli-reference.md)** — All 47 commands with examples
 
+### Customize
+
+- **[Make AIWG Yours](docs/customization/README.md)** — Personal rules, agents, and skills that go live immediately
+- **[Customization Examples](docs/customization/examples.md)** — 5 concrete examples of what people actually customize
+- **[Fork Workflow](docs/customization/fork-workflow.md)** — Upstream sync, contributing back, the ownership model
+
 ### By Audience
 
 **Practitioners:**

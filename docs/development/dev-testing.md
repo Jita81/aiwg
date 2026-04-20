@@ -1,5 +1,7 @@
 # Dev Testing with `--use-dev`
 
+> **Just want to customize AIWG for your own use?** That's a different (simpler) path — see [Make AIWG Yours](../customization/README.md). The Steward handles it end-to-end. This document is for contributors testing framework changes.
+
 Test local framework changes by pointing the installed `aiwg` CLI at your development repository.
 
 ## Quick Start
