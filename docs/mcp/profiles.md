@@ -7,6 +7,26 @@ default provider configuration.
 - **Registry file:** `~/.aiwg/mcp-profiles.json`
 - **Schema:** `apiVersion: aiwg.io/v1`, `kind: McpProfileRegistry`
 
+## Why MCP Profiles
+
+Loading every registered MCP server in every session creates two compounding problems:
+
+**Token pressure** — MCP servers inject their tool manifests into the context at the start of every session. The measured impact across the built-in presets:
+
+| Profile | Servers | Approximate token overhead |
+|---------|---------|--------------------------|
+| `minimal` | none | ~0 |
+| `dev` | 3 servers | ~6 K tokens |
+| `ops` | 3 servers | ~7 K tokens |
+| `incident` | 4 servers | ~9 K tokens |
+| `full` | all (5+) | ~15–21 K tokens |
+
+Keeping a heavy code-search server loaded while doing ops work burns budget on every prompt — and the model can't use it for anything relevant.
+
+**Über-agent behaviour** — when a model sees too many tools, it sometimes reaches for an irrelevant one because it looks plausibly useful. A model that can search the codebase *and* write to CMDB *and* read Google Calendar will occasionally try all three on a task that only needed one. Profiles constrain the visible toolset to what the task actually requires.
+
+The preset profiles map directly to common task classes. Run `aiwg mcp profile init-presets` once to install them, then use `aiwg session --profile <name>` at task start.
+
 ## Quick Start
 
 ```bash
@@ -128,6 +148,35 @@ aiwg mcp inject --provider claude --profile ops --ephemeral
 aiwg mcp inject --provider claude --profile ops --ephemeral --out /tmp/ops.json
 ```
 
+## Provider Support
+
+Profile-aware sessions work differently per provider. AIWG handles the differences behind the scenes — `aiwg session --profile <name>` produces the right behaviour for the active provider.
+
+| Provider | Support level | Mechanism |
+|----------|--------------|-----------|
+| **Claude Code** | Native | Ephemeral JSON config passed via `claude --mcp-config <tmp>`. Default config unchanged. |
+| **Codex** | Emulated | Per-profile runtime home (`HOME=~/.codex/roles-runtime/<profile>/`). OAuth tokens isolated per profile. See [Codex Profiles](./codex-profiles.md). |
+| **Cursor** | Native | Standalone `.cursor/mcp.json` written ephemerally or persistently. |
+| **OpenCode** | Native | Config file injection via provider adapter. |
+| **Windsurf** | Native | Config file injection via provider adapter. |
+| **Factory** | Native | Config file injection via provider adapter. |
+| **Warp** | Degraded | Warp does not support file-based MCP config switching. `aiwg session --profile` for Warp prints setup instructions and the exact server list to configure via Warp's UI (Settings → AI → MCP Servers). |
+| **GitHub Copilot** | Degraded | Copilot MCP configuration is managed through VS Code settings. AIWG generates the correct `mcp` block and prints instructions for manual insertion. |
+| **OpenClaw** | Native | Config injection to `~/.openclaw/` profile directory. |
+
+### Ephemeral vs persistent
+
+By default, `aiwg session --profile <name>` uses **ephemeral** mode — a temporary config is created for the session duration and the provider's default config is never modified. When the session ends, the temp file is deleted.
+
+Use `--persist` to write the profile's servers into the provider's default config permanently:
+
+```bash
+aiwg session --profile dev --persist   # modifies default config
+aiwg session --profile dev             # ephemeral (default)
+```
+
+Warp and Copilot do not support ephemeral mode — `--persist` is implicit, and AIWG prints what to copy into the UI rather than modifying config files.
+
 ## Provider Overrides
 
 Profiles can carry per-provider tool allow/deny lists. These restrict which tools
@@ -196,6 +245,40 @@ Provider overrides are not yet editable via `aiwg mcp profile edit`. Edit
     }
   }
 }
+```
+
+## Migrating from sysops Scripts
+
+If you used `roctinam/sysops` shell wrappers (`claude-role.sh` / `codex-role.sh`), the AIWG profile system is the direct replacement. The mental model is identical — named role, scoped MCP servers, isolated auth for Codex — but it's provider-agnostic and managed by AIWG rather than maintained in a separate repo.
+
+### Claude
+
+| Before | After |
+|--------|-------|
+| `claude-role dev` | `aiwg session --profile dev` |
+| `claude-role ops` | `aiwg session --profile ops` |
+| `claude-role minimal` | `aiwg session --profile minimal` |
+
+`aiwg session` passes `--mcp-config` to Claude with an ephemeral config — same mechanism `claude-role.sh` used.
+
+### Codex
+
+| Before | After |
+|--------|-------|
+| `codex-role dev` | `aiwg session --provider codex --profile dev` |
+| `codex-role ops -- login` | `aiwg mcp profile login ops --provider codex` |
+| Manual `~/.codex/roles-runtime/dev/` setup | Handled automatically by AIWG on first run |
+
+The runtime home layout (`~/.codex/roles-runtime/<profile>/`) is identical to the sysops implementation, so existing auth tokens in those directories are reused automatically on the first `aiwg session` run. No re-authentication needed.
+
+### Deprecation timeline
+
+Once `aiwg session --profile` is running in your environment, the sysops wrappers can be removed from `.bashrc`. The tab-completion aliases (`alias claude-role=...`) can be replaced with shell aliases pointing to `aiwg session` if preferred:
+
+```bash
+# Optional: keep short aliases
+alias cr='aiwg session --profile'              # cr dev, cr ops, cr minimal
+alias crx='aiwg session --provider codex --profile'  # crx dev, crx ops
 ```
 
 ## Further Reading
