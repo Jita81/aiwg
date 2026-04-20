@@ -107,8 +107,9 @@ function displayHelp(): void {
   ]);
 
   helpGroup('CHANNEL', [
+    ['--use-dev [path]', 'Customize AIWG live from a local clone or fork'],
     ['--use-main', 'Switch to edge channel (bleeding edge)'],
-    ['--use-stable', 'Switch to stable channel (npm)'],
+    ['--use-stable', 'Switch back to stable npm package'],
   ]);
 
   ui.rule();
