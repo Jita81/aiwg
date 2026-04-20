@@ -91,7 +91,12 @@
     "aiwg-regenerate-windsurfrules",
     "aiwg-regenerate-opencode",
     "aiwg-regenerate-codex",
-    "activity-log"
+    "activity-log",
+    "customize-setup",
+    "customize-rebuild",
+    "customize-status",
+    "customize-upstream-sync",
+    "customize-contribute-back"
   ],
   "rules": [
     "no-time-estimates",

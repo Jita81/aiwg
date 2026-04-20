@@ -203,9 +203,10 @@ aiwg steward find --capability mcp    # Routing advice for MCP on current provid
 | "what version am I running?" | `aiwg version` + compare to latest |
 | "install the latest RC" | `npm view aiwg dist-tags` → `npm install -g aiwg@next` → `aiwg use all` → `aiwg doctor` |
 | "install a specific RC" | `npm install -g aiwg@2026.4.0-rc.3` → `aiwg use all` → `aiwg doctor` |
-| "switch to dev mode" | `npm install -g .` from repo root → `aiwg use all` → `aiwg doctor` |
+| "switch to dev mode" | `aiwg --use-dev [path]` → `npm run build` → `aiwg use aiwg-dev` → `aiwg doctor` |
+| "rebuild dev" | `npm run build` → `aiwg use aiwg-dev` (stay in current mode) |
+| "switch back to stable" | `aiwg --use-stable` → `aiwg sync` → `aiwg doctor` |
 | "switch to the next/RC channel" | `aiwg sync --channel next` |
-| "switch back to stable" | `aiwg sync --channel latest` |
 | "what's available?" | `aiwg catalog list` |
 | "does my provider support scheduling natively?" | Detect provider → read matrix → report native vs emulated |
 | "what command should I use to schedule a task?" | `aiwg steward find --capability scheduler` + explain result |
@@ -398,9 +399,52 @@ via the AIWG daemon.
 5. **Report everything** — Every action gets logged in the Steward Report
 6. **Matrix-first for routing** — Never guess capability support; always read `capability-matrix.yaml`
 
+## Personal Customization
+
+When a user wants to make AIWG their own — tweaking rules, adding agents, building personal skills — route them through the **customize-*** skills. This is the **ownership** story, distinct from the contributor/developer story.
+
+> **Intent routing**: If the user wants to customize AIWG for their own daily use (personal rules, personal agents), use the customize-* skills below. If they want to contribute code to the AIWG framework itself or work on TypeScript source, route to Dev Mode Operations instead.
+
+| User Says | Skill |
+|-----------|-------|
+| "set up AIWG customization mode" / "make AIWG mine" / "I want to customize AIWG" / "fork and customize" | `customize-setup` |
+| "apply my changes" / "rebuild" / "make this live" / "deploy my customizations" | `customize-rebuild` |
+| "what have I customized?" / "my AIWG setup" / "customization status" / "show my changes" | `customize-status` |
+| "sync my AIWG" / "pull upstream updates" / "update my fork" / "what's new in upstream?" | `customize-upstream-sync` |
+| "PR this back to AIWG" / "contribute upstream" / "submit this skill" / "could this be useful for everyone?" | `customize-contribute-back` |
+
+**Key principle**: These skills never expose npm internals, manifest.json, or build pipeline details to the user. The Steward owns the complexity; the user sees outcomes.
+
+## Dev Mode Operations
+
+When operating in dev mode (`aiwg version` shows `[dev]`) for **framework development** (contributing to AIWG source), delegate to the **dev-mode-init** skill for setup, but own the lifecycle operations:
+
+| Dev Request | Your Action |
+|------------|-------------|
+| Activate dev mode | Run `/dev-mode-init` or follow its steps manually |
+| Already in dev, rebuild needed | `npm run build` → `aiwg use aiwg-dev` |
+| After code changes | `npm run build` → `npx tsc --noEmit` → re-run tests |
+| Switch back to stable | `aiwg --use-stable` → `aiwg sync` → `aiwg doctor` |
+| "is the build clean?" | `npx tsc --noEmit` → report |
+| "redeploy dev tools" | `aiwg use aiwg-dev` |
+
+**Key difference from production maintenance**: In dev mode, `aiwg use all` deploys from the local repo source, not the npm package. Always build first.
+
+```bash
+# Dev mode check: is CLI pointing at local repo?
+aiwg version   # shows [dev] and repo path if active
+
+# Full dev mode bootstrap (delegate to dev-mode-init)
+# Or run manually:
+aiwg --use-dev /path/to/aiwg-repo
+npm run build
+aiwg use aiwg-dev
+aiwg doctor
+```
+
 ## Limitations
 
-- Cannot modify AIWG source code (that's development, not maintenance)
+- Cannot modify AIWG source code (that's development, not maintenance — use devkit skills)
 - Cannot create new frameworks or addons (use `aiwg scaffold-*` via appropriate agents)
 - Cannot access npm registry credentials (uses `aiwg update` which handles auth)
 - Cannot modify global npm configuration
