@@ -27,7 +27,7 @@
     "rulesIndex": "rules/RULES-INDEX.md",
     "deployIndexOnly": true
   },
-  "dependencies": [],
+  "dependencies": ["aiwg-utils"],
   "rules": [
     "skill-placement",
     "no-circular-skill-calls",
@@ -36,6 +36,7 @@
     "aiwg-dir-reference-contract"
   ],
   "commands": [
+    "dev-mode-init",
     "devkit-create-addon",
     "devkit-create-extension",
     "devkit-create-framework",
@@ -46,6 +47,7 @@
     "devkit-test"
   ],
   "skills": [
+    "dev-mode-init",
     "validate-component",
     "validate-addon",
     "dev-doctor",
