@@ -258,6 +258,58 @@ async function setupWebSockets(httpServer: any, readOnly: boolean): Promise<void
       return;
     }
 
+    // /ws/sandbox/:sandboxId/management
+    // Proxies to the sandbox management WS bus (wsEndpoint).
+    // The management WS is a multicast bus — all agents and sessions share one connection.
+    // The browser sends attach_session / send_input / pty_resize frames and receives
+    // output / session_attached / session_detached frames for all agents.
+    const mgmtMatch = pathname.match(/^\/ws\/sandbox\/([^/]+)\/management$/);
+    if (mgmtMatch) {
+      const sandboxId = mgmtMatch[1];
+      const sandbox = sandboxRegistry.get(sandboxId);
+      if (!sandbox?.connected) {
+        socket.destroy();
+        return;
+      }
+      // wsEndpoint is already a full ws:// URL (e.g. ws://localhost:8121)
+      const mgmtWsUrl = sandbox.wsEndpoint;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      wss.handleUpgrade(req, socket, head, async (browserWs: any) => {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const WS: any = wsMod.WebSocket ?? wsMod.default?.WebSocket ?? wsMod.default;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const sandboxWs = new WS(mgmtWsUrl) as any;
+
+          sandboxWs.on('open', () => {
+            // Relay sandbox → browser
+            sandboxWs.on('message', (data: Buffer | string) => {
+              if (browserWs.readyState === 1) {
+                try { browserWs.send(typeof data === 'string' ? data : data.toString()); } catch { /* ignore */ }
+              }
+            });
+            sandboxWs.on('close', () => { try { browserWs.close(1001, 'Sandbox closed'); } catch { /* ignore */ } });
+            sandboxWs.on('error', () => { try { browserWs.close(1011, 'Sandbox WS error'); } catch { /* ignore */ } });
+
+            // Relay browser → sandbox
+            browserWs.on('message', (data: Buffer | string) => {
+              if (sandboxWs.readyState === 1) {
+                try { sandboxWs.send(typeof data === 'string' ? data : data.toString()); } catch { /* ignore */ }
+              }
+            });
+            browserWs.on('close', () => { try { sandboxWs.close(); } catch { /* ignore */ } });
+          });
+
+          sandboxWs.on('error', () => {
+            try { browserWs.close(1011, 'Could not connect to sandbox management WS'); } catch { /* ignore */ }
+          });
+        } catch {
+          try { browserWs.close(1011, 'Management proxy error'); } catch { /* ignore */ }
+        }
+      });
+      return;
+    }
+
     // Unknown WS path — reject cleanly
     socket.destroy();
   });
@@ -464,6 +516,19 @@ async function startServer(opts: {
     } catch {
       return c.json({ error: 'Invalid request body' }, 400);
     }
+  });
+
+  // Clear all disconnected sandboxes (forces re-registration)
+  app.delete('/api/sandboxes/offline', (c: any) => {
+    const removed = sandboxRegistry.clearOffline();
+    return c.json({ ok: true, removed });
+  });
+
+  // Admin-force deregister any sandbox by id (no sandbox token required — local dashboard only).
+  // Idempotent: returns ok even if the sandbox is already gone (e.g. server restarted since last poll).
+  app.delete('/api/sandboxes/:id/forget', (c: any) => {
+    sandboxRegistry.deregister(c.req.param('id'));
+    return c.json({ ok: true });
   });
 
   // Deregister a sandbox

@@ -1,11 +1,16 @@
 /**
  * WebSocket PTY Bridge
  *
- * Bridges browser WebSocket connections to local PTY processes via node-pty.
- * Phase 1 (local exec): spawns commands using node-pty.
- * Phase 2 (container/VM): will delegate to agentic-sandbox PTY adapter (#657).
+ * Bridges browser WebSocket connections to PTY sessions. Three modes:
  *
- * Protocol over WebSocket:
+ * Phase 1 (local exec): spawns commands using node-pty.
+ * Phase 2a (sandbox WS): bridges to agentic-sandbox management WebSocket.
+ *   Connects to the sandbox's management WS server, subscribes to an agent,
+ *   starts an interactive shell, and multicasts PTY output to all browser clients.
+ *   Leverages the sandbox's tokio broadcast channel for zero-copy multicast.
+ * Phase 2b (sandbox REST, deprecated): polls /api/v1/tasks log endpoint.
+ *
+ * Browser ↔ serve protocol:
  *   Client → Server: { type: 'data', payload: string }    — stdin to PTY
  *   Client → Server: { type: 'resize', cols: number, rows: number }
  *   Client → Server: { type: 'close' }                    — request graceful shutdown
@@ -13,8 +18,18 @@
  *   Server → Client: { type: 'exit', code: number }       — PTY process exited
  *   Server → Client: { type: 'error', message: string }   — error notification
  *
+ * Sandbox management WS protocol (agentic-sandbox):
+ *   → { type: 'subscribe', agent_id }
+ *   → { type: 'start_shell', agent_id, cols, rows }
+ *   → { type: 'send_input', agent_id, command_id, data }
+ *   → { type: 'pty_resize', agent_id, command_id, cols, rows }
+ *   → { type: 'kill_session', agent_id, session_name }
+ *   ← { type: 'shell_started', agent_id, command_id }
+ *   ← { type: 'output', agent_id, command_id, stream, data, ts }
+ *   ← { type: 'session_killed' | 'session_detached', agent_id, exit_code? }
+ *
  * @issue #712
- * @see #657 — agentic-sandbox PTY transport (backend upgrade)
+ * @see #657 — agentic-sandbox PTY transport
  * @see #711 — HTTP server scaffold
  */
 
@@ -169,21 +184,54 @@ export const registry = new PtySessionRegistry();
 /**
  * Spawn a PTY process for the given session.
  *
- * Delegates to agentic-sandbox if AIWG_SANDBOX_ENDPOINT is set or a sandbox
- * is registered; otherwise falls back to local node-pty.
+ * Priority order:
+ *   1. Explicit wsEndpoint opt → sandbox management WebSocket bridge
+ *   2. Auto-detect: first connected sandbox in registry → sandbox WS bridge
+ *   3. AIWG_SANDBOX_ENDPOINT env var → legacy REST polling (deprecated)
+ *   4. Fallback → local node-pty
  *
- * @issue #657 — sandbox transport for PTY adapter
+ * @issue #657 — agentic-sandbox PTY transport
  */
 export async function spawnPty(
   session: PtySession,
   command: string,
   args: string[],
-  opts: { cols?: number; rows?: number; cwd?: string; sandboxEndpoint?: string; agentId?: string } = {},
+  opts: {
+    cols?: number;
+    rows?: number;
+    cwd?: string;
+    sandboxEndpoint?: string;
+    agentId?: string;
+    /** agentic-sandbox management WebSocket URL (e.g. ws://localhost:8121) */
+    wsEndpoint?: string;
+  } = {},
 ): Promise<void> {
-  const sandboxEndpoint = opts.sandboxEndpoint || process.env.AIWG_SANDBOX_ENDPOINT;
+  // Phase 2a: explicit management WS endpoint
+  if (opts.wsEndpoint) {
+    const agentId = opts.agentId || process.env.AIWG_SANDBOX_AGENT_ID || 'agent-01';
+    await spawnSandboxWsPty(session, agentId, opts.wsEndpoint, opts);
+    return;
+  }
 
+  // Phase 2b: auto-detect — use first connected sandbox from registry
+  try {
+    const { sandboxRegistry } = await import('./sandbox-registry.js');
+    const sandboxes = sandboxRegistry.list();
+    const connected = sandboxes.find((s) => s.connected && s.wsEndpoint);
+    if (connected) {
+      const agentId = opts.agentId
+        || process.env.AIWG_SANDBOX_AGENT_ID
+        || connected.agents.find((a) => a.status === 'ready')?.agentId
+        || connected.agents[0]?.agentId
+        || 'agent-01';
+      await spawnSandboxWsPty(session, agentId, connected.wsEndpoint, opts);
+      return;
+    }
+  } catch { /* registry not available — fall through to local PTY */ }
+
+  // Phase 2c: legacy REST-based sandbox (AIWG_SANDBOX_ENDPOINT env var — deprecated)
+  const sandboxEndpoint = opts.sandboxEndpoint || process.env.AIWG_SANDBOX_ENDPOINT;
   if (sandboxEndpoint) {
-    // Phase 2: delegate to agentic-sandbox via HTTP REST → gRPC bridge
     await spawnSandboxPty(session, command, args, {
       ...opts,
       sandboxEndpoint,
@@ -223,9 +271,169 @@ export async function spawnPty(
 }
 
 /**
+ * Spawn a PTY session bridged to an agentic-sandbox management WebSocket.
+ *
+ * Connects to the sandbox's management WS server at wsEndpoint, subscribes to
+ * the target agent, starts an interactive shell, then multicasts PTY output to
+ * all browser clients via the existing PtySessionRegistry broadcast channel.
+ *
+ * The sandbox side uses a tokio::sync::broadcast channel (capacity 10k) so
+ * multiple concurrent browser clients receive identical output streams without
+ * extra overhead. This function is the Node.js consumer of that broadcast.
+ *
+ * @issue #657
+ */
+async function spawnSandboxWsPty(
+  session: PtySession,
+  agentId: string,
+  wsEndpoint: string,
+  opts: { cols?: number; rows?: number },
+): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let wsMod: any;
+  try {
+    wsMod = await (new Function('m', 'return import(m)'))('ws');
+  } catch {
+    throw new Error('ws package required for sandbox PTY bridge. Run: npm install ws');
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const WS: any = wsMod.WebSocket ?? wsMod.default?.WebSocket ?? wsMod.default;
+  if (typeof WS !== 'function') {
+    throw new Error('Could not resolve WebSocket constructor from ws package');
+  }
+
+  const cols = opts.cols ?? 120;
+  const rows = opts.rows ?? 30;
+
+  return new Promise<void>((resolve, reject) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sock = new WS(wsEndpoint) as any;
+    let commandId: string | null = null;
+    let onDataCb: ((data: string) => void) | null = null;
+    let onExitCb: ((e: { exitCode: number }) => void) | null = null;
+    let settled = false;
+
+    const settle = (err?: Error) => {
+      if (settled) return;
+      settled = true;
+      if (err) reject(err);
+      else resolve();
+    };
+
+    const sendMsg = (msg: object) => {
+      if (sock.readyState === 1 /* OPEN */) {
+        sock.send(JSON.stringify(msg));
+      }
+    };
+
+    sock.on('open', () => {
+      // Subscribe to this agent's broadcast stream, then start interactive shell
+      sendMsg({ type: 'subscribe', agent_id: agentId });
+      sendMsg({ type: 'start_shell', agent_id: agentId, cols, rows });
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    sock.on('message', (raw: any) => {
+      let msg: Record<string, unknown>;
+      try {
+        msg = JSON.parse(typeof raw === 'string' ? raw : (raw as Buffer).toString()) as Record<string, unknown>;
+      } catch {
+        return;
+      }
+
+      // Shell handshake complete — record command_id used for routing all I/O
+      if (msg['type'] === 'shell_started' && msg['agent_id'] === agentId) {
+        commandId = msg['command_id'] as string;
+        settle();
+        return;
+      }
+
+      // PTY output from the sandbox broadcast channel → forward to browser
+      if (
+        msg['type'] === 'output' &&
+        msg['agent_id'] === agentId &&
+        msg['command_id'] === commandId &&
+        (msg['stream'] === 'stdout' || msg['stream'] === undefined) &&
+        msg['data']
+      ) {
+        const data = typeof msg['data'] === 'string' ? msg['data'] : String(msg['data']);
+        onDataCb?.(data);
+        return;
+      }
+
+      // Session ended on sandbox side
+      if (
+        (msg['type'] === 'session_killed' || msg['type'] === 'session_detached') &&
+        msg['agent_id'] === agentId
+      ) {
+        onExitCb?.({ exitCode: (msg['exit_code'] as number | undefined) ?? 0 });
+      }
+    });
+
+    sock.on('error', (err: Error) => {
+      const message = err instanceof Error ? err.message : String(err);
+      settle(new Error(`Sandbox WS error connecting to ${wsEndpoint}: ${message}`));
+    });
+
+    sock.on('close', () => {
+      if (!settled) {
+        settle(new Error(`Sandbox WS closed before shell_started (agent: ${agentId}, endpoint: ${wsEndpoint})`));
+      } else {
+        // Unexpected disconnect after session started
+        onExitCb?.({ exitCode: 1 });
+      }
+    });
+
+    // PtyLike wrapper: routes browser I/O back through the sandbox management WS
+    const sandboxPty: PtyLike = {
+      write(data: string) {
+        if (!commandId) return;
+        sendMsg({ type: 'send_input', agent_id: agentId, command_id: commandId, data });
+      },
+      resize(c: number, r: number) {
+        if (!commandId) return;
+        sendMsg({ type: 'pty_resize', agent_id: agentId, command_id: commandId, cols: c, rows: r });
+      },
+      kill(_signal?: string) {
+        if (commandId) sendMsg({ type: 'kill_session', agent_id: agentId, session_name: commandId });
+        sock.close();
+      },
+      onData(cb: (data: string) => void) { onDataCb = cb; },
+      onExit(cb: (e: { exitCode: number }) => void) { onExitCb = cb; },
+    };
+
+    session.pty = sandboxPty;
+
+    // Wire output → broadcast pipeline (mirrors the local PTY pattern)
+    sandboxPty.onData((data: string) => {
+      registry.appendOutput(session.id, data);
+      registry.broadcast(session.id, { type: 'data', payload: data });
+    });
+    sandboxPty.onExit(({ exitCode }: { exitCode: number }) => {
+      session.exited = true;
+      registry.broadcast(session.id, { type: 'exit', code: exitCode });
+    });
+
+    // 15 s timeout for shell handshake
+    const timeout = setTimeout(
+      () => settle(new Error(`Timed out waiting for shell_started from agent ${agentId} at ${wsEndpoint}`)),
+      15_000,
+    );
+    if ((timeout as unknown as { unref?: () => void }).unref) {
+      (timeout as unknown as { unref: () => void }).unref();
+    }
+  });
+}
+
+/**
  * Spawn a PTY session on a remote agentic-sandbox instance.
  * Submits a task and polls for log output via REST.
  *
+ * @deprecated Use spawnSandboxWsPty (management WebSocket) instead.
+ *   The REST polling approach requires a /api/v1/tasks endpoint that the
+ *   agentic-sandbox management server does not expose. Left as fallback for
+ *   custom sandbox implementations that implement the task REST API.
  * @issue #657
  */
 async function spawnSandboxPty(
@@ -355,6 +563,8 @@ let clientCounter = 0;
  * @param command - Command to spawn (default: 'aiwg')
  * @param args - Command arguments (default: ['mc', 'watch'])
  * @param cwd - Working directory
+ * @param wsEndpoint - Optional: sandbox management WS URL for explicit agent targeting
+ * @param agentId - Optional: sandbox agent ID to target (requires wsEndpoint)
  */
 export async function handlePtyConnection(
   sessionId: string,
@@ -362,6 +572,8 @@ export async function handlePtyConnection(
   command = 'aiwg',
   cmdArgs: string[] = ['mc', 'watch'],
   cwd?: string,
+  wsEndpoint?: string,
+  agentId?: string,
 ): Promise<void> {
   const clientId = `client-${++clientCounter}`;
 
@@ -372,7 +584,7 @@ export async function handlePtyConnection(
     session = registry.create(sessionId);
     registry.addClient(sessionId, clientId, ws);
     try {
-      await spawnPty(session, command, cmdArgs, { cwd });
+      await spawnPty(session, command, cmdArgs, { cwd, wsEndpoint, agentId });
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       ws.send(JSON.stringify({ type: 'error', message: msg }));
@@ -445,13 +657,16 @@ export function createPtyWsHandler(c: any): any {
   const command: string = q.command ?? 'aiwg';
   const cmdArgs: string[] = q.args ? (q.args as string).split(',') : ['mc', 'watch'];
   const cwd: string | undefined = q.cwd;
+  // Explicit sandbox targeting (optional — auto-detected from registry when absent)
+  const wsEndpoint: string | undefined = q.wsEndpoint;
+  const agentId: string | undefined = q.agentId;
 
   let wsRef: (WebSocketLike & { _onMessage?: (d: string) => void; _onClose?: () => void }) | null = null;
 
   return {
     onOpen(_evt: unknown, ws: WebSocketLike) {
       wsRef = ws as typeof wsRef;
-      handlePtyConnection(sessionId, ws, command, cmdArgs, cwd).catch((err) => {
+      handlePtyConnection(sessionId, ws, command, cmdArgs, cwd, wsEndpoint, agentId).catch((err) => {
         ws.send(JSON.stringify({ type: 'error', message: String(err) }));
         ws.close(1011);
       });

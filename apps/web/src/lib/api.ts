@@ -148,6 +148,8 @@ export const api = {
 
   // Sandbox (#731)
   sandboxes: () => request<SandboxesResponse>('/api/sandboxes'),
+  clearOfflineSandboxes: () => request<{ ok: boolean; removed: number }>('/api/sandboxes/offline', { method: 'DELETE' }),
+  forgetSandbox: (id: string) => request<{ ok: boolean }>(`/api/sandboxes/${id}/forget`, { method: 'DELETE' }),
   agents: () => request<AgentsResponse>('/api/agents'),
   sandboxAgents: (id: string) => request<{ agents: SandboxAgent[] }>(`/api/sandboxes/${id}/agents`),
   sandboxLoadouts: (id: string) => request<Loadout[]>(`/api/sandboxes/${id}/loadouts`),

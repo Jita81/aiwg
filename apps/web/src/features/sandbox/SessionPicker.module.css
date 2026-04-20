@@ -237,39 +237,11 @@
 .termDotOn  { background: #4caf50; }
 .termDotOff { background: #555; }
 
+/* Terminal output container — fixed height so FitAddon can measure it correctly.
+   overflow:hidden clips xterm's canvas; xterm itself scrolls internally. */
 .termOutput {
-  flex: 1;
-  min-height: 160px;
-  max-height: 320px;
-  overflow-y: auto;
-  margin: 0;
-  padding: 8px;
-  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
-  font-size: 11px;
-  line-height: 1.5;
-  color: #d4d4d4;
-  white-space: pre-wrap;
-  word-break: break-all;
-  background: transparent;
-}
-
-.termInput {
-  width: 100%;
+  height: 300px;
+  overflow: hidden;
+  padding: 4px;
   box-sizing: border-box;
-  padding: 5px 8px;
-  background: #111;
-  border: none;
-  border-top: 1px solid #1a1a1a;
-  color: #d4d4d4;
-  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
-  font-size: 11px;
-  outline: none;
-}
-
-.termInput:disabled {
-  color: #444;
-}
-
-.termInput::placeholder {
-  color: #444;
 }

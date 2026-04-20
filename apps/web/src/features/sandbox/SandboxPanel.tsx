@@ -21,6 +21,7 @@ interface State {
   loading: boolean;
   error: string | null;
   actionInProgress: string | null;
+  clearing: boolean;
 }
 
 type Action =
@@ -28,7 +29,8 @@ type Action =
   | { type: 'SET_SELECTED'; id: string | null }
   | { type: 'SET_LOADING'; loading: boolean }
   | { type: 'SET_ERROR'; error: string | null }
-  | { type: 'SET_ACTION'; id: string | null };
+  | { type: 'SET_ACTION'; id: string | null }
+  | { type: 'SET_CLEARING'; clearing: boolean };
 
 const INITIAL: State = {
   sandboxes: [],
@@ -36,6 +38,7 @@ const INITIAL: State = {
   loading: false,
   error: null,
   actionInProgress: null,
+  clearing: false,
 };
 
 function reducer(state: State, action: Action): State {
@@ -54,6 +57,8 @@ function reducer(state: State, action: Action): State {
       return { ...state, error: action.error };
     case 'SET_ACTION':
       return { ...state, actionInProgress: action.id };
+    case 'SET_CLEARING':
+      return { ...state, clearing: action.clearing };
     default:
       return state;
   }
@@ -119,6 +124,30 @@ export function SandboxPanel() {
 
   const selectedSandbox = state.sandboxes.find(s => s.id === state.selectedSandbox);
 
+  const handleForgetSandbox = useCallback(async (id: string) => {
+    try {
+      await api.forgetSandbox(id);
+      const data = await api.sandboxes();
+      dispatch({ type: 'SET_SANDBOXES', sandboxes: data.sandboxes });
+    } catch (err) {
+      dispatch({ type: 'SET_ERROR', error: `Delete failed: ${err}` });
+    }
+  }, []);
+
+  const handleClearOffline = useCallback(async () => {
+    dispatch({ type: 'SET_CLEARING', clearing: true });
+    try {
+      await api.clearOfflineSandboxes();
+      // Poll immediately to refresh list
+      const data = await api.sandboxes();
+      dispatch({ type: 'SET_SANDBOXES', sandboxes: data.sandboxes });
+    } catch (err) {
+      dispatch({ type: 'SET_ERROR', error: `Clear failed: ${err}` });
+    } finally {
+      dispatch({ type: 'SET_CLEARING', clearing: false });
+    }
+  }, []);
+
   const handleAgentAction = useCallback(async (
     sandboxId: string,
     agentId: string,
@@ -138,7 +167,20 @@ export function SandboxPanel() {
     <div className={styles.panel}>
       {/* Sidebar: sandbox list */}
       <aside className={styles.sidebar} aria-label="Registered sandboxes">
-        <h3 className={styles.sidebarTitle}>Sandboxes</h3>
+        <div className={styles.sidebarHeader}>
+          <h3 className={styles.sidebarTitle}>Sandboxes</h3>
+          {state.sandboxes.some(s => !s.connected) && (
+            <button
+              type="button"
+              className={styles.clearOfflineBtn}
+              onClick={handleClearOffline}
+              disabled={state.clearing}
+              title="Remove all disconnected sandboxes to force re-registration"
+            >
+              {state.clearing ? 'Clearing…' : 'Clear Offline'}
+            </button>
+          )}
+        </div>
         {state.sandboxes.length === 0 ? (
           <div className={styles.empty}>
             <p>No sandboxes registered.</p>
@@ -149,7 +191,7 @@ export function SandboxPanel() {
         ) : (
           <ul className={styles.sandboxList}>
             {state.sandboxes.map((s) => (
-              <li key={s.id}>
+              <li key={s.id} className={styles.sandboxRow}>
                 <button
                   type="button"
                   className={[
@@ -165,6 +207,15 @@ export function SandboxPanel() {
                       ? `${s.agentCount} agent${s.agentCount !== 1 ? 's' : ''}`
                       : 'offline'}
                   </span>
+                </button>
+                <button
+                  type="button"
+                  className={styles.sandboxDeleteBtn}
+                  onClick={(e) => { e.stopPropagation(); handleForgetSandbox(s.id); }}
+                  title="Remove this sandbox from the registry"
+                  aria-label={`Remove ${s.name}`}
+                >
+                  ✕
                 </button>
               </li>
             ))}

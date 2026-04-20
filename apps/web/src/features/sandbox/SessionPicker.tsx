@@ -4,11 +4,13 @@
  * Renders a collapsible session list for a specific sandbox agent.
  * Each session shows name, command, age, has_screen status, and Attach/Kill controls.
  * "+ New Terminal" creates a new bash session via the sandbox REST API.
- * Attaching opens an inline terminal pane using the orchestrate WS protocol
- * (proxied through aiwg serve at /ws/sandbox/:sandboxId/sessions/:sessionId/orchestrate).
+ * Attaching opens an inline terminal pane using the management WS protocol
+ * (proxied through aiwg serve at /ws/sandbox/:sandboxId/management).
  *
- * The orchestrate WS sends structured screen_update frames (VT100 rendered text),
- * not raw PTY bytes. The TerminalPane replaces its display on each frame.
+ * The management WS is a multicast bus shared by all agents. TerminalPane sends
+ * attach_session (by session_name) and receives output frames as raw PTY bytes,
+ * buffering all output by command_id for instant replay on re-attach.
+ * FitAddon sizes the xterm terminal to the container so the PTY is resized to match.
  *
  * Session list auto-refreshes every 5 s while the drawer is open with no active
  * terminal, and is also triggered by Attach/Kill/New actions.
@@ -29,113 +31,255 @@ function relAge(secs: number): string {
   return `${Math.floor(m / 60)}h`;
 }
 
-// ---- Orchestrate terminal pane ----
+// ---- Management WS terminal pane ----
 //
-// Connects to the aiwg serve orchestrate WS proxy:
-//   /ws/sandbox/:sandboxId/sessions/:sessionId/orchestrate
+// Connects to the aiwg serve management WS proxy:
+//   /ws/sandbox/:sandboxId/management  →  sandbox.wsEndpoint (ws://host:port)
 //
-// Server → client frames (tagged union on `type`):
-//   session_start  { session_id }
-//   screen_update  { session_id, timestamp, screen: { rows, cols, text, cursor_row, cursor_col, scrollback_tail }, prompt_detected }
-//   prompt_detected { session_id, prompt_text, confidence }
-//   session_end    { session_id, exit_code? }
-//   error          { message }
+// The management WS is a multicast bus.  All agents share one connection.
 //
 // Client → server frames:
-//   { type: "write",  text: string }
-//   { type: "resize", rows: number, cols: number }
-//   { type: "signal", signal: "SIGINT" | "SIGTERM" | "SIGKILL" }
+//   { type: "attach_session", agent_id, session_name, cols, rows }
+//   { type: "send_input",     data, command_id }
+//   { type: "pty_resize",     cols, rows, command_id }
+//
+// Server → client frames (relevant subset):
+//   { type: "output",          agent_id, command_id, data, stream, ts }
+//   { type: "session_attached",agent_id, command_id }
+//   { type: "error",           message }
+//
+// Output buffering: all output is buffered by command_id (last 32 KB) regardless
+// of which session is attached.  On attach, the terminal is cleared and the buffer
+// is replayed — matching the sandbox management UI's behaviour exactly.
 
 interface TerminalPaneProps {
   sandboxId: string;
-  sessionId: string;
-  sessionName: string;
+  agentId: string;
+  sessionId: string;   // used as buffer key before command_id is known
+  sessionName: string; // sent in attach_session
 }
 
-function TerminalPane({ sandboxId, sessionId, sessionName }: TerminalPaneProps) {
-  const outputRef = useRef<HTMLPreElement>(null);
+const RECONNECT_BASE_MS = 1_000;
+const RECONNECT_MAX_ATTEMPTS = 8;
+
+function TerminalPane({ sandboxId, agentId, sessionId, sessionName }: TerminalPaneProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const xtermRef = useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const fitAddonRef = useRef<any>(null);
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
-  const [screen, setScreen] = useState('');
-  const [scrollback, setScrollback] = useState('');
+  // command_id → raw PTY bytes (last 32 KB per session)
+  const sessionBuffersRef = useRef<Map<string, string>>(new Map());
+  // command_id confirmed by session_attached; null until server responds
+  const attachedCmdRef = useRef<string | null>(null);
+  const reconnectAttemptsRef = useRef(0);
+  const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [statusText, setStatusText] = useState('Connecting…');
   const [connected, setConnected] = useState(false);
-  const [exited, setExited] = useState(false);
 
   useEffect(() => {
-    const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${proto}//${window.location.host}/ws/sandbox/${sandboxId}/sessions/${sessionId}/orchestrate`;
-    const ws = new WebSocket(wsUrl);
-    wsRef.current = ws;
+    if (!containerRef.current) return;
+    let isMounted = true;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let term: any = null;
 
-    ws.onopen = () => setConnected(true);
+    function sendAttach() {
+      if (wsRef.current?.readyState !== WebSocket.OPEN || !term) return;
+      wsRef.current.send(JSON.stringify({
+        type: 'attach_session',
+        agent_id: agentId,
+        session_name: sessionName,
+        cols: term.cols,
+        rows: term.rows,
+      }));
+    }
 
-    ws.onmessage = (evt) => {
-      try {
-        const msg = JSON.parse(evt.data as string) as Record<string, unknown>;
-        switch (msg['type']) {
-          case 'screen_update': {
-            const s = msg['screen'] as { text?: string; scrollback_tail?: string } | undefined;
-            if (s?.text !== undefined) setScreen(s.text);
-            if (s?.scrollback_tail !== undefined) setScrollback(s.scrollback_tail);
-            break;
+    function connectWs() {
+      if (!isMounted) return;
+      const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsUrl = `${proto}//${window.location.host}/ws/sandbox/${sandboxId}/management`;
+      const ws = new WebSocket(wsUrl);
+      wsRef.current = ws;
+
+      ws.onopen = () => {
+        if (!isMounted) return;
+        reconnectAttemptsRef.current = 0;
+        setConnected(true);
+        setStatusText(sessionName);
+        // Fit to container so PTY is sized to match the visible terminal
+        try { fitAddonRef.current?.fit(); } catch { /* ignore */ }
+        sendAttach();
+      };
+
+      ws.onmessage = (evt) => {
+        if (!isMounted || !term) return;
+        try {
+          const msg = JSON.parse(evt.data as string) as Record<string, unknown>;
+          switch (msg['type']) {
+            case 'output': {
+              // Only handle output for our agent
+              if (msg['agent_id'] !== agentId) break;
+              const cmdId = msg['command_id'] as string | undefined;
+              const data = msg['data'] as string | undefined;
+              if (!cmdId || !data) break;
+
+              // Always buffer (last 32 KB)
+              let buf = sessionBuffersRef.current.get(cmdId) ?? '';
+              buf += data;
+              if (buf.length > 32768) buf = buf.slice(-32768);
+              sessionBuffersRef.current.set(cmdId, buf);
+
+              // Write to terminal only when this is our attached session
+              if (cmdId === attachedCmdRef.current) {
+                term.write(data);
+              }
+              break;
+            }
+            case 'session_attached': {
+              if (msg['agent_id'] !== agentId) break;
+              const cmdId = msg['command_id'] as string | undefined;
+              if (!cmdId) break;
+              const prev = attachedCmdRef.current;
+              attachedCmdRef.current = cmdId;
+
+              // On first attach or if command_id changed, replay from buffer
+              if (prev !== cmdId) {
+                term.clear();
+                const buf = sessionBuffersRef.current.get(cmdId);
+                if (buf) term.write(buf);
+              }
+              setStatusText(sessionName);
+              break;
+            }
+            case 'error':
+              term.writeln(`\r\n\x1b[31m[Error: ${msg['message'] ?? 'unknown'}]\x1b[0m`);
+              break;
           }
-          case 'session_end':
-            setExited(true);
-            setConnected(false);
-            setScreen((prev) => prev + `\n[Session ended${msg['exit_code'] !== undefined ? `: exit ${msg['exit_code']}` : ''}]\n`);
-            break;
-          case 'error':
-            setScreen((prev) => prev + `\n[Error: ${msg['message'] ?? 'unknown'}]\n`);
-            break;
+        } catch { /* ignore malformed frames */ }
+      };
+
+      ws.onclose = () => {
+        if (!isMounted) return;
+        setConnected(false);
+        const attempt = reconnectAttemptsRef.current;
+        if (attempt >= RECONNECT_MAX_ATTEMPTS) {
+          setStatusText('Connection lost — go back and re-attach');
+          return;
         }
-      } catch { /* ignore malformed frames */ }
+        const delay = RECONNECT_BASE_MS * Math.pow(2, attempt);
+        reconnectAttemptsRef.current = attempt + 1;
+        setStatusText(`Reconnecting… (${attempt + 1}/${RECONNECT_MAX_ATTEMPTS})`);
+        reconnectTimerRef.current = setTimeout(() => {
+          if (isMounted) {
+            attachedCmdRef.current = null; // will be re-confirmed by session_attached
+            connectWs();
+          }
+        }, delay);
+      };
+
+      ws.onerror = () => { /* onclose handles recovery */ };
+    }
+
+    async function init() {
+      const [{ Terminal }, { FitAddon }] = await Promise.all([
+        import('@xterm/xterm'),
+        import('@xterm/addon-fit'),
+      ]);
+      if (!isMounted || !containerRef.current) return;
+
+      term = new Terminal({
+        rows: 24,
+        cols: 80,
+        // scrollback:0 — we replay from sessionBuffersRef on re-attach; accumulating
+        // old output in scrollback causes content to shift up incorrectly.
+        scrollback: 0,
+        cursorBlink: true,
+        convertEol: false,
+        theme: {
+          background: '#0d0d0d',
+          foreground: '#d4d4d4',
+          cursor: '#d4d4d4',
+          selectionBackground: 'rgba(255,255,255,0.25)',
+        },
+        fontFamily: '"Cascadia Code", "Fira Code", "JetBrains Mono", monospace',
+        fontSize: 12,
+        lineHeight: 1.3,
+      });
+
+      // Inner wrapper with 100% height so FitAddon measures the container correctly
+      const wrapper = document.createElement('div');
+      wrapper.style.width = '100%';
+      wrapper.style.height = '100%';
+      containerRef.current!.appendChild(wrapper);
+
+      const fitAddon = new FitAddon();
+      fitAddonRef.current = fitAddon;
+      term.loadAddon(fitAddon);
+      term.open(wrapper);
+      try { fitAddon.fit(); } catch { /* ignore */ }
+      xtermRef.current = term;
+
+      // Ctrl+C: copy when text selected; otherwise pass through
+      term.attachCustomKeyEventHandler((ev: KeyboardEvent) => {
+        if (ev.type !== 'keydown') return true;
+        if (ev.ctrlKey && ev.key === 'c' && term.hasSelection()) return false;
+        if (ev.ctrlKey && ev.key === 'v') return false;
+        return true;
+      });
+
+      term.onData((data: string) => {
+        if (wsRef.current?.readyState === WebSocket.OPEN && attachedCmdRef.current) {
+          wsRef.current.send(JSON.stringify({
+            type: 'send_input',
+            data,
+            command_id: attachedCmdRef.current,
+          }));
+        }
+      });
+
+      // Re-fit and resize PTY when the container changes size
+      const resizeObserver = new ResizeObserver(() => {
+        if (!isMounted) return;
+        try { fitAddonRef.current?.fit(); } catch { /* ignore */ }
+        if (wsRef.current?.readyState === WebSocket.OPEN && attachedCmdRef.current) {
+          wsRef.current.send(JSON.stringify({
+            type: 'pty_resize',
+            cols: term.cols,
+            rows: term.rows,
+            command_id: attachedCmdRef.current,
+          }));
+        }
+      });
+      resizeObserverRef.current = resizeObserver;
+      resizeObserver.observe(containerRef.current!);
+
+      requestAnimationFrame(() => { if (isMounted) connectWs(); });
+    }
+
+    init();
+
+    return () => {
+      isMounted = false;
+      if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
+      resizeObserverRef.current?.disconnect();
+      resizeObserverRef.current = null;
+      wsRef.current?.close();
+      xtermRef.current?.dispose();
+      wsRef.current = null;
+      xtermRef.current = null;
+      fitAddonRef.current = null;
     };
-
-    ws.onclose = () => { setConnected(false); wsRef.current = null; };
-    ws.onerror = () => setConnected(false);
-
-    return () => { ws.close(); wsRef.current = null; };
-  }, [sandboxId, sessionId]);
-
-  // Auto-scroll on content change
-  useEffect(() => {
-    if (outputRef.current) {
-      outputRef.current.scrollTop = outputRef.current.scrollHeight;
-    }
-  }, [screen, scrollback]);
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
-    const input = e.currentTarget;
-    if (e.key === 'Enter') {
-      wsRef.current.send(JSON.stringify({ type: 'write', text: input.value + '\n' }));
-      input.value = '';
-    } else if (e.ctrlKey && e.key === 'c') {
-      wsRef.current.send(JSON.stringify({ type: 'signal', signal: 'SIGINT' }));
-      e.preventDefault();
-    }
-  };
+  }, [sandboxId, agentId, sessionId, sessionName]);
 
   return (
     <div className={styles.terminal}>
       <div className={styles.termStatus}>
         <span className={[styles.termDot, connected ? styles.termDotOn : styles.termDotOff].join(' ')} />
-        <span>{connected ? sessionName : exited ? 'Session exited' : 'Connecting...'}</span>
+        <span>{statusText}</span>
       </div>
-      <pre ref={outputRef} className={styles.termOutput}>
-        {scrollback ? scrollback + '\n' : ''}
-        {screen || (connected ? '' : 'Waiting for screen...')}
-      </pre>
-      <input
-        type="text"
-        className={styles.termInput}
-        placeholder={connected ? 'Type and press Enter  (Ctrl+C sends SIGINT)' : 'Disconnected'}
-        disabled={!connected}
-        onKeyDown={handleKeyDown}
-        spellCheck={false}
-        autoComplete="off"
-        autoCorrect="off"
-        autoCapitalize="off"
-      />
+      <div ref={containerRef} className={styles.termOutput} />
     </div>
   );
 }
@@ -153,7 +297,7 @@ export interface SessionPickerProps {
 }
 
 export function SessionPicker({ sandboxId, agentId }: SessionPickerProps) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -165,19 +309,31 @@ export function SessionPicker({ sandboxId, agentId }: SessionPickerProps) {
     try {
       const data = await api.agentSessions(sandboxId, agentId);
       setSessions(data.sessions);
+      return data.sessions;
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
+      return [];
     } finally {
       setLoading(false);
     }
   }, [sandboxId, agentId]);
 
-  // Fetch on open; poll every 5 s while list is visible
+  // Fetch on open; poll every 5 s while list is visible.
+  // On first load, auto-attach if exactly one attachable session exists.
+  const didAutoAttach = useRef(false);
   useEffect(() => {
     if (!open || active) return;
-    fetchSessions();
+    let cancelled = false;
+    fetchSessions().then((initial) => {
+      if (cancelled || didAutoAttach.current) return;
+      const attachable = initial.filter(s => s.has_screen);
+      if (attachable.length === 1) {
+        didAutoAttach.current = true;
+        setActive({ sessionId: attachable[0].session_id, sessionName: attachable[0].session_name });
+      }
+    });
     const id = setInterval(fetchSessions, 5_000);
-    return () => clearInterval(id);
+    return () => { cancelled = true; clearInterval(id); };
   }, [open, active, fetchSessions]);
 
   const handleAttach = (session: Session) => {
@@ -187,6 +343,17 @@ export function SessionPicker({ sandboxId, agentId }: SessionPickerProps) {
   const handleNewTerminal = async () => {
     setError(null);
     try {
+      // Re-fetch to check for an existing attachable session before creating a new one
+      const current = await api.agentSessions(sandboxId, agentId);
+      const attachable = current.sessions.filter(s => s.has_screen);
+      if (attachable.length > 0) {
+        // Prefer the most-recently-seen session (last in list)
+        const pick = attachable[attachable.length - 1];
+        setSessions(current.sessions);
+        setActive({ sessionId: pick.session_id, sessionName: pick.session_name });
+        return;
+      }
+      // No live session — create a new one
       const result = await api.createSession(sandboxId, agentId, { command: 'bash' });
       setActive({ sessionId: result.session_id, sessionName: result.session_name });
       fetchSessions().catch(() => { /* ignore */ });
@@ -236,6 +403,7 @@ export function SessionPicker({ sandboxId, agentId }: SessionPickerProps) {
               </div>
               <TerminalPane
                 sandboxId={sandboxId}
+                agentId={agentId}
                 sessionId={active.sessionId}
                 sessionName={active.sessionName}
               />

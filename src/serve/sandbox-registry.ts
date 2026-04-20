@@ -229,6 +229,22 @@ export class SandboxRegistry {
   }
 
   /**
+   * Remove all disconnected sandboxes from the registry.
+   * Forces re-registration on next sandbox startup.
+   * Returns the number of entries removed.
+   */
+  clearOffline(): number {
+    const toRemove: string[] = [];
+    for (const [id, sandbox] of this.sandboxes) {
+      if (!sandbox.connected) toRemove.push(id);
+    }
+    for (const id of toRemove) {
+      this.deregister(id);
+    }
+    return toRemove.length;
+  }
+
+  /**
    * Deregister a sandbox (on shutdown or explicit delete).
    */
   deregister(id: string): boolean {
@@ -334,25 +350,9 @@ export class SandboxRegistry {
         break;
       }
       case 'session.start': {
-        const a = sandbox.agents.get(event.agentId);
-        if (a) {
-          a.status = 'busy';
-          a.lastHeartbeat = event.timestamp;
-        }
-        break;
-      }
-      case 'session.end': {
-        const a2 = sandbox.agents.get(event.agentId);
-        if (a2 && a2.status === 'busy') {
-          a2.status = 'ready';
-          a2.lastHeartbeat = event.timestamp;
-        }
-        break;
-      }
-      case 'session.start': {
-        // Increment live session count on the agent so the dashboard badge updates
         const agent = sandbox.agents.get(event.agentId);
         if (agent) {
+          agent.status = 'busy';
           agent.sessionCount = (agent.sessionCount ?? 0) + 1;
           agent.lastHeartbeat = event.timestamp;
         }
@@ -360,8 +360,9 @@ export class SandboxRegistry {
       }
       case 'session.end': {
         const agent = sandbox.agents.get(event.agentId);
-        if (agent && agent.sessionCount) {
-          agent.sessionCount = Math.max(0, agent.sessionCount - 1);
+        if (agent) {
+          if (agent.status === 'busy') agent.status = 'ready';
+          if (agent.sessionCount) agent.sessionCount = Math.max(0, agent.sessionCount - 1);
           agent.lastHeartbeat = event.timestamp;
         }
         break;

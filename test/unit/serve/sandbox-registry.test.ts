@@ -50,6 +50,24 @@ describe('SandboxRegistry', () => {
     it('returns false when deregistering unknown id', () => {
       expect(registry.deregister('nonexistent')).toBe(false);
     });
+
+    it('clearOffline removes disconnected sandboxes and returns count', () => {
+      const { sandbox_id: id1 } = registry.register(REQ);
+      const { sandbox_id: id2 } = registry.register({ ...REQ, name: 'b' });
+      // id1 connected, id2 offline
+      registry.setConnected(id1, true);
+      expect(registry.clearOffline()).toBe(1);
+      expect(registry.get(id1)).toBeDefined();
+      expect(registry.get(id2)).toBeUndefined();
+      expect(registry.size).toBe(1);
+    });
+
+    it('clearOffline returns 0 when all sandboxes are connected', () => {
+      const { sandbox_id } = registry.register(REQ);
+      registry.setConnected(sandbox_id, true);
+      expect(registry.clearOffline()).toBe(0);
+      expect(registry.size).toBe(1);
+    });
   });
 
   describe('authentication', () => {
