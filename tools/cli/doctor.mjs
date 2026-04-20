@@ -51,8 +51,9 @@ async function runDoctor() {
   }
 
   // 2. Check version — include channel label (stable / next / nightly / edge)
+  let versionInfo = null;
   try {
-    const versionInfo = await getVersionInfo();
+    versionInfo = await getVersionInfo();
     const channelLabel = versionInfo.channel !== 'stable' ? ` [${versionInfo.channel}]` : '';
     check('AIWG Version', 'ok', `${versionInfo.version}${channelLabel}`);
   } catch {
@@ -61,6 +62,45 @@ async function runDoctor() {
       check('AIWG Version', 'ok', version.split('\n')[0]);
     } catch {
       check('AIWG Version', 'warn', 'Could not determine version');
+    }
+  }
+
+  // 2b. Customize mode — upstream staleness check (fork mode only)
+  if (versionInfo?.devMode && versionInfo?.edgePath) {
+    try {
+      // Check if upstream remote exists (fork mode)
+      const remotes = execSync('git remote', { cwd: versionInfo.edgePath, encoding: 'utf-8' }).trim().split('\n');
+      if (remotes.includes('upstream')) {
+        // Count commits upstream has that we don't
+        let aheadCount = 0;
+        try {
+          execSync('git fetch upstream --dry-run', { cwd: versionInfo.edgePath, stdio: 'pipe' });
+          aheadCount = parseInt(
+            execSync('git rev-list HEAD..upstream/main --count', {
+              cwd: versionInfo.edgePath, encoding: 'utf-8'
+            }).trim(), 10
+          ) || 0;
+        } catch {
+          // fetch dry-run can fail on no-network; skip count
+        }
+        const sourcePath = versionInfo.edgePath.replace(os.homedir(), '~');
+        if (aheadCount > 0) {
+          check(
+            'Customize Mode',
+            'info',
+            `Active — source: ${sourcePath} | upstream has ${aheadCount} commit(s) — tell Steward "sync my AIWG" to update`,
+          );
+        } else {
+          check('Customize Mode', 'ok', `Active (fork) — source: ${sourcePath} — up to date with upstream`);
+        }
+      } else {
+        // Local clone mode (no upstream remote)
+        const sourcePath = versionInfo.edgePath.replace(os.homedir(), '~');
+        check('Customize Mode', 'ok', `Active (local clone) — source: ${sourcePath}`);
+      }
+    } catch {
+      const sourcePath = versionInfo.edgePath.replace(os.homedir(), '~');
+      check('Customize Mode', 'ok', `Active — source: ${sourcePath}`);
     }
   }
 
