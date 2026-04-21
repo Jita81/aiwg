@@ -164,6 +164,30 @@ export interface SandboxAgent {
   provisioningStep?: ProvisioningStep;
   /** True if provisioning has stalled (#911) */
   provisioningStalled?: boolean;
+  /** Stable agent instance UUIDv7 — survives restarts and reprovisions (#917) */
+  instanceId?: string;
+  /** Operator-assigned stable human-readable name (e.g. "security-01") (#917) */
+  logicalName?: string;
+}
+
+// ---- Agent identity types (#917) ----
+
+export interface AgentIdentityRecord {
+  instanceId: string;
+  logicalName?: string;
+  lastAgentId?: string;
+  lastSandboxId?: string;
+  lastSeenAt: string;
+}
+
+export interface AgentIdentitiesResponse {
+  identities: AgentIdentityRecord[];
+}
+
+export interface ResolveAgentResponse {
+  sandboxId: string;
+  sandboxName: string;
+  agent: SandboxAgent;
 }
 
 export interface SandboxSummary {
@@ -261,12 +285,30 @@ export interface CreateSessionResponse {
   ws_url: string;
 }
 
-// ---- Loadout types (#733) ----
+// ---- Loadout types (#733 #915) ----
 
 export interface Loadout {
   name: string;
   description?: string;
   resources?: { cpus?: number; memory?: string; disk?: string };
+}
+
+/** Override patches applied on top of a base loadout during provisioning (#915). */
+export interface ProvisionOverrides {
+  /** Extra packages to install */
+  add_packages?: string[];
+  /** AIWG frameworks to deploy */
+  aiwg_frameworks?: string[];
+  /** Memory in MB (overrides loadout default) */
+  memory_mb?: number;
+  /** vCPU count (overrides loadout default) */
+  vcpus?: number;
+}
+
+export interface ProvisionRequest {
+  name: string;
+  loadout: string;
+  overrides?: ProvisionOverrides;
 }
 
 // ---- Task types (#907) ----
@@ -298,11 +340,42 @@ export interface SandboxTasksResponse {
   total_count: number;
 }
 
+// ---- Agent routing types (#916) ----
+
+export interface AgentFilter {
+  sandbox_id?: string;
+  agent_id?: string;
+  agent_name?: string;
+  platform?: string;
+  frameworks?: string[];
+  agents?: string[];
+  skills?: string[];
+  min_memory_gb?: number;
+  max_cpu_percent?: number;
+  fallback?: { strategy: 'any_with_framework' | 'any' | 'none'; retry_after_seconds?: number; max_retries?: number };
+}
+
+export interface AgentCandidate {
+  sandboxId: string;
+  sandboxName: string;
+  agent: SandboxAgent;
+  matchReason: string;
+  rejected?: Array<{ agentId: string; reason: string }>;
+}
+
+export interface RoutingResult {
+  selected?: AgentCandidate;
+  candidates: AgentCandidate[];
+  filter: AgentFilter;
+}
+
 export interface SubmitTaskRequest {
   /** YAML manifest as a string */
   manifest_yaml?: string;
   /** JSON manifest (alternative to YAML) */
   manifest?: Record<string, unknown>;
+  /** Agent routing filter — selects which agent to run this task (#916) */
+  agent_filter?: AgentFilter;
 }
 
 export interface SubmitTaskResponse {
@@ -327,7 +400,7 @@ export const api = {
   agents: () => request<AgentsResponse>('/api/agents'),
   sandboxAgents: (id: string) => request<{ agents: SandboxAgent[] }>(`/api/sandboxes/${id}/agents`),
   sandboxLoadouts: (id: string) => request<Loadout[]>(`/api/sandboxes/${id}/loadouts`),
-  sandboxProvision: (id: string, body: { name: string; loadout: string }) =>
+  sandboxProvision: (id: string, body: ProvisionRequest) =>
     request<{ agent_id: string }>(`/api/sandboxes/${id}/provision`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -392,6 +465,32 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     }),
+
+  // Agent routing (#916)
+  routingCandidates: (filter: AgentFilter) => {
+    const params = new URLSearchParams();
+    if (filter.sandbox_id) params.set('sandbox_id', filter.sandbox_id);
+    if (filter.agent_id) params.set('agent_id', filter.agent_id);
+    if (filter.agent_name) params.set('agent_name', filter.agent_name);
+    if (filter.frameworks?.length) params.set('frameworks', filter.frameworks.join(','));
+    if (filter.agents?.length) params.set('agents', filter.agents.join(','));
+    if (filter.skills?.length) params.set('skills', filter.skills.join(','));
+    if (filter.max_cpu_percent !== undefined) params.set('max_cpu_percent', String(filter.max_cpu_percent));
+    if (filter.min_memory_gb !== undefined) params.set('min_memory_gb', String(filter.min_memory_gb));
+    return request<RoutingResult>(`/api/agents/candidates?${params.toString()}`);
+  },
+
+  // Agent identity (#917)
+  aliasAgent: (sandboxId: string, agentId: string, name: string) =>
+    request<{ ok: boolean; logicalName: string }>(`/api/sandboxes/${sandboxId}/agents/${agentId}/alias`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    }),
+  resolveAgent: (ref: string) =>
+    request<ResolveAgentResponse>(`/api/agents/resolve/${encodeURIComponent(ref)}`),
+  agentIdentities: () =>
+    request<AgentIdentitiesResponse>('/api/agents/identities'),
 
   // HITL (#732)
   hitl: () => request<HitlResponse>('/api/hitl'),

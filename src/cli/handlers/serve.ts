@@ -20,6 +20,7 @@ import {
   type RegisterRequest,
   type SandboxEvent,
 } from '../../serve/sandbox-registry.js';
+import { routeTask, type AgentFilter } from '../../serve/agent-router.js';
 
 const DEFAULT_PORT = 7337;
 const DEFAULT_HOST = '127.0.0.1';
@@ -566,6 +567,25 @@ async function startServer(opts: {
     return c.json({ agents: sandboxRegistry.allAgents() });
   });
 
+  // Routing candidates — returns all agents ranked by filter match + load score (#916)
+  // Query params map directly to AgentFilter fields (JSON-encoded or comma-separated).
+  app.get('/api/agents/candidates', (c: any) => {
+    const q = c.req.query();
+    const filter: AgentFilter = {};
+    if (q.sandbox_id) filter.sandbox_id = q.sandbox_id;
+    if (q.agent_id) filter.agent_id = q.agent_id;
+    if (q.agent_name) filter.agent_name = q.agent_name;
+    if (q.frameworks) filter.frameworks = q.frameworks.split(',').filter(Boolean);
+    if (q.agents) filter.agents = q.agents.split(',').filter(Boolean);
+    if (q.skills) filter.skills = q.skills.split(',').filter(Boolean);
+    if (q.max_cpu_percent) filter.max_cpu_percent = parseFloat(q.max_cpu_percent);
+    if (q.min_memory_gb) filter.min_memory_gb = parseFloat(q.min_memory_gb);
+
+    const allAgents = sandboxRegistry.allAgents();
+    const result = routeTask(allAgents, filter);
+    return c.json(result);
+  });
+
   // Proxy endpoints for sandbox lifecycle (#733)
   // These forward to the registered sandbox's HTTP endpoint
   app.get('/api/sandboxes/:id/loadouts', async (c: any) => {
@@ -622,6 +642,39 @@ async function startServer(opts: {
     } catch (err) {
       return c.json({ error: `Sandbox unreachable: ${err instanceof Error ? err.message : String(err)}` }, 502);
     }
+  });
+
+  // Agent identity alias endpoint (#917)
+  // Assigns a stable human-readable logical name to an agent.
+  // Persists in ~/.config/aiwg/sandbox-agents.json so name survives AIWG restarts.
+  app.post('/api/sandboxes/:id/agents/:aid/alias', async (c: any) => {
+    const sandboxId = c.req.param('id');
+    const agentId = c.req.param('aid');
+    const body = await c.req.json().catch(() => ({}));
+    const { name } = body as { name?: string };
+    if (!name || typeof name !== 'string' || !name.trim()) {
+      return c.json({ error: 'name is required' }, 400);
+    }
+    const ok = sandboxRegistry.aliasAgent(sandboxId, agentId, name.trim());
+    if (!ok) return c.json({ error: 'Agent or sandbox not found' }, 404);
+    return c.json({ ok: true, logicalName: name.trim() });
+  });
+
+  // Resolve agent by agentId, instanceId, or logicalName (#917)
+  app.get('/api/agents/resolve/:ref', (c: any) => {
+    const ref = c.req.param('ref');
+    const result = sandboxRegistry.resolveAgent(ref);
+    if (!result) return c.json({ error: `Agent '${ref}' not found` }, 404);
+    return c.json({
+      sandboxId: result.sandbox.id,
+      sandboxName: result.sandbox.name,
+      agent: result.agent,
+    });
+  });
+
+  // List known agent identities from persistent store (#917)
+  app.get('/api/agents/identities', (c: any) => {
+    return c.json({ identities: sandboxRegistry.knownAgentIdentities() });
   });
 
   // Session management proxy endpoints (#896)

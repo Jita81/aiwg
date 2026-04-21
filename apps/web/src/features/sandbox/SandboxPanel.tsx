@@ -9,7 +9,7 @@
  */
 
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
-import { api, type SandboxSummary, type SandboxAgent, type SandboxTask, type SubmitTaskRequest, type AiwgExecRequest, type AiwgExecResponse } from '../../lib/api.js';
+import { api, type SandboxSummary, type SandboxAgent, type SandboxTask, type SubmitTaskRequest, type AiwgExecRequest, type AiwgExecResponse, type AgentCandidate, type Loadout } from '../../lib/api.js';
 import styles from './SandboxPanel.module.css';
 import { SessionPicker } from './SessionPicker.js';
 
@@ -106,6 +106,7 @@ function shortId(id?: string): string {
 export function SandboxPanel() {
   const [state, dispatch] = useReducer(reducer, INITIAL);
   const [activeTab, setActiveTab] = useState<'agents' | 'tasks' | 'remote'>('agents');
+  const [showProvisionModal, setShowProvisionModal] = useState(false);
 
   // Poll sandboxes
   useEffect(() => {
@@ -232,6 +233,17 @@ export function SandboxPanel() {
           </div>
         ) : (
           <>
+            {/* Provision modal (#915) */}
+            {showProvisionModal && selectedSandbox.connected && (
+              <ProvisionModal
+                sandboxId={selectedSandbox.id}
+                onClose={() => setShowProvisionModal(false)}
+                onProvisioned={() => {
+                  // Poll will pick up the new agent automatically
+                }}
+              />
+            )}
+
             {/* Sandbox header */}
             <div className={styles.sandboxHeader}>
               <h2 className={styles.sandboxTitle}>
@@ -241,6 +253,18 @@ export function SandboxPanel() {
                   <span className={styles.offlineBadge}>offline</span>
                 )}
               </h2>
+              <div className={styles.sandboxHeaderActions}>
+                {selectedSandbox.connected && (
+                  <button
+                    type="button"
+                    className={styles.actionBtn}
+                    onClick={() => setShowProvisionModal(true)}
+                    title="Provision a new agent VM on this sandbox"
+                  >
+                    Provision VM
+                  </button>
+                )}
+              </div>
               <div className={styles.sandboxInfo}>
                 <span>v{selectedSandbox.version}</span>
                 <span>{selectedSandbox.capabilities.join(', ')}</span>
@@ -502,6 +526,136 @@ function RemoteAiwgPanel({
   );
 }
 
+// ---- Provision Modal (#915) ----
+
+const COMMON_PACKAGES = ['poetry', 'pre-commit', 'semgrep', 'trivy', 'bandit', 'httpie', 'jq', 'gh'];
+const KNOWN_FRAMEWORKS = ['sdlc-complete', 'forensics-complete', 'media-marketing-kit', 'research-complete'];
+
+function ProvisionModal({
+  sandboxId,
+  onClose,
+  onProvisioned,
+}: { sandboxId: string; onClose: () => void; onProvisioned: () => void }) {
+  const [loadouts, setLoadouts] = useState<Loadout[]>([]);
+  const [vmName, setVmName] = useState('');
+  const [selectedLoadout, setSelectedLoadout] = useState('');
+  const [addPackages, setAddPackages] = useState<string[]>([]);
+  const [frameworks, setFrameworks] = useState<string[]>([]);
+  const [provisioning, setProvisioning] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    api.sandboxLoadouts(sandboxId)
+      .then((ls) => {
+        setLoadouts(ls);
+        if (ls.length > 0) setSelectedLoadout(ls[0].name);
+      })
+      .catch(() => { /* loadouts unavailable */ });
+  }, [sandboxId]);
+
+  const togglePackage = (pkg: string) =>
+    setAddPackages((prev) => prev.includes(pkg) ? prev.filter((p) => p !== pkg) : [...prev, pkg]);
+
+  const toggleFramework = (fw: string) =>
+    setFrameworks((prev) => prev.includes(fw) ? prev.filter((f) => f !== fw) : [...prev, fw]);
+
+  const handleProvision = useCallback(async () => {
+    if (!vmName.trim() || !selectedLoadout) return;
+    setProvisioning(true);
+    setError(null);
+    try {
+      await api.sandboxProvision(sandboxId, {
+        name: vmName.trim(),
+        loadout: selectedLoadout,
+        overrides: {
+          ...(addPackages.length > 0 ? { add_packages: addPackages } : {}),
+          ...(frameworks.length > 0 ? { aiwg_frameworks: frameworks } : {}),
+        },
+      });
+      onProvisioned();
+      onClose();
+    } catch (e) {
+      setError(`Provision failed: ${String(e)}`);
+    } finally {
+      setProvisioning(false);
+    }
+  }, [sandboxId, vmName, selectedLoadout, addPackages, frameworks, onProvisioned, onClose]);
+
+  return (
+    <div className={styles.modalOverlay} onClick={onClose} role="dialog" aria-modal="true" aria-label="Provision VM">
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.modalHeader}>
+          <h3>Provision New Agent VM</h3>
+          <button type="button" className={styles.modalClose} onClick={onClose} aria-label="Close">✕</button>
+        </div>
+        <div className={styles.modalBody}>
+          <div className={styles.provisionFormRow}>
+            <label className={styles.provisionLabel}>VM Name</label>
+            <input
+              className={styles.remoteInput}
+              value={vmName}
+              onChange={(e) => setVmName(e.target.value)}
+              placeholder="agent-01"
+              autoFocus
+            />
+          </div>
+          <div className={styles.provisionFormRow}>
+            <label className={styles.provisionLabel}>Base Loadout</label>
+            <select
+              className={styles.remoteSelect}
+              value={selectedLoadout}
+              onChange={(e) => setSelectedLoadout(e.target.value)}
+            >
+              {loadouts.length === 0
+                ? <option value="">No loadouts available</option>
+                : loadouts.map((l) => (
+                    <option key={l.name} value={l.name}>{l.name}{l.description ? ` — ${l.description}` : ''}</option>
+                  ))
+              }
+            </select>
+          </div>
+          <div className={styles.provisionSection}>
+            <div className={styles.provisionSectionLabel}>Extra Packages</div>
+            <div className={styles.provisionCheckboxGrid}>
+              {COMMON_PACKAGES.map((pkg) => (
+                <label key={pkg} className={styles.provisionCheckbox}>
+                  <input type="checkbox" checked={addPackages.includes(pkg)} onChange={() => togglePackage(pkg)} />
+                  {pkg}
+                </label>
+              ))}
+            </div>
+          </div>
+          <div className={styles.provisionSection}>
+            <div className={styles.provisionSectionLabel}>AIWG Frameworks</div>
+            <div className={styles.provisionCheckboxGrid}>
+              {KNOWN_FRAMEWORKS.map((fw) => (
+                <label key={fw} className={styles.provisionCheckbox}>
+                  <input type="checkbox" checked={frameworks.includes(fw)} onChange={() => toggleFramework(fw)} />
+                  {fw}
+                </label>
+              ))}
+            </div>
+          </div>
+          {error && <div className={styles.error}>{error}</div>}
+        </div>
+        <div className={styles.modalFooter}>
+          <button type="button" className={styles.actionBtnSecondary} onClick={onClose} disabled={provisioning}>
+            Cancel
+          </button>
+          <button
+            type="button"
+            className={styles.actionBtn}
+            onClick={handleProvision}
+            disabled={provisioning || !vmName.trim() || !selectedLoadout}
+          >
+            {provisioning ? 'Provisioning…' : 'Provision'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ---- Sandbox Tasks View (#907) ----
 
 const TASK_STATE_COLORS: Record<string, string> = {
@@ -531,6 +685,8 @@ function SandboxTasksView({ sandboxId, connected }: { sandboxId: string; connect
   const [manifest, setManifest] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [candidates, setCandidates] = useState<AgentCandidate[]>([]);
+  const [selectedCandidate, setSelectedCandidate] = useState<string>('');
 
   // Poll task list
   useEffect(() => {
@@ -549,12 +705,26 @@ function SandboxTasksView({ sandboxId, connected }: { sandboxId: string; connect
     return () => { active = false; clearInterval(id); };
   }, [sandboxId, connected]);
 
+  // Load routing candidates when form opens (#916)
+  useEffect(() => {
+    if (!showForm) { setCandidates([]); setSelectedCandidate(''); return; }
+    api.routingCandidates({ sandbox_id: sandboxId })
+      .then((r) => {
+        setCandidates(r.candidates);
+        if (r.selected) setSelectedCandidate(r.selected.agent.agentId);
+      })
+      .catch(() => { /* routing preview is best-effort */ });
+  }, [showForm, sandboxId]);
+
   const handleSubmit = useCallback(async () => {
     if (!manifest.trim()) return;
     setSubmitting(true);
     setSubmitError(null);
     try {
-      const body: SubmitTaskRequest = { manifest_yaml: manifest.trim() };
+      const body: SubmitTaskRequest = {
+        manifest_yaml: manifest.trim(),
+        ...(selectedCandidate ? { agent_filter: { agent_id: selectedCandidate } } : {}),
+      };
       await api.submitTask(sandboxId, body);
       setManifest('');
       setShowForm(false);
@@ -567,7 +737,7 @@ function SandboxTasksView({ sandboxId, connected }: { sandboxId: string; connect
     } finally {
       setSubmitting(false);
     }
-  }, [sandboxId, manifest]);
+  }, [sandboxId, manifest, selectedCandidate]);
 
   const handleCancel = useCallback(async (taskId: string) => {
     try {
@@ -611,6 +781,28 @@ function SandboxTasksView({ sandboxId, connected }: { sandboxId: string; connect
             rows={6}
             disabled={submitting}
           />
+          {/* Candidate agent selector (#916) */}
+          {candidates.length > 0 && (
+            <div className={styles.candidateRow}>
+              <label className={styles.taskFormLabel} htmlFor="task-agent">
+                Route to agent
+              </label>
+              <select
+                id="task-agent"
+                className={styles.remoteSelect}
+                value={selectedCandidate}
+                onChange={(e) => setSelectedCandidate(e.target.value)}
+              >
+                <option value="">Auto-select (best match)</option>
+                {candidates.map((c) => (
+                  <option key={c.agent.agentId} value={c.agent.agentId}>
+                    {c.agent.logicalName ?? c.agent.agentId}
+                    {c.agent.latestMetrics ? ` — CPU ${c.agent.latestMetrics.cpu_percent.toFixed(0)}%` : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           {submitError && <div className={styles.error}>{submitError}</div>}
           <div className={styles.taskFormActions}>
             <button

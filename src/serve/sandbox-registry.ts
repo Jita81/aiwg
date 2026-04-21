@@ -16,6 +16,9 @@
  */
 
 import { randomUUID } from 'crypto';
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
+import { homedir } from 'os';
+import { join } from 'path';
 
 // ============================================================
 // Types
@@ -82,6 +85,16 @@ export interface SandboxAgent {
   provisioningStep?: ProvisioningStep;
   /** True if provisioning has stalled (no progress for 30s+) (#911) */
   provisioningStalled?: boolean;
+  /**
+   * Stable agent instance identity — UUIDv7 generated on first start, persisted by the sandbox.
+   * Survives restarts, reprovisions, and agentId changes (#917).
+   */
+  instanceId?: string;
+  /**
+   * Human-readable stable name assigned by the operator (e.g. "security-01").
+   * Persisted in ~/.config/aiwg/sandbox-agents.json (#917).
+   */
+  logicalName?: string;
 }
 
 // ============================================================
@@ -101,6 +114,40 @@ export interface SandboxCapabilities {
   supported_server_messages: string[];
   /** Named feature flags (e.g. "replay_buffer", "role_control", "seq_tracking") */
   features: string[];
+}
+
+// ============================================================
+// Persistent agent identity store (#917)
+// ============================================================
+
+/** One record per known agent instance in the persistent store. */
+interface AgentIdentityRecord {
+  instanceId: string;
+  logicalName?: string;
+  /** Last known agentId — may change across reprovisions */
+  lastAgentId?: string;
+  /** Last known sandboxId */
+  lastSandboxId?: string;
+  lastSeenAt: string;
+}
+
+const IDENTITY_STORE_PATH = join(homedir(), '.config', 'aiwg', 'sandbox-agents.json');
+
+function loadIdentityStore(): Map<string, AgentIdentityRecord> {
+  try {
+    if (existsSync(IDENTITY_STORE_PATH)) {
+      const data = JSON.parse(readFileSync(IDENTITY_STORE_PATH, 'utf-8')) as AgentIdentityRecord[];
+      return new Map(data.map((r) => [r.instanceId, r]));
+    }
+  } catch { /* ignore parse/read errors */ }
+  return new Map();
+}
+
+function saveIdentityStore(store: Map<string, AgentIdentityRecord>): void {
+  try {
+    mkdirSync(join(homedir(), '.config', 'aiwg'), { recursive: true });
+    writeFileSync(IDENTITY_STORE_PATH, JSON.stringify([...store.values()], null, 2), 'utf-8');
+  } catch { /* ignore write errors */ }
 }
 
 /** Convenience helper — returns true if the sandbox advertises a feature flag. */
@@ -265,6 +312,11 @@ export interface SandboxEvent {
   // AIWG log fields (#914)
   level?: string;
   message?: string;
+  // Agent identity fields (#917)
+  /** Stable agent instance UUIDv7 — set on agent.connected events */
+  agentInstanceId?: string;
+  /** Operator-assigned logical name — set on agent.connected events */
+  agentLogicalName?: string;
 }
 
 export interface HitlRequest {
@@ -316,16 +368,31 @@ export class SandboxRegistry {
   private sandboxes = new Map<string, SandboxRegistration>();
   private hitlRequests = new Map<string, HitlRequest>();
   private listeners = new Set<(event: SandboxEvent) => void>();
-  /** instance_id → sandbox_id (stable reverse-lookup for upsert) */
+  /** instance_id → sandbox_id (stable reverse-lookup for sandbox upsert) */
   private byInstanceId = new Map<string, string>();
   /** instance_id → last registration timestamp (ms, for debounce) */
   private lastRegistrationTime = new Map<string, number>();
   /** Timer for HITL expiry checks (#908) */
   private expiryTimer: ReturnType<typeof setInterval> | null = null;
+  /** agentInstanceId → { sandboxId, agentId } — cross-restart lookup (#917) */
+  private byAgentInstanceId = new Map<string, { sandboxId: string; agentId: string }>();
+  /** logicalName → { sandboxId, agentId } — human-readable alias lookup (#917) */
+  private byLogicalName = new Map<string, { sandboxId: string; agentId: string }>();
+  /** Persistent store: agentInstanceId → identity record (#917) */
+  private identityStore: Map<string, AgentIdentityRecord>;
 
   constructor() {
     // Check for expired HITL requests every 60 seconds (#908)
     this.expiryTimer = setInterval(() => this.checkHitlExpiry(), 60_000);
+    // Load persistent agent identity from disk (#917)
+    this.identityStore = loadIdentityStore();
+    // Restore logical names from persisted store
+    for (const record of this.identityStore.values()) {
+      if (record.logicalName) {
+        // Will be indexed properly when agent reconnects; logical names are
+        // pre-loaded so aliasAgent() calls can reference them immediately.
+      }
+    }
   }
 
   private checkHitlExpiry(): void {
@@ -535,6 +602,33 @@ export class SandboxRegistry {
     // Update agent inventory based on event type
     switch (eventType) {
       case 'agent.connected': {
+        // Resolve persistent logical name from identity store (#917)
+        const agentInstanceId = event.agentInstanceId;
+        let logicalName = event.agentLogicalName;
+        if (agentInstanceId) {
+          const record = this.identityStore.get(agentInstanceId);
+          if (record) {
+            logicalName = logicalName ?? record.logicalName;
+            // Update record with current location
+            record.lastAgentId = event.agentId;
+            record.lastSandboxId = event.sandboxId;
+            record.lastSeenAt = event.timestamp;
+            if (!record.logicalName && logicalName) record.logicalName = logicalName;
+          } else {
+            this.identityStore.set(agentInstanceId, {
+              instanceId: agentInstanceId,
+              logicalName,
+              lastAgentId: event.agentId,
+              lastSandboxId: event.sandboxId,
+              lastSeenAt: event.timestamp,
+            });
+          }
+          saveIdentityStore(this.identityStore);
+          this.byAgentInstanceId.set(agentInstanceId, { sandboxId: event.sandboxId, agentId: event.agentId });
+        }
+        if (logicalName) {
+          this.byLogicalName.set(logicalName, { sandboxId: event.sandboxId, agentId: event.agentId });
+        }
         sandbox.agents.set(event.agentId, {
           agentId: event.agentId,
           status: 'ready',
@@ -542,6 +636,8 @@ export class SandboxRegistry {
           aiwgFrameworks: event.aiwgFrameworks,
           connectedAt: event.timestamp,
           lastHeartbeat: event.timestamp,
+          instanceId: agentInstanceId,
+          logicalName,
         });
         break;
       }
@@ -705,6 +801,72 @@ export class SandboxRegistry {
     return result;
   }
 
+  /**
+   * Resolve an agent reference by agentId → instanceId → logicalName (#917).
+   * Returns the sandbox registration and agent, or undefined if not found.
+   */
+  resolveAgent(ref: string): { sandbox: SandboxRegistration; agent: SandboxAgent } | undefined {
+    // 1. Direct agentId lookup
+    for (const sandbox of this.sandboxes.values()) {
+      const agent = sandbox.agents.get(ref);
+      if (agent) return { sandbox, agent };
+    }
+    // 2. agentInstanceId lookup
+    const byInstance = this.byAgentInstanceId.get(ref);
+    if (byInstance) {
+      const sandbox = this.sandboxes.get(byInstance.sandboxId);
+      const agent = sandbox?.agents.get(byInstance.agentId);
+      if (sandbox && agent) return { sandbox, agent };
+    }
+    // 3. logicalName lookup
+    const byName = this.byLogicalName.get(ref);
+    if (byName) {
+      const sandbox = this.sandboxes.get(byName.sandboxId);
+      const agent = sandbox?.agents.get(byName.agentId);
+      if (sandbox && agent) return { sandbox, agent };
+    }
+    return undefined;
+  }
+
+  /**
+   * Assign a stable logical name to an agent (#917).
+   * Persists the mapping to ~/.config/aiwg/sandbox-agents.json.
+   */
+  aliasAgent(sandboxId: string, agentId: string, logicalName: string): boolean {
+    const sandbox = this.sandboxes.get(sandboxId);
+    const agent = sandbox?.agents.get(agentId);
+    if (!sandbox || !agent) return false;
+
+    // Remove old logical name index if any
+    if (agent.logicalName && agent.logicalName !== logicalName) {
+      this.byLogicalName.delete(agent.logicalName);
+    }
+    agent.logicalName = logicalName;
+    this.byLogicalName.set(logicalName, { sandboxId, agentId });
+
+    // Persist to store
+    const instanceId = agent.instanceId;
+    if (instanceId) {
+      const record = this.identityStore.get(instanceId) ?? {
+        instanceId,
+        lastAgentId: agentId,
+        lastSandboxId: sandboxId,
+        lastSeenAt: new Date().toISOString(),
+      };
+      record.logicalName = logicalName;
+      this.identityStore.set(instanceId, record);
+      saveIdentityStore(this.identityStore);
+    }
+    return true;
+  }
+
+  /**
+   * List known agent identities from the persistent store (#917).
+   */
+  knownAgentIdentities(): AgentIdentityRecord[] {
+    return [...this.identityStore.values()];
+  }
+
   // ---- HITL ----
 
   /**
@@ -760,6 +922,8 @@ export class SandboxRegistry {
     this.listeners.clear();
     this.byInstanceId.clear();
     this.lastRegistrationTime.clear();
+    this.byAgentInstanceId.clear();
+    this.byLogicalName.clear();
   }
 }
 
