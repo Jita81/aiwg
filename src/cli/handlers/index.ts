@@ -92,6 +92,7 @@ import { runHandler } from './run.js';
 import { stewardHandler, stewardHandlers } from './steward.js';
 import { serveHandler } from './serve.js';
 import { lintHandler } from './lint.js';
+import { sandboxHandler, sandboxHandlers } from './sandbox.js';
 
 import type { CommandHandler } from './types.js';
 
@@ -189,6 +190,9 @@ export {
   // Serve
   serveHandler,
 
+  // Sandbox management
+  sandboxHandler,
+
   // Lint
   lintHandler,
 };
@@ -204,6 +208,7 @@ export {
   teamHandlers,
   stewardHandlers,
   daemonHandlers,
+  sandboxHandlers,
 };
 
 /**
@@ -290,6 +295,9 @@ export const allHandlers: CommandHandler[] = [
 
   // Web dashboard
   serveHandler,
+
+  // Sandbox management (#917)
+  ...sandboxHandlers,
 
   // Lint
   lintHandler,

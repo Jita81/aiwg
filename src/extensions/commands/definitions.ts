@@ -477,6 +477,36 @@ export const serveCommand: Extension = {
   } satisfies SkillMetadata,
 };
 
+// Sandbox Management Commands (#917)
+
+export const sandboxCommand: Extension = {
+  id: 'sandbox',
+  type: 'skill',
+  name: 'Sandbox',
+  description: 'Sandbox agent management — alias, resolve, and list agent identities',
+  version: '1.0.0',
+  capabilities: ['cli', 'sandbox', 'agent-identity', 'agent-routing'],
+  keywords: ['sandbox', 'alias', 'agent', 'identity', 'resolve', 'logical-name'],
+  category: 'project',
+  platforms: {
+    claude: 'full',
+    generic: 'full',
+  },
+  deployment: {
+    pathTemplate: '.{platform}/commands/{id}.md',
+    core: true,
+  },
+  metadata: {
+    type: 'skill',
+    triggerPhrases: ['sandbox alias', 'alias agent', 'sandbox resolve', 'agent identities'],
+    commandHint: {
+      template: 'utility',
+      argumentHint: 'alias|resolve|identities [options]',
+      allowedTools: ['Bash'],
+    },
+  } satisfies SkillMetadata,
+};
+
 // Workspace Management Commands
 
 export const statusCommand: Extension = {
@@ -2348,6 +2378,9 @@ export const commandDefinitions: Extension[] = [
   rlmPrepCommand,
   rlmSearchCommand,
   rlmStatusCommand,
+
+  // Sandbox management (#917)
+  sandboxCommand,
 ];
 
 // ============================================

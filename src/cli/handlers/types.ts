@@ -88,6 +88,7 @@ export type CommandCategory =
   | 'daemon'        // Daemon and behavior management
   | 'config'        // User-level config management
   | 'ops'           // Operations ecosystem management
+  | 'sandbox'       // Sandbox agent management (alias, resolve, identities)
   | 'agentic-tools'; // Support tools for agentic sessions (RLM chunk, fanout, etc.)
 
 /**

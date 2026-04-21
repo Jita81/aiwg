@@ -603,11 +603,33 @@ async function startServer(opts: {
     const sandbox = sandboxRegistry.get(c.req.param('id'));
     if (!sandbox) return c.json({ error: 'Sandbox not found' }, 404);
     try {
-      const body = await c.req.json();
-      const resp = await fetch(`${sandbox.httpEndpoint}/api/v1/provision`, {
+      const body = await c.req.json() as {
+        name: string;
+        loadout: string;
+        overrides?: {
+          add_packages?: string[];
+          aiwg_frameworks?: string[];
+          memory_mb?: number;
+          vcpus?: number;
+        };
+      };
+      // Map ProvisionRequest → CreateVmRequest (sandbox /api/v1/vms schema).
+      // The sandbox uses `loadout` field directly; resource overrides are top-level.
+      // `add_packages` has no direct equivalent in CreateVmRequest — dropped for now.
+      // `aiwg_frameworks` override maps to composition.aiwg.frameworks when set.
+      const vmBody: Record<string, unknown> = {
+        name: body.name,
+        loadout: body.loadout,
+      };
+      if (body.overrides?.vcpus !== undefined) vmBody['vcpus'] = body.overrides.vcpus;
+      if (body.overrides?.memory_mb !== undefined) vmBody['memory_mb'] = body.overrides.memory_mb;
+      if (body.overrides?.aiwg_frameworks?.length) {
+        vmBody['composition'] = { aiwg: { frameworks: body.overrides.aiwg_frameworks } };
+      }
+      const resp = await fetch(`${sandbox.httpEndpoint}/api/v1/vms`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+        body: JSON.stringify(vmBody),
       });
       return c.json(await resp.json(), resp.status);
     } catch (err) {
