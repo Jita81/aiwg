@@ -8,8 +8,8 @@
  * @issue #733
  */
 
-import { useCallback, useEffect, useReducer, useState } from 'react';
-import { api, type SandboxSummary, type SandboxAgent, type SandboxTask, type SubmitTaskRequest } from '../../lib/api.js';
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
+import { api, type SandboxSummary, type SandboxAgent, type SandboxTask, type SubmitTaskRequest, type AiwgExecRequest, type AiwgExecResponse } from '../../lib/api.js';
 import styles from './SandboxPanel.module.css';
 import { SessionPicker } from './SessionPicker.js';
 
@@ -105,7 +105,7 @@ function shortId(id?: string): string {
 
 export function SandboxPanel() {
   const [state, dispatch] = useReducer(reducer, INITIAL);
-  const [activeTab, setActiveTab] = useState<'agents' | 'tasks'>('agents');
+  const [activeTab, setActiveTab] = useState<'agents' | 'tasks' | 'remote'>('agents');
 
   // Poll sandboxes
   useEffect(() => {
@@ -302,6 +302,15 @@ export function SandboxPanel() {
               >
                 Tasks
               </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeTab === 'remote'}
+                className={activeTab === 'remote' ? styles.tabActive : styles.tab}
+                onClick={() => setActiveTab('remote')}
+              >
+                Remote
+              </button>
             </div>
 
             {/* Agent grid */}
@@ -334,6 +343,15 @@ export function SandboxPanel() {
               />
             )}
 
+            {/* Remote AIWG panel */}
+            {activeTab === 'remote' && (
+              <RemoteAiwgPanel
+                sandboxId={selectedSandbox.id}
+                agents={selectedSandbox.agents}
+                connected={selectedSandbox.connected}
+              />
+            )}
+
             {state.error && (
               <div className={styles.error} role="alert">
                 {state.error}
@@ -343,6 +361,143 @@ export function SandboxPanel() {
           </>
         )}
       </div>
+    </div>
+  );
+}
+
+// ---- Metric Bar (#911) ----
+
+function MetricBar({ label, value, max, unit }: { label: string; value: number; max: number; unit: string }) {
+  const pct = Math.min(100, Math.round((value / max) * 100));
+  const color = pct >= 90 ? '#f44336' : pct >= 70 ? '#ff9800' : '#4caf50';
+  return (
+    <div className={styles.metricBar}>
+      <span className={styles.metricLabel}>{label}</span>
+      <div className={styles.metricTrack}>
+        <div className={styles.metricFill} style={{ width: `${pct}%`, background: color }} />
+      </div>
+      <span className={styles.metricValue}>{value}{unit}</span>
+    </div>
+  );
+}
+
+// ---- Remote AIWG Panel (#914) ----
+
+const AIWG_QUICK_COMMANDS: Array<{ label: string; subcommand: string; args?: string[] }> = [
+  { label: 'Doctor', subcommand: 'doctor', args: ['--json'] },
+  { label: 'Status', subcommand: 'status' },
+  { label: 'Sync (dry run)', subcommand: 'sync', args: ['--dry-run'] },
+  { label: 'Version', subcommand: 'version' },
+];
+
+function RemoteAiwgPanel({
+  sandboxId,
+  agents,
+  connected,
+}: { sandboxId: string; agents: SandboxAgent[]; connected: boolean }) {
+  const [selectedAgent, setSelectedAgent] = useState(agents[0]?.agentId ?? '');
+  const [subcommand, setSubcommand] = useState('doctor');
+  const [args, setArgs] = useState('--json');
+  const [running, setRunning] = useState(false);
+  const [result, setResult] = useState<AiwgExecResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const outputRef = useRef<HTMLPreElement>(null);
+
+  const handleRun = useCallback(async () => {
+    if (!selectedAgent || !subcommand.trim()) return;
+    setRunning(true);
+    setResult(null);
+    setError(null);
+    try {
+      const body: AiwgExecRequest = {
+        subcommand: subcommand.trim(),
+        args: args.trim() ? args.trim().split(/\s+/) : [],
+        timeout: 30,
+      };
+      const res = await api.aiwgExec(sandboxId, selectedAgent, body);
+      setResult(res);
+    } catch (e) {
+      setError(String(e));
+    } finally {
+      setRunning(false);
+    }
+  }, [sandboxId, selectedAgent, subcommand, args]);
+
+  if (!connected) {
+    return <div className={styles.emptyAgents}>Remote AIWG unavailable while sandbox is offline</div>;
+  }
+
+  return (
+    <div className={styles.remotePanel}>
+      <div className={styles.remoteForm}>
+        <div className={styles.remoteRow}>
+          <label className={styles.remoteLabel}>Agent</label>
+          <select
+            className={styles.remoteSelect}
+            value={selectedAgent}
+            onChange={(e) => setSelectedAgent(e.target.value)}
+          >
+            {agents.map((a) => (
+              <option key={a.agentId} value={a.agentId}>{a.agentId}</option>
+            ))}
+          </select>
+        </div>
+        <div className={styles.remoteRow}>
+          <label className={styles.remoteLabel}>Subcommand</label>
+          <input
+            className={styles.remoteInput}
+            value={subcommand}
+            onChange={(e) => setSubcommand(e.target.value)}
+            placeholder="doctor"
+          />
+        </div>
+        <div className={styles.remoteRow}>
+          <label className={styles.remoteLabel}>Args</label>
+          <input
+            className={styles.remoteInput}
+            value={args}
+            onChange={(e) => setArgs(e.target.value)}
+            placeholder="--json"
+          />
+        </div>
+        <div className={styles.remoteQuickBtns}>
+          {AIWG_QUICK_COMMANDS.map((cmd) => (
+            <button
+              key={cmd.label}
+              type="button"
+              className={styles.actionBtnSecondary}
+              disabled={running}
+              onClick={() => { setSubcommand(cmd.subcommand); setArgs((cmd.args ?? []).join(' ')); }}
+            >
+              {cmd.label}
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          className={styles.actionBtn}
+          onClick={handleRun}
+          disabled={running || !selectedAgent || !subcommand.trim()}
+        >
+          {running ? 'Running…' : 'Run'}
+        </button>
+      </div>
+
+      {error && <div className={styles.error}>{error}</div>}
+
+      {result && (
+        <div className={styles.remoteOutput}>
+          <div className={styles.remoteOutputHeader}>
+            Exit code: <strong style={{ color: result.exit_code === 0 ? '#4caf50' : '#f44336' }}>{result.exit_code}</strong>
+          </div>
+          {result.stdout && (
+            <pre ref={outputRef} className={styles.remoteOutputPre}>{result.stdout}</pre>
+          )}
+          {result.stderr && (
+            <pre className={styles.remoteOutputErr}>{result.stderr}</pre>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -544,10 +699,49 @@ function AgentCard({
       {agent.aiwgFrameworks && agent.aiwgFrameworks.length > 0 && (
         <div className={styles.frameworks}>
           {agent.aiwgFrameworks.map((fw) => (
-            <span key={fw.name} className={styles.fwBadge} title={`Providers: ${fw.providers.join(', ')}`}>
-              {fw.name}
+            <span
+              key={fw.name}
+              className={styles.fwBadge}
+              title={`Providers: ${fw.providers.join(', ')}${fw.version ? ` · v${fw.version}` : ''}`}
+            >
+              {fw.name}{fw.version && <span className={styles.fwVersion}> v{fw.version}</span>}
             </span>
           ))}
+        </div>
+      )}
+
+      {/* Metrics bars (#911) */}
+      {agent.latestMetrics && (
+        <div className={styles.metricsRow}>
+          <MetricBar
+            label="CPU"
+            value={agent.latestMetrics.cpu_percent}
+            max={100}
+            unit="%"
+          />
+          {agent.latestMetrics.memory_total_bytes > 0 && (
+            <MetricBar
+              label="Mem"
+              value={Math.round(agent.latestMetrics.memory_used_bytes / 1024 / 1024)}
+              max={Math.round(agent.latestMetrics.memory_total_bytes / 1024 / 1024)}
+              unit="MB"
+            />
+          )}
+        </div>
+      )}
+
+      {/* Provisioning step (#911) */}
+      {agent.status === 'provisioning' && agent.provisioningStep && (
+        <div className={[styles.provisioningStep, agent.provisioningStalled ? styles.provisioningStalled : ''].join(' ')}>
+          <span className={styles.provisioningLabel}>
+            {agent.provisioningStalled ? '⚠ stalled: ' : ''}
+            {agent.provisioningStep.step}
+          </span>
+          {agent.provisioningStep.total_steps !== undefined && agent.provisioningStep.step_index !== undefined && (
+            <span className={styles.provisioningProgress}>
+              {agent.provisioningStep.step_index + 1}/{agent.provisioningStep.total_steps}
+            </span>
+          )}
         </div>
       )}
 

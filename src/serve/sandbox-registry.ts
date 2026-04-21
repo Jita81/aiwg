@@ -58,19 +58,97 @@ export interface SandboxRegistration {
   agents: Map<string, SandboxAgent>;
   /** Sandbox-level artifact inventory reported at registration time (#906) */
   sandboxInventory?: AgentInventory;
+  /** WebSocket protocol capabilities advertised at registration time (#912) */
+  wsCapabilities?: SandboxCapabilities;
 }
 
 export interface SandboxAgent {
   agentId: string;
   status: 'starting' | 'provisioning' | 'ready' | 'busy' | 'error' | 'disconnected';
   loadout?: string;
-  aiwgFrameworks?: Array<{ name: string; providers: string[] }>;
+  /** Framework list — name, providers, and optional version/content_hash (#910) */
+  aiwgFrameworks?: Array<{ name: string; providers: string[]; version?: string; content_hash?: string }>;
   connectedAt?: string;
   lastHeartbeat?: string;
   /** Live session count — incremented/decremented by session.start/session.end events */
   sessionCount?: number;
   /** Agent/command/skill manifest inventory — populated by agent.inventory_updated events (#906) */
   inventory?: AgentInventory;
+  /** Latest metrics snapshot — populated by agent.metrics_updated events (#911) */
+  latestMetrics?: AgentMetrics;
+  /** Rolling metrics history (last METRICS_HISTORY_MAX samples) — for sparklines (#911) */
+  metricsHistory?: AgentMetricsSample[];
+  /** Current provisioning step — populated by agent.provisioning_step events (#911) */
+  provisioningStep?: ProvisioningStep;
+  /** True if provisioning has stalled (no progress for 30s+) (#911) */
+  provisioningStalled?: boolean;
+}
+
+// ============================================================
+// Protocol capabilities (#912)
+// ============================================================
+
+/**
+ * Protocol capabilities advertised by the sandbox on registration.
+ * Enables AIWG to select the correct WS message path for each sandbox.
+ */
+export interface SandboxCapabilities {
+  /** Numeric protocol version (e.g. 2) */
+  ws_protocol_version: number;
+  /** Client message types this sandbox accepts */
+  supported_client_messages: string[];
+  /** Server message types this sandbox emits */
+  supported_server_messages: string[];
+  /** Named feature flags (e.g. "replay_buffer", "role_control", "seq_tracking") */
+  features: string[];
+}
+
+/** Convenience helper — returns true if the sandbox advertises a feature flag. */
+export function sandboxHasFeature(reg: { wsCapabilities?: SandboxCapabilities }, feature: string): boolean {
+  return reg.wsCapabilities?.features.includes(feature) ?? false;
+}
+
+/** Returns true if the sandbox supports a given client message type. */
+export function sandboxSupports(reg: { wsCapabilities?: SandboxCapabilities }, msg: string): boolean {
+  return reg.wsCapabilities?.supported_client_messages.includes(msg) ?? false;
+}
+
+// ============================================================
+// Metrics types (#911)
+// ============================================================
+
+export interface AgentMetrics {
+  cpu_percent: number;
+  memory_used_bytes: number;
+  memory_total_bytes: number;
+  uptime_seconds: number;
+  load_avg_1m?: number;
+  disk_used_bytes?: number;
+  disk_total_bytes?: number;
+  /** Unix timestamp (ms) when metrics were sampled */
+  ts: number;
+}
+
+/** Compact sample stored in the rolling history ring. */
+export interface AgentMetricsSample {
+  cpu_percent: number;
+  memory_percent: number;
+  ts: number;
+}
+
+/** Maximum number of samples kept per agent (#911). ~5 min at 5s interval. */
+export const METRICS_HISTORY_MAX = 60;
+
+// ============================================================
+// Provisioning types (#911)
+// ============================================================
+
+export interface ProvisioningStep {
+  step: string;
+  step_index?: number;
+  total_steps?: number;
+  elapsed_seconds?: number;
+  ts: string;
 }
 
 // ============================================================
@@ -127,11 +205,17 @@ export type SandboxEventType =
   | 'hitl.responded'          // emitted by aiwg serve after forwarding response (#908)
   | 'hitl.timed_out'          // emitted when a HITL request expires (#908)
   | 'agent.inventory_updated' // sandbox pushed new agent/command/skill manifest hashes (#906)
-  | 'task.submitted'          // task accepted by sandbox orchestrator (#907)
-  | 'task.started'            // task VM allocated and running (#907)
-  | 'task.progressed'         // incremental output chunk (#907)
-  | 'task.completed'          // task exited cleanly (#907)
-  | 'task.failed';            // task errored or cancelled (#907)
+  | 'task.submitted'              // task accepted by sandbox orchestrator (#907)
+  | 'task.started'                // task VM allocated and running (#907)
+  | 'task.progressed'             // incremental output chunk (#907)
+  | 'task.completed'              // task exited cleanly (#907)
+  | 'task.failed'                 // task errored or cancelled (#907)
+  | 'agent.metrics_updated'       // heartbeat metrics (cpu, memory, disk, uptime) (#911)
+  | 'agent.provisioning_step'     // provisioning step progress (#911)
+  | 'agent.provisioning_stalled'  // no provisioning progress for 30s+ (#911)
+  | 'framework.update_available'  // sandbox framework version behind host (#910)
+  | 'session.screen_updated'      // screen state hash changed (throttled) (#913)
+  | 'aiwg.log';                   // log line from sandbox AIWG instance (#914)
 
 
 export interface SandboxEvent {
@@ -163,6 +247,24 @@ export interface SandboxEvent {
   taskId?: string;
   outputChunk?: string;
   taskError?: string;
+  // Metrics fields (#911)
+  metrics?: AgentMetrics;
+  // Provisioning step fields (#911)
+  stepIndex?: number;
+  totalSteps?: number;
+  elapsedSeconds?: number;
+  stalledForSeconds?: number;
+  // Framework version fields (#910)
+  framework?: string;
+  currentVersion?: string;
+  availableVersion?: string;
+  daysBehind?: number;
+  // Screen state fields (#913)
+  screenHash?: string;
+  changedLines?: number[];
+  // AIWG log fields (#914)
+  level?: string;
+  message?: string;
 }
 
 export interface HitlRequest {
@@ -191,6 +293,8 @@ export interface RegisterRequest {
   command_inventory?: CommandManifestSummary[];
   /** Skill manifest summaries for all deployed skills (#906) */
   skill_inventory?: SkillManifestSummary[];
+  /** WebSocket protocol capabilities — enables negotiation on connect (#912) */
+  ws_capabilities?: SandboxCapabilities;
 }
 
 export interface RegisterResponse {
@@ -290,6 +394,10 @@ export class SandboxRegistry {
               last_updated: new Date().toISOString(),
             };
           }
+          // Refresh WS capabilities if provided (#912)
+          if (req.ws_capabilities) {
+            existing.wsCapabilities = req.ws_capabilities;
+          }
           this.lastRegistrationTime.set(instanceId, now);
           return { sandbox_id: existingId, token: existing.token };
         }
@@ -327,6 +435,7 @@ export class SandboxRegistry {
       connected: false,
       agents: new Map(),
       sandboxInventory,
+      wsCapabilities: req.ws_capabilities,
     };
 
     this.sandboxes.set(id, registration);
@@ -505,12 +614,64 @@ export class SandboxRegistry {
         }
         break;
       }
+      case 'agent.metrics_updated': {
+        // Store latest metrics + rolling history (#911)
+        if (event.metrics) {
+          const agent = sandbox.agents.get(event.agentId);
+          if (agent) {
+            agent.latestMetrics = event.metrics;
+            const sample: AgentMetricsSample = {
+              cpu_percent: event.metrics.cpu_percent,
+              memory_percent: event.metrics.memory_total_bytes > 0
+                ? (event.metrics.memory_used_bytes / event.metrics.memory_total_bytes) * 100
+                : 0,
+              ts: event.metrics.ts,
+            };
+            if (!agent.metricsHistory) agent.metricsHistory = [];
+            agent.metricsHistory.push(sample);
+            if (agent.metricsHistory.length > METRICS_HISTORY_MAX) {
+              agent.metricsHistory = agent.metricsHistory.slice(-METRICS_HISTORY_MAX);
+            }
+            agent.lastHeartbeat = event.timestamp;
+          }
+        }
+        break;
+      }
+      case 'agent.provisioning_step': {
+        // Store current provisioning step (#911)
+        const agent = sandbox.agents.get(event.agentId);
+        if (agent && event.step) {
+          agent.provisioningStep = {
+            step: event.step,
+            step_index: event.stepIndex,
+            total_steps: event.totalSteps,
+            elapsed_seconds: event.elapsedSeconds,
+            ts: event.timestamp,
+          };
+          agent.provisioningStalled = false;
+          agent.lastHeartbeat = event.timestamp;
+        }
+        break;
+      }
+      case 'agent.provisioning_stalled': {
+        // Mark provisioning as stalled (#911)
+        const agent = sandbox.agents.get(event.agentId);
+        if (agent) {
+          agent.provisioningStalled = true;
+          agent.lastHeartbeat = event.timestamp;
+        }
+        break;
+      }
       // Task lifecycle events — no local state update, listeners handle display (#907)
       case 'task.submitted':
       case 'task.started':
       case 'task.progressed':
       case 'task.completed':
       case 'task.failed':
+      // Pass-through events — no AIWG state to update (#910 #913 #914)
+      case 'framework.update_available':
+      case 'session.screen_updated':
+      case 'aiwg.log':
       // Synthetic HITL events — emitted by aiwg serve, no state to update (#908)
       case 'hitl.responded':
       case 'hitl.timed_out':
@@ -626,6 +787,8 @@ export interface SandboxSummary {
   agents: Array<SandboxAgent>;
   /** Sandbox-level artifact inventory reported at registration time (#906) */
   sandboxInventory?: AgentInventory;
+  /** WebSocket protocol capabilities advertised at registration (#912) */
+  wsCapabilities?: SandboxCapabilities;
 }
 
 function toSummary(s: SandboxRegistration): SandboxSummary {
@@ -646,6 +809,7 @@ function toSummary(s: SandboxRegistration): SandboxSummary {
     agentCount: s.agents.size,
     agents: [...s.agents.values()],
     sandboxInventory: s.sandboxInventory,
+    wsCapabilities: s.wsCapabilities,
   };
 }
 

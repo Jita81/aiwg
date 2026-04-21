@@ -538,3 +538,187 @@
   background: rgba(244, 67, 54, 0.08);
   border-radius: 3px;
 }
+
+/* Metric bar (#911) */
+.metricsRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.metricBar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.metricLabel {
+  width: 28px;
+  color: #888;
+  flex-shrink: 0;
+}
+
+.metricTrack {
+  flex: 1;
+  height: 6px;
+  background: #2a2a2a;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.metricFill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.metricValue {
+  width: 48px;
+  text-align: right;
+  color: #aaa;
+  font-family: monospace;
+  flex-shrink: 0;
+}
+
+/* Provisioning step (#911) */
+.provisioningStep {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding: 4px 8px;
+  background: #0d1a2a;
+  border: 1px solid #1a3a5a;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.provisioningStalled {
+  border-color: #5a3a1a;
+  background: #1a1000;
+  color: #ff9800;
+}
+
+.provisioningLabel {
+  color: #88aacc;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.provisioningStalled .provisioningLabel {
+  color: #ff9800;
+}
+
+.provisioningProgress {
+  color: #555;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+/* Framework version badge (#910) */
+.fwVersion {
+  color: #8a8aff;
+  font-size: 10px;
+  margin-left: 2px;
+  opacity: 0.8;
+}
+
+/* Remote AIWG panel (#914) */
+.remotePanel {
+  padding: 0 16px 16px;
+}
+
+.remoteForm {
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.remoteRow {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.remoteLabel {
+  font-size: 11px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.remoteSelect,
+.remoteInput {
+  background: #0a0a0a;
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-family: monospace;
+  font-size: 12px;
+  padding: 5px 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.remoteSelect:focus,
+.remoteInput:focus {
+  outline: none;
+  border-color: #5a8fff;
+}
+
+.remoteQuickBtns {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+}
+
+.remoteOutput {
+  background: #0a0a0a;
+  border: 1px solid #1e1e1e;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.remoteOutputHeader {
+  padding: 6px 10px;
+  font-size: 12px;
+  color: #888;
+  border-bottom: 1px solid #1e1e1e;
+  background: #111;
+}
+
+.remoteOutputPre {
+  margin: 0;
+  padding: 10px;
+  font-family: monospace;
+  font-size: 12px;
+  color: #e0e0e0;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.remoteOutputErr {
+  margin: 0;
+  padding: 10px;
+  font-family: monospace;
+  font-size: 12px;
+  color: #ff8888;
+  white-space: pre-wrap;
+  word-break: break-all;
+  border-top: 1px solid #2a1a1a;
+  background: rgba(244, 67, 54, 0.05);
+}

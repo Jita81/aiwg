@@ -776,6 +776,102 @@ async function startServer(opts: {
     }
   });
 
+  // Screen state proxy (#913)
+  // Forwards to sandbox GET /api/v1/sessions/:sessionId/screen — already exists in sandbox.
+  app.get('/api/sandboxes/:id/sessions/:sessionId/screen', async (c: any) => {
+    const sandbox = sandboxRegistry.get(c.req.param('id'));
+    if (!sandbox) return c.json({ error: 'Sandbox not found' }, 404);
+    try {
+      const resp = await fetch(
+        `${sandbox.httpEndpoint}/api/v1/sessions/${c.req.param('sessionId')}/screen`,
+      );
+      return c.json(await resp.json(), resp.status);
+    } catch (err) {
+      return c.json({ error: `Sandbox unreachable: ${err instanceof Error ? err.message : String(err)}` }, 502);
+    }
+  });
+
+  // Remote AIWG exec proxy (#914)
+  // Forwards to sandbox POST /api/v1/aiwg/exec — requires sandbox companion issue.
+  // Will 502 gracefully until that endpoint is implemented.
+  app.post('/api/sandboxes/:id/agents/:aid/aiwg/exec', async (c: any) => {
+    const sandbox = sandboxRegistry.get(c.req.param('id'));
+    if (!sandbox) return c.json({ error: 'Sandbox not found' }, 404);
+    try {
+      const body = await c.req.json().catch(() => ({}));
+      const resp = await fetch(
+        `${sandbox.httpEndpoint}/api/v1/agents/${c.req.param('aid')}/aiwg/exec`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        },
+      );
+      return c.json(await resp.json(), resp.status);
+    } catch (err) {
+      return c.json({ error: `Sandbox unreachable: ${err instanceof Error ? err.message : String(err)}` }, 502);
+    }
+  });
+
+  // Framework update proxy (#910)
+  // Instructs a sandbox agent to update a named framework.
+  // Requires sandbox companion issue (PATCH /api/v1/agents/:id/frameworks/:name).
+  app.patch('/api/sandboxes/:id/agents/:aid/frameworks/:name', async (c: any) => {
+    const sandbox = sandboxRegistry.get(c.req.param('id'));
+    if (!sandbox) return c.json({ error: 'Sandbox not found' }, 404);
+    try {
+      const body = await c.req.json().catch(() => ({}));
+      const resp = await fetch(
+        `${sandbox.httpEndpoint}/api/v1/agents/${c.req.param('aid')}/frameworks/${c.req.param('name')}`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        },
+      );
+      if (resp.status === 204) return new Response(null, { status: 204 });
+      return c.json(await resp.json(), resp.status);
+    } catch (err) {
+      return c.json({ error: `Sandbox unreachable: ${err instanceof Error ? err.message : String(err)}` }, 502);
+    }
+  });
+
+  // Agent manifest discovery and push (#909)
+  // GET  — list deployed manifests for a platform (with content hashes for drift detection)
+  // POST — push/replace a single agent manifest
+  // Requires sandbox companion issue (GET/POST /api/v1/agents/:id/manifests/:platform).
+  app.get('/api/sandboxes/:id/agents/:aid/manifests/:platform', async (c: any) => {
+    const sandbox = sandboxRegistry.get(c.req.param('id'));
+    if (!sandbox) return c.json({ error: 'Sandbox not found' }, 404);
+    try {
+      const resp = await fetch(
+        `${sandbox.httpEndpoint}/api/v1/agents/${c.req.param('aid')}/manifests/${c.req.param('platform')}`,
+      );
+      return c.json(await resp.json(), resp.status);
+    } catch (err) {
+      return c.json({ error: `Sandbox unreachable: ${err instanceof Error ? err.message : String(err)}` }, 502);
+    }
+  });
+
+  app.post('/api/sandboxes/:id/agents/:aid/manifests/:platform', async (c: any) => {
+    const sandbox = sandboxRegistry.get(c.req.param('id'));
+    if (!sandbox) return c.json({ error: 'Sandbox not found' }, 404);
+    try {
+      const body = await c.req.json().catch(() => ({}));
+      const resp = await fetch(
+        `${sandbox.httpEndpoint}/api/v1/agents/${c.req.param('aid')}/manifests/${c.req.param('platform')}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        },
+      );
+      return c.json(await resp.json(), resp.status);
+    } catch (err) {
+      return c.json({ error: `Sandbox unreachable: ${err instanceof Error ? err.message : String(err)}` }, 502);
+    }
+  });
+
   // Static file serving — apps/web/dist/ (#714)
   // Only register serveStatic when the dist directory actually exists.
   // When it doesn't, fall back to a helpful HTML placeholder so the

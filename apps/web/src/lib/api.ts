@@ -27,6 +27,91 @@ export interface TelemetryResponse {
   events: unknown[];
 }
 
+// ---- Protocol capabilities (#912) ----
+
+export interface SandboxCapabilities {
+  ws_protocol_version: number;
+  supported_client_messages: string[];
+  supported_server_messages: string[];
+  features: string[];
+}
+
+/** Returns true if the sandbox advertises a named feature flag. */
+export function sandboxHasFeature(caps: SandboxCapabilities | undefined, feature: string): boolean {
+  return caps?.features.includes(feature) ?? false;
+}
+
+// ---- Metrics types (#911) ----
+
+export interface AgentMetrics {
+  cpu_percent: number;
+  memory_used_bytes: number;
+  memory_total_bytes: number;
+  uptime_seconds: number;
+  load_avg_1m?: number;
+  disk_used_bytes?: number;
+  disk_total_bytes?: number;
+  /** Unix timestamp (ms) */
+  ts: number;
+}
+
+export interface AgentMetricsSample {
+  cpu_percent: number;
+  memory_percent: number;
+  ts: number;
+}
+
+// ---- Provisioning types (#911) ----
+
+export interface ProvisioningStep {
+  step: string;
+  step_index?: number;
+  total_steps?: number;
+  elapsed_seconds?: number;
+  ts: string;
+}
+
+// ---- Screen state types (#913) ----
+
+export interface ScreenStateResponse {
+  session_id: string;
+  rows: number;
+  cols: number;
+  text: string;
+  cursor: { row: number; col: number };
+  scrollback_tail?: string;
+  prompt_detected: boolean;
+  prompt_text?: string;
+}
+
+// ---- Remote AIWG exec types (#914) ----
+
+export interface AiwgExecRequest {
+  subcommand: string;
+  args?: string[];
+  timeout?: number;
+}
+
+export interface AiwgExecResponse {
+  exit_code: number;
+  stdout: string;
+  stderr: string;
+}
+
+// ---- Agent manifest types (#909) ----
+
+export interface AgentDeploymentStatus {
+  name: string;
+  local_hash: string;
+  deployed_hash: string;
+  in_sync: boolean;
+}
+
+export interface ManifestListResponse {
+  platform: string;
+  manifests: AgentDeploymentStatus[];
+}
+
 // ---- Inventory types (#906) ----
 
 export interface AgentManifestSummary {
@@ -65,11 +150,20 @@ export interface SandboxAgent {
   agentId: string;
   status: 'starting' | 'provisioning' | 'ready' | 'busy' | 'error' | 'disconnected';
   loadout?: string;
-  aiwgFrameworks?: Array<{ name: string; providers: string[] }>;
+  /** Framework list — includes optional version/content_hash for version tracking (#910) */
+  aiwgFrameworks?: Array<{ name: string; providers: string[]; version?: string; content_hash?: string }>;
   sandboxId?: string;
   sandboxName?: string;
   /** Agent/command/skill manifest inventory (#906) */
   inventory?: AgentInventory;
+  /** Latest metrics snapshot (#911) */
+  latestMetrics?: AgentMetrics;
+  /** Rolling metrics history for sparklines (#911) */
+  metricsHistory?: AgentMetricsSample[];
+  /** Current provisioning step (#911) */
+  provisioningStep?: ProvisioningStep;
+  /** True if provisioning has stalled (#911) */
+  provisioningStalled?: boolean;
 }
 
 export interface SandboxSummary {
@@ -92,6 +186,8 @@ export interface SandboxSummary {
   agents: SandboxAgent[];
   /** Sandbox-level artifact inventory reported at registration (#906) */
   sandboxInventory?: AgentInventory;
+  /** WebSocket protocol capabilities (#912) */
+  wsCapabilities?: SandboxCapabilities;
 }
 
 export interface SandboxesResponse {
@@ -266,6 +362,36 @@ export const api = {
     request<SandboxTask>(`/api/sandboxes/${sandboxId}/tasks/${taskId}`),
   cancelTask: (sandboxId: string, taskId: string) =>
     request<void>(`/api/sandboxes/${sandboxId}/tasks/${taskId}`, { method: 'DELETE' }),
+
+  // Screen state (#913)
+  sessionScreen: (sandboxId: string, sessionId: string) =>
+    request<ScreenStateResponse>(`/api/sandboxes/${sandboxId}/sessions/${sessionId}/screen`),
+
+  // Remote AIWG exec (#914)
+  aiwgExec: (sandboxId: string, agentId: string, body: AiwgExecRequest) =>
+    request<AiwgExecResponse>(`/api/sandboxes/${sandboxId}/agents/${agentId}/aiwg/exec`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    }),
+
+  // Framework update (#910)
+  updateFramework: (sandboxId: string, agentId: string, frameworkName: string, version?: string) =>
+    request<void>(`/api/sandboxes/${sandboxId}/agents/${agentId}/frameworks/${frameworkName}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ version }),
+    }),
+
+  // Agent manifest discovery and push (#909)
+  listManifests: (sandboxId: string, agentId: string, platform: string) =>
+    request<ManifestListResponse>(`/api/sandboxes/${sandboxId}/agents/${agentId}/manifests/${platform}`),
+  pushManifest: (sandboxId: string, agentId: string, platform: string, body: { name: string; content: string; content_hash: string }) =>
+    request<{ ok: boolean }>(`/api/sandboxes/${sandboxId}/agents/${agentId}/manifests/${platform}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    }),
 
   // HITL (#732)
   hitl: () => request<HitlResponse>('/api/hitl'),
