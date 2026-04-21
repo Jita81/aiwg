@@ -663,7 +663,16 @@ export async function handlePtyConnection(
     // Reconnect to existing session — replay buffer
     registry.addClient(sessionId, clientId, ws);
     if (session.outputBuffer) {
-      ws.send(JSON.stringify({ type: 'data', payload: session.outputBuffer }));
+      // Trim replay to start from the last full-screen erase so that tmux's
+      // screen-init sequences (cursor moves, status-bar paint) from before the
+      // erase don't render as literal garbage in a fresh xterm.js context.
+      // Everything before \x1b[2J would be cleared by the erase anyway;
+      // everything after is the session content tmux redrew (MOTD, history, etc).
+      // If no erase is found, replay the whole buffer unchanged.
+      const ERASE = '\x1b[2J';
+      const lastErase = session.outputBuffer.lastIndexOf(ERASE);
+      const replay = lastErase !== -1 ? session.outputBuffer.slice(lastErase) : session.outputBuffer;
+      ws.send(JSON.stringify({ type: 'data', payload: replay }));
     }
   } else {
     // Session exited — inform client

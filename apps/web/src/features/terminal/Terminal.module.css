@@ -11,59 +11,59 @@
 .toolbar {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 6px 12px;
-  background: #1a1a1a;
-  border-bottom: 1px solid #2a2a2a;
-  min-height: 36px;
+  gap: 8px;
+  padding: 2px 8px;
+  background: #111;
+  border-bottom: 1px solid #1e1e1e;
+  min-height: 22px;
 }
 
 .sessionLabel {
-  font-size: 12px;
-  color: #888;
+  font-size: 10px;
+  color: #555;
   flex: 1;
 }
 
 .sessionLabel code {
-  color: #b0d0ff;
-  font-size: 11px;
+  color: #6a8fbf;
+  font-size: 10px;
 }
 
 .badge {
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 10px;
+  padding: 1px 5px;
+  border-radius: 6px;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
 }
 
-.connecting  { background: #2a2a00; color: #ffdd00; }
-.connected   { background: #002a00; color: #00ff88; }
-.reconnecting{ background: #2a1a00; color: #ffaa00; }
-.exited      { background: #1a0000; color: #ff6060; }
+.connecting  { background: #1e1e00; color: #888800; }
+.connected   { background: #001a00; color: #3a8a55; }
+.reconnecting{ background: #1a1000; color: #886020; }
+.exited      { background: #110000; color: #884040; }
 
 .actions {
   display: flex;
-  gap: 6px;
+  gap: 4px;
 }
 
 .actions button {
-  background: #2a2a2a;
-  color: #c0c0c0;
-  border: 1px solid #3a3a3a;
-  border-radius: 4px;
-  padding: 3px 10px;
-  font-size: 11px;
+  background: transparent;
+  color: #444;
+  border: 1px solid #222;
+  border-radius: 3px;
+  padding: 1px 6px;
+  font-size: 10px;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: color 0.1s, border-color 0.1s;
 }
 
 .actions button:hover,
 .actions button:focus-visible {
-  background: #3a3a3a;
-  outline: 2px solid #5a8fff;
-  outline-offset: 2px;
+  color: #888;
+  border-color: #333;
+  outline: none;
 }
 
 .terminal {
