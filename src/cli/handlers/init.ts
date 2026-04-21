@@ -41,25 +41,59 @@ const PROVIDER_LABELS: Record<string, string> = {
 };
 
 /**
- * Prompt for a yes/no answer via readline
+ * Hard timeout applied to every interactive prompt so the CLI can never hang
+ * indefinitely on a detached or unresponsive terminal. After the timeout the
+ * prompt resolves to the supplied default and a visible warning is printed.
+ * Overridable via AIWG_PROMPT_TIMEOUT_MS for CI/test tuning.
  */
-async function askYesNo(rl: readline.Interface, question: string): Promise<boolean> {
+const PROMPT_TIMEOUT_MS = (() => {
+  const raw = process.env['AIWG_PROMPT_TIMEOUT_MS'];
+  const n = raw ? parseInt(raw, 10) : NaN;
+  return Number.isFinite(n) && n > 0 ? n : 60_000;
+})();
+
+function askWithTimeout<T>(
+  rl: readline.Interface,
+  prompt: string,
+  parse: (answer: string) => T,
+  fallback: T,
+  fallbackLabel: string,
+): Promise<T> {
   return new Promise((resolve) => {
-    rl.question(question, (answer) => {
-      resolve(answer.trim().toLowerCase().startsWith('y'));
+    let settled = false;
+    const timer = setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      ui.warn(`  No input within ${Math.round(PROMPT_TIMEOUT_MS / 1000)}s — using default: ${fallbackLabel}`);
+      resolve(fallback);
+    }, PROMPT_TIMEOUT_MS);
+    rl.question(prompt, (answer) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      resolve(parse(answer));
     });
   });
 }
 
 /**
+ * Prompt for a yes/no answer via readline
+ */
+async function askYesNo(rl: readline.Interface, question: string, defaultValue = false): Promise<boolean> {
+  return askWithTimeout(
+    rl,
+    question,
+    (a) => a.trim().toLowerCase().startsWith('y'),
+    defaultValue,
+    defaultValue ? 'yes' : 'no',
+  );
+}
+
+/**
  * Prompt for a string value via readline
  */
-async function askString(rl: readline.Interface, prompt: string): Promise<string> {
-  return new Promise((resolve) => {
-    rl.question(prompt, (answer) => {
-      resolve(answer.trim());
-    });
-  });
+async function askString(rl: readline.Interface, prompt: string, fallback = ''): Promise<string> {
+  return askWithTimeout(rl, prompt, (a) => a.trim(), fallback, fallback || '(empty)');
 }
 
 /**
@@ -149,7 +183,7 @@ export const initHandler: CommandHandler = {
         providers = await askProviders(rl);
 
         console.log('');
-        const addScripts = await askYesNo(rl, '  Add default scripts (deploy, doctor, sync)? [Y/n]: ');
+        const addScripts = await askYesNo(rl, '  Add default scripts (deploy, doctor, sync)? [Y/n]: ', true);
         if (addScripts) {
           scripts = {
             deploy: 'aiwg use all',
@@ -157,7 +191,7 @@ export const initHandler: CommandHandler = {
             sync: 'aiwg sync',
           };
 
-          const addCustom = await askYesNo(rl, '  Add a custom script? [y/N]: ');
+          const addCustom = await askYesNo(rl, '  Add a custom script? [y/N]: ', false);
           if (addCustom) {
             const name = await askString(rl, '  Script name: ');
             const cmd = await askString(rl, '  Command: ');

@@ -609,6 +609,14 @@ export class UseHandler implements CommandHandler {
     const _providersFlagIdx = remainingArgs.findIndex(a => a === '--providers');
     const _providersValue = _providersFlagIdx >= 0 ? remainingArgs[_providersFlagIdx + 1] : null;
 
+    // Bulk/automation intent: `aiwg use all` and `aiwg use --yes` skip the
+    // init wizard and use sensible defaults so CLI calls never hang waiting
+    // on a detached terminal. Users who want the wizard run `aiwg init`.
+    const _isBulkIntent = framework === 'all'
+      || remainingArgs.includes('--yes')
+      || remainingArgs.includes('-y')
+      || remainingArgs.includes('--non-interactive');
+
     if (!config) {
       if (_providersValue) {
         // --providers shorthand: write config without wizard
@@ -617,12 +625,16 @@ export class UseHandler implements CommandHandler {
           : _providersValue.split(',').map(s => s.trim()).filter(Boolean);
         config = emptyConfig(pList.length > 0 ? pList : ['claude']);
         await writeAiwgConfig(projectDir, config);
-      } else if (targetDir || _hasExplicitProvider || !process.stdin.isTTY) {
+      } else if (_isBulkIntent || targetDir || _hasExplicitProvider || !process.stdin.isTTY) {
         // Non-interactive: auto-create minimal config with explicit provider or default (#734)
-        // When --prefix/--target is set, we're in automated mode — no wizard
+        // When --prefix/--target is set, or `use all`, or --yes is passed, we're in
+        // automated mode — no wizard, no prompts, no way to hang on stdin.
         const autoProvider = _hasExplicitProvider ? remainingArgs[_providerFlagIdx + 1] : 'claude';
         config = emptyConfig([autoProvider]);
         await writeAiwgConfig(projectDir, config);
+        if (_isBulkIntent && framework === 'all') {
+          ui.dim(`  No .aiwg/aiwg.config found — auto-created with provider '${autoProvider}'. Run 'aiwg init' to customize.`);
+        }
       } else if (process.stdin.isTTY) {
         // Interactive terminal with no config → run init wizard inline (#720)
         const initResult = await initHandler.execute({ ...ctx, args: [] });
@@ -762,8 +774,12 @@ export class UseHandler implements CommandHandler {
               ui.warn(`Unknown profile "${selectedProfile}". Available: ${templates.map((t: string) => t.replace('.md', '')).join(', ')}`);
               selectedProfile = undefined;
             }
+          } else if (_isBulkIntent || !process.stdin.isTTY) {
+            // Bulk/automation or non-TTY: silently pick 'generic' default.
+            // The profile picker is annoying during `aiwg use all`.
+            selectedProfile = 'generic';
           } else if (process.stdin.isTTY) {
-            // Interactive profile selection
+            // Interactive profile selection with hard timeout
             ui.blank();
             ui.header('  Select a topology profile:');
             const templateNames = templates.map((t: string) => t.replace('.md', ''));
@@ -777,8 +793,24 @@ export class UseHandler implements CommandHandler {
               input: process.stdin,
               output: process.stdout,
             });
+            const promptTimeoutMs = (() => {
+              const raw = process.env['AIWG_PROMPT_TIMEOUT_MS'];
+              const n = raw ? parseInt(raw, 10) : NaN;
+              return Number.isFinite(n) && n > 0 ? n : 60_000;
+            })();
             const answer = await new Promise<string>((resolve) => {
+              let settled = false;
+              const timer = setTimeout(() => {
+                if (settled) return;
+                settled = true;
+                rl.close();
+                ui.warn(`  No input within ${Math.round(promptTimeoutMs / 1000)}s — using default: generic`);
+                resolve('');
+              }, promptTimeoutMs);
               rl.question('  Enter number or name [generic]: ', (ans) => {
+                if (settled) return;
+                settled = true;
+                clearTimeout(timer);
                 rl.close();
                 resolve(ans.trim());
               });
@@ -792,6 +824,8 @@ export class UseHandler implements CommandHandler {
                 selectedProfile = answer;
               }
             }
+            // Fall through: if answer was empty (timeout or user hit enter),
+            // selectedProfile stays undefined and downstream uses 'generic' default.
           }
 
           // Write profile config to project namespace
