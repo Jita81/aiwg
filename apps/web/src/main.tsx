@@ -1,5 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import '@xterm/xterm/css/xterm.css';
 import { App } from './app/App.js';
 
 const rootEl = document.getElementById('root');
