@@ -64,6 +64,7 @@ function TerminalPane({ sandboxId, agentId }: TerminalPaneProps) {
   const [statusText, setStatusText] = useState('Connecting…');
   const [wsError, setWsError] = useState<string | null>(null);
   const [connected, setConnected] = useState(false);
+  const [isExhausted, setIsExhausted] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -321,6 +322,7 @@ function TerminalPane({ sandboxId, agentId }: TerminalPaneProps) {
       ws.onopen = () => {
         if (!isMounted) return;
         reconnectAttemptsRef.current = 0;
+        setIsExhausted(false);
         setConnected(true);
         setStatusText('Listing sessions…');
         setPhase('listing');
@@ -338,7 +340,8 @@ function TerminalPane({ sandboxId, agentId }: TerminalPaneProps) {
         setConnected(false);
         const attempt = reconnectAttemptsRef.current;
         if (attempt >= RECONNECT_MAX_ATTEMPTS) {
-          setStatusText('Connection lost — refresh to retry');
+          setStatusText('Connection lost');
+          setIsExhausted(true);
           return;
         }
         const delay = RECONNECT_BASE_MS * Math.pow(2, attempt);
@@ -438,12 +441,20 @@ function TerminalPane({ sandboxId, agentId }: TerminalPaneProps) {
         <div className={styles.termOutput} style={{ overflowY: 'auto', padding: '8px' }}>
           {(phase === 'connecting' || phase === 'listing') && (
             <div className={styles.infoRow}>
-              {phase === 'connecting' ? 'Connecting…' : 'Listing sessions…'}
+              <span className={styles.spinnerRow}>
+                <span className={styles.spinner} />
+                {phase === 'connecting' ? 'Connecting…' : 'Listing sessions…'}
+              </span>
             </div>
           )}
 
           {phase === 'attaching' && (
-            <div className={styles.infoRow}>Attaching to {pickedSessionRef.current}…</div>
+            <div className={styles.infoRow}>
+              <span className={styles.spinnerRow}>
+                <span className={styles.spinner} />
+                Attaching to {pickedSessionRef.current}…
+              </span>
+            </div>
           )}
 
           {phase === 'picking' && (
@@ -492,12 +503,38 @@ function TerminalPane({ sandboxId, agentId }: TerminalPaneProps) {
        * display:none while picking so it doesn't take space, display:block
        * when attached so FitAddon measures real dimensions.
        * The terminal lifecycle useEffect fires AFTER this paint.
+       *
+       * Overlay: when the WS drops while attached, the xterm stays mounted
+       * but receives no data. An overlay communicates reconnect progress and
+       * surfaces a Reload button on exhaustion.
        */}
       <div
         ref={containerRef}
         className={styles.termOutput}
-        style={{ display: phase === 'attached' ? 'block' : 'none' }}
-      />
+        style={{ position: 'relative', display: phase === 'attached' ? 'block' : 'none' }}
+      >
+        {!connected && (
+          <div className={[styles.termOverlay, isExhausted ? styles.termOverlayLost : ''].join(' ').trim()}>
+            {isExhausted ? (
+              <>
+                <span>Connection lost</span>
+                <button
+                  type="button"
+                  className={styles.reloadBtn}
+                  onClick={() => window.location.reload()}
+                >
+                  Reload
+                </button>
+              </>
+            ) : (
+              <span className={styles.spinnerRow}>
+                <span className={styles.spinner} />
+                {statusText}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
