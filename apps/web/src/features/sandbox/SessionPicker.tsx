@@ -3,27 +3,30 @@
  *
  * The terminal pane connects to the management WS, lists sessions via
  * `list_sessions`, shows an inline picker, then attaches to the chosen one.
- * All session state (names, IDs, running status) comes directly from the
- * management WS so there are no REST ↔ WS naming mismatches.
+ * All session state comes directly from the management WS — no REST/WS naming
+ * mismatch possible.
  *
  * Management WS protocol (proxied at /ws/sandbox/:sandboxId/management):
  *
  *   Client → server:
- *     { type: "subscribe",      agent_id }
- *     { type: "list_sessions",  agent_id }
+ *     { type: "subscribe",      agent_id }            ← sent together on open
+ *     { type: "list_sessions",  agent_id }            ← sent together on open
  *     { type: "attach_session", agent_id, session_name, cols, rows }
- *     { type: "create_session", agent_id, session_name, session_type,
- *                               command, cols, rows }
  *     { type: "send_input",     agent_id, command_id, data }
  *     { type: "pty_resize",     agent_id, command_id, cols, rows }
  *
  *   Server → client:
- *     { type: "subscribed",      agent_id }
  *     { type: "session_list",    agent_id, sessions[] }
  *     { type: "session_attached",agent_id, session_name, command_id }
- *     { type: "session_created", agent_id, session_name, ... }
  *     { type: "output",          agent_id, command_id, data, stream, ts }
  *     { type: "error",           message }
+ *
+ * Design notes:
+ *   - subscribe + list_sessions are sent together on open (one round trip, not two)
+ *   - xterm is initialized in a useEffect keyed on phase === 'attached', which runs
+ *     AFTER React commits display:block to the container — FitAddon then measures
+ *     the real dimensions instead of 0×0 on a hidden element
+ *   - The WS session_attached handler only updates refs/state; no async work
  *
  * @issue #896
  */
@@ -44,8 +47,6 @@ interface WsSession {
 }
 
 // ---- Terminal Pane ----
-//
-// Owns the full lifecycle: WS connection → session list → pick → attach → I/O.
 
 interface TerminalPaneProps {
   sandboxId: string;
@@ -72,17 +73,14 @@ function TerminalPane({ sandboxId, agentId }: TerminalPaneProps) {
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const sessionBuffersRef = useRef<Map<string, string>>(new Map());
+  // command_id confirmed by session_attached; drives output routing and input/resize
   const attachedCmdRef = useRef<string | null>(null);
-  const pickedSessionRef = useRef<string | null>(null); // session_name being attached
+  const pickedSessionRef = useRef<string | null>(null);
   const reconnectAttemptsRef = useRef(0);
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const phaseRef = useRef<Phase>('connecting');
-
-  // Keep phaseRef in sync so WS handlers can read current phase without stale closure
-  useEffect(() => { phaseRef.current = phase; }, [phase]);
 
   // ------------------------------------------------------------------
-  // WS helpers (stable refs, not subject to React re-render)
+  // WS send helper
   // ------------------------------------------------------------------
 
   const sendWs = useCallback((msg: Record<string, unknown>) => {
@@ -96,21 +94,25 @@ function TerminalPane({ sandboxId, agentId }: TerminalPaneProps) {
   }, [agentId, sendWs]);
 
   // ------------------------------------------------------------------
-  // xterm initialisation (runs after the container div is visible)
+  // xterm init — called from the useEffect below, AFTER React commits
+  // the display:block update so FitAddon measures real dimensions.
   // ------------------------------------------------------------------
 
   const initTerminal = useCallback(async () => {
-    if (!containerRef.current || xtermRef.current) return;
+    if (!containerRef.current) return;
+
     const [{ Terminal }, { FitAddon }] = await Promise.all([
       import('@xterm/xterm'),
       import('@xterm/addon-fit'),
     ]);
     if (!containerRef.current) return; // unmounted during async import
 
+    if (xtermRef.current) return; // already initialized (concurrent call)
+
     const term = new Terminal({
       rows: 24,
       cols: 80,
-      scrollback: 0, // replay from buffer on re-attach
+      scrollback: 0, // replay from sessionBuffersRef on re-attach
       cursorBlink: true,
       convertEol: false,
       theme: {
@@ -133,10 +135,12 @@ function TerminalPane({ sandboxId, agentId }: TerminalPaneProps) {
     fitAddonRef.current = fitAddon;
     term.loadAddon(fitAddon);
     term.open(wrapper);
+
+    // Container is visible at this point (useEffect fires after React paint)
     try { fitAddon.fit(); } catch { /* ignore */ }
     xtermRef.current = term;
 
-    // Ctrl+C: copy if selection; otherwise pass through
+    // Keyboard: Ctrl+C copies if selection active, otherwise pass through
     term.attachCustomKeyEventHandler((ev: KeyboardEvent) => {
       if (ev.type !== 'keydown') return true;
       if (ev.ctrlKey && ev.key === 'c' && term.hasSelection()) return false;
@@ -164,18 +168,61 @@ function TerminalPane({ sandboxId, agentId }: TerminalPaneProps) {
     });
     resizeObserverRef.current = resizeObserver;
     resizeObserver.observe(containerRef.current);
-
-    // Sync PTY dimensions now that xterm is sized
-    if (attachedCmdRef.current) {
-      sendWs({
-        type: 'pty_resize',
-        agent_id: agentId,
-        command_id: attachedCmdRef.current,
-        cols: term.cols,
-        rows: term.rows,
-      });
-    }
   }, [agentId, sendWs]);
+
+  // ------------------------------------------------------------------
+  // Terminal lifecycle: runs after React commits display:block.
+  //
+  // On first attach:  init xterm (which now has real dimensions), replay buffer.
+  // On re-attach:     fitAddon.fit() to sync dimensions, replay buffer.
+  // This is the ONLY place initTerminal is called — never from a WS handler.
+  // ------------------------------------------------------------------
+
+  useEffect(() => {
+    if (phase !== 'attached' || !containerRef.current) return;
+    let cancelled = false;
+
+    const cmdId = attachedCmdRef.current;
+
+    if (!xtermRef.current) {
+      // First attach — initialize, then replay buffered output
+      initTerminal().then(() => {
+        if (cancelled || !xtermRef.current || !cmdId) return;
+        const buf = sessionBuffersRef.current.get(cmdId);
+        xtermRef.current.clear();
+        if (buf) xtermRef.current.write(buf);
+        // Sync PTY size now that xterm is measured
+        if (wsRef.current?.readyState === WebSocket.OPEN) {
+          sendWs({
+            type: 'pty_resize',
+            agent_id: agentId,
+            command_id: cmdId,
+            cols: xtermRef.current.cols,
+            rows: xtermRef.current.rows,
+          });
+        }
+      });
+    } else {
+      // Re-attach to a different session — fit to container, replay buffer
+      try { fitAddonRef.current?.fit(); } catch { /* ignore */ }
+      if (cmdId) {
+        const buf = sessionBuffersRef.current.get(cmdId);
+        xtermRef.current.clear();
+        if (buf) xtermRef.current.write(buf);
+        if (wsRef.current?.readyState === WebSocket.OPEN) {
+          sendWs({
+            type: 'pty_resize',
+            agent_id: agentId,
+            command_id: cmdId,
+            cols: xtermRef.current.cols,
+            rows: xtermRef.current.rows,
+          });
+        }
+      }
+    }
+
+    return () => { cancelled = true; };
+  }, [phase, agentId, initTerminal, sendWs]);
 
   // ------------------------------------------------------------------
   // WS connection lifecycle
@@ -191,17 +238,12 @@ function TerminalPane({ sandboxId, agentId }: TerminalPaneProps) {
       catch { return; }
 
       switch (msg['type']) {
-        case 'subscribed':
-          // Subscription confirmed — now request the session list
-          requestSessionList();
-          break;
-
         case 'session_list': {
           if (msg['agent_id'] !== agentId) break;
           const raw = (msg['sessions'] as WsSession[] | undefined) ?? [];
           setSessions(raw);
           setPhase((prev) => {
-            if (prev === 'connecting' || prev === 'listing') {
+            if (prev === 'listing') {
               // Auto-attach if exactly one running interactive session
               const attachable = raw.filter(s => s.running && s.session_type === 'interactive');
               if (attachable.length === 1) {
@@ -227,56 +269,41 @@ function TerminalPane({ sandboxId, agentId }: TerminalPaneProps) {
           if (msg['agent_id'] !== agentId) break;
           const cmdId = msg['command_id'] as string | undefined;
           if (!cmdId) break;
-          const prev = attachedCmdRef.current;
+          // Update routing ref — useEffect below handles xterm init/replay
+          // after React commits the display:block update to the container.
           attachedCmdRef.current = cmdId;
           setPhase('attached');
           setStatusText(pickedSessionRef.current ?? 'terminal');
-
-          // Init xterm lazily on first attach
-          if (!xtermRef.current) {
-            initTerminal().then(() => {
-              if (!isMounted || !xtermRef.current) return;
-              if (prev !== cmdId) {
-                xtermRef.current.clear();
-                const buf = sessionBuffersRef.current.get(cmdId);
-                if (buf) xtermRef.current.write(buf);
-              }
-            });
-          } else if (prev !== cmdId) {
-            xtermRef.current.clear();
-            const buf = sessionBuffersRef.current.get(cmdId);
-            if (buf) xtermRef.current.write(buf);
-          }
           break;
         }
-
-        case 'session_created':
-          // New session created — refresh the list
-          requestSessionList();
-          break;
 
         case 'output': {
           if (msg['agent_id'] !== agentId) break;
           const cmdId = msg['command_id'] as string | undefined;
           const data = msg['data'] as string | undefined;
           if (!cmdId || !data) break;
+          // Always buffer (32 KB ring) so re-attach can replay
           let buf = sessionBuffersRef.current.get(cmdId) ?? '';
           buf += data;
           if (buf.length > 32768) buf = buf.slice(-32768);
           sessionBuffersRef.current.set(cmdId, buf);
+          // Write to terminal only when attached and initialized
           if (cmdId === attachedCmdRef.current && xtermRef.current) {
             xtermRef.current.write(data);
           }
           break;
         }
 
+        case 'session_created':
+          requestSessionList();
+          break;
+
         case 'error': {
           const errMsg = (msg['message'] as string) ?? 'unknown error';
-          if (xtermRef.current && phaseRef.current === 'attached') {
+          if (xtermRef.current && attachedCmdRef.current) {
             xtermRef.current.writeln(`\r\n\x1b[31m[Error: ${errMsg}]\x1b[0m`);
           } else {
             setWsError(errMsg);
-            // If we were mid-attach, drop back to the picker
             setPhase((prev) => (prev === 'attaching' ? 'picking' : prev));
           }
           break;
@@ -297,8 +324,11 @@ function TerminalPane({ sandboxId, agentId }: TerminalPaneProps) {
         setConnected(true);
         setStatusText('Listing sessions…');
         setPhase('listing');
-        // Subscribe first; session_list is requested in the 'subscribed' handler
+        // Send subscribe + list_sessions together — one round trip, not two.
+        // The server processes messages in order so subscription is registered
+        // before list_sessions is handled.
         ws.send(JSON.stringify({ type: 'subscribe', agent_id: agentId }));
+        ws.send(JSON.stringify({ type: 'list_sessions', agent_id: agentId }));
       };
 
       ws.onmessage = handleMessage;
@@ -340,10 +370,10 @@ function TerminalPane({ sandboxId, agentId }: TerminalPaneProps) {
       xtermRef.current = null;
       fitAddonRef.current = null;
     };
-  }, [sandboxId, agentId, requestSessionList, initTerminal]);
+  }, [sandboxId, agentId, requestSessionList]);
 
   // ------------------------------------------------------------------
-  // Handlers
+  // User action handlers
   // ------------------------------------------------------------------
 
   const handleAttach = (session: WsSession) => {
@@ -363,7 +393,6 @@ function TerminalPane({ sandboxId, agentId }: TerminalPaneProps) {
   const handleNewTerminal = async () => {
     setWsError(null);
     try {
-      // Use REST API for session creation (sandbox-side operation)
       await api.createSession(sandboxId, agentId, { command: 'bash' });
       requestSessionList();
     } catch (err) {
@@ -383,11 +412,9 @@ function TerminalPane({ sandboxId, agentId }: TerminalPaneProps) {
   // Render
   // ------------------------------------------------------------------
 
-  const attachable = sessions.filter(s => s.running && s.session_type === 'interactive');
-
   return (
     <div className={styles.terminal}>
-      {/* Status bar — always visible */}
+      {/* Status bar */}
       <div className={styles.termStatus}>
         <span className={[styles.termDot, connected ? styles.termDotOn : styles.termDotOff].join(' ')} />
         <span>{statusText}</span>
@@ -398,7 +425,7 @@ function TerminalPane({ sandboxId, agentId }: TerminalPaneProps) {
         )}
       </div>
 
-      {/* Error banner (non-terminal errors) */}
+      {/* Non-terminal error banner */}
       {wsError && (
         <div className={styles.errBanner}>
           {wsError}
@@ -406,12 +433,12 @@ function TerminalPane({ sandboxId, agentId }: TerminalPaneProps) {
         </div>
       )}
 
-      {/* Session picker — shown in connecting/listing/picking/attaching phases */}
+      {/* Session picker — shown before terminal is attached */}
       {phase !== 'attached' && (
         <div className={styles.termOutput} style={{ overflowY: 'auto', padding: '8px' }}>
           {(phase === 'connecting' || phase === 'listing') && (
             <div className={styles.infoRow}>
-              {phase === 'connecting' ? 'Connecting to management server…' : 'Listing sessions…'}
+              {phase === 'connecting' ? 'Connecting…' : 'Listing sessions…'}
             </div>
           )}
 
@@ -419,7 +446,7 @@ function TerminalPane({ sandboxId, agentId }: TerminalPaneProps) {
             <div className={styles.infoRow}>Attaching to {pickedSessionRef.current}…</div>
           )}
 
-          {(phase === 'picking') && (
+          {phase === 'picking' && (
             <>
               {sessions.length === 0 && (
                 <div className={styles.infoRow}>No active sessions for this agent.</div>
@@ -430,20 +457,22 @@ function TerminalPane({ sandboxId, agentId }: TerminalPaneProps) {
                   <span
                     className={[
                       styles.dot,
-                      s.running && s.session_type === 'interactive' ? styles.dotRunning : styles.dotExited
+                      s.running && s.session_type === 'interactive' ? styles.dotRunning : styles.dotExited,
                     ].join(' ')}
-                    title={s.running ? `Running — ${s.session_type}` : 'Not running'}
+                    title={s.running ? `${s.session_type} — running` : 'not running'}
                   />
-                  <span className={styles.sessionLabel} title={s.command}>
-                    {s.session_name}
-                  </span>
+                  <span className={styles.sessionLabel} title={s.command}>{s.session_name}</span>
                   <span className={styles.sessionAge}>{s.session_type}</span>
                   <button
                     type="button"
                     className={styles.attachBtn}
                     onClick={() => handleAttach(s)}
                     disabled={!s.running || s.session_type !== 'interactive'}
-                    title={!s.running ? 'Session not running' : s.session_type !== 'interactive' ? 'No PTY — headless/background session' : 'Attach terminal'}
+                    title={
+                      !s.running ? 'Session not running'
+                      : s.session_type !== 'interactive' ? 'No PTY (headless/background)'
+                      : 'Attach terminal'
+                    }
                   >
                     Attach
                   </button>
@@ -453,18 +482,17 @@ function TerminalPane({ sandboxId, agentId }: TerminalPaneProps) {
               <button type="button" className={styles.newTermBtn} onClick={handleNewTerminal}>
                 + New Terminal
               </button>
-
-              {attachable.length === 0 && sessions.length > 0 && (
-                <div className={styles.infoRow} style={{ marginTop: 6 }}>
-                  No attachable sessions (interactive + running). Create a new one above.
-                </div>
-              )}
             </>
           )}
         </div>
       )}
 
-      {/* xterm container — always mounted once attached so xterm has a stable DOM node */}
+      {/*
+       * xterm container — always in the DOM once the component mounts,
+       * display:none while picking so it doesn't take space, display:block
+       * when attached so FitAddon measures real dimensions.
+       * The terminal lifecycle useEffect fires AFTER this paint.
+       */}
       <div
         ref={containerRef}
         className={styles.termOutput}
@@ -474,7 +502,7 @@ function TerminalPane({ sandboxId, agentId }: TerminalPaneProps) {
   );
 }
 
-// ---- Session Picker (thin wrapper) ----
+// ---- Session Picker (thin toggle wrapper) ----
 
 export interface SessionPickerProps {
   sandboxId: string;
