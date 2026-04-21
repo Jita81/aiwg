@@ -1,70 +1,69 @@
 /**
  * Session Picker + Inline Terminal
  *
- * Renders a collapsible session list for a specific sandbox agent.
- * Each session shows name, command, age, has_screen status, and Attach/Kill controls.
- * "+ New Terminal" creates a new bash session via the sandbox REST API.
- * Attaching opens an inline terminal pane using the management WS protocol
- * (proxied through aiwg serve at /ws/sandbox/:sandboxId/management).
+ * The terminal pane connects to the management WS, lists sessions via
+ * `list_sessions`, shows an inline picker, then attaches to the chosen one.
+ * All session state (names, IDs, running status) comes directly from the
+ * management WS so there are no REST ↔ WS naming mismatches.
  *
- * The management WS is a multicast bus shared by all agents. TerminalPane sends
- * attach_session (by session_name) and receives output frames as raw PTY bytes,
- * buffering all output by command_id for instant replay on re-attach.
- * FitAddon sizes the xterm terminal to the container so the PTY is resized to match.
+ * Management WS protocol (proxied at /ws/sandbox/:sandboxId/management):
  *
- * Session list auto-refreshes every 5 s while the drawer is open with no active
- * terminal, and is also triggered by Attach/Kill/New actions.
+ *   Client → server:
+ *     { type: "subscribe",      agent_id }
+ *     { type: "list_sessions",  agent_id }
+ *     { type: "attach_session", agent_id, session_name, cols, rows }
+ *     { type: "create_session", agent_id, session_name, session_type,
+ *                               command, cols, rows }
+ *     { type: "send_input",     agent_id, command_id, data }
+ *     { type: "pty_resize",     agent_id, command_id, cols, rows }
+ *
+ *   Server → client:
+ *     { type: "subscribed",      agent_id }
+ *     { type: "session_list",    agent_id, sessions[] }
+ *     { type: "session_attached",agent_id, session_name, command_id }
+ *     { type: "session_created", agent_id, session_name, ... }
+ *     { type: "output",          agent_id, command_id, data, stream, ts }
+ *     { type: "error",           message }
  *
  * @issue #896
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { api, type Session } from '../../lib/api.js';
+import { api } from '../../lib/api.js';
 import styles from './SessionPicker.module.css';
 
-// ---- Helpers ----
+// ---- Types ----
 
-function relAge(secs: number): string {
-  if (secs < 60) return `${secs}s`;
-  const m = Math.floor(secs / 60);
-  if (m < 60) return `${m}m`;
-  return `${Math.floor(m / 60)}h`;
+interface WsSession {
+  session_name: string;
+  command_id: string;
+  session_id: string;
+  session_type: string;
+  command: string;
+  running: boolean;
 }
 
-// ---- Management WS terminal pane ----
+// ---- Terminal Pane ----
 //
-// Connects to the aiwg serve management WS proxy:
-//   /ws/sandbox/:sandboxId/management  →  sandbox.wsEndpoint (ws://host:port)
-//
-// The management WS is a multicast bus.  All agents share one connection.
-//
-// Client → server frames:
-//   { type: "subscribe",      agent_id }                                 ← must send first
-//   { type: "attach_session", agent_id, session_name, cols, rows }
-//   { type: "send_input",     agent_id, command_id, data }
-//   { type: "pty_resize",     agent_id, command_id, cols, rows }
-//
-// Server → client frames (relevant subset):
-//   { type: "subscribed",      agent_id }
-//   { type: "output",          agent_id, command_id, data, stream, ts }
-//   { type: "session_attached",agent_id, session_name, command_id }
-//   { type: "error",           message }
-//
-// Output buffering: all output is buffered by command_id (last 32 KB) regardless
-// of which session is attached.  On attach, the terminal is cleared and the buffer
-// is replayed — matching the sandbox management UI's behaviour exactly.
+// Owns the full lifecycle: WS connection → session list → pick → attach → I/O.
 
 interface TerminalPaneProps {
   sandboxId: string;
   agentId: string;
-  sessionId: string;   // used as buffer key before command_id is known
-  sessionName: string; // sent in attach_session
 }
+
+type Phase = 'connecting' | 'listing' | 'picking' | 'attaching' | 'attached';
 
 const RECONNECT_BASE_MS = 1_000;
 const RECONNECT_MAX_ATTEMPTS = 8;
 
-function TerminalPane({ sandboxId, agentId, sessionId, sessionName }: TerminalPaneProps) {
+function TerminalPane({ sandboxId, agentId }: TerminalPaneProps) {
+  const [phase, setPhase] = useState<Phase>('connecting');
+  const [sessions, setSessions] = useState<WsSession[]>([]);
+  const [statusText, setStatusText] = useState('Connecting…');
+  const [wsError, setWsError] = useState<string | null>(null);
+  const [connected, setConnected] = useState(false);
+
   const containerRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const xtermRef = useRef<any>(null);
@@ -72,33 +71,220 @@ function TerminalPane({ sandboxId, agentId, sessionId, sessionName }: TerminalPa
   const fitAddonRef = useRef<any>(null);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
-  // command_id → raw PTY bytes (last 32 KB per session)
   const sessionBuffersRef = useRef<Map<string, string>>(new Map());
-  // command_id confirmed by session_attached; null until server responds
   const attachedCmdRef = useRef<string | null>(null);
+  const pickedSessionRef = useRef<string | null>(null); // session_name being attached
   const reconnectAttemptsRef = useRef(0);
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [statusText, setStatusText] = useState('Connecting…');
-  const [connected, setConnected] = useState(false);
+  const phaseRef = useRef<Phase>('connecting');
 
-  useEffect(() => {
-    if (!containerRef.current) return;
-    let isMounted = true;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let term: any = null;
+  // Keep phaseRef in sync so WS handlers can read current phase without stale closure
+  useEffect(() => { phaseRef.current = phase; }, [phase]);
 
-    function sendAttach() {
-      if (wsRef.current?.readyState !== WebSocket.OPEN || !term) return;
-      wsRef.current.send(JSON.stringify({
-        type: 'attach_session',
+  // ------------------------------------------------------------------
+  // WS helpers (stable refs, not subject to React re-render)
+  // ------------------------------------------------------------------
+
+  const sendWs = useCallback((msg: Record<string, unknown>) => {
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify(msg));
+    }
+  }, []);
+
+  const requestSessionList = useCallback(() => {
+    sendWs({ type: 'list_sessions', agent_id: agentId });
+  }, [agentId, sendWs]);
+
+  // ------------------------------------------------------------------
+  // xterm initialisation (runs after the container div is visible)
+  // ------------------------------------------------------------------
+
+  const initTerminal = useCallback(async () => {
+    if (!containerRef.current || xtermRef.current) return;
+    const [{ Terminal }, { FitAddon }] = await Promise.all([
+      import('@xterm/xterm'),
+      import('@xterm/addon-fit'),
+    ]);
+    if (!containerRef.current) return; // unmounted during async import
+
+    const term = new Terminal({
+      rows: 24,
+      cols: 80,
+      scrollback: 0, // replay from buffer on re-attach
+      cursorBlink: true,
+      convertEol: false,
+      theme: {
+        background: '#0d0d0d',
+        foreground: '#d4d4d4',
+        cursor: '#d4d4d4',
+        selectionBackground: 'rgba(255,255,255,0.25)',
+      },
+      fontFamily: '"Cascadia Code", "Fira Code", "JetBrains Mono", monospace',
+      fontSize: 12,
+      lineHeight: 1.3,
+    });
+
+    const wrapper = document.createElement('div');
+    wrapper.style.width = '100%';
+    wrapper.style.height = '100%';
+    containerRef.current.appendChild(wrapper);
+
+    const fitAddon = new FitAddon();
+    fitAddonRef.current = fitAddon;
+    term.loadAddon(fitAddon);
+    term.open(wrapper);
+    try { fitAddon.fit(); } catch { /* ignore */ }
+    xtermRef.current = term;
+
+    // Ctrl+C: copy if selection; otherwise pass through
+    term.attachCustomKeyEventHandler((ev: KeyboardEvent) => {
+      if (ev.type !== 'keydown') return true;
+      if (ev.ctrlKey && ev.key === 'c' && term.hasSelection()) return false;
+      if (ev.ctrlKey && ev.key === 'v') return false;
+      return true;
+    });
+
+    term.onData((data: string) => {
+      if (wsRef.current?.readyState === WebSocket.OPEN && attachedCmdRef.current) {
+        sendWs({ type: 'send_input', agent_id: agentId, command_id: attachedCmdRef.current, data });
+      }
+    });
+
+    const resizeObserver = new ResizeObserver(() => {
+      try { fitAddonRef.current?.fit(); } catch { /* ignore */ }
+      if (wsRef.current?.readyState === WebSocket.OPEN && attachedCmdRef.current && xtermRef.current) {
+        sendWs({
+          type: 'pty_resize',
+          agent_id: agentId,
+          command_id: attachedCmdRef.current,
+          cols: xtermRef.current.cols,
+          rows: xtermRef.current.rows,
+        });
+      }
+    });
+    resizeObserverRef.current = resizeObserver;
+    resizeObserver.observe(containerRef.current);
+
+    // Sync PTY dimensions now that xterm is sized
+    if (attachedCmdRef.current) {
+      sendWs({
+        type: 'pty_resize',
         agent_id: agentId,
-        session_name: sessionName,
+        command_id: attachedCmdRef.current,
         cols: term.cols,
         rows: term.rows,
-      }));
+      });
+    }
+  }, [agentId, sendWs]);
+
+  // ------------------------------------------------------------------
+  // WS connection lifecycle
+  // ------------------------------------------------------------------
+
+  useEffect(() => {
+    let isMounted = true;
+
+    function handleMessage(evt: MessageEvent) {
+      if (!isMounted) return;
+      let msg: Record<string, unknown>;
+      try { msg = JSON.parse(evt.data as string); }
+      catch { return; }
+
+      switch (msg['type']) {
+        case 'subscribed':
+          // Subscription confirmed — now request the session list
+          requestSessionList();
+          break;
+
+        case 'session_list': {
+          if (msg['agent_id'] !== agentId) break;
+          const raw = (msg['sessions'] as WsSession[] | undefined) ?? [];
+          setSessions(raw);
+          setPhase((prev) => {
+            if (prev === 'connecting' || prev === 'listing') {
+              // Auto-attach if exactly one running interactive session
+              const attachable = raw.filter(s => s.running && s.session_type === 'interactive');
+              if (attachable.length === 1) {
+                const s = attachable[0];
+                pickedSessionRef.current = s.session_name;
+                wsRef.current?.send(JSON.stringify({
+                  type: 'attach_session',
+                  agent_id: agentId,
+                  session_name: s.session_name,
+                  cols: 80,
+                  rows: 24,
+                }));
+                return 'attaching';
+              }
+              return 'picking';
+            }
+            return prev; // mid-session refresh — stay in current phase
+          });
+          break;
+        }
+
+        case 'session_attached': {
+          if (msg['agent_id'] !== agentId) break;
+          const cmdId = msg['command_id'] as string | undefined;
+          if (!cmdId) break;
+          const prev = attachedCmdRef.current;
+          attachedCmdRef.current = cmdId;
+          setPhase('attached');
+          setStatusText(pickedSessionRef.current ?? 'terminal');
+
+          // Init xterm lazily on first attach
+          if (!xtermRef.current) {
+            initTerminal().then(() => {
+              if (!isMounted || !xtermRef.current) return;
+              if (prev !== cmdId) {
+                xtermRef.current.clear();
+                const buf = sessionBuffersRef.current.get(cmdId);
+                if (buf) xtermRef.current.write(buf);
+              }
+            });
+          } else if (prev !== cmdId) {
+            xtermRef.current.clear();
+            const buf = sessionBuffersRef.current.get(cmdId);
+            if (buf) xtermRef.current.write(buf);
+          }
+          break;
+        }
+
+        case 'session_created':
+          // New session created — refresh the list
+          requestSessionList();
+          break;
+
+        case 'output': {
+          if (msg['agent_id'] !== agentId) break;
+          const cmdId = msg['command_id'] as string | undefined;
+          const data = msg['data'] as string | undefined;
+          if (!cmdId || !data) break;
+          let buf = sessionBuffersRef.current.get(cmdId) ?? '';
+          buf += data;
+          if (buf.length > 32768) buf = buf.slice(-32768);
+          sessionBuffersRef.current.set(cmdId, buf);
+          if (cmdId === attachedCmdRef.current && xtermRef.current) {
+            xtermRef.current.write(data);
+          }
+          break;
+        }
+
+        case 'error': {
+          const errMsg = (msg['message'] as string) ?? 'unknown error';
+          if (xtermRef.current && phaseRef.current === 'attached') {
+            xtermRef.current.writeln(`\r\n\x1b[31m[Error: ${errMsg}]\x1b[0m`);
+          } else {
+            setWsError(errMsg);
+            // If we were mid-attach, drop back to the picker
+            setPhase((prev) => (prev === 'attaching' ? 'picking' : prev));
+          }
+          break;
+        }
+      }
     }
 
-    function connectWs() {
+    function connect() {
       if (!isMounted) return;
       const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       const wsUrl = `${proto}//${window.location.host}/ws/sandbox/${sandboxId}/management`;
@@ -109,67 +295,20 @@ function TerminalPane({ sandboxId, agentId, sessionId, sessionName }: TerminalPa
         if (!isMounted) return;
         reconnectAttemptsRef.current = 0;
         setConnected(true);
-        setStatusText(sessionName);
-        // Fit to container so PTY is sized to match the visible terminal
-        try { fitAddonRef.current?.fit(); } catch { /* ignore */ }
-        // Subscribe first so output frames arrive before we attach
+        setStatusText('Listing sessions…');
+        setPhase('listing');
+        // Subscribe first; session_list is requested in the 'subscribed' handler
         ws.send(JSON.stringify({ type: 'subscribe', agent_id: agentId }));
-        sendAttach();
       };
 
-      ws.onmessage = (evt) => {
-        if (!isMounted || !term) return;
-        try {
-          const msg = JSON.parse(evt.data as string) as Record<string, unknown>;
-          switch (msg['type']) {
-            case 'output': {
-              // Only handle output for our agent
-              if (msg['agent_id'] !== agentId) break;
-              const cmdId = msg['command_id'] as string | undefined;
-              const data = msg['data'] as string | undefined;
-              if (!cmdId || !data) break;
-
-              // Always buffer (last 32 KB)
-              let buf = sessionBuffersRef.current.get(cmdId) ?? '';
-              buf += data;
-              if (buf.length > 32768) buf = buf.slice(-32768);
-              sessionBuffersRef.current.set(cmdId, buf);
-
-              // Write to terminal only when this is our attached session
-              if (cmdId === attachedCmdRef.current) {
-                term.write(data);
-              }
-              break;
-            }
-            case 'session_attached': {
-              if (msg['agent_id'] !== agentId) break;
-              const cmdId = msg['command_id'] as string | undefined;
-              if (!cmdId) break;
-              const prev = attachedCmdRef.current;
-              attachedCmdRef.current = cmdId;
-
-              // On first attach or if command_id changed, replay from buffer
-              if (prev !== cmdId) {
-                term.clear();
-                const buf = sessionBuffersRef.current.get(cmdId);
-                if (buf) term.write(buf);
-              }
-              setStatusText(sessionName);
-              break;
-            }
-            case 'error':
-              term.writeln(`\r\n\x1b[31m[Error: ${msg['message'] ?? 'unknown'}]\x1b[0m`);
-              break;
-          }
-        } catch { /* ignore malformed frames */ }
-      };
+      ws.onmessage = handleMessage;
 
       ws.onclose = () => {
         if (!isMounted) return;
         setConnected(false);
         const attempt = reconnectAttemptsRef.current;
         if (attempt >= RECONNECT_MAX_ATTEMPTS) {
-          setStatusText('Connection lost — go back and re-attach');
+          setStatusText('Connection lost — refresh to retry');
           return;
         }
         const delay = RECONNECT_BASE_MS * Math.pow(2, attempt);
@@ -177,8 +316,10 @@ function TerminalPane({ sandboxId, agentId, sessionId, sessionName }: TerminalPa
         setStatusText(`Reconnecting… (${attempt + 1}/${RECONNECT_MAX_ATTEMPTS})`);
         reconnectTimerRef.current = setTimeout(() => {
           if (isMounted) {
-            attachedCmdRef.current = null; // will be re-confirmed by session_attached
-            connectWs();
+            attachedCmdRef.current = null;
+            pickedSessionRef.current = null;
+            setPhase('connecting');
+            connect();
           }
         }, delay);
       };
@@ -186,85 +327,7 @@ function TerminalPane({ sandboxId, agentId, sessionId, sessionName }: TerminalPa
       ws.onerror = () => { /* onclose handles recovery */ };
     }
 
-    async function init() {
-      const [{ Terminal }, { FitAddon }] = await Promise.all([
-        import('@xterm/xterm'),
-        import('@xterm/addon-fit'),
-      ]);
-      if (!isMounted || !containerRef.current) return;
-
-      term = new Terminal({
-        rows: 24,
-        cols: 80,
-        // scrollback:0 — we replay from sessionBuffersRef on re-attach; accumulating
-        // old output in scrollback causes content to shift up incorrectly.
-        scrollback: 0,
-        cursorBlink: true,
-        convertEol: false,
-        theme: {
-          background: '#0d0d0d',
-          foreground: '#d4d4d4',
-          cursor: '#d4d4d4',
-          selectionBackground: 'rgba(255,255,255,0.25)',
-        },
-        fontFamily: '"Cascadia Code", "Fira Code", "JetBrains Mono", monospace',
-        fontSize: 12,
-        lineHeight: 1.3,
-      });
-
-      // Inner wrapper with 100% height so FitAddon measures the container correctly
-      const wrapper = document.createElement('div');
-      wrapper.style.width = '100%';
-      wrapper.style.height = '100%';
-      containerRef.current!.appendChild(wrapper);
-
-      const fitAddon = new FitAddon();
-      fitAddonRef.current = fitAddon;
-      term.loadAddon(fitAddon);
-      term.open(wrapper);
-      try { fitAddon.fit(); } catch { /* ignore */ }
-      xtermRef.current = term;
-
-      // Ctrl+C: copy when text selected; otherwise pass through
-      term.attachCustomKeyEventHandler((ev: KeyboardEvent) => {
-        if (ev.type !== 'keydown') return true;
-        if (ev.ctrlKey && ev.key === 'c' && term.hasSelection()) return false;
-        if (ev.ctrlKey && ev.key === 'v') return false;
-        return true;
-      });
-
-      term.onData((data: string) => {
-        if (wsRef.current?.readyState === WebSocket.OPEN && attachedCmdRef.current) {
-          wsRef.current.send(JSON.stringify({
-            type: 'send_input',
-            agent_id: agentId,
-            command_id: attachedCmdRef.current,
-            data,
-          }));
-        }
-      });
-
-      // Re-fit and resize PTY when the container changes size
-      const resizeObserver = new ResizeObserver(() => {
-        if (!isMounted) return;
-        try { fitAddonRef.current?.fit(); } catch { /* ignore */ }
-        if (wsRef.current?.readyState === WebSocket.OPEN && attachedCmdRef.current) {
-          wsRef.current.send(JSON.stringify({
-            type: 'pty_resize',
-            agent_id: agentId,
-            command_id: attachedCmdRef.current,
-            cols: term.cols,
-            rows: term.rows,
-          }));
-        }
-      });
-      resizeObserverRef.current = resizeObserver;
-      resizeObserver.observe(containerRef.current!);
-
-      requestAnimationFrame(() => { if (isMounted) connectWs(); });
-    }
-
-    init();
+    connect();
 
     return () => {
       isMounted = false;
@@ -277,25 +340,141 @@ function TerminalPane({ sandboxId, agentId, sessionId, sessionName }: TerminalPa
       xtermRef.current = null;
       fitAddonRef.current = null;
     };
-  }, [sandboxId, agentId, sessionId, sessionName]);
+  }, [sandboxId, agentId, requestSessionList, initTerminal]);
+
+  // ------------------------------------------------------------------
+  // Handlers
+  // ------------------------------------------------------------------
+
+  const handleAttach = (session: WsSession) => {
+    setWsError(null);
+    pickedSessionRef.current = session.session_name;
+    sendWs({
+      type: 'attach_session',
+      agent_id: agentId,
+      session_name: session.session_name,
+      cols: 80,
+      rows: 24,
+    });
+    setPhase('attaching');
+    setStatusText(`Attaching to ${session.session_name}…`);
+  };
+
+  const handleNewTerminal = async () => {
+    setWsError(null);
+    try {
+      // Use REST API for session creation (sandbox-side operation)
+      await api.createSession(sandboxId, agentId, { command: 'bash' });
+      requestSessionList();
+    } catch (err) {
+      setWsError(`Failed to create session: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  };
+
+  const handleBack = () => {
+    attachedCmdRef.current = null;
+    pickedSessionRef.current = null;
+    setPhase('listing');
+    setStatusText('Listing sessions…');
+    requestSessionList();
+  };
+
+  // ------------------------------------------------------------------
+  // Render
+  // ------------------------------------------------------------------
+
+  const attachable = sessions.filter(s => s.running && s.session_type === 'interactive');
 
   return (
     <div className={styles.terminal}>
+      {/* Status bar — always visible */}
       <div className={styles.termStatus}>
         <span className={[styles.termDot, connected ? styles.termDotOn : styles.termDotOff].join(' ')} />
         <span>{statusText}</span>
+        {phase === 'attached' && (
+          <button type="button" className={styles.backBtn} onClick={handleBack}>
+            ← Sessions
+          </button>
+        )}
       </div>
-      <div ref={containerRef} className={styles.termOutput} />
+
+      {/* Error banner (non-terminal errors) */}
+      {wsError && (
+        <div className={styles.errBanner}>
+          {wsError}
+          <button type="button" onClick={() => setWsError(null)}>✕</button>
+        </div>
+      )}
+
+      {/* Session picker — shown in connecting/listing/picking/attaching phases */}
+      {phase !== 'attached' && (
+        <div className={styles.termOutput} style={{ overflowY: 'auto', padding: '8px' }}>
+          {(phase === 'connecting' || phase === 'listing') && (
+            <div className={styles.infoRow}>
+              {phase === 'connecting' ? 'Connecting to management server…' : 'Listing sessions…'}
+            </div>
+          )}
+
+          {phase === 'attaching' && (
+            <div className={styles.infoRow}>Attaching to {pickedSessionRef.current}…</div>
+          )}
+
+          {(phase === 'picking') && (
+            <>
+              {sessions.length === 0 && (
+                <div className={styles.infoRow}>No active sessions for this agent.</div>
+              )}
+
+              {sessions.map((s) => (
+                <div key={s.session_id || s.session_name} className={styles.sessionRow}>
+                  <span
+                    className={[
+                      styles.dot,
+                      s.running && s.session_type === 'interactive' ? styles.dotRunning : styles.dotExited
+                    ].join(' ')}
+                    title={s.running ? `Running — ${s.session_type}` : 'Not running'}
+                  />
+                  <span className={styles.sessionLabel} title={s.command}>
+                    {s.session_name}
+                  </span>
+                  <span className={styles.sessionAge}>{s.session_type}</span>
+                  <button
+                    type="button"
+                    className={styles.attachBtn}
+                    onClick={() => handleAttach(s)}
+                    disabled={!s.running || s.session_type !== 'interactive'}
+                    title={!s.running ? 'Session not running' : s.session_type !== 'interactive' ? 'No PTY — headless/background session' : 'Attach terminal'}
+                  >
+                    Attach
+                  </button>
+                </div>
+              ))}
+
+              <button type="button" className={styles.newTermBtn} onClick={handleNewTerminal}>
+                + New Terminal
+              </button>
+
+              {attachable.length === 0 && sessions.length > 0 && (
+                <div className={styles.infoRow} style={{ marginTop: 6 }}>
+                  No attachable sessions (interactive + running). Create a new one above.
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
+      {/* xterm container — always mounted once attached so xterm has a stable DOM node */}
+      <div
+        ref={containerRef}
+        className={styles.termOutput}
+        style={{ display: phase === 'attached' ? 'block' : 'none' }}
+      />
     </div>
   );
 }
 
-// ---- Session Picker ----
-
-interface ActiveSession {
-  sessionId: string;
-  sessionName: string;
-}
+// ---- Session Picker (thin wrapper) ----
 
 export interface SessionPickerProps {
   sandboxId: string;
@@ -304,85 +483,6 @@ export interface SessionPickerProps {
 
 export function SessionPicker({ sandboxId, agentId }: SessionPickerProps) {
   const [open, setOpen] = useState(true);
-  const [sessions, setSessions] = useState<Session[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [active, setActive] = useState<ActiveSession | null>(null);
-
-  const fetchSessions = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await api.agentSessions(sandboxId, agentId);
-      setSessions(data.sessions);
-      return data.sessions;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-      return [];
-    } finally {
-      setLoading(false);
-    }
-  }, [sandboxId, agentId]);
-
-  // Fetch on open; poll every 5 s while list is visible.
-  // On first load, auto-attach if exactly one attachable session exists.
-  const didAutoAttach = useRef(false);
-  useEffect(() => {
-    if (!open || active) return;
-    let cancelled = false;
-    fetchSessions().then((initial) => {
-      if (cancelled || didAutoAttach.current) return;
-      const attachable = initial.filter(s => s.has_screen);
-      if (attachable.length === 1) {
-        didAutoAttach.current = true;
-        setActive({ sessionId: attachable[0].session_id, sessionName: attachable[0].session_name });
-      }
-    });
-    const id = setInterval(fetchSessions, 5_000);
-    return () => { cancelled = true; clearInterval(id); };
-  }, [open, active, fetchSessions]);
-
-  const handleAttach = (session: Session) => {
-    setActive({ sessionId: session.session_id, sessionName: session.session_name });
-  };
-
-  const handleNewTerminal = async () => {
-    setError(null);
-    try {
-      // Re-fetch to check for an existing attachable session before creating a new one
-      const current = await api.agentSessions(sandboxId, agentId);
-      const attachable = current.sessions.filter(s => s.has_screen);
-      if (attachable.length > 0) {
-        // Prefer the most-recently-seen session (last in list)
-        const pick = attachable[attachable.length - 1];
-        setSessions(current.sessions);
-        setActive({ sessionId: pick.session_id, sessionName: pick.session_name });
-        return;
-      }
-      // No live session — create a new one
-      const result = await api.createSession(sandboxId, agentId, { command: 'bash' });
-      setActive({ sessionId: result.session_id, sessionName: result.session_name });
-      fetchSessions().catch(() => { /* ignore */ });
-    } catch (err) {
-      setError(`Failed to create session: ${err instanceof Error ? err.message : String(err)}`);
-    }
-  };
-
-  const handleKill = async (sessionName: string) => {
-    setError(null);
-    try {
-      await api.killSession(sandboxId, agentId, sessionName);
-      if (active?.sessionName === sessionName) setActive(null);
-      await fetchSessions();
-    } catch (err) {
-      setError(`Failed to kill session: ${err instanceof Error ? err.message : String(err)}`);
-    }
-  };
-
-  const handleBack = () => {
-    setActive(null);
-    fetchSessions().catch(() => { /* ignore */ });
-  };
 
   return (
     <div className={styles.sessionPicker}>
@@ -398,77 +498,7 @@ export function SessionPicker({ sandboxId, agentId }: SessionPickerProps) {
 
       {open && (
         <div className={styles.drawer}>
-          {active ? (
-            /* ---- Active terminal pane ---- */
-            <div className={styles.terminalWrap}>
-              <div className={styles.terminalHeader}>
-                <span className={styles.terminalLabel}>{active.sessionName}</span>
-                <button type="button" className={styles.backBtn} onClick={handleBack}>
-                  ← Sessions
-                </button>
-              </div>
-              <TerminalPane
-                sandboxId={sandboxId}
-                agentId={agentId}
-                sessionId={active.sessionId}
-                sessionName={active.sessionName}
-              />
-            </div>
-          ) : (
-            /* ---- Session list ---- */
-            <>
-              {error && (
-                <div className={styles.errBanner}>
-                  {error}
-                  <button type="button" onClick={() => setError(null)}>✕</button>
-                </div>
-              )}
-
-              {loading && sessions.length === 0 && (
-                <div className={styles.infoRow}>Loading sessions...</div>
-              )}
-
-              {!loading && sessions.length === 0 && !error && (
-                <div className={styles.infoRow}>No active sessions for this agent.</div>
-              )}
-
-              {sessions.map((session) => (
-                <div key={session.session_id} className={styles.sessionRow}>
-                  <span
-                    className={[styles.dot, session.has_screen ? styles.dotRunning : styles.dotExited].join(' ')}
-                    title={session.has_screen ? 'Attachable' : 'No screen state'}
-                    aria-label={session.has_screen ? 'Attachable' : 'No screen state'}
-                  />
-                  <span className={styles.sessionLabel} title={`${session.command} (${session.session_type})`}>
-                    {session.session_name}
-                  </span>
-                  <span className={styles.sessionAge}>{relAge(session.created_at_secs)}</span>
-                  <button
-                    type="button"
-                    className={styles.attachBtn}
-                    onClick={() => handleAttach(session)}
-                    disabled={!session.has_screen}
-                    title={!session.has_screen ? 'No screen state — session may have exited' : 'Attach terminal'}
-                  >
-                    Attach
-                  </button>
-                  <button
-                    type="button"
-                    className={styles.killBtn}
-                    onClick={() => handleKill(session.session_name)}
-                    title="Kill session"
-                    aria-label="Kill session"
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
-
-              <button type="button" className={styles.newTermBtn} onClick={handleNewTerminal}>
-                + New Terminal
-              </button>
-            </>
-          )}
+          <TerminalPane sandboxId={sandboxId} agentId={agentId} />
         </div>
       )}
     </div>
