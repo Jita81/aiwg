@@ -680,7 +680,8 @@ async function startServer(opts: {
 
   app.post('/api/hitl/:id/respond', async (c: any) => {
     const hitlId: string = c.req.param('id');
-    const hitl = sandboxRegistry.resolveHitl(hitlId);
+    // Use getHitl (not resolveHitl) — don't remove from queue until sandbox confirms (#908)
+    const hitl = sandboxRegistry.getHitl(hitlId);
     if (!hitl) return c.json({ error: 'HITL request not found or already resolved' }, 404);
     const sandbox = sandboxRegistry.get(hitl.sandboxId);
     if (!sandbox) return c.json({ error: 'Sandbox no longer registered' }, 410);
@@ -691,7 +692,21 @@ async function startServer(opts: {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text }),
       });
-      return c.json({ ok: true }, resp.status);
+      if (resp.ok || resp.status === 204) {
+        // Remove from queue only after sandbox confirms receipt (#908)
+        sandboxRegistry.resolveHitl(hitlId);
+        // Notify browser subscribers that the HITL was responded to (#908)
+        sandboxRegistry.emit({
+          type: 'hitl.responded',
+          sandboxId: hitl.sandboxId,
+          agentId: hitl.agentId,
+          timestamp: new Date().toISOString(),
+          hitlId,
+          sessionId: hitl.sessionId,
+        });
+      }
+      // Return 200 regardless of sandbox's 204 (body-less responses cause issues on some clients)
+      return c.json({ ok: resp.ok }, resp.ok ? 200 : resp.status);
     } catch (err) {
       return c.json({ error: `Sandbox unreachable: ${err instanceof Error ? err.message : String(err)}` }, 502);
     }
@@ -701,6 +716,64 @@ async function startServer(opts: {
     const hitl = sandboxRegistry.resolveHitl(c.req.param('id'));
     if (!hitl) return c.json({ error: 'HITL request not found or already resolved' }, 404);
     return c.json({ ok: true });
+  });
+
+  // Task proxy endpoints (#907)
+  // Forward to sandbox /api/v1/tasks — enables the serve dashboard task submission UI
+
+  app.get('/api/sandboxes/:id/tasks', async (c: any) => {
+    const sandbox = sandboxRegistry.get(c.req.param('id'));
+    if (!sandbox) return c.json({ error: 'Sandbox not found' }, 404);
+    try {
+      const url = new URL(`${sandbox.httpEndpoint}/api/v1/tasks`);
+      const qs = c.req.query() as Record<string, string>;
+      for (const [k, v] of Object.entries(qs)) url.searchParams.set(k, v);
+      const resp = await fetch(url.toString());
+      return c.json(await resp.json(), resp.status);
+    } catch (err) {
+      return c.json({ error: `Sandbox unreachable: ${err instanceof Error ? err.message : String(err)}` }, 502);
+    }
+  });
+
+  app.post('/api/sandboxes/:id/tasks', async (c: any) => {
+    const sandbox = sandboxRegistry.get(c.req.param('id'));
+    if (!sandbox) return c.json({ error: 'Sandbox not found' }, 404);
+    try {
+      const body = await c.req.json().catch(() => ({}));
+      const resp = await fetch(`${sandbox.httpEndpoint}/api/v1/tasks`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      return c.json(await resp.json(), resp.status);
+    } catch (err) {
+      return c.json({ error: `Sandbox unreachable: ${err instanceof Error ? err.message : String(err)}` }, 502);
+    }
+  });
+
+  app.get('/api/sandboxes/:id/tasks/:taskId', async (c: any) => {
+    const sandbox = sandboxRegistry.get(c.req.param('id'));
+    if (!sandbox) return c.json({ error: 'Sandbox not found' }, 404);
+    try {
+      const resp = await fetch(`${sandbox.httpEndpoint}/api/v1/tasks/${c.req.param('taskId')}`);
+      return c.json(await resp.json(), resp.status);
+    } catch (err) {
+      return c.json({ error: `Sandbox unreachable: ${err instanceof Error ? err.message : String(err)}` }, 502);
+    }
+  });
+
+  app.delete('/api/sandboxes/:id/tasks/:taskId', async (c: any) => {
+    const sandbox = sandboxRegistry.get(c.req.param('id'));
+    if (!sandbox) return c.json({ error: 'Sandbox not found' }, 404);
+    try {
+      const resp = await fetch(`${sandbox.httpEndpoint}/api/v1/tasks/${c.req.param('taskId')}`, {
+        method: 'DELETE',
+      });
+      if (resp.status === 204) return new Response(null, { status: 204 });
+      return c.json(await resp.json(), resp.status);
+    } catch (err) {
+      return c.json({ error: `Sandbox unreachable: ${err instanceof Error ? err.message : String(err)}` }, 502);
+    }
   });
 
   // Static file serving — apps/web/dist/ (#714)

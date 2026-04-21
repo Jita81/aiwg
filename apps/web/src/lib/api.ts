@@ -27,6 +27,38 @@ export interface TelemetryResponse {
   events: unknown[];
 }
 
+// ---- Inventory types (#906) ----
+
+export interface AgentManifestSummary {
+  name: string;
+  description: string;
+  model?: string;
+  category: string;
+  platform: string;
+  content_hash: string;
+}
+
+export interface CommandManifestSummary {
+  name: string;
+  description: string;
+  platform: string;
+  content_hash: string;
+}
+
+export interface SkillManifestSummary {
+  name: string;
+  description: string;
+  platform: string;
+  content_hash: string;
+}
+
+export interface AgentInventory {
+  agents: AgentManifestSummary[];
+  commands: CommandManifestSummary[];
+  skills: SkillManifestSummary[];
+  last_updated: string;
+}
+
 // ---- Sandbox types (#731) ----
 
 export interface SandboxAgent {
@@ -36,6 +68,8 @@ export interface SandboxAgent {
   aiwgFrameworks?: Array<{ name: string; providers: string[] }>;
   sandboxId?: string;
   sandboxName?: string;
+  /** Agent/command/skill manifest inventory (#906) */
+  inventory?: AgentInventory;
 }
 
 export interface SandboxSummary {
@@ -56,6 +90,8 @@ export interface SandboxSummary {
   disconnectedAt?: string;
   agentCount: number;
   agents: SandboxAgent[];
+  /** Sandbox-level artifact inventory reported at registration (#906) */
+  sandboxInventory?: AgentInventory;
 }
 
 export interface SandboxesResponse {
@@ -137,6 +173,48 @@ export interface Loadout {
   resources?: { cpus?: number; memory?: string; disk?: string };
 }
 
+// ---- Task types (#907) ----
+
+export interface SandboxTaskProgress {
+  output_bytes: number;
+  tool_calls: number;
+  current_tool?: string;
+  last_activity_at?: string;
+}
+
+export interface SandboxTask {
+  id: string;
+  name: string;
+  state: 'pending' | 'running' | 'completed' | 'failed' | 'cancelled' | string;
+  state_message?: string;
+  created_at: string;
+  started_at?: string;
+  state_changed_at: string;
+  vm_name?: string;
+  vm_ip?: string;
+  exit_code?: number;
+  error?: string;
+  progress: SandboxTaskProgress;
+}
+
+export interface SandboxTasksResponse {
+  tasks: SandboxTask[];
+  total_count: number;
+}
+
+export interface SubmitTaskRequest {
+  /** YAML manifest as a string */
+  manifest_yaml?: string;
+  /** JSON manifest (alternative to YAML) */
+  manifest?: Record<string, unknown>;
+}
+
+export interface SubmitTaskResponse {
+  task_id: string;
+  accepted: boolean;
+  error?: string;
+}
+
 export const api = {
   health: () => request<HealthResponse>('/api/health'),
   sessions: () => request<SessionsResponse>('/api/sessions'),
@@ -174,6 +252,20 @@ export const api = {
   /** Kill a session by its session_name (the DELETE path key on the sandbox). */
   killSession: (sandboxId: string, agentId: string, sessionName: string) =>
     request<void>(`/api/sandboxes/${sandboxId}/agents/${agentId}/sessions/${encodeURIComponent(sessionName)}`, { method: 'DELETE' }),
+
+  // Tasks (#907)
+  sandboxTasks: (sandboxId: string, state?: string) =>
+    request<SandboxTasksResponse>(`/api/sandboxes/${sandboxId}/tasks${state ? `?state=${encodeURIComponent(state)}` : ''}`),
+  submitTask: (sandboxId: string, body: SubmitTaskRequest) =>
+    request<SubmitTaskResponse>(`/api/sandboxes/${sandboxId}/tasks`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    }),
+  getTask: (sandboxId: string, taskId: string) =>
+    request<SandboxTask>(`/api/sandboxes/${sandboxId}/tasks/${taskId}`),
+  cancelTask: (sandboxId: string, taskId: string) =>
+    request<void>(`/api/sandboxes/${sandboxId}/tasks/${taskId}`, { method: 'DELETE' }),
 
   // HITL (#732)
   hitl: () => request<HitlResponse>('/api/hitl'),

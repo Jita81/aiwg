@@ -109,7 +109,8 @@ export function HitlDrawer() {
   }, [state.requests, state.activeIdx]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    // Send on Enter (without Shift) or Ctrl+Enter (#908)
+    if ((e.key === 'Enter' && !e.shiftKey) || (e.key === 'Enter' && e.ctrlKey)) {
       e.preventDefault();
       handleRespond();
     }
@@ -168,7 +169,7 @@ export function HitlDrawer() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Type your response... (Enter to send, Shift+Enter for newline)"
+              placeholder="Type your response... (Enter or Ctrl+Enter to send, Shift+Enter for newline)"
               rows={2}
               disabled={submitting}
               aria-label="Response to agent"

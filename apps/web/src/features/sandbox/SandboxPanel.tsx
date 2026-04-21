@@ -8,8 +8,8 @@
  * @issue #733
  */
 
-import { useCallback, useEffect, useReducer } from 'react';
-import { api, type SandboxSummary, type SandboxAgent } from '../../lib/api.js';
+import { useCallback, useEffect, useReducer, useState } from 'react';
+import { api, type SandboxSummary, type SandboxAgent, type SandboxTask, type SubmitTaskRequest } from '../../lib/api.js';
 import styles from './SandboxPanel.module.css';
 import { SessionPicker } from './SessionPicker.js';
 
@@ -105,6 +105,7 @@ function shortId(id?: string): string {
 
 export function SandboxPanel() {
   const [state, dispatch] = useReducer(reducer, INITIAL);
+  const [activeTab, setActiveTab] = useState<'agents' | 'tasks'>('agents');
 
   // Poll sandboxes
   useEffect(() => {
@@ -281,25 +282,57 @@ export function SandboxPanel() {
               </div>
             )}
 
-            {/* Agent grid */}
-            <div className={styles.agentGrid} role="list" aria-label="Agents">
-              {selectedSandbox.agents.length === 0 ? (
-                <div className={styles.emptyAgents}>
-                  {selectedSandbox.connected ? 'No agents connected' : 'No agent data from last session'}
-                </div>
-              ) : (
-                selectedSandbox.agents.map((agent) => (
-                  <AgentCard
-                    key={agent.agentId}
-                    agent={agent}
-                    sandboxId={selectedSandbox.id}
-                    onAction={handleAgentAction}
-                    actionInProgress={state.actionInProgress}
-                    sandboxConnected={selectedSandbox.connected}
-                  />
-                ))
-              )}
+            {/* Tab bar */}
+            <div className={styles.tabBar} role="tablist">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeTab === 'agents'}
+                className={activeTab === 'agents' ? styles.tabActive : styles.tab}
+                onClick={() => setActiveTab('agents')}
+              >
+                Agents
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeTab === 'tasks'}
+                className={activeTab === 'tasks' ? styles.tabActive : styles.tab}
+                onClick={() => setActiveTab('tasks')}
+              >
+                Tasks
+              </button>
             </div>
+
+            {/* Agent grid */}
+            {activeTab === 'agents' && (
+              <div className={styles.agentGrid} role="list" aria-label="Agents">
+                {selectedSandbox.agents.length === 0 ? (
+                  <div className={styles.emptyAgents}>
+                    {selectedSandbox.connected ? 'No agents connected' : 'No agent data from last session'}
+                  </div>
+                ) : (
+                  selectedSandbox.agents.map((agent) => (
+                    <AgentCard
+                      key={agent.agentId}
+                      agent={agent}
+                      sandboxId={selectedSandbox.id}
+                      onAction={handleAgentAction}
+                      actionInProgress={state.actionInProgress}
+                      sandboxConnected={selectedSandbox.connected}
+                    />
+                  ))
+                )}
+              </div>
+            )}
+
+            {/* Tasks panel */}
+            {activeTab === 'tasks' && (
+              <SandboxTasksView
+                sandboxId={selectedSandbox.id}
+                connected={selectedSandbox.connected}
+              />
+            )}
 
             {state.error && (
               <div className={styles.error} role="alert">
@@ -310,6 +343,170 @@ export function SandboxPanel() {
           </>
         )}
       </div>
+    </div>
+  );
+}
+
+// ---- Sandbox Tasks View (#907) ----
+
+const TASK_STATE_COLORS: Record<string, string> = {
+  pending: '#ff9800',
+  running: '#2196f3',
+  completed: '#4caf50',
+  failed: '#f44336',
+  cancelled: '#555',
+};
+
+function taskStateBadge(state: string) {
+  return (
+    <span
+      className={styles.statusDot}
+      style={{ background: TASK_STATE_COLORS[state] ?? '#888' }}
+      title={state}
+      aria-label={`State: ${state}`}
+    />
+  );
+}
+
+function SandboxTasksView({ sandboxId, connected }: { sandboxId: string; connected: boolean }) {
+  const [tasks, setTasks] = useState<SandboxTask[]>([]);
+  const [total, setTotal] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
+  const [manifest, setManifest] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // Poll task list
+  useEffect(() => {
+    if (!connected) return;
+    let active = true;
+    async function poll() {
+      try {
+        const data = await api.sandboxTasks(sandboxId);
+        if (active) { setTasks(data.tasks); setTotal(data.total_count); setError(null); }
+      } catch (e) {
+        if (active) setError(String(e));
+      }
+    }
+    poll();
+    const id = setInterval(poll, 3000);
+    return () => { active = false; clearInterval(id); };
+  }, [sandboxId, connected]);
+
+  const handleSubmit = useCallback(async () => {
+    if (!manifest.trim()) return;
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      const body: SubmitTaskRequest = { manifest_yaml: manifest.trim() };
+      await api.submitTask(sandboxId, body);
+      setManifest('');
+      setShowForm(false);
+      // Refresh immediately
+      const data = await api.sandboxTasks(sandboxId);
+      setTasks(data.tasks);
+      setTotal(data.total_count);
+    } catch (e) {
+      setSubmitError(`Submit failed: ${String(e)}`);
+    } finally {
+      setSubmitting(false);
+    }
+  }, [sandboxId, manifest]);
+
+  const handleCancel = useCallback(async (taskId: string) => {
+    try {
+      await api.cancelTask(sandboxId, taskId);
+      const data = await api.sandboxTasks(sandboxId);
+      setTasks(data.tasks);
+      setTotal(data.total_count);
+    } catch (e) {
+      setError(`Cancel failed: ${String(e)}`);
+    }
+  }, [sandboxId]);
+
+  if (!connected) {
+    return <div className={styles.emptyAgents}>Tasks unavailable while sandbox is offline</div>;
+  }
+
+  return (
+    <div className={styles.tasksView}>
+      <div className={styles.tasksHeader}>
+        <span className={styles.tasksCount}>{total} task{total !== 1 ? 's' : ''}</span>
+        <button
+          type="button"
+          className={styles.actionBtn}
+          onClick={() => setShowForm(!showForm)}
+        >
+          {showForm ? 'Cancel' : 'New Task'}
+        </button>
+      </div>
+
+      {showForm && (
+        <div className={styles.taskForm}>
+          <label className={styles.taskFormLabel} htmlFor="task-manifest">
+            Task manifest (YAML)
+          </label>
+          <textarea
+            id="task-manifest"
+            className={styles.taskManifestInput}
+            value={manifest}
+            onChange={(e) => setManifest(e.target.value)}
+            placeholder={`name: my-task\nagent: my-agent\ncommand: |\n  aiwg use sdlc && echo done`}
+            rows={6}
+            disabled={submitting}
+          />
+          {submitError && <div className={styles.error}>{submitError}</div>}
+          <div className={styles.taskFormActions}>
+            <button
+              type="button"
+              className={styles.actionBtn}
+              onClick={handleSubmit}
+              disabled={submitting || !manifest.trim()}
+            >
+              {submitting ? 'Submitting…' : 'Submit'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {error && <div className={styles.error}>{error}</div>}
+
+      {tasks.length === 0 ? (
+        <div className={styles.emptyAgents}>No tasks. Use "New Task" to submit one.</div>
+      ) : (
+        <ul className={styles.taskList}>
+          {tasks.map((task) => (
+            <li key={task.id} className={styles.taskRow}>
+              <div className={styles.taskRowHeader}>
+                {taskStateBadge(task.state)}
+                <strong className={styles.taskName}>{task.name}</strong>
+                <span className={styles.taskState}>{task.state}</span>
+                {task.vm_name && <span className={styles.taskMeta}>VM: {task.vm_name}</span>}
+              </div>
+              <div className={styles.taskRowMeta}>
+                <span>Created {fmtTime(task.created_at)}</span>
+                {task.progress.tool_calls > 0 && (
+                  <span>{task.progress.tool_calls} tool calls</span>
+                )}
+                {task.progress.current_tool && (
+                  <span>Running: {task.progress.current_tool}</span>
+                )}
+              </div>
+              {task.error && <div className={styles.taskError}>{task.error}</div>}
+              {(task.state === 'pending' || task.state === 'running') && (
+                <button
+                  type="button"
+                  className={styles.actionBtnDanger}
+                  onClick={() => handleCancel(task.id)}
+                >
+                  Cancel
+                </button>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

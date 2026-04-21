@@ -56,6 +56,8 @@ export interface SandboxRegistration {
   disconnectedAt?: string;
   /** Live agent inventory (updated by sandbox events) */
   agents: Map<string, SandboxAgent>;
+  /** Sandbox-level artifact inventory reported at registration time (#906) */
+  sandboxInventory?: AgentInventory;
 }
 
 export interface SandboxAgent {
@@ -67,7 +69,48 @@ export interface SandboxAgent {
   lastHeartbeat?: string;
   /** Live session count — incremented/decremented by session.start/session.end events */
   sessionCount?: number;
+  /** Agent/command/skill manifest inventory — populated by agent.inventory_updated events (#906) */
+  inventory?: AgentInventory;
 }
+
+// ============================================================
+// Inventory types (#906)
+// ============================================================
+
+export interface AgentManifestSummary {
+  name: string;
+  description: string;
+  model?: string;
+  category: string;
+  platform: string;
+  /** SHA-256 of agent manifest file — for change detection */
+  content_hash: string;
+}
+
+export interface CommandManifestSummary {
+  name: string;
+  description: string;
+  platform: string;
+  content_hash: string;
+}
+
+export interface SkillManifestSummary {
+  name: string;
+  description: string;
+  platform: string;
+  content_hash: string;
+}
+
+export interface AgentInventory {
+  agents: AgentManifestSummary[];
+  commands: CommandManifestSummary[];
+  skills: SkillManifestSummary[];
+  last_updated: string;
+}
+
+// ============================================================
+// Events
+// ============================================================
 
 /**
  * Events pushed from agentic-sandbox to aiwg serve over WebSocket.
@@ -80,7 +123,15 @@ export type SandboxEventType =
   | 'agent.ready'
   | 'session.start'
   | 'session.end'
-  | 'hitl.input_required';
+  | 'hitl.input_required'
+  | 'hitl.responded'          // emitted by aiwg serve after forwarding response (#908)
+  | 'hitl.timed_out'          // emitted when a HITL request expires (#908)
+  | 'agent.inventory_updated' // sandbox pushed new agent/command/skill manifest hashes (#906)
+  | 'task.submitted'          // task accepted by sandbox orchestrator (#907)
+  | 'task.started'            // task VM allocated and running (#907)
+  | 'task.progressed'         // incremental output chunk (#907)
+  | 'task.completed'          // task exited cleanly (#907)
+  | 'task.failed';            // task errored or cancelled (#907)
 
 
 export interface SandboxEvent {
@@ -99,11 +150,19 @@ export interface SandboxEvent {
   /** Exit code — present on session.end events */
   exitCode?: number;
   task?: string;
-  // HITL-specific fields
+  // HITL-specific fields (#908)
   hitlId?: string;
   prompt?: string;
   context?: string;
   expiresAt?: string;
+  // Inventory-specific fields (#906)
+  agentInventory?: AgentManifestSummary[];
+  commandInventory?: CommandManifestSummary[];
+  skillInventory?: SkillManifestSummary[];
+  // Task lifecycle fields (#907)
+  taskId?: string;
+  outputChunk?: string;
+  taskError?: string;
 }
 
 export interface HitlRequest {
@@ -126,6 +185,12 @@ export interface RegisterRequest {
   http_endpoint: string;
   capabilities?: string[];
   version?: string;
+  /** Agent manifest summaries for all deployed agents (#906) */
+  agent_inventory?: AgentManifestSummary[];
+  /** Command manifest summaries for all deployed commands (#906) */
+  command_inventory?: CommandManifestSummary[];
+  /** Skill manifest summaries for all deployed skills (#906) */
+  skill_inventory?: SkillManifestSummary[];
 }
 
 export interface RegisterResponse {
@@ -151,6 +216,30 @@ export class SandboxRegistry {
   private byInstanceId = new Map<string, string>();
   /** instance_id → last registration timestamp (ms, for debounce) */
   private lastRegistrationTime = new Map<string, number>();
+  /** Timer for HITL expiry checks (#908) */
+  private expiryTimer: ReturnType<typeof setInterval> | null = null;
+
+  constructor() {
+    // Check for expired HITL requests every 60 seconds (#908)
+    this.expiryTimer = setInterval(() => this.checkHitlExpiry(), 60_000);
+  }
+
+  private checkHitlExpiry(): void {
+    const now = new Date().toISOString();
+    for (const [hitlId, req] of this.hitlRequests) {
+      if (req.expiresAt && req.expiresAt <= now) {
+        this.hitlRequests.delete(hitlId);
+        this.emit({
+          type: 'hitl.timed_out',
+          sandboxId: req.sandboxId,
+          agentId: req.agentId,
+          timestamp: new Date().toISOString(),
+          hitlId,
+          sessionId: req.sessionId,
+        });
+      }
+    }
+  }
 
   /**
    * Register a sandbox instance.
@@ -192,6 +281,15 @@ export class SandboxRegistry {
           existing.version = req.version ?? existing.version;
           existing.lastRegisteredAt = new Date().toISOString();
           existing.connected = false; // WS will update this when it (re-)connects
+          // Refresh sandbox-level inventory if provided (#906)
+          if (req.agent_inventory || req.command_inventory || req.skill_inventory) {
+            existing.sandboxInventory = {
+              agents: req.agent_inventory ?? existing.sandboxInventory?.agents ?? [],
+              commands: req.command_inventory ?? existing.sandboxInventory?.commands ?? [],
+              skills: req.skill_inventory ?? existing.sandboxInventory?.skills ?? [],
+              last_updated: new Date().toISOString(),
+            };
+          }
           this.lastRegistrationTime.set(instanceId, now);
           return { sandbox_id: existingId, token: existing.token };
         }
@@ -202,6 +300,16 @@ export class SandboxRegistry {
     const id = `sandbox-${randomUUID().slice(0, 8)}`;
     const token = randomUUID();
     const now_iso = new Date().toISOString();
+
+    const sandboxInventory: AgentInventory | undefined =
+      (req.agent_inventory || req.command_inventory || req.skill_inventory)
+        ? {
+            agents: req.agent_inventory ?? [],
+            commands: req.command_inventory ?? [],
+            skills: req.skill_inventory ?? [],
+            last_updated: now_iso,
+          }
+        : undefined;
 
     const registration: SandboxRegistration = {
       id,
@@ -218,6 +326,7 @@ export class SandboxRegistry {
       lastEventAt: now_iso,
       connected: false,
       agents: new Map(),
+      sandboxInventory,
     };
 
     this.sandboxes.set(id, registration);
@@ -382,9 +491,41 @@ export class SandboxRegistry {
         }
         break;
       }
+      case 'agent.inventory_updated': {
+        // Update the agent's manifest inventory (#906)
+        const agent = sandbox.agents.get(event.agentId);
+        if (agent && (event.agentInventory || event.commandInventory || event.skillInventory)) {
+          agent.inventory = {
+            agents: event.agentInventory ?? agent.inventory?.agents ?? [],
+            commands: event.commandInventory ?? agent.inventory?.commands ?? [],
+            skills: event.skillInventory ?? agent.inventory?.skills ?? [],
+            last_updated: event.timestamp,
+          };
+          agent.lastHeartbeat = event.timestamp;
+        }
+        break;
+      }
+      // Task lifecycle events — no local state update, listeners handle display (#907)
+      case 'task.submitted':
+      case 'task.started':
+      case 'task.progressed':
+      case 'task.completed':
+      case 'task.failed':
+      // Synthetic HITL events — emitted by aiwg serve, no state to update (#908)
+      case 'hitl.responded':
+      case 'hitl.timed_out':
+        break;
     }
 
     // Notify listeners (browser push, telemetry, etc.)
+    this.emit(event);
+  }
+
+  /**
+   * Emit a synthetic event to all listeners without modifying internal state.
+   * Used by serve.ts to push server-side events (e.g. hitl.responded) to the browser.
+   */
+  emit(event: SandboxEvent): void {
     for (const listener of this.listeners) {
       try { listener(event); } catch { /* ignore listener errors */ }
     }
@@ -446,9 +587,13 @@ export class SandboxRegistry {
   }
 
   /**
-   * Shut down — clear all state.
+   * Shut down — clear all state and stop background timers.
    */
   shutdown(): void {
+    if (this.expiryTimer !== null) {
+      clearInterval(this.expiryTimer);
+      this.expiryTimer = null;
+    }
     this.sandboxes.clear();
     this.hitlRequests.clear();
     this.listeners.clear();
@@ -479,6 +624,8 @@ export interface SandboxSummary {
   disconnectedAt?: string;
   agentCount: number;
   agents: Array<SandboxAgent>;
+  /** Sandbox-level artifact inventory reported at registration time (#906) */
+  sandboxInventory?: AgentInventory;
 }
 
 function toSummary(s: SandboxRegistration): SandboxSummary {
@@ -498,6 +645,7 @@ function toSummary(s: SandboxRegistration): SandboxSummary {
     disconnectedAt: s.disconnectedAt,
     agentCount: s.agents.size,
     agents: [...s.agents.values()],
+    sandboxInventory: s.sandboxInventory,
   };
 }
 

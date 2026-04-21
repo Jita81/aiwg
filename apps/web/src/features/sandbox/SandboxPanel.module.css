@@ -393,3 +393,148 @@
   color: #555;
   font-style: italic;
 }
+
+/* Tab bar (#907) */
+.tabBar {
+  display: flex;
+  gap: 2px;
+  padding: 0 16px;
+  border-bottom: 1px solid #1e1e1e;
+  margin-bottom: 12px;
+}
+
+.tab {
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #888;
+  font-size: 13px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.tab:hover {
+  color: #ccc;
+}
+
+.tabActive {
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid #2196f3;
+  color: #e0e0e0;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* Tasks view (#907) */
+.tasksView {
+  padding: 0 16px 16px;
+}
+
+.tasksHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.tasksCount {
+  font-size: 13px;
+  color: #888;
+}
+
+.taskForm {
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 14px;
+}
+
+.taskFormLabel {
+  display: block;
+  font-size: 11px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.taskManifestInput {
+  width: 100%;
+  background: #0a0a0a;
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-family: monospace;
+  font-size: 12px;
+  padding: 8px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.taskFormActions {
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.taskList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.taskRow {
+  background: #111;
+  border: 1px solid #1e1e1e;
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+
+.taskRowHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.taskName {
+  font-size: 13px;
+  color: #e0e0e0;
+}
+
+.taskState {
+  font-size: 11px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.taskMeta {
+  font-size: 11px;
+  color: #555;
+  margin-left: auto;
+}
+
+.taskRowMeta {
+  display: flex;
+  gap: 12px;
+  font-size: 11px;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.taskError {
+  font-size: 12px;
+  color: #f44336;
+  margin-bottom: 6px;
+  padding: 4px 6px;
+  background: rgba(244, 67, 54, 0.08);
+  border-radius: 3px;
+}
