@@ -39,13 +39,15 @@ function relAge(secs: number): string {
 // The management WS is a multicast bus.  All agents share one connection.
 //
 // Client → server frames:
+//   { type: "subscribe",      agent_id }                                 ← must send first
 //   { type: "attach_session", agent_id, session_name, cols, rows }
-//   { type: "send_input",     data, command_id }
-//   { type: "pty_resize",     cols, rows, command_id }
+//   { type: "send_input",     agent_id, command_id, data }
+//   { type: "pty_resize",     agent_id, command_id, cols, rows }
 //
 // Server → client frames (relevant subset):
+//   { type: "subscribed",      agent_id }
 //   { type: "output",          agent_id, command_id, data, stream, ts }
-//   { type: "session_attached",agent_id, command_id }
+//   { type: "session_attached",agent_id, session_name, command_id }
 //   { type: "error",           message }
 //
 // Output buffering: all output is buffered by command_id (last 32 KB) regardless
@@ -110,6 +112,8 @@ function TerminalPane({ sandboxId, agentId, sessionId, sessionName }: TerminalPa
         setStatusText(sessionName);
         // Fit to container so PTY is sized to match the visible terminal
         try { fitAddonRef.current?.fit(); } catch { /* ignore */ }
+        // Subscribe first so output frames arrive before we attach
+        ws.send(JSON.stringify({ type: 'subscribe', agent_id: agentId }));
         sendAttach();
       };
 
@@ -233,8 +237,9 @@ function TerminalPane({ sandboxId, agentId, sessionId, sessionName }: TerminalPa
         if (wsRef.current?.readyState === WebSocket.OPEN && attachedCmdRef.current) {
           wsRef.current.send(JSON.stringify({
             type: 'send_input',
-            data,
+            agent_id: agentId,
             command_id: attachedCmdRef.current,
+            data,
           }));
         }
       });
@@ -246,9 +251,10 @@ function TerminalPane({ sandboxId, agentId, sessionId, sessionName }: TerminalPa
         if (wsRef.current?.readyState === WebSocket.OPEN && attachedCmdRef.current) {
           wsRef.current.send(JSON.stringify({
             type: 'pty_resize',
+            agent_id: agentId,
+            command_id: attachedCmdRef.current,
             cols: term.cols,
             rows: term.rows,
-            command_id: attachedCmdRef.current,
           }));
         }
       });
