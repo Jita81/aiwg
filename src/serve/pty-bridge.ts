@@ -19,13 +19,15 @@
  *   Server → Client: { type: 'error', message: string }   — error notification
  *
  * Sandbox management WS protocol (agentic-sandbox):
- *   → { type: 'subscribe', agent_id }
- *   → { type: 'start_shell', agent_id, cols, rows }
- *   → { type: 'send_input', agent_id, command_id, data }
- *   → { type: 'pty_resize', agent_id, command_id, cols, rows }
- *   → { type: 'kill_session', agent_id, session_name }
- *   ← { type: 'shell_started', agent_id, command_id }
- *   ← { type: 'output', agent_id, command_id, stream, data, ts }
+ *   → { type: 'subscribe',     agent_id }
+ *   → { type: 'start_shell',   agent_id, cols, rows }
+ *   → { type: 'list_sessions', agent_id }                       — resolves session_name (#901)
+ *   → { type: 'send_input',    agent_id, command_id, data }
+ *   → { type: 'pty_resize',    agent_id, command_id, cols, rows }
+ *   → { type: 'kill_session',  agent_id, session_name }         — must use session_name, not command_id
+ *   ← { type: 'shell_started', agent_id, command_id }           — idempotent: same cmd_id on reconnect (#903)
+ *   ← { type: 'session_list',  agent_id, sessions[] }           — provides session_name for kill (#901)
+ *   ← { type: 'output',        agent_id, command_id, stream, data, ts }
  *   ← { type: 'session_killed' | 'session_detached', agent_id, exit_code? }
  *
  * @issue #712
@@ -277,9 +279,28 @@ export async function spawnPty(
  * the target agent, starts an interactive shell, then multicasts PTY output to
  * all browser clients via the existing PtySessionRegistry broadcast channel.
  *
- * The sandbox side uses a tokio::sync::broadcast channel (capacity 10k) so
- * multiple concurrent browser clients receive identical output streams without
- * extra overhead. This function is the Node.js consumer of that broadcast.
+ * The sandbox uses an OutputAggregator that broadcasts all output for an agent_id
+ * to every subscribed WS connection. Multiple aiwg bridges sharing the same PTY
+ * session receive identical output streams — no extra overhead on the sandbox side.
+ * (#903: secondary start_shell for an existing session returns the same command_id
+ * as the primary — the PTY is ref-counted and survives until the last subscriber
+ * disconnects. The output filter `command_id === commandId` remains correct in all
+ * cases whether this is the first or a subsequent attach.)
+ *
+ * After shell_started, list_sessions is issued to resolve the human-readable
+ * session_name (e.g. "main") needed for kill_session. (#901)
+ *
+ * If the WS connection drops after handshake, the bridge reconnects with exponential
+ * backoff rather than marking the session exited. The tmux session on the VM is
+ * preserved as long as at least one subscriber is attached. (#902)
+ *
+ * Future: once aiwg-serve needs operator control (pause/inspect/hand-off), use the
+ * formal session protocol keyed on session_id from list_sessions:
+ *   JoinSession { session_id, role: "controller" | "observer" }
+ *   SessionInput { session_id, data }
+ *   SessionResize { session_id, cols, rows }
+ *   RequestControl / ReleaseControl
+ * This enables role-gated stdin and replay from a sequence number. (#904)
  *
  * @issue #657
  */
@@ -307,12 +328,19 @@ async function spawnSandboxWsPty(
   const rows = opts.rows ?? 30;
 
   return new Promise<void>((resolve, reject) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const sock = new WS(wsEndpoint) as any;
     let commandId: string | null = null;
+    // session_name resolved via list_sessions after shell_started (#901)
+    // The kill_session handler looks up by session_name, not command_id.
+    let sessionName: string | null = null;
     let onDataCb: ((data: string) => void) | null = null;
     let onExitCb: ((e: { exitCode: number }) => void) | null = null;
     let settled = false;
+    let reconnectAttempt = 0;
+    const MAX_RECONNECT = 8;
+
+    // sock is reassigned on each reconnect; sendMsg always uses the current one
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let sock: any = null;
 
     const settle = (err?: Error) => {
       if (settled) return;
@@ -322,68 +350,110 @@ async function spawnSandboxWsPty(
     };
 
     const sendMsg = (msg: object) => {
-      if (sock.readyState === 1 /* OPEN */) {
+      if (sock?.readyState === 1 /* OPEN */) {
         sock.send(JSON.stringify(msg));
       }
     };
 
-    sock.on('open', () => {
-      // Subscribe to this agent's broadcast stream, then start interactive shell
-      sendMsg({ type: 'subscribe', agent_id: agentId });
-      sendMsg({ type: 'start_shell', agent_id: agentId, cols, rows });
-    });
+    function connect() {
+      sock = new WS(wsEndpoint);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    sock.on('message', (raw: any) => {
-      let msg: Record<string, unknown>;
-      try {
-        msg = JSON.parse(typeof raw === 'string' ? raw : (raw as Buffer).toString()) as Record<string, unknown>;
-      } catch {
-        return;
-      }
+      sock.on('open', () => {
+        // Subscribe then start (or re-attach to) the interactive shell.
+        // After sandbox#ce8e600, start_shell for an existing session returns
+        // the same command_id (idempotent attach) — no new PTY is spawned. (#903)
+        sendMsg({ type: 'subscribe', agent_id: agentId });
+        sendMsg({ type: 'start_shell', agent_id: agentId, cols, rows });
+      });
 
-      // Shell handshake complete — record command_id used for routing all I/O
-      if (msg['type'] === 'shell_started' && msg['agent_id'] === agentId) {
-        commandId = msg['command_id'] as string;
-        settle();
-        return;
-      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      sock.on('message', (raw: any) => {
+        let msg: Record<string, unknown>;
+        try {
+          msg = JSON.parse(typeof raw === 'string' ? raw : (raw as Buffer).toString()) as Record<string, unknown>;
+        } catch {
+          return;
+        }
 
-      // PTY output from the sandbox broadcast channel → forward to browser
-      if (
-        msg['type'] === 'output' &&
-        msg['agent_id'] === agentId &&
-        msg['command_id'] === commandId &&
-        (msg['stream'] === 'stdout' || msg['stream'] === undefined) &&
-        msg['data']
-      ) {
-        const data = typeof msg['data'] === 'string' ? msg['data'] : String(msg['data']);
-        onDataCb?.(data);
-        return;
-      }
+        // Shell handshake — record command_id for all subsequent I/O routing.
+        // On reconnect, the server returns the same command_id (idempotent). (#903)
+        if (msg['type'] === 'shell_started' && msg['agent_id'] === agentId) {
+          commandId = msg['command_id'] as string;
+          // Resolve the outer promise on first shell_started only
+          settle();
+          // Request session list to resolve the session_name needed for kill (#901)
+          sendMsg({ type: 'list_sessions', agent_id: agentId });
+          return;
+        }
 
-      // Session ended on sandbox side
-      if (
-        (msg['type'] === 'session_killed' || msg['type'] === 'session_detached') &&
-        msg['agent_id'] === agentId
-      ) {
-        onExitCb?.({ exitCode: (msg['exit_code'] as number | undefined) ?? 0 });
-      }
-    });
+        // session_list response: find our session by command_id, store session_name (#901)
+        if (msg['type'] === 'session_list' && msg['agent_id'] === agentId) {
+          type SessEntry = { session_name: string; command_id: string };
+          const sessions = msg['sessions'] as SessEntry[] | undefined;
+          const match = sessions?.find((s) => s.command_id === commandId);
+          if (match) sessionName = match.session_name;
+          return;
+        }
 
-    sock.on('error', (err: Error) => {
-      const message = err instanceof Error ? err.message : String(err);
-      settle(new Error(`Sandbox WS error connecting to ${wsEndpoint}: ${message}`));
-    });
+        // PTY output from the sandbox broadcast channel → forward to browser
+        if (
+          msg['type'] === 'output' &&
+          msg['agent_id'] === agentId &&
+          msg['command_id'] === commandId &&
+          (msg['stream'] === 'stdout' || msg['stream'] === undefined) &&
+          msg['data']
+        ) {
+          const data = typeof msg['data'] === 'string' ? msg['data'] : String(msg['data']);
+          onDataCb?.(data);
+          return;
+        }
 
-    sock.on('close', () => {
+        // Session ended on sandbox side (explicit kill or process exit)
+        if (
+          (msg['type'] === 'session_killed' || msg['type'] === 'session_detached') &&
+          msg['agent_id'] === agentId
+        ) {
+          onExitCb?.({ exitCode: (msg['exit_code'] as number | undefined) ?? 0 });
+        }
+      });
+
+      sock.on('error', (_err: Error) => {
+        // If not yet settled, the 'close' event will follow and settle with an error.
+        // After settlement, let 'close' drive reconnection.
+      });
+
+      sock.on('close', () => {
+        if (!settled) {
+          // Closed before shell_started — fatal for the initial connect
+          settle(new Error(`Sandbox WS closed before shell_started (agent: ${agentId}, endpoint: ${wsEndpoint})`));
+          return;
+        }
+        if (session.exited) return; // already torn down intentionally
+
+        // Unexpected mid-session disconnect — reconnect with exponential backoff. (#902)
+        // The tmux session on the VM survives as long as we reconnect before the last
+        // subscriber drops (sandbox ref-counts WS subscribers per PTY).
+        if (reconnectAttempt < MAX_RECONNECT) {
+          reconnectAttempt++;
+          const delay = Math.min(1_000 * Math.pow(2, reconnectAttempt), 30_000);
+          setTimeout(connect, delay);
+        } else {
+          // Exhausted retries — treat as session exit
+          onExitCb?.({ exitCode: 1 });
+        }
+      });
+
+      // 15 s timeout for the initial shell handshake only (not applied on reconnects)
       if (!settled) {
-        settle(new Error(`Sandbox WS closed before shell_started (agent: ${agentId}, endpoint: ${wsEndpoint})`));
-      } else {
-        // Unexpected disconnect after session started
-        onExitCb?.({ exitCode: 1 });
+        const timeout = setTimeout(
+          () => settle(new Error(`Timed out waiting for shell_started from agent ${agentId} at ${wsEndpoint}`)),
+          15_000,
+        );
+        if ((timeout as unknown as { unref?: () => void }).unref) {
+          (timeout as unknown as { unref: () => void }).unref();
+        }
       }
-    });
+    }
 
     // PtyLike wrapper: routes browser I/O back through the sandbox management WS
     const sandboxPty: PtyLike = {
@@ -396,8 +466,12 @@ async function spawnSandboxWsPty(
         sendMsg({ type: 'pty_resize', agent_id: agentId, command_id: commandId, cols: c, rows: r });
       },
       kill(_signal?: string) {
-        if (commandId) sendMsg({ type: 'kill_session', agent_id: agentId, session_name: commandId });
-        sock.close();
+        // Kill by session_name — the sandbox KillSession handler looks up by name,
+        // not by command_id. session_name is resolved from list_sessions. (#901)
+        if (sessionName) {
+          sendMsg({ type: 'kill_session', agent_id: agentId, session_name: sessionName });
+        }
+        sock?.close();
       },
       onData(cb: (data: string) => void) { onDataCb = cb; },
       onExit(cb: (e: { exitCode: number }) => void) { onExitCb = cb; },
@@ -415,14 +489,7 @@ async function spawnSandboxWsPty(
       registry.broadcast(session.id, { type: 'exit', code: exitCode });
     });
 
-    // 15 s timeout for shell handshake
-    const timeout = setTimeout(
-      () => settle(new Error(`Timed out waiting for shell_started from agent ${agentId} at ${wsEndpoint}`)),
-      15_000,
-    );
-    if ((timeout as unknown as { unref?: () => void }).unref) {
-      (timeout as unknown as { unref: () => void }).unref();
-    }
+    connect();
   });
 }
 
