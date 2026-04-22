@@ -9,7 +9,7 @@
   "man": "./man/aiwg.1",
   "main": "src/cli/index.mjs",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   },
   "scripts": {
     "postinstall": "node ./bin/postinstall.mjs",
@@ -30,6 +30,9 @@
     "test:watch": "vitest --config config/vitest.config.js",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist coverage",
+    "check:install-size": "node tools/cli/check-install-size.mjs --verbose",
+    "check:dep-budget": "node tools/cli/check-dep-budget.mjs --verbose",
+    "check:budgets": "npm run check:install-size && npm run check:dep-budget",
     "uat": "vitest run --config config/vitest.uat.config.js",
     "uat:watch": "vitest --config config/vitest.uat.config.js",
     "uat:live": "vitest run --config config/vitest.uat-live.config.js",
@@ -42,10 +45,10 @@
   },
   "files": [
     "bin/",
+    "dist/",
     "src/",
     "tools/",
     "agentic/",
-    "docs/",
     "templates/",
     "plugins/",
     "man/",

@@ -49,6 +49,19 @@ function ensureInvocationId() {
 }
 const invocationId = ensureInvocationId();
 
+// Startup tracing — set AIWG_TRACE_STARTUP=1 to print per-phase timings to
+// stderr. Useful for diagnosing cold-start regressions. No-op by default so
+// it doesn't cost anything on the hot path.
+const traceStartup = process.env['AIWG_TRACE_STARTUP'] === '1' ||
+  process.env['AIWG_TRACE_STARTUP']?.toLowerCase() === 'true';
+const startHr = process.hrtime.bigint();
+function trace(phase) {
+  if (!traceStartup) return;
+  const ms = Number(process.hrtime.bigint() - startHr) / 1_000_000;
+  process.stderr.write(`[trace] +${ms.toFixed(1)}ms ${phase}\n`);
+}
+trace('bin:entry');
+
 /**
  * Resolve the path to the compiled router.
  *
@@ -182,11 +195,15 @@ async function main() {
   process.once('SIGTERM', onSigterm);
 
   // Direct in-process dispatch — no tsx fork, no facade, no router-loader.
+  trace('resolve:router');
   const routerPath = await resolveRouterPath();
+  trace('import:router');
   const { run } = await import('file://' + routerPath);
+  trace('dispatch:begin');
   try {
     await run(args, { cwd: process.cwd(), signal: abortController.signal });
   } finally {
+    trace('dispatch:end');
     process.removeListener('SIGINT', onSigint);
     process.removeListener('SIGTERM', onSigterm);
   }
