@@ -128,3 +128,41 @@ export function exitCodeFor(err: unknown): number {
   if (isAiwgError(err)) return err.exitCode;
   return EXIT_CODES.GENERAL;
 }
+
+/**
+ * Convert any thrown value into a uniform HandlerResult shape, preserving
+ * AiwgError's semantic fields (code, exitCode, hint) where present.
+ *
+ * This is the bridge between the in-handler `try { ... } catch (err) { ... }`
+ * pattern and the HandlerResult contract the router expects. Use it in every
+ * handler's top-level catch:
+ *
+ *   try {
+ *     await doWork(ctx);
+ *     return { exitCode: 0 };
+ *   } catch (err) {
+ *     return handlerResultFromError(err);
+ *   }
+ *
+ * Non-AiwgError throws map to `{ exitCode: 1, message, error }`. AiwgError
+ * throws carry their `exitCode` (USAGE=2, CONFIG=78, CANT_CREATE=73, etc.)
+ * plus the `hint` merged into the message for single-line output.
+ *
+ * Phase 5 of the CLI Stabilization Epic (#922) — unblocks the exit-code
+ * propagation from Phase 4 (#921) that was previously flattened to 1.
+ */
+export function handlerResultFromError(err: unknown): {
+  exitCode: number;
+  message: string;
+  error: Error;
+} {
+  if (isAiwgError(err)) {
+    const message = err.hint ? `${err.message} — hint: ${err.hint}` : err.message;
+    return { exitCode: err.exitCode, message, error: err };
+  }
+  if (err instanceof Error) {
+    return { exitCode: EXIT_CODES.GENERAL, message: err.message, error: err };
+  }
+  const message = String(err);
+  return { exitCode: EXIT_CODES.GENERAL, message, error: new Error(message) };
+}

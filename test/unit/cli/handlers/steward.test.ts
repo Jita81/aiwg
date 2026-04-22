@@ -111,17 +111,17 @@ describe('steward capabilities --provider', () => {
     consoleSpy.mockRestore();
   });
 
-  it('exits 1 for unknown provider', async () => {
+  it('exits 2 (USAGE) for unknown provider', async () => {
     const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
     const result = await stewardHandler.execute(makeCtx(['capabilities', '--provider', 'unknown-xyz']));
-    expect(result.exitCode).toBe(1);
+    expect(result.exitCode).toBe(2);
     consoleSpy.mockRestore();
   });
 
-  it('exits 1 when --provider flag has no value', async () => {
+  it('exits 2 (USAGE) when --provider flag has no value', async () => {
     const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
     const result = await stewardHandler.execute(makeCtx(['capabilities', '--provider']));
-    expect(result.exitCode).toBe(1);
+    expect(result.exitCode).toBe(2);
     consoleSpy.mockRestore();
   });
 });
@@ -136,10 +136,10 @@ describe('steward capabilities --feature', () => {
     consoleSpy.mockRestore();
   });
 
-  it('exits 1 for unknown feature', async () => {
+  it('exits 2 (USAGE) for unknown feature', async () => {
     const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
     const result = await stewardHandler.execute(makeCtx(['capabilities', '--feature', 'nonexistent-feature']));
-    expect(result.exitCode).toBe(1);
+    expect(result.exitCode).toBe(2);
     consoleSpy.mockRestore();
   });
 });
@@ -165,17 +165,17 @@ describe('steward find --capability', () => {
     consoleSpy.mockRestore();
   });
 
-  it('exits 1 for unknown capability', async () => {
+  it('exits 2 (USAGE) for unknown capability', async () => {
     const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
     const result = await stewardHandler.execute(makeCtx(['find', '--capability', 'nonexistent']));
-    expect(result.exitCode).toBe(1);
+    expect(result.exitCode).toBe(2);
     consoleSpy.mockRestore();
   });
 
-  it('exits 1 when --capability flag is missing', async () => {
+  it('exits 2 (USAGE) when --capability flag is missing', async () => {
     const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
     const result = await stewardHandler.execute(makeCtx(['find']));
-    expect(result.exitCode).toBe(1);
+    expect(result.exitCode).toBe(2);
     consoleSpy.mockRestore();
   });
 });
@@ -183,10 +183,10 @@ describe('steward find --capability', () => {
 describe('steward unknown subcommand', () => {
   beforeEach(() => { vi.clearAllMocks(); });
 
-  it('exits 1', async () => {
+  it('exits 2 (USAGE)', async () => {
     const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
     const result = await stewardHandler.execute(makeCtx(['bogus']));
-    expect(result.exitCode).toBe(1);
+    expect(result.exitCode).toBe(2);
     consoleSpy.mockRestore();
   });
 });

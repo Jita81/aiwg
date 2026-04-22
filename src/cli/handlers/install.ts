@@ -23,6 +23,7 @@ import type { CommandHandler, HandlerContext, HandlerResult } from './types.js';
 import { installPackage } from '../../packages/registry.js';
 import { recordDeployment } from '../../packages/package-registry.js';
 import { createScriptRunner } from './script-runner.js';
+import { handlerResultFromError } from '../errors.js';
 import * as ui from '../ui.js';
 
 function parseFlag(args: string[], flag: string): string | undefined {
@@ -88,10 +89,10 @@ export const installHandler: CommandHandler = {
     try {
       ({ cachePath, key, type, namespace } = await installPackage(rawRef, { refresh }));
     } catch (error) {
-      return {
-        exitCode: 1,
-        message: `Error: ${error instanceof Error ? error.message : String(error)}`,
-      };
+      // Preserve AiwgError.exitCode while keeping the "Error: " prefix users
+      // are used to seeing from `aiwg install`.
+      const result = handlerResultFromError(error);
+      return { ...result, message: `Error: ${result.message}` };
     }
 
     ui.success(`Installed: ${key} (${type})`);

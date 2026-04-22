@@ -22,6 +22,7 @@ import { registerCliCommands, registerHooks } from '../cli-extension-loader.js';
 import { translateSkillsToCommands, providerNeedsCommands } from '../../plugin/skill-command-translator.js';
 import * as ui from '../ui.js';
 import { readAiwgConfig, writeAiwgConfig, updateInstalled, hashManifest, emptyConfig, getProjectDir } from '../../config/aiwg-config.js';
+import { getLogger } from '../log.js';
 import { initHandler } from './init.js';
 import {
   checkCollisions,
@@ -584,6 +585,12 @@ export class UseHandler implements CommandHandler {
     const framework = ctx.args[0];
     const remainingArgs = ctx.args.slice(1);
 
+    // Structured logger for this invocation. Records go to both stderr (if
+    // verbose level) and ~/.aiwg/logs/aiwg-YYYY-MM-DD.jsonl with full
+    // provenance (invocation_id, aiwg_version, git_sha, etc.). #925.
+    const log = getLogger('cli:use', { framework: framework ?? '<all>' });
+    const span = log.span('use');
+
     // Resolve --prefix as alias for --target (#734)
     // --prefix is more intuitive for "deploy to a project directory" in cloud-init/CI
     const prefixIdx = remainingArgs.findIndex(a => a === '--prefix');
@@ -1044,6 +1051,7 @@ export class UseHandler implements CommandHandler {
       }
     }
 
+    span.end('use:complete', { framework });
     return {
       exitCode: 0,
       message: verbose ? `Successfully deployed ${framework} framework` : '',

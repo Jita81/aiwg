@@ -21,6 +21,7 @@ import {
   attachToLoopOutput,
   RalphLaunchOptions,
 } from './ralph-launcher.js';
+import { handlerResultFromError } from '../errors.js';
 
 /**
  * Parse Ralph command arguments
@@ -196,12 +197,9 @@ export class RalphHandler implements CommandHandler {
         message: `✓ ${result.message}\n  PID: ${result.pid}\n  Loop ID: ${result.loopId}`,
       };
     } catch (error) {
-      return {
-        exitCode: 1,
-        message: `Failed to launch Ralph: ${error instanceof Error ? error.message : String(error)}`,
-        error: error instanceof Error ? error : new Error(String(error)),
-      };
-    }
+        const result = handlerResultFromError(error);
+        return { ...result, message: `Failed to launch Ralph: ${result.message}` };
+      }
   }
 
   private getHelpText(): string {
@@ -404,12 +402,9 @@ export class RalphResumeHandler implements CommandHandler {
         message: `✓ ${result.message}\n  PID: ${result.pid}\n  Loop ID: ${result.loopId}`,
       };
     } catch (error) {
-      return {
-        exitCode: 1,
-        message: `Failed to resume: ${error instanceof Error ? error.message : String(error)}`,
-        error: error instanceof Error ? error : new Error(String(error)),
-      };
-    }
+        const result = handlerResultFromError(error);
+        return { ...result, message: `Failed to resume: ${result.message}` };
+      }
   }
 }
 
@@ -525,12 +520,9 @@ export class RalphAttachHandler implements CommandHandler {
       await attachToLoopOutput(process.cwd(), loopId);
       return { exitCode: 0, message: '' };
     } catch (error) {
-      return {
-        exitCode: 1,
-        message: `Failed to attach: ${error instanceof Error ? error.message : String(error)}`,
-        error: error instanceof Error ? error : new Error(String(error)),
-      };
-    }
+        const result = handlerResultFromError(error);
+        return { ...result, message: `Failed to attach: ${result.message}` };
+      }
   }
 }
 

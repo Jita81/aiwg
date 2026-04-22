@@ -21,6 +21,7 @@ import {
   type SandboxEvent,
 } from '../../serve/sandbox-registry.js';
 import { routeTask, type AgentFilter } from '../../serve/agent-router.js';
+import { AiwgError, EXIT_CODES } from '../errors.js';
 
 const DEFAULT_PORT = 7337;
 const DEFAULT_HOST = '127.0.0.1';
@@ -346,18 +347,25 @@ async function startServer(opts: {
       { stdio: 'inherit' },
     );
     if (result.status !== 0) {
-      throw new Error(
-        'Failed to install serve dependencies. Install manually:\n  npm install hono @hono/node-server ws',
-      );
+      throw new AiwgError({
+        code: 'ERR_SERVE_DEPS_INSTALL_FAILED',
+        message: 'Failed to install serve dependencies (hono, @hono/node-server, ws)',
+        hint: 'Install manually: npm install hono @hono/node-server ws',
+        exitCode: EXIT_CODES.GENERAL,
+      });
     }
     // Retry imports after install
     try {
       honoMod = await (new Function('m', 'return import(m)'))('hono');
       nodeMod = await (new Function('m', 'return import(m)'))('@hono/node-server');
-    } catch {
-      throw new Error(
-        'Serve dependencies installed but could not be loaded. Try:\n  npm install hono @hono/node-server ws',
-      );
+    } catch (err) {
+      throw new AiwgError({
+        code: 'ERR_SERVE_DEPS_LOAD_FAILED',
+        message: 'Serve dependencies installed but could not be loaded',
+        hint: 'Try: npm install hono @hono/node-server ws',
+        exitCode: EXIT_CODES.GENERAL,
+        cause: err,
+      });
     }
   }
 
@@ -1028,8 +1036,8 @@ export const serveHandler: CommandHandler = {
     try {
       server = await startServer({ port, host, readOnly, frameworkRoot: ctx.frameworkRoot });
     } catch (error) {
-      const err = error as Error;
-      return { exitCode: 1, message: err.message, error: err };
+      const { handlerResultFromError } = await import('../errors.js');
+      return handlerResultFromError(error);
     }
 
     const { url } = server;

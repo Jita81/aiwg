@@ -26,6 +26,7 @@ import type { CommandHandler, HandlerContext, HandlerResult } from './types.js';
 import { getVersionInfo } from '../../channel/manager.mjs';
 import { getLoggerInfo } from '../log.js';
 import { readAiwgConfig, getProjectDir } from '../../config/aiwg-config.js';
+import { getLogger } from '../log.js';
 import { spawnSync } from 'child_process';
 import { readFileSync, writeFileSync, existsSync, statSync, readdirSync, mkdtempSync, rmSync } from 'fs';
 import path from 'path';
@@ -47,7 +48,14 @@ export const diagnoseHandler: CommandHandler = {
     const includeSecrets = ctx.args.includes('--include-secrets');
     const cwd = getProjectDir(ctx, ctx.args);
 
+    const log = getLogger('cli:diagnose');
+    const span = log.span('diagnose', { stdoutMode, includeSecrets });
     const bundle = await collectBundle({ cwd, includeSecrets });
+    span.end('bundle-collected', {
+      logs: bundle.logs.length,
+      has_config: bundle.config !== null,
+      has_git: bundle.git !== null,
+    });
 
     if (stdoutMode) {
       console.log(JSON.stringify(bundle, null, 2));

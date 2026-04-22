@@ -11,7 +11,7 @@
 
 import path from 'path';
 import type { CommandHandler, HandlerContext, HandlerResult } from './types.js';
-import { AiwgError, EXIT_CODES } from '../errors.js';
+import { AiwgError, EXIT_CODES, handlerResultFromError } from '../errors.js';
 
 /**
  * Runtime info command handler
@@ -36,11 +36,9 @@ export const runtimeInfoHandler: CommandHandler = {
         return { exitCode: 0 };
       }
 
-      return {
-        exitCode: 1,
-        message: err.message,
-        error: err,
-      };
+      // AiwgError exitCode (USAGE=2, CONFIG=78, etc.) now propagates instead
+      // of being flattened to 1. Non-AiwgError throws still map to GENERAL=1.
+      return handlerResultFromError(err);
     }
   },
 };

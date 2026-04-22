@@ -7,6 +7,7 @@
  */
 
 import type { CommandHandler, HandlerContext, HandlerResult } from './types.js';
+import { handlerResultFromError } from '../errors.js';
 
 /**
  * Handler for lint command
@@ -37,11 +38,8 @@ export const lintHandler: CommandHandler = {
         exitCode: Number(process.exitCode) || 0,
       };
     } catch (error) {
-      return {
-        exitCode: 1,
-        message: `Lint command failed: ${error instanceof Error ? error.message : String(error)}`,
-        error: error instanceof Error ? error : new Error(String(error)),
-      };
+      const result = handlerResultFromError(error);
+      return { ...result, message: `Lint command failed: ${result.message}` };
     }
   },
 };

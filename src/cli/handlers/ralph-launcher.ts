@@ -30,6 +30,7 @@ import {
   statSync, openSync, readSync, closeSync,
 } from 'fs';
 import { getProviderConfig } from '../agent-spawn.js';
+import { AiwgError, EXIT_CODES } from '../errors.js';
 
 /**
  * Options for launching an external agent loop
@@ -194,7 +195,12 @@ export async function launchExternalRalph(
   const orchestratorPath = getOrchestratorPath(frameworkRoot);
 
   if (!existsSync(orchestratorPath)) {
-    throw new Error(`External Ralph orchestrator not found at: ${orchestratorPath}`);
+    throw new AiwgError({
+      code: 'ERR_RALPH_ORCHESTRATOR_MISSING',
+      message: `External Ralph orchestrator not found at: ${orchestratorPath}`,
+      hint: 'Run `aiwg use ralph` to deploy the orchestrator, or `npm run build` in the dev repo',
+      exitCode: EXIT_CODES.GENERAL,
+    });
   }
 
   const registryDir = getRegistryDir(projectRoot);
@@ -238,7 +244,12 @@ export async function launchExternalRalph(
 
   const pid = child.pid;
   if (!pid) {
-    throw new Error('Failed to start external Ralph process - no PID');
+    throw new AiwgError({
+      code: 'ERR_RALPH_SPAWN_FAILED',
+      message: 'Failed to start external Ralph process — no PID returned by spawn',
+      hint: 'Check system resources (ulimit -u) and that `node` is on PATH',
+      exitCode: EXIT_CODES.GENERAL,
+    });
   }
 
   // Record the loop in our launcher registry (backup to the external-multi-loop-state-manager)
@@ -435,7 +446,12 @@ export async function resumeLoop(
   const orchestratorPath = getOrchestratorPath(frameworkRoot);
 
   if (!existsSync(orchestratorPath)) {
-    throw new Error(`External Ralph orchestrator not found at: ${orchestratorPath}`);
+    throw new AiwgError({
+      code: 'ERR_RALPH_ORCHESTRATOR_MISSING',
+      message: `External Ralph orchestrator not found at: ${orchestratorPath}`,
+      hint: 'Run `aiwg use ralph` to deploy the orchestrator',
+      exitCode: EXIT_CODES.GENERAL,
+    });
   }
 
   // Build resume arguments
@@ -458,14 +474,24 @@ export async function resumeLoop(
       .sort((a, b) => new Date(b.lastUpdate).getTime() - new Date(a.lastUpdate).getTime());
 
     if (resumable.length === 0) {
-      throw new Error('No loops available to resume');
+      throw new AiwgError({
+        code: 'ERR_RALPH_NO_RESUMABLE',
+        message: 'No loops available to resume',
+        hint: 'Start a new loop with: aiwg ralph "<objective>"',
+        exitCode: EXIT_CODES.USAGE,
+      });
     }
     targetLoopId = resumable[0].loopId;
   }
 
   const entry = registry.loops[targetLoopId];
   if (!entry) {
-    throw new Error(`Loop not found: ${targetLoopId}`);
+    throw new AiwgError({
+      code: 'ERR_RALPH_LOOP_NOT_FOUND',
+      message: `Loop not found: ${targetLoopId}`,
+      hint: 'List available loops with: aiwg ralph-status',
+      exitCode: EXIT_CODES.USAGE,
+    });
   }
 
   const loopDir = join(registryDir, 'loops', targetLoopId);
@@ -492,7 +518,12 @@ export async function resumeLoop(
 
   const pid = child.pid;
   if (!pid) {
-    throw new Error('Failed to start external Ralph process - no PID');
+    throw new AiwgError({
+      code: 'ERR_RALPH_SPAWN_FAILED',
+      message: 'Failed to start external Ralph process — no PID returned by spawn',
+      hint: 'Check system resources (ulimit -u) and that `node` is on PATH',
+      exitCode: EXIT_CODES.GENERAL,
+    });
   }
 
   // Update registry

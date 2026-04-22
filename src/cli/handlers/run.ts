@@ -16,6 +16,7 @@
 import { spawn } from 'child_process';
 import type { CommandHandler, HandlerContext, HandlerResult } from './types.js';
 import { readAiwgConfig, getProjectDir } from '../../config/aiwg-config.js';
+import { handlerResultFromError } from '../errors.js';
 import * as ui from '../ui.js';
 
 /**
@@ -122,10 +123,8 @@ export const runHandler: CommandHandler = {
     try {
       exitCode = await runScript(command, env, projectDir);
     } catch (error) {
-      return {
-        exitCode: 1,
-        message: `Error executing script: ${error instanceof Error ? error.message : String(error)}`,
-      };
+      const result = handlerResultFromError(error);
+      return { ...result, message: `Error executing script: ${result.message}` };
     }
 
     if (exitCode !== 0) {

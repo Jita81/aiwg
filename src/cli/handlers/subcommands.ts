@@ -18,6 +18,7 @@ import { getRegistry } from "../../extensions/registry.js";
 import { registerDeployedExtensions } from "../../extensions/deployment-registration.js";
 import { sessionHandler } from "./session.js";
 import { feedbackHandler } from "./feedback.js";
+import { handlerResultFromError } from "../errors.js";
 
 /**
  * MCP server command handler
@@ -42,11 +43,8 @@ export const mcpHandler: CommandHandler = {
         exitCode: 0,
       };
     } catch (error) {
-      return {
-        exitCode: 1,
-        message: `MCP command failed: ${error instanceof Error ? error.message : String(error)}`,
-        error: error instanceof Error ? error : new Error(String(error)),
-      };
+      const result = handlerResultFromError(error);
+      return { ...result, message: `MCP command failed: ${result.message}` };
     }
   },
 };
@@ -74,11 +72,8 @@ export const catalogHandler: CommandHandler = {
         exitCode: 0,
       };
     } catch (error) {
-      return {
-        exitCode: 1,
-        message: `Catalog command failed: ${error instanceof Error ? error.message : String(error)}`,
-        error: error instanceof Error ? error : new Error(String(error)),
-      };
+      const result = handlerResultFromError(error);
+      return { ...result, message: `Catalog command failed: ${result.message}` };
     }
   },
 };
@@ -393,11 +388,8 @@ export const indexHandler: CommandHandler = {
         exitCode: 0,
       };
     } catch (error) {
-      return {
-        exitCode: 1,
-        message: `Index command failed: ${error instanceof Error ? error.message : String(error)}`,
-        error: error instanceof Error ? error : new Error(String(error)),
-      };
+      const result = handlerResultFromError(error);
+      return { ...result, message: `Index command failed: ${result.message}` };
     }
   },
 };
@@ -426,11 +418,8 @@ export const skillsHandler: CommandHandler = {
         exitCode: 0,
       };
     } catch (error) {
-      return {
-        exitCode: 1,
-        message: `Skills command failed: ${error instanceof Error ? error.message : String(error)}`,
-        error: error instanceof Error ? error : new Error(String(error)),
-      };
+      const result = handlerResultFromError(error);
+      return { ...result, message: `Skills command failed: ${result.message}` };
     }
   },
 };
@@ -459,11 +448,8 @@ export const configHandler: CommandHandler = {
         exitCode: 0,
       };
     } catch (error) {
-      return {
-        exitCode: 1,
-        message: `Config command failed: ${error instanceof Error ? error.message : String(error)}`,
-        error: error instanceof Error ? error : new Error(String(error)),
-      };
+      const result = handlerResultFromError(error);
+      return { ...result, message: `Config command failed: ${result.message}` };
     }
   },
 };
@@ -492,11 +478,8 @@ export const opsHandler: CommandHandler = {
         exitCode: 0,
       };
     } catch (error) {
-      return {
-        exitCode: 1,
-        message: `Ops command failed: ${error instanceof Error ? error.message : String(error)}`,
-        error: error instanceof Error ? error : new Error(String(error)),
-      };
+      const result = handlerResultFromError(error);
+      return { ...result, message: `Ops command failed: ${result.message}` };
     }
   },
 };
@@ -528,11 +511,8 @@ export const rlmToolsHandler: CommandHandler = {
         exitCode: 0,
       };
     } catch (error) {
-      return {
-        exitCode: 1,
-        message: `RLM tools command failed: ${error instanceof Error ? error.message : String(error)}`,
-        error: error instanceof Error ? error : new Error(String(error)),
-      };
+      const result = handlerResultFromError(error);
+      return { ...result, message: `RLM tools command failed: ${result.message}` };
     }
   },
 };

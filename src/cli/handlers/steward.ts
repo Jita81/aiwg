@@ -20,7 +20,7 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 import type { CommandHandler, HandlerContext, HandlerResult } from './types.js';
-import { AiwgError, EXIT_CODES } from '../errors.js';
+import { AiwgError, EXIT_CODES, handlerResultFromError } from '../errors.js';
 
 const _scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const AIWG_ROOT = process.env.AIWG_ROOT || path.resolve(_scriptDir, '../../../');
@@ -340,12 +340,8 @@ export const stewardHandler: CommandHandler = {
       await handleSteward(ctx.args);
       return { exitCode: 0 };
     } catch (error) {
-      const err = error as Error;
-      return {
-        exitCode: 1,
-        message: err.message,
-        error: err,
-      };
+      // Preserve AiwgError.exitCode (USAGE=2, etc.) through the catch.
+      return handlerResultFromError(error);
     }
   },
 };
