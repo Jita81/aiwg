@@ -95,6 +95,7 @@ import { stewardHandler, stewardHandlers } from './steward.js';
 import { serveHandler } from './serve.js';
 import { lintHandler } from './lint.js';
 import { sandboxHandler, sandboxHandlers } from './sandbox.js';
+import { diagnoseHandler } from './diagnose.js';
 
 import type { CommandHandler } from './types.js';
 
@@ -194,6 +195,9 @@ export {
 
   // Sandbox management
   sandboxHandler,
+
+  // Diagnose
+  diagnoseHandler,
 
   // Lint
   lintHandler,
@@ -300,6 +304,9 @@ export const allHandlers: CommandHandler[] = [
 
   // Sandbox management (#917)
   ...sandboxHandlers,
+
+  // Diagnose bundle (#925)
+  diagnoseHandler,
 
   // Lint
   lintHandler,

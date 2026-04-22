@@ -24,12 +24,30 @@
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { existsSync } from 'fs';
+import { randomUUID } from 'crypto';
 import { scheduleBackgroundCheck, maybePrintNotice } from '../src/update/notifier.mjs';
 import { loadConfig } from '../src/channel/manager.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const packageRoot = path.resolve(__dirname, '..');
+
+// Mint or inherit an invocation ID before anything else loads. Child processes
+// spawned by handlers (detached update-notifier, aiwg exec, etc.) inherit the
+// parent's ID via `AIWG_INVOCATION_ID` so their JSONL log records correlate
+// with the parent's — search the log by invocation_id to get the full trace
+// across process boundaries.
+//
+// randomUUID() is UUIDv4 today. Time-ordered v7 is not in Node stdlib yet;
+// the correlation property is what matters, not the ordering.
+function ensureInvocationId() {
+  const existing = process.env['AIWG_INVOCATION_ID'];
+  if (existing) return existing;
+  const fresh = randomUUID();
+  process.env['AIWG_INVOCATION_ID'] = fresh;
+  return fresh;
+}
+const invocationId = ensureInvocationId();
 
 /**
  * Resolve the path to the compiled router.
@@ -62,6 +80,52 @@ async function resolveRouterPath() {
   return installedRouter;
 }
 
+/**
+ * Parse verbosity flags from argv and set the logger level. Stackable:
+ *   (none)    → warn and above
+ *   -v        → info
+ *   -vv       → debug
+ *   -vvv      → debug + scope filter wide-open
+ *   --quiet   → error only
+ *
+ * `AIWG_LOG_LEVEL` env var overrides argv. `--verbose` is a synonym for -v.
+ *
+ * Returns the resolved level so the main entry can stash it. Does NOT mutate
+ * argv — handlers still see the flags. Call before the router loads so the
+ * logger picks up the right level when it initializes.
+ */
+async function applyVerbosityFromArgs(args) {
+  let level = 'warn'; // default
+  if (args.includes('--quiet') || args.includes('-q')) level = 'error';
+  else if (args.includes('-vvv')) { level = 'debug'; process.env['AIWG_DEBUG'] ??= '1'; }
+  else if (args.includes('-vv')) level = 'debug';
+  else if (args.includes('-v') || args.includes('--verbose')) level = 'info';
+  // Env var takes precedence (for CI or scripting).
+  const envLevel = process.env['AIWG_LOG_LEVEL']?.toLowerCase();
+  if (envLevel && ['debug', 'info', 'warn', 'error', 'silent'].includes(envLevel)) {
+    level = envLevel;
+  }
+  // Reach into the compiled logger (same dist/ we're about to dispatch to)
+  // and set the level. Failing to import the logger here is non-fatal — the
+  // logger's own fallbacks will pick up AIWG_LOG_LEVEL from env.
+  try {
+    const routerPath = await resolveRouterPath();
+    const logPath = path.join(path.dirname(routerPath), 'log.js');
+    if (existsSync(logPath)) {
+      const { setLogLevel, setInvocationId, pruneOldLogs } = await import('file://' + logPath);
+      setLogLevel(level);
+      setInvocationId(invocationId);
+      // One-shot prune of old JSONL files on startup. Bounded work; safe to
+      // call on every invocation because the work is a single directory list.
+      pruneOldLogs();
+    }
+  } catch {
+    // If the logger isn't importable yet (fresh clone without dist/), the
+    // regular router-resolution error below surfaces it.
+  }
+  return level;
+}
+
 async function main() {
   const args = process.argv.slice(2);
 
@@ -83,6 +147,11 @@ async function main() {
     await switchToStable();
     return;
   }
+
+  // Wire up the logger level from -v/-vv/--quiet/AIWG_LOG_LEVEL before any
+  // handler runs, and stamp the top-level invocation ID so the logger can
+  // tag every record with it.
+  await applyVerbosityFromArgs(args);
 
   // Update notifier: print any pending notice from the previous run's
   // background check, then schedule the next background check. Both are

@@ -481,6 +481,36 @@ export const serveCommand: Extension = {
   } satisfies SkillMetadata,
 };
 
+// Diagnose Command (#925)
+
+export const diagnoseCommand: Extension = {
+  id: 'diagnose',
+  type: 'skill',
+  name: 'Diagnose',
+  description: 'Produce a shareable support bundle (logs + env + config) for bug reports',
+  version: '1.0.0',
+  capabilities: ['cli', 'diagnostics', 'troubleshooting', 'support', 'bundle'],
+  keywords: ['diagnose', 'troubleshoot', 'bundle', 'support', 'bug-report', 'logs'],
+  category: 'maintenance',
+  platforms: {
+    claude: 'full',
+    generic: 'full',
+  },
+  deployment: {
+    pathTemplate: '.{platform}/commands/{id}.md',
+    core: true,
+  },
+  metadata: {
+    type: 'skill',
+    triggerPhrases: ['diagnose', 'collect logs', 'bug report', 'support bundle', 'what is wrong'],
+    commandHint: {
+      template: 'utility',
+      argumentHint: '[--stdout] [--include-secrets]',
+      allowedTools: ['Bash'],
+    },
+  } satisfies SkillMetadata,
+};
+
 // Sandbox Management Commands (#917)
 
 export const sandboxCommand: Extension = {
@@ -2385,6 +2415,9 @@ export const commandDefinitions: Extension[] = [
 
   // Sandbox management (#917)
   sandboxCommand,
+
+  // Diagnose (#925)
+  diagnoseCommand,
 ];
 
 // ============================================
