@@ -46,7 +46,6 @@
   "files": [
     "bin/",
     "dist/",
-    "src/",
     "tools/",
     "agentic/",
     "templates/",
