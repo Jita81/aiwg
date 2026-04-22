@@ -10,13 +10,15 @@
 
 ## Executive Decision
 
-**Skip both.** Do the one cheap cleanup (remove `src/` from the published tarball), close #923 as-is, document the architectural path forward for the aspirational 5 MB target as a separate proposal.
+**Skip both.** Do the one cheap cleanup (remove `src/` from the published tarball), close #923 as-is.
+
+> **Note on the 5 MB target.** An earlier draft of this document treated the 5 MB target from epic [#924](https://git.integrolabs.net/roctinam/aiwg/issues/924) as a hard constraint. It isn't — the budgets in `tools/cli/check-install-size.mjs` are deliberately set above current values to catch regressions, not to enforce a specific MB number. Install size is directionally something we want to keep reasonable; it's not load-bearing in this decision. The two remaining reasons below stand independently of any size target.
 
 ### Why skip the bundle
 
-1. **Addressable savings are small.** The published package is 34 MB unpacked. Of that, **22 MB is framework content** (`agentic/` 16 MB + `plugins/` 6.6 MB) that `aiwg use` deploys to projects — bundling cannot touch this. The `dist/` directory (the only thing bundling can affect) is 5.4 MB. Best-case bundle output: ~1 MB. **Ceiling savings: ~4 MB unpacked.** The 5 MB epic target is fundamentally incompatible with shipping framework content in the same package.
-2. **PoC hit the #927 overrun signal.** esbuild bundle built in 56ms and produced a clean 816 KB single file, but the bundle hangs on import at runtime. Debugging that is ≥1 day of work per the issue's own criterion ("if bundle PoC is still producing broken dynamic imports after 1 day, recommend skipping").
-3. **Cold-start ceiling is ~30ms.** The current 145ms cold start is already inside the Phase 6 150ms budget. Bundling 221 JS files into one removes module-resolution overhead, but modern Node (v20+) resolves modules in ~100μs each — the realistic saving is 20–25ms. The spike issue explicitly says "if <30ms improvement, recommend skipping."
+1. **PoC hit the #927 overrun signal (primary blocker).** esbuild bundle built in 56ms and produced a clean 816 KB single file, but the bundle hangs on import at runtime. Root cause untraced — likely dynamic `import()` paths not preserved, `(0, eval)('require')` hacks in `.mjs` files breaking under the bundler, `__dirname` semantics changing, or circular imports activating. Per the issue's own criterion: "if bundle PoC is still producing broken dynamic imports after 1 day, recommend skipping."
+2. **Cold-start ceiling is ~30ms (threshold miss).** The current 145ms cold start is already inside the Phase 6 150ms budget. Bundling 221 JS files into one removes module-resolution overhead, but modern Node (v20+) resolves modules in ~100μs each — the realistic saving is 20–25ms. The spike issue explicitly says "if <30ms improvement, recommend skipping." This threshold was missed regardless of install size.
+3. **Install-size savings are modest.** The `dist/` directory is 5.4 MB; best-case bundle output is ~1 MB. **Ceiling savings: ~4 MB unpacked.** Framework content (22 MB in `agentic/` + `plugins/`) dominates and is unaffected by bundling because `aiwg use` deploys that content at runtime. If install size becomes an actual priority later, splitting framework content into an optional follow-on package is the lever — not bundling the CLI.
 
 ### Why skip SEA
 
