@@ -25,6 +25,7 @@ import os from 'os';
 import { CommandHandler, HandlerContext, HandlerResult } from './types.js';
 import { readAiwgConfig } from '../../config/aiwg-config.js';
 import { createPromptInterface, askString, askChoice } from '../prompt-utils.js';
+import { debug } from '../log.js';
 
 // ── GitHub repo ───────────────────────────────────────────────────────────────
 
@@ -93,8 +94,9 @@ async function collectSystemContext(cwd: string): Promise<SystemContext> {
     if (match) aiwgVersion = match[1];
   } catch (err) {
     // Feedback command degrades gracefully when version detection fails; log
-    // under AIWG_DEBUG so the root cause is visible during bug reproduction.
-    if (process.env['AIWG_DEBUG']) console.error('[feedback] version detect failed:', err);
+    // under AIWG_DEBUG=cli:feedback:* so the root cause is visible during
+    // bug reproduction.
+    debug('cli:feedback:version', 'version detect failed', err);
   }
 
   // Provider from project config
@@ -107,7 +109,7 @@ async function collectSystemContext(cwd: string): Promise<SystemContext> {
       frameworks = Object.keys(config.installed);
     }
   } catch (err) {
-    if (process.env['AIWG_DEBUG']) console.error('[feedback] config read failed:', err);
+    debug('cli:feedback:config', 'config read failed', err);
   }
 
   return {

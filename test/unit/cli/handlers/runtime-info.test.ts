@@ -251,8 +251,12 @@ describe('Runtime Info Command Handler', () => {
 
       const result = await runtimeInfoHandler.execute(mockContext);
 
+      // Error is an AiwgError with exitCode 2 (USAGE). The handler
+      // currently flattens it to exitCode 1 via its generic catch; that
+      // remap moves in Phase 5 (#922) when handlers stop swallowing
+      // AiwgError. The message comes from the AiwgError body.
       expect(result.exitCode).toBe(1);
-      expect(result.message).toBe('Tool name required for --check');
+      expect(result.message).toBe('--check requires a tool name');
     });
 
     it('should output JSON when --json flag is present', async () => {

@@ -106,6 +106,49 @@ async function main() {
 // in #924. 1500ms is plenty for a normal npm registry check; if the check
 // is slower the user still gets their shell back promptly and the check
 // runs again on the next invocation.
+// Lazy-loaded structured error formatter. Imported on demand so a failing
+// top-level catch doesn't itself throw by trying to load a missing dist/.
+async function formatAndExit(error, fallbackCode = 1) {
+  // Show stack trace when the user has opted in to verbose diagnostics.
+  const verbose =
+    process.env.AIWG_DEBUG === '1' ||
+    process.env.AIWG_DEBUG?.toLowerCase() === 'true' ||
+    process.env.DEBUG === '1' ||
+    process.argv.includes('--verbose') ||
+    process.argv.includes('-vv') ||
+    process.argv.includes('-vvv');
+
+  let exitCode = fallbackCode;
+  try {
+    const errorsMod = await import(
+      'file://' + path.join(packageRoot, 'dist', 'src', 'cli', 'errors.js')
+    );
+    const { formatError, exitCodeFor } = errorsMod;
+    const formatted = formatError(error, { verbose });
+    // Strip ANSI colors when stderr isn't a TTY so piped output stays clean.
+    process.stderr.write(formatted + '\n');
+    exitCode = exitCodeFor(error);
+  } catch {
+    // Fallback path: dist/ missing or errors.js failed to load. Print a
+    // minimal message so we never silently exit.
+    const msg = error instanceof Error ? error.message : String(error);
+    process.stderr.write(`aiwg: error: ${msg}\n`);
+    if (verbose && error instanceof Error && error.stack) {
+      process.stderr.write(error.stack + '\n');
+    }
+  }
+  process.exit(exitCode);
+}
+
+// Install process-level handlers for unhandled failures so the same
+// structured formatter renders them instead of Node's default crash dump.
+process.on('uncaughtException', (err) => {
+  formatAndExit(err, 1).catch(() => process.exit(1));
+});
+process.on('unhandledRejection', (reason) => {
+  formatAndExit(reason, 1).catch(() => process.exit(1));
+});
+
 main()
   .then(async (result) => {
     const updateCheckPromise = result?.updateCheckPromise;
@@ -118,10 +161,4 @@ main()
     }
     process.exit(0);
   })
-  .catch((error) => {
-    console.error('Error:', error.message);
-    if (process.env.DEBUG) {
-      console.error(error.stack);
-    }
-    process.exit(1);
-  });
+  .catch((error) => formatAndExit(error, 1));

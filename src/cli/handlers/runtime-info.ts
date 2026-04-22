@@ -11,6 +11,7 @@
 
 import path from 'path';
 import type { CommandHandler, HandlerContext, HandlerResult } from './types.js';
+import { AiwgError, EXIT_CODES } from '../errors.js';
 
 /**
  * Runtime info command handler
@@ -69,7 +70,12 @@ async function handleRuntimeInfo(args: string[]): Promise<void> {
     if (hasFeature) {
       const featureName = args[featureIndex + 1];
       if (!featureName) {
-        throw new Error('Feature name required for --feature (cron, agent_teams, tasks, mcp, behaviors, mission_control)');
+        throw new AiwgError({
+          code: 'ERR_USAGE_MISSING_VALUE',
+          message: '--feature requires a feature name',
+          hint: 'Known: cron, agent_teams, tasks, mcp, behaviors, mission_control',
+          exitCode: EXIT_CODES.USAGE,
+        });
       }
       if (hasJson) {
         const matrix = loadCapabilityMatrix();
@@ -93,11 +99,21 @@ async function handleRuntimeInfo(args: string[]): Promise<void> {
     if (providerIndex >= 0) {
       const providerName = args[providerIndex + 1];
       if (!providerName) {
-        throw new Error('Provider name required for --provider');
+        throw new AiwgError({
+          code: 'ERR_USAGE_MISSING_VALUE',
+          message: '--provider requires a provider name',
+          hint: 'Example: aiwg runtime-info --capabilities --provider claude',
+          exitCode: EXIT_CODES.USAGE,
+        });
       }
       const caps = getProviderCapabilities(providerName);
       if (!caps) {
-        throw new Error(`Unknown provider: ${providerName}. Known: ${Object.keys(loadCapabilityMatrix().providers).join(', ')}`);
+        throw new AiwgError({
+          code: 'ERR_USAGE_UNKNOWN_PROVIDER',
+          message: `Unknown provider: ${providerName}`,
+          hint: `Known: ${Object.keys(loadCapabilityMatrix().providers).join(', ')}`,
+          exitCode: EXIT_CODES.USAGE,
+        });
       }
       if (hasJson) {
         console.log(JSON.stringify({ provider: providerName, ...caps }, null, 2));
@@ -166,7 +182,12 @@ async function handleRuntimeInfo(args: string[]): Promise<void> {
     const toolName = args[checkIndex + 1];
 
     if (!toolName) {
-      throw new Error('Tool name required for --check');
+      throw new AiwgError({
+        code: 'ERR_USAGE_MISSING_VALUE',
+        message: '--check requires a tool name',
+        hint: 'Example: aiwg runtime-info --check git',
+        exitCode: EXIT_CODES.USAGE,
+      });
     }
 
     const check = await discovery.checkTool(toolName);

@@ -20,6 +20,7 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 import type { CommandHandler, HandlerContext, HandlerResult } from './types.js';
+import { AiwgError, EXIT_CODES } from '../errors.js';
 
 const _scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const AIWG_ROOT = process.env.AIWG_ROOT || path.resolve(_scriptDir, '../../../');
@@ -73,9 +74,12 @@ async function loadMatrix(): Promise<CapabilityMatrix> {
     return yaml.load(raw) as CapabilityMatrix;
   }
 
-  throw new Error(
-    `Cannot parse capability-matrix.yaml: js-yaml not available. Run: npm install -g aiwg@latest`
-  );
+  throw new AiwgError({
+    code: 'ERR_DEPS_MISSING',
+    message: 'Cannot parse capability-matrix.yaml: js-yaml not available',
+    hint: 'Reinstall: npm install -g aiwg@latest',
+    exitCode: EXIT_CODES.GENERAL,
+  });
 }
 
 // ── Detect current provider ────────────────────────────────────────────────────
@@ -184,11 +188,21 @@ async function handleSteward(args: string[]): Promise<void> {
 
     if (providerFlag >= 0) {
       const providerId = args[providerFlag + 1];
-      if (!providerId) throw new Error('--provider requires a provider name');
+      if (!providerId) throw new AiwgError({
+        code: 'ERR_USAGE_MISSING_VALUE',
+        message: '--provider requires a provider name',
+        hint: 'Example: aiwg steward capabilities --provider claude',
+        exitCode: EXIT_CODES.USAGE,
+      });
       const provider = matrix.providers[providerId];
       if (!provider) {
         const known = Object.keys(matrix.providers).join(', ');
-        throw new Error(`Unknown provider: ${providerId}\nKnown providers: ${known}`);
+        throw new AiwgError({
+          code: 'ERR_USAGE_UNKNOWN_PROVIDER',
+          message: `Unknown provider: ${providerId}`,
+          hint: `Known providers: ${known}`,
+          exitCode: EXIT_CODES.USAGE,
+        });
       }
       console.log(formatProvider(providerId, provider, matrix.features));
       return;
@@ -196,11 +210,21 @@ async function handleSteward(args: string[]): Promise<void> {
 
     if (featureFlag >= 0) {
       const featureId = args[featureFlag + 1];
-      if (!featureId) throw new Error('--feature requires a feature name');
+      if (!featureId) throw new AiwgError({
+        code: 'ERR_USAGE_MISSING_VALUE',
+        message: '--feature requires a feature name',
+        hint: "Example: aiwg steward capabilities --feature cron",
+        exitCode: EXIT_CODES.USAGE,
+      });
       const feat = matrix.features[featureId];
       if (!feat) {
         const known = Object.keys(matrix.features).join(', ');
-        throw new Error(`Unknown feature: ${featureId}\nKnown features: ${known}`);
+        throw new AiwgError({
+          code: 'ERR_USAGE_UNKNOWN_FEATURE',
+          message: `Unknown feature: ${featureId}`,
+          hint: `Known features: ${known}`,
+          exitCode: EXIT_CODES.USAGE,
+        });
       }
 
       console.log(`\n  Feature: ${featureId}`);
@@ -242,15 +266,30 @@ async function handleSteward(args: string[]): Promise<void> {
 
   if (subcommand === 'find') {
     const capFlag = args.indexOf('--capability');
-    if (capFlag < 0) throw new Error("find requires --capability <name>");
+    if (capFlag < 0) throw new AiwgError({
+      code: 'ERR_USAGE_MISSING_FLAG',
+      message: "'aiwg steward find' requires --capability <name>",
+      hint: 'Example: aiwg steward find --capability cron',
+      exitCode: EXIT_CODES.USAGE,
+    });
 
     const capabilityId = args[capFlag + 1];
-    if (!capabilityId) throw new Error('--capability requires a feature name');
+    if (!capabilityId) throw new AiwgError({
+      code: 'ERR_USAGE_MISSING_VALUE',
+      message: '--capability requires a feature name',
+      hint: 'Example: aiwg steward find --capability cron',
+      exitCode: EXIT_CODES.USAGE,
+    });
 
     const feat = matrix.features[capabilityId];
     if (!feat) {
       const known = Object.keys(matrix.features).join(', ');
-      throw new Error(`Unknown capability: ${capabilityId}\nKnown capabilities: ${known}`);
+      throw new AiwgError({
+        code: 'ERR_USAGE_UNKNOWN_CAPABILITY',
+        message: `Unknown capability: ${capabilityId}`,
+        hint: `Known capabilities: ${known}`,
+        exitCode: EXIT_CODES.USAGE,
+      });
     }
 
     const detected = detectProvider() ?? matrix.baseline;
@@ -279,7 +318,12 @@ async function handleSteward(args: string[]): Promise<void> {
     return;
   }
 
-  throw new Error(`Unknown steward subcommand: ${subcommand}\nRun 'aiwg steward --help' for usage.`);
+  throw new AiwgError({
+    code: 'ERR_USAGE_UNKNOWN_SUBCOMMAND',
+    message: `Unknown steward subcommand: ${subcommand}`,
+    hint: "Run 'aiwg steward --help' for usage",
+    exitCode: EXIT_CODES.USAGE,
+  });
 }
 
 // ── Handler export ────────────────────────────────────────────────────────────

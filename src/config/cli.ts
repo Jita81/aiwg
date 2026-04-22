@@ -21,6 +21,7 @@
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { UserConfig } from './user-config.js';
+import { AiwgError, EXIT_CODES } from '../cli/errors.js';
 
 const _scriptDir = path.dirname(fileURLToPath(import.meta.url));
 
@@ -83,7 +84,12 @@ export async function main(args: string[]): Promise<void> {
     default:
       printUsage();
       if (subcommand) {
-        throw new Error(`Unknown config subcommand: ${subcommand}`);
+        throw new AiwgError({
+          code: 'ERR_USAGE_UNKNOWN_SUBCOMMAND',
+          message: `Unknown config subcommand: ${subcommand}`,
+          hint: "Run 'aiwg config' without arguments to see usage",
+          exitCode: EXIT_CODES.USAGE,
+        });
       }
       break;
   }
@@ -92,7 +98,12 @@ export async function main(args: string[]): Promise<void> {
 async function handleGet(config: UserConfig, args: string[]): Promise<void> {
   const key = args[0];
   if (!key) {
-    throw new Error('Usage: aiwg config get <key>\n\nExample: aiwg config get defaults.provider');
+    throw new AiwgError({
+      code: 'ERR_USAGE_MISSING_ARG',
+      message: 'aiwg config get requires a key',
+      hint: 'Example: aiwg config get defaults.provider',
+      exitCode: EXIT_CODES.USAGE,
+    });
   }
 
   const value = await config.get(key);
@@ -110,7 +121,12 @@ async function handleSet(config: UserConfig, args: string[]): Promise<void> {
   const value = args[1];
 
   if (!key || value === undefined) {
-    throw new Error('Usage: aiwg config set <key> <value>\n\nExample: aiwg config set defaults.verbosity quiet');
+    throw new AiwgError({
+      code: 'ERR_USAGE_MISSING_ARG',
+      message: 'aiwg config set requires both a key and a value',
+      hint: 'Example: aiwg config set defaults.verbosity quiet',
+      exitCode: EXIT_CODES.USAGE,
+    });
   }
 
   await config.set(key, value);
@@ -156,7 +172,12 @@ async function handleValidate(config: UserConfig): Promise<void> {
   console.log(`${errors.length} error(s), ${warnings.length} warning(s), ${infos.length} info`);
 
   if (errors.length > 0) {
-    throw new Error(`Config validation failed with ${errors.length} error(s)`);
+    throw new AiwgError({
+      code: 'ERR_CONFIG_VALIDATION',
+      message: `Config validation failed with ${errors.length} error(s)`,
+      hint: 'Fix the errors listed above, or run: aiwg config edit',
+      exitCode: EXIT_CODES.CONFIG,
+    });
   }
 }
 
@@ -186,8 +207,14 @@ async function handleEdit(config: UserConfig): Promise<void> {
   const { execSync } = await import('child_process');
   try {
     execSync(`${editor} "${configPath}"`, { stdio: 'inherit' });
-  } catch {
-    throw new Error(`Failed to open editor: ${editor}`);
+  } catch (err) {
+    throw new AiwgError({
+      code: 'ERR_EDITOR_FAILED',
+      message: `Failed to open editor: ${editor}`,
+      hint: 'Set EDITOR or VISUAL to a valid editor binary, or edit the file directly',
+      exitCode: EXIT_CODES.GENERAL,
+      cause: err,
+    });
   }
 }
 
