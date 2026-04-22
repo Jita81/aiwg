@@ -160,16 +160,19 @@ export const refreshHandler: CommandHandler = {
             research: 'agentic/code/frameworks/research-complete/manifest.json',
           };
           const frameworkRoot = await getFrameworkRoot();
-          const stale: string[] = [];
-          for (const [name, entry] of Object.entries(config.installed)) {
-            if (!entry.manifestHash) continue;
-            const relPath = MANIFEST_PATHS[name];
-            if (!relPath) continue;
-            const currentHash = await hashManifest(join(frameworkRoot, relPath));
-            if (currentHash && currentHash !== entry.manifestHash) {
-              stale.push(name);
-            }
-          }
+          // Batch-hash manifests in parallel instead of serially awaiting each
+          // one. For ~10 frameworks this cuts refresh latency from ~N*I/O to
+          // max-single-I/O on a warm filesystem (#919 cleanup).
+          const hashChecks = await Promise.all(
+            Object.entries(config.installed).map(async ([name, entry]) => {
+              if (!entry.manifestHash) return null;
+              const relPath = MANIFEST_PATHS[name];
+              if (!relPath) return null;
+              const currentHash = await hashManifest(join(frameworkRoot, relPath));
+              return currentHash && currentHash !== entry.manifestHash ? name : null;
+            }),
+          );
+          const stale: string[] = hashChecks.filter((n): n is string => n !== null);
           if (stale.length > 0) {
             for (const name of stale) {
               ui.warn(`Stale deployment: ${name} — run 'aiwg use ${name}' to redeploy`);

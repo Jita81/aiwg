@@ -15,7 +15,7 @@
 
 import { spawn } from 'child_process';
 import type { CommandHandler, HandlerContext, HandlerResult } from './types.js';
-import { readAiwgConfig } from '../../config/aiwg-config.js';
+import { readAiwgConfig, getProjectDir } from '../../config/aiwg-config.js';
 import * as ui from '../ui.js';
 
 /**
@@ -52,7 +52,7 @@ export const runHandler: CommandHandler = {
 
   async execute(ctx: HandlerContext): Promise<HandlerResult> {
     const scriptName = ctx.args[0];
-    const projectDir = ctx.cwd;
+    const projectDir = getProjectDir(ctx, ctx.args);
 
     const config = await readAiwgConfig(projectDir);
 

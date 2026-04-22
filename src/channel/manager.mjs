@@ -10,6 +10,7 @@
  */
 
 import fs from 'fs/promises';
+import { readFileSync, existsSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { execSync, spawn } from 'child_process';
@@ -95,11 +96,35 @@ const DEFAULT_CONFIG = {
 };
 
 /**
- * Get the package root directory
+ * Get the package root directory.
+ *
+ * Walks up from this file's directory looking for the nearest package.json
+ * that names "aiwg". This works whether this module runs from its source
+ * location (`src/channel/manager.mjs`) or from its compiled-build copy
+ * (`dist/src/channel/manager.mjs`), both of which have package.json at
+ * the repo root.
+ *
+ * The walk is bounded to 10 levels as a safety cap.
+ *
  * @returns {string} Path to package root
  */
 export function getPackageRoot() {
-  // Go up from src/channel to package root
+  let dir = __dirname;
+  for (let i = 0; i < 10; i++) {
+    const pkg = path.join(dir, 'package.json');
+    if (existsSync(pkg)) {
+      try {
+        const content = JSON.parse(readFileSync(pkg, 'utf8'));
+        if (content.name === 'aiwg') return dir;
+      } catch {
+        // keep walking
+      }
+    }
+    const parent = path.dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  // Fallback to the legacy hardcoded two-up resolution.
   return path.resolve(__dirname, '..', '..');
 }
 
@@ -254,14 +279,13 @@ export async function switchToDev(devPath) {
     process.exit(1);
   }
 
-  // Verify CLI facade exists (needed for delegation)
-  try {
-    await fs.access(path.join(resolvedPath, 'src', 'cli', 'facade.mjs'));
-  } catch {
-    console.error(`Error: ${resolvedPath}/src/cli/facade.mjs not found.`);
-    console.error('Dev mode requires the source CLI facade. Is this the right repo?');
-    process.exit(1);
-  }
+  // Verify compiled router exists (dev-mode dispatch imports from dist/).
+  // Accept repos that have never been built by emitting a clear build hint
+  // rather than hard-failing here — the first `aiwg` invocation will re-check
+  // and print the same hint. This lets `aiwg --use-dev /path/to/fresh/clone`
+  // succeed followed by `npm run build`.
+  const distRouter = path.join(resolvedPath, 'dist', 'src', 'cli', 'router.js');
+  const distExists = await fs.access(distRouter).then(() => true).catch(() => false);
 
   config.channel = 'edge';
   config.edgePath = resolvedPath;
@@ -270,9 +294,14 @@ export async function switchToDev(devPath) {
 
   console.log('Switched to dev mode.');
   console.log(`Dev repo:    ${resolvedPath}`);
-  console.log(`CLI source:  ${resolvedPath}/src/cli/facade.mjs`);
+  console.log(`Router:      ${distRouter}`);
+  if (!distExists) {
+    console.log('');
+    console.log('NOTE: dist/ is not built yet. Before running aiwg commands:');
+    console.log(`  (cd ${resolvedPath} && npm run build)`);
+  }
   console.log('');
-  console.log('The aiwg command now runs code from your local repo.');
+  console.log('The aiwg command now runs the compiled router from your local repo.');
   console.log('After making changes, run: npm run build');
   console.log('');
   console.log('Commands:');

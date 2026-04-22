@@ -134,14 +134,18 @@ export const updateCommand: Extension = {
   } satisfies SkillMetadata,
 };
 
-export const syncCommand: Extension = {
-  id: 'sync',
+// Renamed from `refreshCommand` as part of #694 (avoid collision with git sync
+// semantics) and re-linked to `refreshHandler` in #919. Users who type
+// `aiwg sync` still reach this handler via its 'sync' alias and see a
+// deprecation notice.
+export const refreshCommand: Extension = {
+  id: 'refresh',
   type: 'skill',
-  name: 'Sync',
-  description: 'Sync AIWG to latest version and re-deploy all frameworks to active provider',
+  name: 'Refresh',
+  description: 'Refresh AIWG to latest version and re-deploy all frameworks to active provider (formerly: sync)',
   version: '1.0.0',
-  capabilities: ['cli', 'sync', 'maintenance', 'deploy', 'self-maintenance'],
-  keywords: ['sync', 'refresh', 'update', 'redeploy', 'current', 'latest'],
+  capabilities: ['cli', 'refresh', 'sync', 'maintenance', 'deploy', 'self-maintenance'],
+  keywords: ['refresh', 'sync', 'update', 'redeploy', 'current', 'latest'],
   category: 'maintenance',
   platforms: {
     claude: 'full',
@@ -2263,7 +2267,7 @@ export const commandDefinitions: Extension[] = [
   versionCommand,
   doctorCommand,
   updateCommand,
-  syncCommand,
+  refreshCommand,
 
   // Framework (5)
   useCommand,

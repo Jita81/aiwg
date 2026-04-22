@@ -108,6 +108,26 @@ export function getConfigPath(projectDir: string): string {
 }
 
 /**
+ * Resolve the project directory for a handler invocation.
+ *
+ * Precedence:
+ *   1. `--target <path>` or `--prefix <path>` flag in args
+ *   2. The HandlerContext `cwd`, if provided
+ *   3. `process.cwd()`
+ *
+ * All three variants existed scattered across handlers (#919 cleanup).
+ * Use this helper so we have one authoritative resolution.
+ */
+export function getProjectDir(
+  ctx: { cwd?: string } | undefined,
+  args: readonly string[] = [],
+): string {
+  const targetIdx = args.findIndex(a => a === '--target' || a === '--prefix');
+  const targetValue = targetIdx >= 0 ? args[targetIdx + 1] : undefined;
+  return targetValue || ctx?.cwd || process.cwd();
+}
+
+/**
  * Read .aiwg/aiwg.config.
  * Returns null if the file does not exist.
  */

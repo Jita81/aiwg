@@ -21,7 +21,7 @@ import { registerDeployedExtensions } from '../../extensions/deployment-registra
 import { registerCliCommands, registerHooks } from '../cli-extension-loader.js';
 import { translateSkillsToCommands, providerNeedsCommands } from '../../plugin/skill-command-translator.js';
 import * as ui from '../ui.js';
-import { readAiwgConfig, writeAiwgConfig, updateInstalled, hashManifest, emptyConfig } from '../../config/aiwg-config.js';
+import { readAiwgConfig, writeAiwgConfig, updateInstalled, hashManifest, emptyConfig, getProjectDir } from '../../config/aiwg-config.js';
 import { initHandler } from './init.js';
 import {
   checkCollisions,
@@ -592,13 +592,15 @@ export class UseHandler implements CommandHandler {
       remainingArgs[prefixIdx] = '--target';
     }
 
-    // Read project config for config-first resolution (#621)
-    // When --target/--prefix is set, resolve config from that directory instead of cwd
+    // Read project config for config-first resolution (#621).
+    // projectDir resolution uses the shared helper so --target/--prefix,
+    // ctx.cwd, and process.cwd() fallback are handled consistently across
+    // handlers (#919 cleanup).
     const targetFlagIdx = remainingArgs.findIndex(a => a === '--target');
     const targetDir = targetFlagIdx >= 0 && remainingArgs[targetFlagIdx + 1]
       ? remainingArgs[targetFlagIdx + 1]
       : null;
-    const projectDir = targetDir || ctx.cwd || process.cwd();
+    const projectDir = getProjectDir(ctx, remainingArgs);
     let config = await readAiwgConfig(projectDir);
 
     // Auto-init when no config found (#720)

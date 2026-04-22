@@ -80,7 +80,9 @@ import {
   subcommandHandlers,
 } from './subcommands.js';
 import { runtimeInfoHandler } from './runtime-info.js';
-import { syncHandler } from './sync.js';
+// sync was renamed to refresh (#694). refreshHandler exposes both 'refresh'
+// (primary) and 'sync' (deprecated alias) to preserve backward compatibility.
+import { refreshHandler } from './refresh.js';
 import { mcHandler, mcHandlers } from './mc.js';
 import { sdlcAccelerateHandler } from './sdlc-accelerate.js';
 import { teamHandler, teamHandlers } from './team.js';
@@ -103,7 +105,7 @@ export {
   versionHandler,
   doctorHandler,
   updateHandler,
-  syncHandler,
+  refreshHandler,
 
   // Framework management
   useHandler,
@@ -222,7 +224,7 @@ export const allHandlers: CommandHandler[] = [
   versionHandler,
   doctorHandler,
   updateHandler,
-  syncHandler,
+  refreshHandler,
 
   // Framework management
   useHandler,
