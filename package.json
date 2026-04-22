@@ -22,6 +22,8 @@
     "build:copy-mjs": "node -e \"const{cpSync,mkdirSync,statSync,readdirSync}=require('fs');const{join,dirname}=require('path');function walk(d){for(const f of readdirSync(d,{withFileTypes:true})){const p=join(d,f.name);if(f.isDirectory())walk(p);else if(f.name.endsWith('.mjs')){const o=p.replace(/^src\\//,'dist/src/');mkdirSync(dirname(o),{recursive:true});cpSync(p,o);}}}walk('src');console.log('Copied .mjs files to dist/');\"",
     "build:web": "npm --prefix apps/web ci && npm --prefix apps/web run build",
     "test": "vitest run --config config/vitest.config.js",
+    "test:integration": "vitest run --config config/vitest.config.js test/integration/cli-startup.test.ts test/integration/cli-perf.test.ts",
+    "test:perf": "vitest run --config config/vitest.config.js test/integration/cli-perf.test.ts",
     "test:ci": "vitest run --config config/vitest.config.js && vitest run --config config/vitest.uat.config.js",
     "test:coverage": "vitest --config config/vitest.config.js --coverage",
     "test:ui": "vitest --config config/vitest.config.js --ui",

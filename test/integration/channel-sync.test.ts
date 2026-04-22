@@ -98,7 +98,9 @@ vi.mock('../../src/cli/ui.js', () => ({
   channelLabel: vi.fn((s: string) => s === 'stable' ? '' : `[${s}]`),
 }));
 
-import { syncHandler } from '../../src/cli/handlers/sync.js';
+// sync.ts was deleted in Phase 2 (#919); refreshHandler exposes 'sync' as an
+// alias, so we reach the same handler via refresh.
+import { refreshHandler as syncHandler } from '../../src/cli/handlers/refresh.js';
 
 function makeCtx(args: string[] = []) {
   return { args, rawArgs: args, cwd: '/mock', frameworkRoot: '/mock/root' };
