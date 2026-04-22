@@ -24,7 +24,7 @@
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { existsSync } from 'fs';
-import { checkForUpdates } from '../src/update/checker.mjs';
+import { scheduleBackgroundCheck, maybePrintNotice } from '../src/update/notifier.mjs';
 import { loadConfig } from '../src/channel/manager.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -84,18 +84,43 @@ async function main() {
     return;
   }
 
-  // Fire-and-forget update check. Tracked so main() can optionally await
-  // briefly at exit, but the command itself never blocks on it.
-  const updateCheckPromise = checkForUpdates().catch(() => {
-    // Silently ignore update check failures
-  });
+  // Update notifier: print any pending notice from the previous run's
+  // background check, then schedule the next background check. Both are
+  // non-blocking — the current command never waits on the network.
+  // Honors NO_UPDATE_NOTIFIER, CI=*, and non-TTY stderr.
+  maybePrintNotice();
+  scheduleBackgroundCheck(packageRoot);
+
+  // Top-level cancellation controller. SIGINT / SIGTERM flip it, long-running
+  // handlers plumb ctx.signal through fetches and loops so Ctrl-C cancels
+  // in-flight work cleanly instead of leaving orphaned sockets and children.
+  // Exit codes 130 (SIGINT = 128+2) and 143 (SIGTERM = 128+15) follow shell
+  // convention so scripts can branch on the signal kind.
+  const abortController = new AbortController();
+  const onSigint = () => {
+    abortController.abort('sigint');
+    // Safety deadline: if a handler does not honor the signal, force exit
+    // after 3s. .unref() so a well-behaved handler can still finish first.
+    const deadline = setTimeout(() => process.exit(130), 3_000);
+    deadline.unref?.();
+  };
+  const onSigterm = () => {
+    abortController.abort('sigterm');
+    const deadline = setTimeout(() => process.exit(143), 3_000);
+    deadline.unref?.();
+  };
+  process.once('SIGINT', onSigint);
+  process.once('SIGTERM', onSigterm);
 
   // Direct in-process dispatch — no tsx fork, no facade, no router-loader.
   const routerPath = await resolveRouterPath();
   const { run } = await import('file://' + routerPath);
-  await run(args, { cwd: process.cwd() });
-
-  return { updateCheckPromise };
+  try {
+    await run(args, { cwd: process.cwd(), signal: abortController.signal });
+  } finally {
+    process.removeListener('SIGINT', onSigint);
+    process.removeListener('SIGTERM', onSigterm);
+  }
 }
 
 // Give the background update check a brief grace window before forcing exit.
@@ -149,16 +174,10 @@ process.on('unhandledRejection', (reason) => {
   formatAndExit(reason, 1).catch(() => process.exit(1));
 });
 
+// With the update notifier now running as a detached unref()'d child (#920),
+// main() has no background promise to grace-wait on — the router finishes,
+// we exit. The background child writes its cache file and exits on its own
+// schedule.
 main()
-  .then(async (result) => {
-    const updateCheckPromise = result?.updateCheckPromise;
-    if (updateCheckPromise) {
-      const GRACE_MS = 1500;
-      await Promise.race([
-        updateCheckPromise,
-        new Promise((resolve) => setTimeout(resolve, GRACE_MS).unref()),
-      ]);
-    }
-    process.exit(0);
-  })
+  .then(() => process.exit(0))
   .catch((error) => formatAndExit(error, 1));

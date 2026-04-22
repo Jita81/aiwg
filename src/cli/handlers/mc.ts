@@ -505,8 +505,13 @@ async function mcAgents(ctx: HandlerContext): Promise<HandlerResult> {
 
   let result: { selected?: Record<string, unknown>; candidates: Record<string, unknown>[] };
   try {
+    // Combine user-cancel (Ctrl-C) with the per-call timeout so the fetch
+    // aborts on either. `AbortSignal.any` requires Node 20+.
+    const signal = ctx.signal
+      ? AbortSignal.any([ctx.signal, AbortSignal.timeout(fetchTimeoutMs)])
+      : AbortSignal.timeout(fetchTimeoutMs);
     const resp = await fetch(`${base}/api/agents/candidates?${params.toString()}`, {
-      signal: AbortSignal.timeout(fetchTimeoutMs),
+      signal,
     });
     if (!resp.ok) {
       ui.error(`aiwg serve returned ${resp.status} — is it running on port ${port}?`);

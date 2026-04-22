@@ -40,6 +40,18 @@ export interface HandlerContext {
 
   /** Whether running in dry-run mode */
   dryRun?: boolean;
+
+  /**
+   * Cancellation signal. Aborted on SIGINT/SIGTERM by the top-level entry.
+   * Long-running handlers MUST check `signal.aborted` between iterations
+   * (or `throwIfAborted()`), and any fetch()/child-process call that
+   * accepts a signal MUST plumb this through (typically via
+   * `AbortSignal.any([ctx.signal, AbortSignal.timeout(N)])`).
+   *
+   * Handlers that never block or loop can safely ignore this field.
+   * Optional so existing handlers can adopt incrementally (#920).
+   */
+  signal?: AbortSignal;
 }
 
 /**

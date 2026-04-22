@@ -75,7 +75,10 @@ export function getHookRegistry(): HookRegistry {
  * await run([]);
  * ```
  */
-export async function run(args: string[], options: { cwd?: string } = {}): Promise<void> {
+export async function run(
+  args: string[],
+  options: { cwd?: string; signal?: AbortSignal } = {},
+): Promise<void> {
   const registry = await initRouter();
   const [rawCommand, ...commandArgs] = args;
 
@@ -230,16 +233,20 @@ export async function run(args: string[], options: { cwd?: string } = {}): Promi
 async function buildContext(
   args: string[],
   rawArgs: string[],
-  options: { cwd?: string }
+  options: { cwd?: string; signal?: AbortSignal }
 ): Promise<HandlerContext> {
   const frameworkRoot = await getFrameworkRoot();
-  return {
+  const ctx: HandlerContext = {
     args,
     rawArgs,
     cwd: options.cwd || process.cwd(),
     frameworkRoot,
     dryRun: args.includes('--dry-run'),
   };
+  // Only attach signal when one is supplied (keeps the field optional for
+  // test fixtures that construct bare contexts).
+  if (options.signal) ctx.signal = options.signal;
+  return ctx;
 }
 
 // Export for testing

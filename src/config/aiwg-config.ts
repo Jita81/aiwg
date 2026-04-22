@@ -9,8 +9,8 @@
  * @implements #621
  */
 
-import { readFile, writeFile, mkdir, access, readdir } from 'fs/promises';
-import { createHash } from 'crypto';
+import { readFile, writeFile, mkdir, access, readdir, rename, unlink } from 'fs/promises';
+import { createHash, randomBytes } from 'crypto';
 import { resolve, join, isAbsolute } from 'path';
 import { homedir } from 'os';
 
@@ -157,7 +157,23 @@ export async function writeAiwgConfig(projectDir: string, config: AiwgConfig): P
   const dir = resolve(projectDir, AIWG_DIR);
   await mkdir(dir, { recursive: true });
   const filePath = join(dir, CONFIG_FILENAME);
-  await writeFile(filePath, JSON.stringify(config, null, 2) + '\n', 'utf-8');
+  // Atomic write: emit to a temp sibling, fsync-ish via rename. Prevents a
+  // crash or kill mid-write from corrupting the config file. Rename is
+  // atomic on POSIX and on NTFS when both paths are on the same volume.
+  // The random suffix avoids collisions if two concurrent writers run.
+  const tmpPath = `${filePath}.${randomBytes(6).toString('hex')}.tmp`;
+  try {
+    await writeFile(tmpPath, JSON.stringify(config, null, 2) + '\n', 'utf-8');
+    await rename(tmpPath, filePath);
+  } catch (err) {
+    // Best-effort cleanup of the temp file on failure, ignoring ENOENT.
+    try {
+      await unlink(tmpPath);
+    } catch {
+      /* ignore */
+    }
+    throw err;
+  }
 }
 
 /**

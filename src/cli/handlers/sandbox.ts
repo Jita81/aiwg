@@ -44,6 +44,18 @@ function reachabilityMessage(err: unknown): string {
   return `Cannot reach aiwg serve. Start it with: aiwg serve`;
 }
 
+/**
+ * Combine the handler's user-cancel signal (Ctrl-C) with a per-call
+ * timeout so fetches abort on either. Node 20+ `AbortSignal.any` is
+ * required; handlers without `ctx.signal` (older test fixtures) fall
+ * back to the timeout alone.
+ */
+function combineSignal(ctxSignal: AbortSignal | undefined, timeoutMs: number): AbortSignal {
+  const timeoutSignal = AbortSignal.timeout(timeoutMs);
+  if (!ctxSignal) return timeoutSignal;
+  return AbortSignal.any([ctxSignal, timeoutSignal]);
+}
+
 async function sandboxAlias(ctx: HandlerContext): Promise<HandlerResult> {
   const [sandboxId, agentId, ...nameParts] = ctx.args;
   const name = nameParts.join(' ');
@@ -60,7 +72,7 @@ async function sandboxAlias(ctx: HandlerContext): Promise<HandlerResult> {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name }),
-      signal: AbortSignal.timeout(fetchTimeoutMs()),
+      signal: combineSignal(ctx.signal, fetchTimeoutMs()),
     });
     if (!resp.ok) {
       const body = await resp.json().catch(() => ({ error: resp.statusText })) as { error?: string };
@@ -86,7 +98,7 @@ async function sandboxResolve(ctx: HandlerContext): Promise<HandlerResult> {
   const base = getServeBase();
   try {
     const resp = await fetch(`${base}/api/agents/resolve/${encodeURIComponent(ref)}`, {
-      signal: AbortSignal.timeout(fetchTimeoutMs()),
+      signal: combineSignal(ctx.signal, fetchTimeoutMs()),
     });
     if (!resp.ok) {
       const body = await resp.json().catch(() => ({ error: resp.statusText })) as { error?: string };
@@ -112,7 +124,7 @@ async function sandboxIdentities(ctx: HandlerContext): Promise<HandlerResult> {
   const base = getServeBase();
   try {
     const resp = await fetch(`${base}/api/agents/identities`, {
-      signal: AbortSignal.timeout(fetchTimeoutMs()),
+      signal: combineSignal(ctx.signal, fetchTimeoutMs()),
     });
     if (!resp.ok) {
       ui.error(`identities failed (${resp.status}): ${resp.statusText}`);
