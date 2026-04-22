@@ -780,38 +780,33 @@ export class UseHandler implements CommandHandler {
             // The profile picker is annoying during `aiwg use all`.
             selectedProfile = 'generic';
           } else if (process.stdin.isTTY) {
-            // Interactive profile selection with hard timeout via the shared
-            // prompt-utils helper. The timer is .unref()'d internally so a
-            // Ctrl-C closing the readline interface does not hold the event
-            // loop open for the remainder of the window.
-            const { createPromptInterface, askString } = await import('../prompt-utils.js');
+            // Interactive profile selection via the shared `listSelect` helper
+            // (POC for spike #926). One call renders the option list, handles
+            // number-or-name matching, threads `ctx.signal` for Ctrl-C
+            // cancellation, and resolves to the fallback on timeout or empty
+            // input. The hand-rolled parse-and-branch that used to live here
+            // is now a one-liner.
+            const { createPromptInterface, listSelect } = await import('../prompt-utils.js');
             ui.blank();
             ui.header('  Select a topology profile:');
             const templateNames = templates.map((t: string) => t.replace('.md', ''));
-            templateNames.forEach((name: string, i: number) => {
-              const isDefault = name === 'generic' ? ' (default)' : '';
-              console.log(`    ${i + 1}. ${name}${isDefault}`);
-            });
-            console.log('');
+            const options = templateNames.map((name: string) => ({
+              label: name === 'generic' ? `${name} (default)` : name,
+              value: name,
+            }));
 
             const rl = createPromptInterface();
-            let answer = '';
             try {
-              answer = await askString(rl, '  Enter number or name [generic]: ', '');
+              selectedProfile = await listSelect(
+                rl,
+                '  Enter number or name [generic]: ',
+                options,
+                'generic',
+                ctx.signal,
+              );
             } finally {
               rl.close();
             }
-
-            if (answer) {
-              const num = parseInt(answer, 10);
-              if (!isNaN(num) && num >= 1 && num <= templateNames.length) {
-                selectedProfile = templateNames[num - 1];
-              } else if (templateNames.includes(answer)) {
-                selectedProfile = answer;
-              }
-            }
-            // Fall through: if answer was empty (timeout or user hit enter),
-            // selectedProfile stays undefined and downstream uses 'generic' default.
           }
 
           // Write profile config to project namespace

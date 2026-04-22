@@ -58,37 +58,65 @@ export function askWithTimeout<T>(
   fallback: T,
   fallbackLabel: string,
   timeoutMs: number = promptTimeoutMs(),
+  signal?: AbortSignal,
 ): Promise<T> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     let settled = false;
     const timer = setTimeout(() => {
       if (settled) return;
       settled = true;
       ui.warn(`  No input within ${Math.round(timeoutMs / 1000)}s — using default: ${fallbackLabel}`);
+      cleanup();
       resolve(fallback);
     }, timeoutMs);
     // Ensure the timer does not block the event loop if the readline interface
     // is closed (e.g. user hits Ctrl-C). The callback only fires if the timer
     // is still live and the event loop has other work.
     timer.unref?.();
+
+    // Integrate with the HandlerContext.signal plumbed through in Phase 3
+    // (#920). When Ctrl-C aborts the top-level AbortController, the prompt
+    // rejects cleanly, closes the readline, and clears the timeout — no
+    // orphaned input reader, no pending timer.
+    const onAbort = () => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      try { rl.close(); } catch { /* already closed */ }
+      reject(signal!.reason ?? new Error('Aborted'));
+    };
+    const cleanup = () => {
+      clearTimeout(timer);
+      signal?.removeEventListener('abort', onAbort);
+    };
+    if (signal?.aborted) {
+      // Fire synchronously so the caller's try/catch sees the reject without
+      // awaiting a tick.
+      onAbort();
+      return;
+    }
+    signal?.addEventListener('abort', onAbort, { once: true });
+
     rl.question(prompt, (answer) => {
       if (settled) return;
       settled = true;
-      clearTimeout(timer);
+      cleanup();
       resolve(parse(answer));
     });
   });
 }
 
 /**
- * Prompt for a trimmed string with timeout and default.
+ * Prompt for a trimmed string with timeout and default. Honors `signal` from
+ * the HandlerContext (Phase 3 #920) so Ctrl-C cancels the prompt cleanly.
  */
 export async function askString(
   rl: readline.Interface,
   prompt: string,
   fallback = '',
+  signal?: AbortSignal,
 ): Promise<string> {
-  return askWithTimeout(rl, prompt, (a) => a.trim(), fallback, fallback || '(empty)');
+  return askWithTimeout(rl, prompt, (a) => a.trim(), fallback, fallback || '(empty)', promptTimeoutMs(), signal);
 }
 
 /**
@@ -100,6 +128,7 @@ export async function askYesNo(
   rl: readline.Interface,
   question: string,
   defaultValue = false,
+  signal?: AbortSignal,
 ): Promise<boolean> {
   return askWithTimeout(
     rl,
@@ -107,6 +136,8 @@ export async function askYesNo(
     (a) => a.trim().toLowerCase().startsWith('y'),
     defaultValue,
     defaultValue ? 'yes' : 'no',
+    promptTimeoutMs(),
+    signal,
   );
 }
 
@@ -120,6 +151,7 @@ export async function askChoice<T>(
   prompt: string,
   options: T[],
   fallback?: T,
+  signal?: AbortSignal,
 ): Promise<T> {
   const pick = fallback ?? options[0]!;
   const label = fallback !== undefined ? String(fallback) : String(pick);
@@ -133,5 +165,44 @@ export async function askChoice<T>(
     },
     pick,
     label,
+    promptTimeoutMs(),
+    signal,
+  );
+}
+
+/**
+ * Prompt for a labeled selection from a list of options. Renders each option
+ * as a numbered line before asking. Users can respond by number (1-based) or
+ * by matching the exact `label`. On timeout or invalid input, returns
+ * `fallback`.
+ *
+ * This replaces the hand-rolled number-or-name logic sprinkled across
+ * `init.ts` (provider selection) and `use.ts` (topology profile picker).
+ * POC for the prompt-library spike (#926).
+ */
+export async function listSelect<T>(
+  rl: readline.Interface,
+  prompt: string,
+  options: readonly { label: string; value: T }[],
+  fallback: T,
+  signal?: AbortSignal,
+): Promise<T> {
+  if (options.length === 0) return fallback;
+  options.forEach((opt, i) => console.log(`  ${i + 1}. ${opt.label}`));
+  return askWithTimeout(
+    rl,
+    prompt,
+    (answer) => {
+      const trimmed = answer.trim();
+      if (!trimmed) return fallback;
+      const idx = parseInt(trimmed, 10) - 1;
+      if (!isNaN(idx) && idx >= 0 && idx < options.length) return options[idx]!.value;
+      const match = options.find(o => o.label === trimmed);
+      return match?.value ?? fallback;
+    },
+    fallback,
+    String(fallback),
+    promptTimeoutMs(),
+    signal,
   );
 }

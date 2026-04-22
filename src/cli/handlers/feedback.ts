@@ -254,21 +254,21 @@ function buildIssueBody(
 // AIWG_PROMPT_TIMEOUT_MS hard timeout (default 60s) and .unref()'d timer. A
 // detached TTY can no longer hang the CLI on these prompts.
 
-async function prompt(question: string): Promise<string> {
+async function prompt(question: string, signal?: AbortSignal): Promise<string> {
   const rl = createPromptInterface();
   try {
-    return await askString(rl, question, '');
+    return await askString(rl, question, '', signal);
   } finally {
     rl.close();
   }
 }
 
-async function promptSelect(question: string, options: string[]): Promise<string> {
+async function promptSelect(question: string, options: string[], signal?: AbortSignal): Promise<string> {
   console.log(`\n${question}`);
   options.forEach((opt, i) => console.log(`  ${i + 1}. ${opt}`));
   const rl = createPromptInterface();
   try {
-    return await askChoice(rl, '  Choice: ', options, options[0]);
+    return await askChoice(rl, '  Choice: ', options, options[0], signal);
   } finally {
     rl.close();
   }
@@ -348,6 +348,7 @@ export const feedbackHandler: CommandHandler = {
       const choice = await promptSelect(
         'What kind of feedback?',
         ['Bug report', 'Feature request', 'Documentation gap', 'Other'],
+        ctx.signal,
       );
       if (choice.startsWith('Bug')) type = 'bug';
       else if (choice.startsWith('Feature')) type = 'feature';
@@ -358,7 +359,7 @@ export const feedbackHandler: CommandHandler = {
     // ── Determine title ───────────────────────────────────────────
     let title = args.title ?? '';
     if (!title && isTTY) {
-      title = await prompt('\n  Issue title (short phrase): ');
+      title = await prompt('\n  Issue title (short phrase): ', ctx.signal);
     }
     if (!title) {
       title = `[${type}] Issue from aiwg feedback`;
@@ -367,7 +368,7 @@ export const feedbackHandler: CommandHandler = {
     // ── Determine description ─────────────────────────────────────
     let description = args.body ?? '';
     if (!description && isTTY) {
-      description = await prompt('\n  Describe the issue (press Enter when done):\n  ');
+      description = await prompt('\n  Describe the issue (press Enter when done):\n  ', ctx.signal);
     }
     if (!description) {
       description = '_No description provided._';

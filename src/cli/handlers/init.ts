@@ -52,16 +52,21 @@ const askString = sharedAskString;
 /**
  * Prompt for a comma-separated provider selection
  */
-async function askProviders(rl: readline.Interface): Promise<string[]> {
+async function askProviders(rl: readline.Interface, signal?: AbortSignal): Promise<string[]> {
   const list = VALID_PROVIDERS.map((p, i) => `  ${i + 1}. ${PROVIDER_LABELS[p] ?? p}`).join('\n');
   console.log('');
   console.log('  Available providers:');
   console.log(list);
   console.log('');
 
+  // Multi-select (comma-separated) — stays hand-rolled rather than adopting
+  // listSelect because #926's POC targets single-select only. `signal`
+  // threading is the full migration from the spike.
   const answer = await askString(
     rl,
-    '  Enter provider numbers (comma-separated) or names [1]: '
+    '  Enter provider numbers (comma-separated) or names [1]: ',
+    '',
+    signal,
   );
 
   if (!answer) return ['claude']; // default
@@ -142,10 +147,12 @@ export const initHandler: CommandHandler = {
       });
 
       try {
-        providers = await askProviders(rl);
+        // Thread ctx.signal through every prompt so Ctrl-C during the wizard
+        // cancels cleanly instead of being absorbed by readline (POC #926).
+        providers = await askProviders(rl, ctx.signal);
 
         console.log('');
-        const addScripts = await askYesNo(rl, '  Add default scripts (deploy, doctor, sync)? [Y/n]: ', true);
+        const addScripts = await askYesNo(rl, '  Add default scripts (deploy, doctor, sync)? [Y/n]: ', true, ctx.signal);
         if (addScripts) {
           scripts = {
             deploy: 'aiwg use all',
@@ -153,10 +160,10 @@ export const initHandler: CommandHandler = {
             sync: 'aiwg sync',
           };
 
-          const addCustom = await askYesNo(rl, '  Add a custom script? [y/N]: ', false);
+          const addCustom = await askYesNo(rl, '  Add a custom script? [y/N]: ', false, ctx.signal);
           if (addCustom) {
-            const name = await askString(rl, '  Script name: ');
-            const cmd = await askString(rl, '  Command: ');
+            const name = await askString(rl, '  Script name: ', '', ctx.signal);
+            const cmd = await askString(rl, '  Command: ', '', ctx.signal);
             if (name && cmd) {
               scripts[name] = cmd;
             }
