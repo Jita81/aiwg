@@ -55,8 +55,10 @@ async function main() {
     return;
   }
 
-  // Non-blocking update check (runs in background)
-  checkForUpdates().catch(() => {
+  // Non-blocking update check (runs in background).
+  // We track the promise so main() can await it briefly before forcing exit,
+  // but we never block the command itself on the update check.
+  const updateCheckPromise = checkForUpdates().catch(() => {
     // Silently ignore update check failures
   });
 
@@ -70,7 +72,7 @@ async function main() {
     try {
       const { run: devRun } = await import(devFacade);
       await devRun(args, { cwd: process.cwd() });
-      return;
+      return { updateCheckPromise };
     } catch (err) {
       console.error(`Dev mode: failed to load facade from ${config.edgePath}`);
       console.error(`  ${err.message}`);
@@ -80,12 +82,33 @@ async function main() {
 
   // Run the CLI via facade (supports both legacy and new routers)
   await run(args, { cwd: process.cwd() });
+  return { updateCheckPromise };
 }
 
-main().catch((error) => {
-  console.error('Error:', error.message);
-  if (process.env.DEBUG) {
-    console.error(error.stack);
-  }
-  process.exit(1);
-});
+// After the command completes, give the background update check a brief grace
+// window to finish, then force exit. Without this explicit exit, unawaited
+// promises (HTTPS request pools, buffered readline from the update prompt,
+// libuv worker handles) can keep the event loop alive for minutes on slow
+// networks or detached terminals — the "30s command that hangs for 5 minutes"
+// symptom. 1500 ms is plenty for a normal npm registry check; if the check is
+// slower the user still gets their shell back promptly and the check runs
+// again next invocation.
+main()
+  .then(async (result) => {
+    const updateCheckPromise = result?.updateCheckPromise;
+    if (updateCheckPromise) {
+      const GRACE_MS = 1500;
+      await Promise.race([
+        updateCheckPromise,
+        new Promise((resolve) => setTimeout(resolve, GRACE_MS).unref()),
+      ]);
+    }
+    process.exit(0);
+  })
+  .catch((error) => {
+    console.error('Error:', error.message);
+    if (process.env.DEBUG) {
+      console.error(error.stack);
+    }
+    process.exit(1);
+  });

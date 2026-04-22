@@ -13,10 +13,17 @@ import { run } from './router.js';
 
 const args = process.argv.slice(2);
 
-run(args, { cwd: process.cwd() }).catch((error) => {
-  console.error('Error:', error.message);
-  if (process.env.DEBUG) {
-    console.error(error.stack);
-  }
-  process.exit(1);
-});
+// Force explicit exit after run() resolves. Without this, unawaited background
+// work inside handlers (deferred promises, libuv worker handles, open keepalive
+// sockets) keeps the event loop alive — the symptom is a command that prints
+// its "Next steps" output and then sits for minutes before exiting. A CLI that
+// has finished its work should release the shell immediately.
+run(args, { cwd: process.cwd() })
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error('Error:', error.message);
+    if (process.env.DEBUG) {
+      console.error(error.stack);
+    }
+    process.exit(1);
+  });

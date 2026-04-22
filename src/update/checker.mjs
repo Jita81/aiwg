@@ -127,8 +127,29 @@ async function promptUpdate(message) {
     output: process.stdout,
   });
 
+  // Hard timeout so the update prompt cannot hang the CLI. The update check
+  // runs as a background fire-and-forget from bin/aiwg.mjs; if the user isn't
+  // watching the terminal, we silently decline instead of blocking forever.
+  // Override via AIWG_PROMPT_TIMEOUT_MS.
+  const timeoutMs = (() => {
+    const raw = process.env['AIWG_PROMPT_TIMEOUT_MS'];
+    const n = raw ? parseInt(raw, 10) : NaN;
+    return Number.isFinite(n) && n > 0 ? n : 10_000;
+  })();
+
   return new Promise((resolve) => {
+    let settled = false;
+    const timer = setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      rl.close();
+      resolve(false);
+    }, timeoutMs);
+    timer.unref?.();
     rl.question(`${message} [y/N]: `, (answer) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
       rl.close();
       const normalized = answer.toLowerCase().trim();
       resolve(normalized === 'y' || normalized === 'yes');
