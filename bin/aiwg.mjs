@@ -25,8 +25,8 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import { existsSync } from 'fs';
 import { randomUUID } from 'crypto';
-import { scheduleBackgroundCheck, maybePrintNotice } from '../src/update/notifier.mjs';
-import { loadConfig } from '../src/channel/manager.mjs';
+import { scheduleBackgroundCheck, maybePrintNotice } from '../dist/src/update/notifier.mjs';
+import { loadConfig } from '../dist/src/channel/manager.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -145,18 +145,18 @@ async function main() {
   // Channel-switching commands — handled before anything else so they work
   // even when the router can't load (e.g. fixing a broken dev-mode pointer).
   if (args[0] === '--use-main' || args[0] === '--use-edge') {
-    const { switchToEdge } = await import('../src/channel/manager.mjs');
+    const { switchToEdge } = await import('../dist/src/channel/manager.mjs');
     await switchToEdge();
     return;
   }
   if (args[0] === '--use-dev') {
-    const { switchToDev } = await import('../src/channel/manager.mjs');
+    const { switchToDev } = await import('../dist/src/channel/manager.mjs');
     const devPath = args[1] || process.cwd();
     await switchToDev(devPath);
     return;
   }
   if (args[0] === '--use-stable' || args[0] === '--use-npm') {
-    const { switchToStable } = await import('../src/channel/manager.mjs');
+    const { switchToStable } = await import('../dist/src/channel/manager.mjs');
     await switchToStable();
     return;
   }
