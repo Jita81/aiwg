@@ -15,6 +15,66 @@ import { fileURLToPath } from 'url';
 import { execSync, spawn } from 'child_process';
 import os from 'os';
 
+/**
+ * Run a command with inherited stdio, applying a wall-clock timeout so a
+ * slow or hung git fetch cannot wedge the CLI for minutes. On timeout the
+ * child is SIGTERM'd and escalated to SIGKILL after 5s if it does not exit.
+ * Rejects with an Error carrying `.code = 'ETIMEDOUT'` on timeout or the
+ * original exit code otherwise.
+ *
+ * Replaces execSync() sites that had no timeout. Overridable via
+ * AIWG_GIT_TIMEOUT_MS (default 60s — fetch/pull on slow networks can take
+ * a while but must eventually terminate).
+ */
+async function runWithTimeout(cmd, args, options = {}) {
+  const timeoutMs = (() => {
+    const raw = process.env['AIWG_GIT_TIMEOUT_MS'];
+    const n = raw ? parseInt(raw, 10) : NaN;
+    return Number.isFinite(n) && n > 0 ? n : 60_000;
+  })();
+
+  return new Promise((resolve, reject) => {
+    const child = spawn(cmd, args, {
+      stdio: 'inherit',
+      ...options,
+    });
+
+    let settled = false;
+    const timer = setTimeout(() => {
+      if (settled) return;
+      try { child.kill('SIGTERM'); } catch { /* already exited */ }
+      const kill9 = setTimeout(() => {
+        try { child.kill('SIGKILL'); } catch { /* already exited */ }
+      }, 5_000);
+      kill9.unref?.();
+      settled = true;
+      const err = new Error(`\`${cmd} ${args.join(' ')}\` timed out after ${timeoutMs}ms`);
+      err.code = 'ETIMEDOUT';
+      reject(err);
+    }, timeoutMs);
+    timer.unref?.();
+
+    child.on('close', (code) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      if (code === 0) resolve();
+      else {
+        const err = new Error(`\`${cmd} ${args.join(' ')}\` exited with code ${code}`);
+        err.code = code ?? 1;
+        reject(err);
+      }
+    });
+
+    child.on('error', (err) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      reject(err);
+    });
+  });
+}
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -113,9 +173,9 @@ export async function switchToEdge() {
     // Update existing installation
     console.log(`Updating edge installation at ${config.edgePath}...`);
     try {
-      execSync('git fetch --all', { cwd: config.edgePath, stdio: 'inherit' });
-      execSync('git checkout main', { cwd: config.edgePath, stdio: 'inherit' });
-      execSync('git pull --ff-only', { cwd: config.edgePath, stdio: 'inherit' });
+      await runWithTimeout('git', ['fetch', '--all'], { cwd: config.edgePath });
+      await runWithTimeout('git', ['checkout', 'main'], { cwd: config.edgePath });
+      await runWithTimeout('git', ['pull', '--ff-only'], { cwd: config.edgePath });
       // Ensure sparse checkout excludes .aiwg/ on existing installs
       try {
         const sparseConfig = path.join(config.edgePath, '.git', 'info', 'sparse-checkout');
@@ -373,8 +433,8 @@ export async function updateEdge() {
   console.log('Updating edge installation...');
 
   try {
-    execSync('git fetch --all', { cwd: config.edgePath, stdio: 'inherit' });
-    execSync('git pull --ff-only', { cwd: config.edgePath, stdio: 'inherit' });
+    await runWithTimeout('git', ['fetch', '--all'], { cwd: config.edgePath });
+    await runWithTimeout('git', ['pull', '--ff-only'], { cwd: config.edgePath });
     console.log('');
     console.log('Edge installation updated successfully.');
   } catch (error) {

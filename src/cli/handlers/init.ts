@@ -26,6 +26,7 @@ import {
   getConfigPath,
 } from '../../config/aiwg-config.js';
 import * as ui from '../ui.js';
+import { askString as sharedAskString, askYesNo as sharedAskYesNo } from '../prompt-utils.js';
 
 const PROVIDER_LABELS: Record<string, string> = {
   claude:    'Claude Code       .claude/',
@@ -40,61 +41,13 @@ const PROVIDER_LABELS: Record<string, string> = {
   hermes:    'Hermes (MCP)      aiwg mcp',
 };
 
-/**
- * Hard timeout applied to every interactive prompt so the CLI can never hang
- * indefinitely on a detached or unresponsive terminal. After the timeout the
- * prompt resolves to the supplied default and a visible warning is printed.
- * Overridable via AIWG_PROMPT_TIMEOUT_MS for CI/test tuning.
- */
-const PROMPT_TIMEOUT_MS = (() => {
-  const raw = process.env['AIWG_PROMPT_TIMEOUT_MS'];
-  const n = raw ? parseInt(raw, 10) : NaN;
-  return Number.isFinite(n) && n > 0 ? n : 60_000;
-})();
+// Local aliases for the shared prompt utilities. These preserve existing
+// call sites (askYesNo/askString) while routing through a single timeout
+// and unref-discipline implementation in `src/cli/prompt-utils.ts`.
+// Phase 3 (#920) will replace these with @clack/prompts.
 
-function askWithTimeout<T>(
-  rl: readline.Interface,
-  prompt: string,
-  parse: (answer: string) => T,
-  fallback: T,
-  fallbackLabel: string,
-): Promise<T> {
-  return new Promise((resolve) => {
-    let settled = false;
-    const timer = setTimeout(() => {
-      if (settled) return;
-      settled = true;
-      ui.warn(`  No input within ${Math.round(PROMPT_TIMEOUT_MS / 1000)}s — using default: ${fallbackLabel}`);
-      resolve(fallback);
-    }, PROMPT_TIMEOUT_MS);
-    rl.question(prompt, (answer) => {
-      if (settled) return;
-      settled = true;
-      clearTimeout(timer);
-      resolve(parse(answer));
-    });
-  });
-}
-
-/**
- * Prompt for a yes/no answer via readline
- */
-async function askYesNo(rl: readline.Interface, question: string, defaultValue = false): Promise<boolean> {
-  return askWithTimeout(
-    rl,
-    question,
-    (a) => a.trim().toLowerCase().startsWith('y'),
-    defaultValue,
-    defaultValue ? 'yes' : 'no',
-  );
-}
-
-/**
- * Prompt for a string value via readline
- */
-async function askString(rl: readline.Interface, prompt: string, fallback = ''): Promise<string> {
-  return askWithTimeout(rl, prompt, (a) => a.trim(), fallback, fallback || '(empty)');
-}
+const askYesNo = sharedAskYesNo;
+const askString = sharedAskString;
 
 /**
  * Prompt for a comma-separated provider selection
@@ -139,7 +92,16 @@ export const initHandler: CommandHandler = {
 
   async execute(ctx: HandlerContext): Promise<HandlerResult> {
     const force = ctx.args.includes('--force');
-    const nonInteractive = ctx.args.includes('--non-interactive') || ctx.args.includes('--yes');
+    // Treat a missing stdin TTY as non-interactive so piped/backgrounded
+    // invocations never attempt to create a readline interface. This is a
+    // single authoritative check — downstream code MUST NOT re-derive
+    // interactive-ness from process.stdin.isTTY again.
+    const nonInteractive =
+      ctx.args.includes('--non-interactive') ||
+      ctx.args.includes('--yes') ||
+      !process.stdin.isTTY ||
+      !process.stdout.isTTY ||
+      process.env['CI'] === 'true';
     const projectDir = ctx.cwd;
 
     ui.blank();

@@ -728,7 +728,8 @@ export function attachToLoopOutput(projectRoot: string, loopId?: string): Promis
       // Log file may not exist yet — will appear shortly
     }
 
-    // Poll for new content every 250 ms
+    // Poll for new content every 250 ms. .unref() so the interval cannot
+    // outlive the resolve() path and hold the event loop alive.
     const interval = setInterval(() => {
       try {
         const stats = statSync(outputFile);
@@ -745,6 +746,7 @@ export function attachToLoopOutput(projectRoot: string, loopId?: string): Promis
         // Stop polling if the process has exited
         if (!isProcessAlive(registry.loops[attachedLoopId]?.pid ?? 0)) {
           clearInterval(interval);
+          process.removeListener('SIGINT', onSigint);
           process.stdout.write('\n[ralph-attach] Loop process has exited.\n');
           resolve();
         }
@@ -752,15 +754,19 @@ export function attachToLoopOutput(projectRoot: string, loopId?: string): Promis
         // File may be temporarily unavailable during rotation — ignore
       }
     }, 250);
+    interval.unref?.();
 
-    // Ctrl+C detaches without stopping the loop
-    process.on('SIGINT', () => {
+    // Ctrl+C detaches without stopping the loop. Registered with named handler
+    // + process.once so we can remove it cleanly on process-exit path and so
+    // it does not accumulate across re-attach cycles within a single CLI run.
+    const onSigint = () => {
       clearInterval(interval);
       process.stdout.write('\n\nDetached from loop output. Loop continues in background.\n');
       process.stdout.write(`  Status:     aiwg ralph-status\n`);
       process.stdout.write(`  Re-attach:  aiwg ralph-attach --loop-id ${attachedLoopId}\n`);
       process.stdout.write(`  Abort:      aiwg ralph-abort --loop-id ${attachedLoopId}\n`);
       resolve();
-    });
+    };
+    process.once('SIGINT', onSigint);
   });
 }

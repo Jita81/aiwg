@@ -111,8 +111,10 @@ async function checkAndUpdateVersion(noRepair: boolean): Promise<boolean> {
   try {
     await forceUpdateCheck();
     return true;
-  } catch {
-    // forceUpdateCheck handles its own output — treat errors as non-blocking
+  } catch (err) {
+    // forceUpdateCheck handles its own user-visible output — the underlying
+    // error is only relevant for troubleshooting, gated behind AIWG_DEBUG.
+    if (process.env['AIWG_DEBUG']) console.error('[session] update check failed:', err);
     if (!noRepair) {
       console.log('  Version check failed — attempting sync...');
       const r = spawnSync('npm', ['install', '-g', 'aiwg@latest'], { stdio: 'inherit' });

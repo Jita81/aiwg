@@ -56,20 +56,37 @@ export class DefaultScriptRunner implements ScriptRunner {
 
       const timeout = options.timeout;
       let timeoutId: ReturnType<typeof setTimeout> | undefined;
+      let killEscalationId: ReturnType<typeof setTimeout> | undefined;
+      // Hard deadline for a well-behaved child to respond to SIGTERM before we
+      // escalate to SIGKILL. Prevents a stuck child from outliving the CLI and
+      // masking a timeout as a hang. Overridable via AIWG_SIGKILL_DEADLINE_MS.
+      const killDeadlineMs = (() => {
+        const raw = process.env['AIWG_SIGKILL_DEADLINE_MS'];
+        const n = raw ? parseInt(raw, 10) : NaN;
+        return Number.isFinite(n) && n > 0 ? n : 10_000;
+      })();
 
       if (timeout) {
         timeoutId = setTimeout(() => {
-          child.kill('SIGTERM');
+          // Request graceful termination first, then escalate if the child
+          // does not exit within the deadline. Both kill() calls are wrapped
+          // because they can throw ESRCH on an already-exited child.
+          try { child.kill('SIGTERM'); } catch { /* already exited */ }
+          killEscalationId = setTimeout(() => {
+            try { child.kill('SIGKILL'); } catch { /* already exited */ }
+          }, killDeadlineMs);
+          killEscalationId.unref?.();
           resolve({
             exitCode: 124,
             message: `Script timed out after ${timeout}ms`,
-            error: new Error(`Timeout after ${timeout}ms`),
+            error: new Error(`Timeout after ${timeout}ms (child sent SIGTERM, SIGKILL after ${killDeadlineMs}ms)`),
           });
         }, timeout);
       }
 
       child.on('close', (code) => {
         if (timeoutId) clearTimeout(timeoutId);
+        if (killEscalationId) clearTimeout(killEscalationId);
         // On failure in capture mode, surface the captured stderr
         if (options.capture && code !== 0 && capturedStderr) {
           resolve({
@@ -85,6 +102,7 @@ export class DefaultScriptRunner implements ScriptRunner {
 
       child.on('error', (err) => {
         if (timeoutId) clearTimeout(timeoutId);
+        if (killEscalationId) clearTimeout(killEscalationId);
         resolve({
           exitCode: 1,
           message: `Script error: ${err.message}`,

@@ -22,9 +22,9 @@
 
 import { spawnSync } from 'child_process';
 import os from 'os';
-import { createInterface } from 'readline';
 import { CommandHandler, HandlerContext, HandlerResult } from './types.js';
 import { readAiwgConfig } from '../../config/aiwg-config.js';
+import { createPromptInterface, askString, askChoice } from '../prompt-utils.js';
 
 // ── GitHub repo ───────────────────────────────────────────────────────────────
 
@@ -91,7 +91,11 @@ async function collectSystemContext(cwd: string): Promise<SystemContext> {
     });
     const match = (r.stdout ?? '').match(/(\d{4}\.\d+\.\d+[^\s]*)/);
     if (match) aiwgVersion = match[1];
-  } catch { /* ignore */ }
+  } catch (err) {
+    // Feedback command degrades gracefully when version detection fails; log
+    // under AIWG_DEBUG so the root cause is visible during bug reproduction.
+    if (process.env['AIWG_DEBUG']) console.error('[feedback] version detect failed:', err);
+  }
 
   // Provider from project config
   let provider = 'claude';
@@ -102,7 +106,9 @@ async function collectSystemContext(cwd: string): Promise<SystemContext> {
       provider = config.providers[0] ?? 'claude';
       frameworks = Object.keys(config.installed);
     }
-  } catch { /* ignore */ }
+  } catch (err) {
+    if (process.env['AIWG_DEBUG']) console.error('[feedback] config read failed:', err);
+  }
 
   return {
     aiwgVersion,
@@ -241,28 +247,29 @@ function buildIssueBody(
 }
 
 // ── Interactive prompts ───────────────────────────────────────────────────────
+//
+// Both prompts go through the shared prompt-utils wrapper so they inherit the
+// AIWG_PROMPT_TIMEOUT_MS hard timeout (default 60s) and .unref()'d timer. A
+// detached TTY can no longer hang the CLI on these prompts.
 
-function prompt(question: string): Promise<string> {
-  const rl = createInterface({ input: process.stdin, output: process.stdout });
-  return new Promise((resolve) => {
-    rl.question(question, (answer) => {
-      rl.close();
-      resolve(answer.trim());
-    });
-  });
+async function prompt(question: string): Promise<string> {
+  const rl = createPromptInterface();
+  try {
+    return await askString(rl, question, '');
+  } finally {
+    rl.close();
+  }
 }
 
-function promptSelect(question: string, options: string[]): Promise<string> {
+async function promptSelect(question: string, options: string[]): Promise<string> {
   console.log(`\n${question}`);
   options.forEach((opt, i) => console.log(`  ${i + 1}. ${opt}`));
-  const rl = createInterface({ input: process.stdin, output: process.stdout });
-  return new Promise((resolve) => {
-    rl.question('  Choice: ', (answer) => {
-      rl.close();
-      const idx = parseInt(answer, 10) - 1;
-      resolve(options[idx] ?? options[0]!);
-    });
-  });
+  const rl = createPromptInterface();
+  try {
+    return await askChoice(rl, '  Choice: ', options, options[0]);
+  } finally {
+    rl.close();
+  }
 }
 
 // ── Submission ────────────────────────────────────────────────────────────────

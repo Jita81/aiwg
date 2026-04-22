@@ -495,16 +495,30 @@ async function mcAgents(ctx: HandlerContext): Promise<HandlerResult> {
     else if (a === '--min-memory' && args[i + 1]) { params.set('min_memory_gb', args[++i]!); }
   }
 
+  // 5s timeout so a wedged serve cannot hang the CLI. Override with
+  // AIWG_FETCH_TIMEOUT_MS for slow local environments or integration tests.
+  const fetchTimeoutMs = (() => {
+    const raw = process.env['AIWG_FETCH_TIMEOUT_MS'];
+    const n = raw ? parseInt(raw, 10) : NaN;
+    return Number.isFinite(n) && n > 0 ? n : 5_000;
+  })();
+
   let result: { selected?: Record<string, unknown>; candidates: Record<string, unknown>[] };
   try {
-    const resp = await fetch(`${base}/api/agents/candidates?${params.toString()}`);
+    const resp = await fetch(`${base}/api/agents/candidates?${params.toString()}`, {
+      signal: AbortSignal.timeout(fetchTimeoutMs),
+    });
     if (!resp.ok) {
       ui.error(`aiwg serve returned ${resp.status} — is it running on port ${port}?`);
       return { exitCode: 1 };
     }
     result = await resp.json() as typeof result;
-  } catch {
-    ui.error(`Cannot reach aiwg serve on port ${port}. Start it with: aiwg serve`);
+  } catch (err) {
+    if (err instanceof Error && err.name === 'TimeoutError') {
+      ui.error(`aiwg serve on port ${port} timed out after ${fetchTimeoutMs}ms. Is it wedged?`);
+    } else {
+      ui.error(`Cannot reach aiwg serve on port ${port}. Start it with: aiwg serve`);
+    }
     return { exitCode: 1 };
   }
 

@@ -13,7 +13,6 @@
 import fs from 'fs/promises';
 import path from 'path';
 import os from 'os';
-import readline from 'readline';
 import { CommandHandler, HandlerContext, HandlerResult } from './types.js';
 import { createScriptRunner } from './script-runner.js';
 import { getFrameworkRoot, getVersionInfo } from '../../channel/manager.mjs';
@@ -779,7 +778,11 @@ export class UseHandler implements CommandHandler {
             // The profile picker is annoying during `aiwg use all`.
             selectedProfile = 'generic';
           } else if (process.stdin.isTTY) {
-            // Interactive profile selection with hard timeout
+            // Interactive profile selection with hard timeout via the shared
+            // prompt-utils helper. The timer is .unref()'d internally so a
+            // Ctrl-C closing the readline interface does not hold the event
+            // loop open for the remainder of the window.
+            const { createPromptInterface, askString } = await import('../prompt-utils.js');
             ui.blank();
             ui.header('  Select a topology profile:');
             const templateNames = templates.map((t: string) => t.replace('.md', ''));
@@ -789,32 +792,13 @@ export class UseHandler implements CommandHandler {
             });
             console.log('');
 
-            const rl = readline.createInterface({
-              input: process.stdin,
-              output: process.stdout,
-            });
-            const promptTimeoutMs = (() => {
-              const raw = process.env['AIWG_PROMPT_TIMEOUT_MS'];
-              const n = raw ? parseInt(raw, 10) : NaN;
-              return Number.isFinite(n) && n > 0 ? n : 60_000;
-            })();
-            const answer = await new Promise<string>((resolve) => {
-              let settled = false;
-              const timer = setTimeout(() => {
-                if (settled) return;
-                settled = true;
-                rl.close();
-                ui.warn(`  No input within ${Math.round(promptTimeoutMs / 1000)}s — using default: generic`);
-                resolve('');
-              }, promptTimeoutMs);
-              rl.question('  Enter number or name [generic]: ', (ans) => {
-                if (settled) return;
-                settled = true;
-                clearTimeout(timer);
-                rl.close();
-                resolve(ans.trim());
-              });
-            });
+            const rl = createPromptInterface();
+            let answer = '';
+            try {
+              answer = await askString(rl, '  Enter number or name [generic]: ', '');
+            } finally {
+              rl.close();
+            }
 
             if (answer) {
               const num = parseInt(answer, 10);

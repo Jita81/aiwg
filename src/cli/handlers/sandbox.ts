@@ -19,6 +19,31 @@ function getServeBase(): string {
   return `http://127.0.0.1:${port}`;
 }
 
+/**
+ * Default timeout for CLI → local aiwg serve REST calls. A wedged serve must
+ * not hang the CLI indefinitely. Overridable via AIWG_FETCH_TIMEOUT_MS for
+ * slow local environments or integration tests.
+ */
+function fetchTimeoutMs(): number {
+  const raw = process.env['AIWG_FETCH_TIMEOUT_MS'];
+  const n = raw ? parseInt(raw, 10) : NaN;
+  return Number.isFinite(n) && n > 0 ? n : 5_000;
+}
+
+/**
+ * Format a single-line error message distinguishing fetch timeout from
+ * other unreachable-serve conditions. Timeouts produced by
+ * AbortSignal.timeout() surface as DOMException with `name === 'TimeoutError'`
+ * under Node 20+.
+ */
+function reachabilityMessage(err: unknown): string {
+  const name = err instanceof Error ? err.name : '';
+  if (name === 'TimeoutError') {
+    return `aiwg serve timed out after ${fetchTimeoutMs()}ms. Is it wedged? Try: curl ${getServeBase()}/api/health`;
+  }
+  return `Cannot reach aiwg serve. Start it with: aiwg serve`;
+}
+
 async function sandboxAlias(ctx: HandlerContext): Promise<HandlerResult> {
   const [sandboxId, agentId, ...nameParts] = ctx.args;
   const name = nameParts.join(' ');
@@ -35,6 +60,7 @@ async function sandboxAlias(ctx: HandlerContext): Promise<HandlerResult> {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name }),
+      signal: AbortSignal.timeout(fetchTimeoutMs()),
     });
     if (!resp.ok) {
       const body = await resp.json().catch(() => ({ error: resp.statusText })) as { error?: string };
@@ -44,8 +70,8 @@ async function sandboxAlias(ctx: HandlerContext): Promise<HandlerResult> {
     const result = await resp.json() as { ok: boolean; logicalName: string };
     ui.success(`Agent ${agentId} aliased as "${result.logicalName}"`);
     return { exitCode: 0 };
-  } catch {
-    ui.error(`Cannot reach aiwg serve. Start it with: aiwg serve`);
+  } catch (err) {
+    ui.error(reachabilityMessage(err));
     return { exitCode: 1 };
   }
 }
@@ -59,7 +85,9 @@ async function sandboxResolve(ctx: HandlerContext): Promise<HandlerResult> {
 
   const base = getServeBase();
   try {
-    const resp = await fetch(`${base}/api/agents/resolve/${encodeURIComponent(ref)}`);
+    const resp = await fetch(`${base}/api/agents/resolve/${encodeURIComponent(ref)}`, {
+      signal: AbortSignal.timeout(fetchTimeoutMs()),
+    });
     if (!resp.ok) {
       const body = await resp.json().catch(() => ({ error: resp.statusText })) as { error?: string };
       ui.error(`resolve failed (${resp.status}): ${body.error ?? resp.statusText}`);
@@ -73,8 +101,8 @@ async function sandboxResolve(ctx: HandlerContext): Promise<HandlerResult> {
     console.log(`name:       ${agent['logicalName'] ?? '(none)'}`);
     console.log(`status:     ${agent['status'] ?? '?'}`);
     return { exitCode: 0 };
-  } catch {
-    ui.error(`Cannot reach aiwg serve. Start it with: aiwg serve`);
+  } catch (err) {
+    ui.error(reachabilityMessage(err));
     return { exitCode: 1 };
   }
 }
@@ -83,7 +111,9 @@ async function sandboxIdentities(ctx: HandlerContext): Promise<HandlerResult> {
   const json = ctx.args.includes('--json');
   const base = getServeBase();
   try {
-    const resp = await fetch(`${base}/api/agents/identities`);
+    const resp = await fetch(`${base}/api/agents/identities`, {
+      signal: AbortSignal.timeout(fetchTimeoutMs()),
+    });
     if (!resp.ok) {
       ui.error(`identities failed (${resp.status}): ${resp.statusText}`);
       return { exitCode: 1 };
@@ -110,8 +140,8 @@ async function sandboxIdentities(ctx: HandlerContext): Promise<HandlerResult> {
     }
     ui.blank();
     return { exitCode: 0 };
-  } catch {
-    ui.error(`Cannot reach aiwg serve. Start it with: aiwg serve`);
+  } catch (err) {
+    ui.error(reachabilityMessage(err));
     return { exitCode: 1 };
   }
 }

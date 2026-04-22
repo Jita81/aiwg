@@ -1050,10 +1050,32 @@ export const serveHandler: CommandHandler = {
       }
     }
 
-    // Keep process alive; shut down cleanly on SIGINT/SIGTERM
+    // Keep process alive; shut down cleanly on SIGINT/SIGTERM.
+    //
+    // Registered listeners are removed on the resolve path so that the only
+    // handler we install does not outlive this command (important for tests
+    // or future in-process CLI flows). A 5-second hard deadline after signal
+    // receipt forces process.exit() in case server.close() hangs draining
+    // websocket connections.
     await new Promise<void>((resolve) => {
+      let settled = false;
       const shutdown = () => {
-        server!.close();
+        if (settled) return;
+        settled = true;
+        // Immediately remove both handlers so a second signal doesn't
+        // re-enter shutdown().
+        process.removeListener('SIGINT', shutdown);
+        process.removeListener('SIGTERM', shutdown);
+        try {
+          server!.close();
+        } catch {
+          // Server may already be closing; safe to ignore.
+        }
+        // Hard deadline: if server.close() doesn't drain in 5s, force exit.
+        const forceExit = setTimeout(() => {
+          process.exit(143); // SIGTERM convention
+        }, 5_000);
+        forceExit.unref?.();
         resolve();
       };
       process.once('SIGINT', shutdown);
