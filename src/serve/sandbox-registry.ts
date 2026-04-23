@@ -355,6 +355,111 @@ export interface RegisterResponse {
 }
 
 // ============================================================
+// Event normalization (#933)
+// ============================================================
+//
+// agentic-sandbox emits SandboxEvent over WS with Serde's
+// `rename_all = "snake_case"` applied to the enum tag and every field.
+// So the wire payload is:
+//
+//   { "type": "agent_connected", "agent_id": "agent-01",
+//     "agent_instance_id": "01HX...", "loadout": "base", ... }
+//
+// AIWG's registry switch is written in dot-notation + camelCase
+// (`agent.connected`, `event.agentId`). Before #933, only
+// `session_start`/`session_end` were normalized — every `agent_*`
+// and `hitl_*` event was silently dropped and agents never populated
+// the registry, which is why the dashboard reported "0 agents".
+//
+// normalizeSandboxEvent() maps snake_case event types to the dot
+// notation the switch expects and aliases snake_case top-level fields
+// onto their camelCase twins. Nested payloads (metrics, inventory
+// summaries) are left alone — their consumers already read snake_case
+// keys (e.g. metrics.cpu_percent, AgentManifestSummary.content_hash).
+
+/** Explicit snake_case → dot-notation map for SandboxEventType. */
+const SNAKE_TO_DOT_EVENT_TYPE: Record<string, SandboxEventType> = {
+  agent_connected: 'agent.connected',
+  agent_disconnected: 'agent.disconnected',
+  agent_ready: 'agent.ready',
+  agent_provisioning: 'agent.provisioning',
+  session_start: 'session.start',
+  session_end: 'session.end',
+  hitl_input_required: 'hitl.input_required',
+  hitl_responded: 'hitl.responded',
+  hitl_timed_out: 'hitl.timed_out',
+  agent_inventory_updated: 'agent.inventory_updated',
+  agent_metrics_updated: 'agent.metrics_updated',
+  agent_provisioning_step: 'agent.provisioning_step',
+  agent_provisioning_stalled: 'agent.provisioning_stalled',
+  framework_update_available: 'framework.update_available',
+  session_screen_updated: 'session.screen_updated',
+  task_submitted: 'task.submitted',
+  task_started: 'task.started',
+  task_progressed: 'task.progressed',
+  task_completed: 'task.completed',
+  task_failed: 'task.failed',
+  aiwg_log: 'aiwg.log',
+};
+
+/** Top-level field aliases from snake_case payloads → camelCase view. */
+const SNAKE_TO_CAMEL_FIELDS: Record<string, string> = {
+  agent_id: 'agentId',
+  sandbox_id: 'sandboxId',
+  session_id: 'sessionId',
+  exit_code: 'exitCode',
+  hitl_id: 'hitlId',
+  agent_instance_id: 'agentInstanceId',
+  agent_logical_name: 'agentLogicalName',
+  aiwg_frameworks: 'aiwgFrameworks',
+  agent_inventory: 'agentInventory',
+  command_inventory: 'commandInventory',
+  skill_inventory: 'skillInventory',
+  step_index: 'stepIndex',
+  total_steps: 'totalSteps',
+  elapsed_seconds: 'elapsedSeconds',
+  stalled_for_seconds: 'stalledForSeconds',
+  current_version: 'currentVersion',
+  available_version: 'availableVersion',
+  days_behind: 'daysBehind',
+  screen_hash: 'screenHash',
+  changed_lines: 'changedLines',
+  task_error: 'taskError',
+  output_chunk: 'outputChunk',
+  expires_at: 'expiresAt',
+};
+
+/**
+ * Normalize a raw sandbox event payload into the camelCase + dot-notation
+ * shape `handleEvent` expects. Accepts payloads in either the legacy
+ * snake_case or the newer dot/camelCase shape and is idempotent on the
+ * latter, so it is safe to pipe every inbound event through this helper.
+ */
+export function normalizeSandboxEvent(raw: unknown): SandboxEvent {
+  if (!raw || typeof raw !== 'object') {
+    // Malformed payload — callers discard anything that fails the switch.
+    return { type: 'aiwg.log', sandboxId: '', agentId: '', timestamp: new Date().toISOString() };
+  }
+  const src = raw as Record<string, unknown>;
+  const rawType = typeof src.type === 'string' ? src.type : '';
+  const type = (SNAKE_TO_DOT_EVENT_TYPE[rawType] ?? rawType) as SandboxEventType;
+
+  // Copy every field onto the output, aliasing snake_case top-level keys
+  // to their camelCase equivalents when the camelCase key is not already set.
+  const out: Record<string, unknown> = { ...src, type };
+  for (const [snake, camel] of Object.entries(SNAKE_TO_CAMEL_FIELDS)) {
+    if (snake in src && out[camel] === undefined) {
+      out[camel] = src[snake];
+    }
+  }
+  // Ensure timestamp is always ISO string for downstream consumers.
+  if (typeof out.timestamp !== 'string') {
+    out.timestamp = new Date().toISOString();
+  }
+  return out as unknown as SandboxEvent;
+}
+
+// ============================================================
 // Registry
 // ============================================================
 
