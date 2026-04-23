@@ -7,6 +7,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
   SandboxRegistry,
+  normalizeSandboxEvent,
   type RegisterRequest,
   type SandboxEvent,
   type HitlRequest,
@@ -321,3 +322,167 @@ function makeEvent(
     ...fields,
   };
 }
+
+// ============================================================
+// #933 — snake_case wire-protocol normalization
+// ============================================================
+
+describe('normalizeSandboxEvent (#933)', () => {
+  it('maps snake_case type to dot notation', () => {
+    const out = normalizeSandboxEvent({ type: 'agent_connected', agent_id: 'a1' });
+    expect(out.type).toBe('agent.connected');
+  });
+
+  it('aliases snake_case top-level fields to camelCase', () => {
+    const out = normalizeSandboxEvent({
+      type: 'agent_connected',
+      agent_id: 'a1',
+      agent_instance_id: '01HX-ABC',
+      agent_logical_name: 'security-01',
+    });
+    expect(out.agentId).toBe('a1');
+    expect(out.agentInstanceId).toBe('01HX-ABC');
+    expect(out.agentLogicalName).toBe('security-01');
+  });
+
+  it('is idempotent on already-normalized payloads', () => {
+    const out = normalizeSandboxEvent({
+      type: 'agent.connected',
+      agentId: 'a1',
+      agentInstanceId: '01HX-ABC',
+      timestamp: '2026-04-23T00:00:00Z',
+    });
+    expect(out.type).toBe('agent.connected');
+    expect(out.agentId).toBe('a1');
+    expect(out.timestamp).toBe('2026-04-23T00:00:00Z');
+  });
+
+  it('preserves unmapped types verbatim (forward compatibility)', () => {
+    const out = normalizeSandboxEvent({ type: 'future.event.someday', agent_id: 'a1' });
+    expect(out.type).toBe('future.event.someday');
+    expect(out.agentId).toBe('a1');
+  });
+
+  it('falls back to aiwg.log for malformed payloads', () => {
+    expect(normalizeSandboxEvent(null).type).toBe('aiwg.log');
+    expect(normalizeSandboxEvent(undefined).type).toBe('aiwg.log');
+    expect(normalizeSandboxEvent(42).type).toBe('aiwg.log');
+  });
+
+  it('maps session lifecycle snake_case to dot notation', () => {
+    expect(normalizeSandboxEvent({ type: 'session_start', agent_id: 'a1', session_id: 's1', command: 'bash' }))
+      .toMatchObject({ type: 'session.start', agentId: 'a1', sessionId: 's1', command: 'bash' });
+    expect(normalizeSandboxEvent({ type: 'session_end', agent_id: 'a1', session_id: 's1', exit_code: 0 }))
+      .toMatchObject({ type: 'session.end', agentId: 'a1', sessionId: 's1', exitCode: 0 });
+  });
+
+  it('maps HITL payloads', () => {
+    const out = normalizeSandboxEvent({
+      type: 'hitl_input_required',
+      agent_id: 'a1',
+      session_id: 's1',
+      hitl_id: 'h1',
+      prompt: 'are you sure?',
+      context: 'yolo',
+      expires_at: '2026-04-23T01:00:00Z',
+    });
+    expect(out.type).toBe('hitl.input_required');
+    expect(out.hitlId).toBe('h1');
+    expect(out.sessionId).toBe('s1');
+    expect(out.expiresAt).toBe('2026-04-23T01:00:00Z');
+  });
+});
+
+describe('handleEvent with raw sandbox payloads (#933)', () => {
+  it('populates sandbox.agents from a raw agent_connected payload', () => {
+    const registry = new SandboxRegistry();
+    const { sandbox_id } = registry.register(REQ);
+    // Simulates exactly what agentic-sandbox emits:
+    // management/src/aiwg_serve.rs SandboxEvent with rename_all="snake_case"
+    const raw = {
+      type: 'agent_connected',
+      agent_id: 'agent-01',
+      hostname: 'agent-01',
+      ip_address: '192.168.122.201',
+      loadout: 'base',
+      agent_instance_id: '01HX-TESTINSTANCE',
+      timestamp: '2026-04-23T00:00:00Z',
+    };
+    const event = normalizeSandboxEvent(raw);
+    event.sandboxId = sandbox_id;
+    registry.handleEvent(event);
+
+    const summary = registry.getSummary(sandbox_id)!;
+    expect(summary.agentCount).toBe(1);
+    expect(summary.agents[0]).toMatchObject({
+      agentId: 'agent-01',
+      status: 'ready',
+      loadout: 'base',
+      instanceId: '01HX-TESTINSTANCE',
+    });
+  });
+
+  it('processes raw session_start/session_end into sessionCount', () => {
+    const registry = new SandboxRegistry();
+    const { sandbox_id } = registry.register(REQ);
+
+    registry.handleEvent(normalizeSandboxEvent({
+      type: 'agent_connected', agent_id: 'a1', timestamp: '2026-04-23T00:00:00Z',
+    }));
+    registry.handleEvent({
+      ...normalizeSandboxEvent({
+        type: 'session_start', agent_id: 'a1', session_id: 's1', command: 'bash',
+        timestamp: '2026-04-23T00:00:01Z',
+      }),
+      sandboxId: sandbox_id,
+    });
+
+    // Fix sandboxId on the first event too
+    const agent = registry.getSummary(sandbox_id)?.agents[0];
+    expect(agent).toBeUndefined(); // because first event didn't get sandboxId set
+
+    // Re-run the proper way
+    const registry2 = new SandboxRegistry();
+    const { sandbox_id: sid2 } = registry2.register(REQ);
+    const connect = normalizeSandboxEvent({
+      type: 'agent_connected', agent_id: 'a1', timestamp: '2026-04-23T00:00:00Z',
+    });
+    connect.sandboxId = sid2;
+    registry2.handleEvent(connect);
+    const startEv = normalizeSandboxEvent({
+      type: 'session_start', agent_id: 'a1', session_id: 's1', command: 'bash',
+      timestamp: '2026-04-23T00:00:01Z',
+    });
+    startEv.sandboxId = sid2;
+    registry2.handleEvent(startEv);
+    const agent2 = registry2.getSummary(sid2)!.agents[0];
+    expect(agent2.sessionCount).toBe(1);
+    expect(agent2.status).toBe('busy');
+  });
+
+  it('routes raw hitl_input_required into the pending queue', () => {
+    const registry = new SandboxRegistry();
+    const { sandbox_id } = registry.register(REQ);
+    const raw = {
+      type: 'hitl_input_required',
+      agent_id: 'a1',
+      session_id: 's1',
+      hitl_id: 'h1',
+      prompt: 'confirm?',
+      context: 'prod deploy',
+      timestamp: '2026-04-23T00:00:00Z',
+    };
+    const event = normalizeSandboxEvent(raw);
+    event.sandboxId = sandbox_id;
+    registry.handleEvent(event);
+
+    const pending = registry.pendingHitl();
+    expect(pending).toHaveLength(1);
+    expect(pending[0]).toMatchObject({
+      id: 'h1',
+      agentId: 'a1',
+      sessionId: 's1',
+      prompt: 'confirm?',
+    });
+  });
+});

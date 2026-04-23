@@ -17,8 +17,8 @@ import { createPtyWsHandler, registry as ptyRegistry } from '../../serve/pty-bri
 import { telemetryStore, createEvent } from '../../serve/telemetry.js';
 import {
   sandboxRegistry,
+  normalizeSandboxEvent,
   type RegisterRequest,
-  type SandboxEvent,
 } from '../../serve/sandbox-registry.js';
 import { routeTask, type AgentFilter } from '../../serve/agent-router.js';
 import { AiwgError, EXIT_CODES } from '../errors.js';
@@ -83,9 +83,15 @@ function handleSandboxWs(ws: any, sandboxId: string, token: string): void {
   ws.on('message', (data: Buffer | string) => {
     if (!sandboxRegistry.authenticate(sandboxId, token)) return;
     try {
-      const event: SandboxEvent = JSON.parse(data.toString());
+      // #933: agentic-sandbox serializes SandboxEvent with
+      // rename_all = "snake_case", so the wire tag and field names are
+      // snake_case. normalizeSandboxEvent translates to the dot-notation
+      // + camelCase shape handleEvent expects. Prior to this, every
+      // agent_*/hitl_* event was silently dropped and the dashboard
+      // reported "0 agents".
+      const raw: unknown = JSON.parse(data.toString());
+      const event = normalizeSandboxEvent(raw);
       event.sandboxId = sandboxId;
-      if (!event.timestamp) event.timestamp = new Date().toISOString();
       sandboxRegistry.handleEvent(event);
     } catch { /* ignore malformed events */ }
   });
