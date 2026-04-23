@@ -316,11 +316,13 @@ function TerminalPane({ sandboxId, agentId }: TerminalPaneProps) {
       if (!isMounted) return;
       const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       const wsUrl = `${proto}//${window.location.host}/ws/sandbox/${sandboxId}/management`;
+      console.info(`[SessionPicker] connecting to ${wsUrl} (agent=${agentId})`);
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
 
       ws.onopen = () => {
         if (!isMounted) return;
+        console.info(`[SessionPicker] WS open for sandbox=${sandboxId} agent=${agentId} — subscribing`);
         reconnectAttemptsRef.current = 0;
         setIsExhausted(false);
         setConnected(true);
@@ -335,13 +337,15 @@ function TerminalPane({ sandboxId, agentId }: TerminalPaneProps) {
 
       ws.onmessage = handleMessage;
 
-      ws.onclose = () => {
+      ws.onclose = (ev) => {
         if (!isMounted) return;
+        console.warn(`[SessionPicker] WS closed sandbox=${sandboxId} agent=${agentId}: code=${ev.code} reason="${ev.reason}" wasClean=${ev.wasClean}`);
         setConnected(false);
         const attempt = reconnectAttemptsRef.current;
         if (attempt >= RECONNECT_MAX_ATTEMPTS) {
           setStatusText('Connection lost');
           setIsExhausted(true);
+          setWsError(`WS closed (code=${ev.code}${ev.reason ? `, ${ev.reason}` : ''}) — reconnect attempts exhausted`);
           return;
         }
         const delay = RECONNECT_BASE_MS * Math.pow(2, attempt);
@@ -357,7 +361,10 @@ function TerminalPane({ sandboxId, agentId }: TerminalPaneProps) {
         }, delay);
       };
 
-      ws.onerror = () => { /* onclose handles recovery */ };
+      ws.onerror = (ev) => {
+        console.error(`[SessionPicker] WS error sandbox=${sandboxId} agent=${agentId}`, ev);
+        // onclose will handle recovery + status surfacing.
+      };
     }
 
     connect();

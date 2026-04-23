@@ -72,6 +72,30 @@ function parseServeArgs(args: string[]): {
 // 'upgrade' event and the `ws` npm package instead.
 // ============================================================
 
+/**
+ * Verbose logging gate. Set `AIWG_SERVE_DEBUG=1` to print per-event
+ * traces (sandbox WS message flow, management/orchestrate proxy open/close).
+ * Errors and warnings log unconditionally.
+ */
+const SERVE_DEBUG = process.env.AIWG_SERVE_DEBUG === '1';
+
+function logServeWarn(tag: string, message: string, meta?: unknown): void {
+  if (meta !== undefined) {
+    console.warn(`[serve:${tag}] ${message}`, meta);
+  } else {
+    console.warn(`[serve:${tag}] ${message}`);
+  }
+}
+
+function logServeDebug(tag: string, message: string, meta?: unknown): void {
+  if (!SERVE_DEBUG) return;
+  if (meta !== undefined) {
+    console.log(`[serve:${tag}] ${message}`, meta);
+  } else {
+    console.log(`[serve:${tag}] ${message}`);
+  }
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function handleSandboxWs(ws: any, sandboxId: string, token: string): void {
   if (!sandboxRegistry.authenticate(sandboxId, token)) {
@@ -223,12 +247,19 @@ async function setupWebSockets(httpServer: any, readOnly: boolean): Promise<void
       const sandboxId = orchMatch[1];
       const sessionId = orchMatch[2];
       const sandbox = sandboxRegistry.get(sandboxId);
-      if (!sandbox?.connected) {
+      if (!sandbox) {
+        logServeWarn('orch-proxy', `sandbox ${sandboxId} not found — rejecting orchestrate WS upgrade for session ${sessionId}`);
+        socket.destroy();
+        return;
+      }
+      if (!sandbox.connected) {
+        logServeWarn('orch-proxy', `sandbox ${sandboxId} not connected — rejecting orchestrate WS upgrade for session ${sessionId}`);
         socket.destroy();
         return;
       }
       // Convert httpEndpoint to ws:// URL for the sandbox orchestrate path
       const orchWsUrl = sandbox.httpEndpoint.replace(/^http/, 'ws') + `/ws/sessions/${sessionId}/orchestrate`;
+      logServeDebug('orch-proxy', `upgrading browser → ${orchWsUrl} for session ${sessionId}`);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       wss.handleUpgrade(req, socket, head, async (browserWs: any) => {
         try {
@@ -238,29 +269,40 @@ async function setupWebSockets(httpServer: any, readOnly: boolean): Promise<void
           const sandboxWs = new WS(orchWsUrl) as any;
 
           sandboxWs.on('open', () => {
+            logServeDebug('orch-proxy', `upstream orchestrate WS open for session ${sessionId}`);
             // Relay sandbox → browser
             sandboxWs.on('message', (data: Buffer | string) => {
               if (browserWs.readyState === 1) {
-                try { browserWs.send(typeof data === 'string' ? data : data.toString()); } catch { /* ignore */ }
+                try { browserWs.send(typeof data === 'string' ? data : data.toString()); }
+                catch (err) { logServeWarn('orch-proxy', `relay sandbox→browser failed for ${sessionId}`, err); }
               }
             });
-            sandboxWs.on('close', () => { try { browserWs.close(1001, 'Sandbox closed'); } catch { /* ignore */ } });
-            sandboxWs.on('error', () => { try { browserWs.close(1011, 'Sandbox WS error'); } catch { /* ignore */ } });
+            sandboxWs.on('close', (code: number, reason: Buffer | string) => {
+              logServeDebug('orch-proxy', `upstream orchestrate WS closed for ${sessionId}: code=${code} reason=${reason?.toString?.() ?? ''}`);
+              try { browserWs.close(1001, 'Sandbox closed'); } catch { /* already closed */ }
+            });
+            sandboxWs.on('error', (err: unknown) => {
+              logServeWarn('orch-proxy', `upstream orchestrate WS error for ${sessionId}`, err);
+              try { browserWs.close(1011, 'Sandbox WS error'); } catch { /* already closed */ }
+            });
 
             // Relay browser → sandbox
             browserWs.on('message', (data: Buffer | string) => {
               if (sandboxWs.readyState === 1) {
-                try { sandboxWs.send(typeof data === 'string' ? data : data.toString()); } catch { /* ignore */ }
+                try { sandboxWs.send(typeof data === 'string' ? data : data.toString()); }
+                catch (err) { logServeWarn('orch-proxy', `relay browser→sandbox failed for ${sessionId}`, err); }
               }
             });
             browserWs.on('close', () => { try { sandboxWs.close(); } catch { /* ignore */ } });
           });
 
-          sandboxWs.on('error', () => {
-            try { browserWs.close(1011, 'Could not connect to sandbox orchestrate WS'); } catch { /* ignore */ }
+          sandboxWs.on('error', (err: unknown) => {
+            logServeWarn('orch-proxy', `failed to connect to sandbox orchestrate WS at ${orchWsUrl}`, err);
+            try { browserWs.close(1011, 'Could not connect to sandbox orchestrate WS'); } catch { /* already closed */ }
           });
-        } catch {
-          try { browserWs.close(1011, 'Orchestrate proxy error'); } catch { /* ignore */ }
+        } catch (err) {
+          logServeWarn('orch-proxy', `orchestrate proxy threw for session ${sessionId}`, err);
+          try { browserWs.close(1011, 'Orchestrate proxy error'); } catch { /* already closed */ }
         }
       });
       return;
@@ -275,12 +317,19 @@ async function setupWebSockets(httpServer: any, readOnly: boolean): Promise<void
     if (mgmtMatch) {
       const sandboxId = mgmtMatch[1];
       const sandbox = sandboxRegistry.get(sandboxId);
-      if (!sandbox?.connected) {
+      if (!sandbox) {
+        logServeWarn('mgmt-proxy', `sandbox ${sandboxId} not found in registry — rejecting WS upgrade`);
+        socket.destroy();
+        return;
+      }
+      if (!sandbox.connected) {
+        logServeWarn('mgmt-proxy', `sandbox ${sandboxId} (${sandbox.name}) is not connected — rejecting WS upgrade. Last event: ${sandbox.lastEventAt}`);
         socket.destroy();
         return;
       }
       // wsEndpoint is already a full ws:// URL (e.g. ws://localhost:8121)
       const mgmtWsUrl = sandbox.wsEndpoint;
+      logServeDebug('mgmt-proxy', `upgrading browser → ${mgmtWsUrl} for sandbox ${sandboxId} (${sandbox.name})`);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       wss.handleUpgrade(req, socket, head, async (browserWs: any) => {
         try {
@@ -290,29 +339,42 @@ async function setupWebSockets(httpServer: any, readOnly: boolean): Promise<void
           const sandboxWs = new WS(mgmtWsUrl) as any;
 
           sandboxWs.on('open', () => {
+            logServeDebug('mgmt-proxy', `upstream WS open for sandbox ${sandboxId}`);
             // Relay sandbox → browser
             sandboxWs.on('message', (data: Buffer | string) => {
               if (browserWs.readyState === 1) {
-                try { browserWs.send(typeof data === 'string' ? data : data.toString()); } catch { /* ignore */ }
+                try { browserWs.send(typeof data === 'string' ? data : data.toString()); }
+                catch (err) { logServeWarn('mgmt-proxy', `relay sandbox→browser failed for ${sandboxId}`, err); }
               }
             });
-            sandboxWs.on('close', () => { try { browserWs.close(1001, 'Sandbox closed'); } catch { /* ignore */ } });
-            sandboxWs.on('error', () => { try { browserWs.close(1011, 'Sandbox WS error'); } catch { /* ignore */ } });
+            sandboxWs.on('close', (code: number, reason: Buffer | string) => {
+              logServeDebug('mgmt-proxy', `upstream WS closed for sandbox ${sandboxId}: code=${code} reason=${reason?.toString?.() ?? ''}`);
+              try { browserWs.close(1001, 'Sandbox closed'); } catch { /* already closed */ }
+            });
+            sandboxWs.on('error', (err: unknown) => {
+              logServeWarn('mgmt-proxy', `upstream WS error for sandbox ${sandboxId} (${mgmtWsUrl})`, err);
+              try { browserWs.close(1011, 'Sandbox WS error'); } catch { /* already closed */ }
+            });
 
             // Relay browser → sandbox
             browserWs.on('message', (data: Buffer | string) => {
               if (sandboxWs.readyState === 1) {
-                try { sandboxWs.send(typeof data === 'string' ? data : data.toString()); } catch { /* ignore */ }
+                try { sandboxWs.send(typeof data === 'string' ? data : data.toString()); }
+                catch (err) { logServeWarn('mgmt-proxy', `relay browser→sandbox failed for ${sandboxId}`, err); }
+              } else {
+                logServeWarn('mgmt-proxy', `dropped browser message for ${sandboxId} — upstream readyState=${sandboxWs.readyState}`);
               }
             });
             browserWs.on('close', () => { try { sandboxWs.close(); } catch { /* ignore */ } });
           });
 
-          sandboxWs.on('error', () => {
-            try { browserWs.close(1011, 'Could not connect to sandbox management WS'); } catch { /* ignore */ }
+          sandboxWs.on('error', (err: unknown) => {
+            logServeWarn('mgmt-proxy', `failed to connect to sandbox management WS at ${mgmtWsUrl} for ${sandboxId}`, err);
+            try { browserWs.close(1011, 'Could not connect to sandbox management WS'); } catch { /* already closed */ }
           });
-        } catch {
-          try { browserWs.close(1011, 'Management proxy error'); } catch { /* ignore */ }
+        } catch (err) {
+          logServeWarn('mgmt-proxy', `management proxy threw for sandbox ${sandboxId}`, err);
+          try { browserWs.close(1011, 'Management proxy error'); } catch { /* already closed */ }
         }
       });
       return;
