@@ -222,6 +222,58 @@ export interface AgentsResponse {
   agents: SandboxAgent[];
 }
 
+// ---- VM types (#930) ----
+
+/** VM state as reported by sandbox GET /api/v1/vms. */
+export type VmState =
+  | 'running'
+  | 'stopped'
+  | 'paused'
+  | 'shutdown'
+  | 'crashed'
+  | 'suspended'
+  | 'unknown';
+
+export interface VmInfo {
+  name: string;
+  state: VmState;
+  uuid?: string;
+  vcpus?: number;
+  memory_mb?: number;
+  ip_address?: string | null;
+  uptime_seconds?: number | null;
+}
+
+export interface VmsResponse {
+  vms: VmInfo[];
+  total: number;
+}
+
+/** Extended VM detail returned by GET /api/v1/vms/{name}. */
+export interface VmDetail extends VmInfo {
+  agent?: {
+    connected: boolean;
+    connected_at?: number;
+    hostname?: string;
+  };
+}
+
+/** Authoritative agent record from sandbox HTTP API (not the event-cached view). */
+export interface FullSandboxAgent {
+  id: string;
+  hostname?: string;
+  ip_address?: string;
+  status: string;
+  connected_at?: number;
+  last_heartbeat?: number;
+  metrics?: Record<string, unknown>;
+  system_info?: Record<string, unknown>;
+}
+
+export interface FullAgentsResponse {
+  agents: FullSandboxAgent[];
+}
+
 // ---- HITL types (#732) ----
 
 export interface HitlRequest {
@@ -400,6 +452,18 @@ export const api = {
   agents: () => request<AgentsResponse>('/api/agents'),
   sandboxAgents: (id: string) => request<{ agents: SandboxAgent[] }>(`/api/sandboxes/${id}/agents`),
   sandboxLoadouts: (id: string) => request<Loadout[]>(`/api/sandboxes/${id}/loadouts`),
+  // VM inventory (#930)
+  sandboxVms: (id: string, opts?: { state?: string; prefix?: string }) => {
+    const params = new URLSearchParams();
+    if (opts?.state) params.set('state', opts.state);
+    if (opts?.prefix) params.set('prefix', opts.prefix);
+    const qs = params.toString();
+    return request<VmsResponse>(`/api/sandboxes/${id}/vms${qs ? `?${qs}` : ''}`);
+  },
+  sandboxVm: (id: string, name: string) =>
+    request<VmDetail>(`/api/sandboxes/${id}/vms/${encodeURIComponent(name)}`),
+  sandboxAgentsFull: (id: string) =>
+    request<FullAgentsResponse>(`/api/sandboxes/${id}/agents/full`),
   sandboxProvision: (id: string, body: ProvisionRequest) =>
     request<{ agent_id: string }>(`/api/sandboxes/${id}/provision`, {
       method: 'POST',
