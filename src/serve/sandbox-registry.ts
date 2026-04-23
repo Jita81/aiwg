@@ -877,6 +877,16 @@ export class SandboxRegistry {
       case 'hitl.responded':
       case 'hitl.timed_out':
         break;
+      default: {
+        // Unknown event type — likely a wire-protocol drift between
+        // agentic-sandbox and AIWG. See #933 for the snake_case fix that
+        // started tracking this. Log so future mismatches surface loudly
+        // instead of silently dropping dashboard state.
+        if (process.env.AIWG_SERVE_DEBUG === '1') {
+          console.warn(`[sandbox-registry] unknown event type "${String(eventType)}" from sandbox ${event.sandboxId} — ignored. Payload keys:`, Object.keys(event as unknown as Record<string, unknown>));
+        }
+        break;
+      }
     }
 
     // Notify listeners (browser push, telemetry, etc.)
