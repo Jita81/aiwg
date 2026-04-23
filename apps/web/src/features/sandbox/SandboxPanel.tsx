@@ -9,7 +9,7 @@
  */
 
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
-import { api, type SandboxSummary, type SandboxAgent, type SandboxTask, type SubmitTaskRequest, type AiwgExecRequest, type AiwgExecResponse, type AgentCandidate, type Loadout } from '../../lib/api.js';
+import { api, type SandboxSummary, type SandboxAgent, type SandboxTask, type SubmitTaskRequest, type AiwgExecRequest, type AiwgExecResponse, type AgentCandidate, type Loadout, type VmInfo } from '../../lib/api.js';
 import styles from './SandboxPanel.module.css';
 import { SessionPicker } from './SessionPicker.js';
 
@@ -107,6 +107,9 @@ export function SandboxPanel() {
   const [state, dispatch] = useReducer(reducer, INITIAL);
   const [activeTab, setActiveTab] = useState<'agents' | 'tasks' | 'remote'>('agents');
   const [showProvisionModal, setShowProvisionModal] = useState(false);
+  // VM filter (#930): when set, only agents whose hostname/IP match are shown.
+  // Also drives the VM card "selected" state.
+  const [selectedVm, setSelectedVm] = useState<string | null>(null);
 
   // Poll sandboxes
   useEffect(() => {
@@ -306,6 +309,15 @@ export function SandboxPanel() {
               </div>
             )}
 
+            {/* VMs section (#930) — rendered when sandbox is connected. */}
+            {selectedSandbox.connected && (
+              <SandboxVmsView
+                sandboxId={selectedSandbox.id}
+                selectedVm={selectedVm}
+                onSelectVm={setSelectedVm}
+              />
+            )}
+
             {/* Tab bar */}
             <div className={styles.tabBar} role="tablist">
               <button
@@ -338,26 +350,39 @@ export function SandboxPanel() {
             </div>
 
             {/* Agent grid */}
-            {activeTab === 'agents' && (
-              <div className={styles.agentGrid} role="list" aria-label="Agents">
-                {selectedSandbox.agents.length === 0 ? (
-                  <div className={styles.emptyAgents}>
-                    {selectedSandbox.connected ? 'No agents connected' : 'No agent data from last session'}
-                  </div>
-                ) : (
-                  selectedSandbox.agents.map((agent) => (
-                    <AgentCard
-                      key={agent.agentId}
-                      agent={agent}
-                      sandboxId={selectedSandbox.id}
-                      onAction={handleAgentAction}
-                      actionInProgress={state.actionInProgress}
-                      sandboxConnected={selectedSandbox.connected}
-                    />
-                  ))
-                )}
-              </div>
-            )}
+            {activeTab === 'agents' && (() => {
+              // #930: Filter agents to the selected VM if one is chosen. Match on
+              // hostname (agent.id commonly equals vm.name) or agentId prefix.
+              const visibleAgents = selectedVm
+                ? selectedSandbox.agents.filter(a =>
+                    a.agentId === selectedVm ||
+                    a.agentId.startsWith(`${selectedVm}-`) ||
+                    a.logicalName === selectedVm
+                  )
+                : selectedSandbox.agents;
+              return (
+                <div className={styles.agentGrid} role="list" aria-label="Agents">
+                  {visibleAgents.length === 0 ? (
+                    <div className={styles.emptyAgents}>
+                      {selectedVm
+                        ? `No agents are running on VM "${selectedVm}". Clear the VM filter to see all agents.`
+                        : selectedSandbox.connected ? 'No agents connected' : 'No agent data from last session'}
+                    </div>
+                  ) : (
+                    visibleAgents.map((agent) => (
+                      <AgentCard
+                        key={agent.agentId}
+                        agent={agent}
+                        sandboxId={selectedSandbox.id}
+                        onAction={handleAgentAction}
+                        actionInProgress={state.actionInProgress}
+                        sandboxConnected={selectedSandbox.connected}
+                      />
+                    ))
+                  )}
+                </div>
+              );
+            })()}
 
             {/* Tasks panel */}
             {activeTab === 'tasks' && (
@@ -989,6 +1014,167 @@ function AgentCard({
           sandboxId={sandboxId}
           agentId={agent.agentId}
         />
+      )}
+    </div>
+  );
+}
+
+// ---- VMs View (#930) ----
+
+const VM_STATE_COLORS: Record<string, string> = {
+  running: '#4caf50',
+  stopped: '#555',
+  paused: '#ff9800',
+  shutdown: '#555',
+  crashed: '#f44336',
+  suspended: '#9c27b0',
+  unknown: '#777',
+};
+
+function fmtBytes(mb?: number): string {
+  if (mb === undefined || mb === null) return '—';
+  if (mb >= 1024) return `${(mb / 1024).toFixed(1)} GB`;
+  return `${mb} MB`;
+}
+
+function SandboxVmsView({
+  sandboxId,
+  selectedVm,
+  onSelectVm,
+}: {
+  sandboxId: string;
+  selectedVm: string | null;
+  onSelectVm: (name: string | null) => void;
+}) {
+  const [vms, setVms] = useState<VmInfo[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [httpHealthy, setHttpHealthy] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
+    async function poll() {
+      try {
+        const data = await api.sandboxVms(sandboxId);
+        if (!active) return;
+        setVms(data.vms ?? []);
+        setError(null);
+        setHttpHealthy(true);
+      } catch (err) {
+        if (!active) return;
+        setError(err instanceof Error ? err.message : String(err));
+        setHttpHealthy(false);
+      } finally {
+        if (active) setLoading(false);
+      }
+      if (active) timer = setTimeout(poll, 5000);
+    }
+    poll();
+    return () => {
+      active = false;
+      if (timer) clearTimeout(timer);
+    };
+  }, [sandboxId]);
+
+  if (loading && vms.length === 0 && !error) {
+    return (
+      <div className={styles.sandboxInfo} style={{ padding: '8px 16px' }}>
+        Loading VMs…
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ padding: '12px 16px', borderBottom: '1px solid #2a2a2a' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+        <h3 style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>
+          VMs <span style={{ color: '#888', fontWeight: 400 }}>({vms.length})</span>
+          {httpHealthy === false && (
+            <span
+              style={{ marginLeft: 8, fontSize: 11, color: '#ff9800' }}
+              title="WebSocket connected, but HTTP /api/v1/vms not reachable"
+            >
+              HTTP degraded
+            </span>
+          )}
+        </h3>
+        {selectedVm && (
+          <button
+            type="button"
+            onClick={() => onSelectVm(null)}
+            style={{ fontSize: 12, padding: '2px 8px', cursor: 'pointer' }}
+            title="Clear VM filter"
+          >
+            Clear filter ({selectedVm})
+          </button>
+        )}
+      </div>
+      {error && vms.length === 0 ? (
+        <div className={styles.error} role="alert">
+          VM list unavailable: {error}
+        </div>
+      ) : vms.length === 0 ? (
+        <div className={styles.emptyAgents}>No VMs on this sandbox.</div>
+      ) : (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+            gap: 8,
+          }}
+          role="list"
+          aria-label="Virtual machines"
+        >
+          {vms.map((vm) => {
+            const selected = vm.name === selectedVm;
+            const color = VM_STATE_COLORS[vm.state] || '#777';
+            return (
+              <button
+                key={vm.name}
+                type="button"
+                role="listitem"
+                onClick={() => onSelectVm(selected ? null : vm.name)}
+                title={vm.uuid ? `UUID: ${vm.uuid}` : vm.name}
+                style={{
+                  textAlign: 'left',
+                  padding: 10,
+                  borderRadius: 6,
+                  border: selected ? '2px solid #2196f3' : '1px solid #333',
+                  background: selected ? '#1a2a3a' : '#151515',
+                  color: '#ddd',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 4,
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600, fontSize: 13 }}>
+                  <span
+                    style={{
+                      display: 'inline-block',
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      background: color,
+                    }}
+                    aria-label={`State: ${vm.state}`}
+                  />
+                  <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {vm.name}
+                  </span>
+                  <span style={{ fontSize: 11, color: '#888', fontWeight: 400 }}>{vm.state}</span>
+                </div>
+                <div style={{ fontSize: 11, color: '#aaa', display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  {vm.vcpus !== undefined && <span>{vm.vcpus} vCPU</span>}
+                  {vm.memory_mb !== undefined && <span>{fmtBytes(vm.memory_mb)}</span>}
+                  {vm.ip_address && <span style={{ fontFamily: 'monospace' }}>{vm.ip_address}</span>}
+                </div>
+              </button>
+            );
+          })}
+        </div>
       )}
     </div>
   );

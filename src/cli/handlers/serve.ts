@@ -607,6 +607,52 @@ async function startServer(opts: {
     }
   });
 
+  // List VMs running inside a sandbox (#930)
+  // Proxies GET /api/v1/vms on the sandbox HTTP endpoint.
+  // Supports `state` and `prefix` query params per sandbox API contract.
+  app.get('/api/sandboxes/:id/vms', async (c: any) => {
+    const sandbox = sandboxRegistry.get(c.req.param('id'));
+    if (!sandbox) return c.json({ error: 'Sandbox not found' }, 404);
+    try {
+      const url = new URL(`${sandbox.httpEndpoint}/api/v1/vms`);
+      const state = c.req.query('state');
+      const prefix = c.req.query('prefix');
+      if (state) url.searchParams.set('state', state);
+      if (prefix) url.searchParams.set('prefix', prefix);
+      const resp = await fetch(url.toString());
+      return c.json(await resp.json(), resp.status);
+    } catch (err) {
+      return c.json({ error: `Sandbox unreachable: ${err instanceof Error ? err.message : String(err)}` }, 502);
+    }
+  });
+
+  // Get a single VM's details — resource allocation, IP, attached agent (#930)
+  app.get('/api/sandboxes/:id/vms/:name', async (c: any) => {
+    const sandbox = sandboxRegistry.get(c.req.param('id'));
+    if (!sandbox) return c.json({ error: 'Sandbox not found' }, 404);
+    try {
+      const resp = await fetch(`${sandbox.httpEndpoint}/api/v1/vms/${encodeURIComponent(c.req.param('name'))}`);
+      return c.json(await resp.json(), resp.status);
+    } catch (err) {
+      return c.json({ error: `Sandbox unreachable: ${err instanceof Error ? err.message : String(err)}` }, 502);
+    }
+  });
+
+  // Authoritative agent list from sandbox HTTP API (#930).
+  // Complements the event-cached view at /api/sandboxes/:id/agents by calling
+  // the sandbox's own /api/v1/agents — useful when events have been missed or
+  // when the dashboard needs full system_info / metrics not captured in events.
+  app.get('/api/sandboxes/:id/agents/full', async (c: any) => {
+    const sandbox = sandboxRegistry.get(c.req.param('id'));
+    if (!sandbox) return c.json({ error: 'Sandbox not found' }, 404);
+    try {
+      const resp = await fetch(`${sandbox.httpEndpoint}/api/v1/agents`);
+      return c.json(await resp.json(), resp.status);
+    } catch (err) {
+      return c.json({ error: `Sandbox unreachable: ${err instanceof Error ? err.message : String(err)}` }, 502);
+    }
+  });
+
   app.post('/api/sandboxes/:id/provision', async (c: any) => {
     const sandbox = sandboxRegistry.get(c.req.param('id'));
     if (!sandbox) return c.json({ error: 'Sandbox not found' }, 404);
