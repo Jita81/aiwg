@@ -1,0 +1,178 @@
+{
+  "overall": {
+    "complete": false,
+    "completion_pct": 0.0,
+    "fields_complete": 0,
+    "fields_total": 12,
+    "open_questions_count": 0
+  },
+  "sections": {
+    "product_vision": {
+      "label": "Product Vision",
+      "description": "What are we building, for whom, and why?",
+      "completion_pct": 0.0,
+      "fields": {
+        "product_vision": {
+          "label": "Vision Statement",
+          "status": "empty",
+          "confidence": 0.0,
+          "content": "",
+          "open_questions": [],
+          "_evidence": {
+            "sources": [],
+            "quotes": [],
+            "reasoning": ""
+          }
+        },
+        "target_users": {
+          "label": "Target Users",
+          "status": "empty",
+          "confidence": 0.0,
+          "content": "",
+          "open_questions": [],
+          "_evidence": {
+            "sources": [],
+            "quotes": [],
+            "reasoning": ""
+          }
+        },
+        "key_capabilities": {
+          "label": "Key Capabilities",
+          "status": "empty",
+          "confidence": 0.0,
+          "content": "",
+          "open_questions": [],
+          "_evidence": {
+            "sources": [],
+            "quotes": [],
+            "reasoning": ""
+          }
+        },
+        "success_metrics": {
+          "label": "Success Metrics",
+          "status": "empty",
+          "confidence": 0.0,
+          "content": "",
+          "open_questions": [],
+          "_evidence": {
+            "sources": [],
+            "quotes": [],
+            "reasoning": ""
+          }
+        }
+      }
+    },
+    "technical_approach": {
+      "label": "Technical Approach",
+      "description": "How will we build it? What are the constraints?",
+      "completion_pct": 0.0,
+      "fields": {
+        "technical_approach": {
+          "label": "Architecture & Stack",
+          "status": "empty",
+          "confidence": 0.0,
+          "content": "",
+          "open_questions": [],
+          "_evidence": {
+            "sources": [],
+            "quotes": [],
+            "reasoning": ""
+          }
+        },
+        "architecture_constraints": {
+          "label": "Constraints",
+          "status": "empty",
+          "confidence": 0.0,
+          "content": "",
+          "open_questions": [],
+          "_evidence": {
+            "sources": [],
+            "quotes": [],
+            "reasoning": ""
+          }
+        },
+        "dependencies": {
+          "label": "Dependencies",
+          "status": "empty",
+          "confidence": 0.0,
+          "content": "",
+          "open_questions": [],
+          "_evidence": {
+            "sources": [],
+            "quotes": [],
+            "reasoning": ""
+          }
+        },
+        "risk_areas": {
+          "label": "Risk Areas",
+          "status": "empty",
+          "confidence": 0.0,
+          "content": "",
+          "open_questions": [],
+          "_evidence": {
+            "sources": [],
+            "quotes": [],
+            "reasoning": ""
+          }
+        }
+      }
+    },
+    "phases_and_sizing": {
+      "label": "Phases and Sizing",
+      "description": "How is the work broken down and sequenced?",
+      "completion_pct": 0.0,
+      "fields": {
+        "phase_breakdown": {
+          "label": "Phase Breakdown",
+          "status": "empty",
+          "confidence": 0.0,
+          "content": "",
+          "open_questions": [],
+          "_evidence": {
+            "sources": [],
+            "quotes": [],
+            "reasoning": ""
+          }
+        },
+        "effort_estimates": {
+          "label": "Effort Estimates",
+          "status": "empty",
+          "confidence": 0.0,
+          "content": "",
+          "open_questions": [],
+          "_evidence": {
+            "sources": [],
+            "quotes": [],
+            "reasoning": ""
+          }
+        },
+        "dependency_order": {
+          "label": "Dependency Order",
+          "status": "empty",
+          "confidence": 0.0,
+          "content": "",
+          "open_questions": [],
+          "_evidence": {
+            "sources": [],
+            "quotes": [],
+            "reasoning": ""
+          }
+        },
+        "timeline": {
+          "label": "Timeline",
+          "status": "empty",
+          "confidence": 0.0,
+          "content": "",
+          "open_questions": [],
+          "_evidence": {
+            "sources": [],
+            "quotes": [],
+            "reasoning": ""
+          }
+        }
+      }
+    }
+  },
+  "last_updated": "2026-04-29T01:00:29.639093+00:00",
+  "updated_by": "claude-code"
+}
